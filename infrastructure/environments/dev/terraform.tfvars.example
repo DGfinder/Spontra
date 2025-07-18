@@ -1,0 +1,4 @@
+# Development Environment Variables
+# Copy this file to terraform.tfvars and fill in your values
+
+project_id = "your-gcp-project-id-dev"

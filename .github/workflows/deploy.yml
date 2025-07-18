@@ -1,0 +1,168 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+        - dev
+        - staging
+        - production
+
+env:
+  GCP_REGION: us-central1
+  REGISTRY: gcr.io
+
+jobs:
+  # Build and push Docker images
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.vars.outputs.image-tag }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up environment variables
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        else
+          echo "environment=dev" >> $GITHUB_OUTPUT
+        fi
+        echo "image-tag=${{ github.sha }}" >> $GITHUB_OUTPUT
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+    
+    - name: Configure Docker to use gcloud as credential helper
+      run: gcloud auth configure-docker
+    
+    - name: Build and push user-service
+      run: |
+        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/user-service:${{ steps.vars.outputs.image-tag }} ./services/user-service
+        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/user-service:${{ steps.vars.outputs.image-tag }}
+    
+    - name: Build and push search-service
+      run: |
+        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/search-service:${{ steps.vars.outputs.image-tag }} ./services/search-service
+        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/search-service:${{ steps.vars.outputs.image-tag }}
+    
+    - name: Build and push pricing-service
+      run: |
+        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/pricing-service:${{ steps.vars.outputs.image-tag }} ./services/pricing-service
+        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/pricing-service:${{ steps.vars.outputs.image-tag }}
+    
+    - name: Build and push data-ingestion-service
+      run: |
+        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/data-ingestion-service:${{ steps.vars.outputs.image-tag }} ./services/data-ingestion-service
+        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/data-ingestion-service:${{ steps.vars.outputs.image-tag }}
+    
+    - name: Build and push frontend
+      run: |
+        docker build -f docker/Dockerfile.frontend -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/frontend:${{ steps.vars.outputs.image-tag }} ./frontend
+        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/frontend:${{ steps.vars.outputs.image-tag }}
+
+  # Deploy infrastructure with Terraform
+  deploy-infrastructure:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up environment
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        else
+          echo "environment=dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ~1.0
+    
+    - name: Terraform Init
+      working-directory: ./infrastructure/environments/${{ steps.vars.outputs.environment }}
+      run: terraform init
+      env:
+        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+    
+    - name: Terraform Plan
+      working-directory: ./infrastructure/environments/${{ steps.vars.outputs.environment }}
+      run: terraform plan -out=tfplan
+      env:
+        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+    
+    - name: Terraform Apply
+      working-directory: ./infrastructure/environments/${{ steps.vars.outputs.environment }}
+      run: terraform apply -auto-approve tfplan
+      env:
+        TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+  # Deploy applications to Kubernetes
+  deploy-applications:
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-infrastructure]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up environment
+      id: vars
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+        else
+          echo "environment=dev" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+    
+    - name: Get GKE credentials
+      run: |
+        gcloud container clusters get-credentials spontra-${{ steps.vars.outputs.environment }}-cluster --region=${{ env.GCP_REGION }} --project=${{ secrets.GCP_PROJECT_ID }}
+    
+    - name: Deploy to Kubernetes
+      run: |
+        # Update image tags in Kubernetes manifests
+        find k8s -name "*.yaml" -exec sed -i "s/IMAGE_TAG/${{ needs.build-and-push.outputs.image-tag }}/g" {} \;
+        find k8s -name "*.yaml" -exec sed -i "s/PROJECT_ID/${{ secrets.GCP_PROJECT_ID }}/g" {} \;
+        
+        # Apply manifests
+        kubectl apply -f k8s/
+    
+    - name: Verify deployment
+      run: |
+        kubectl rollout status deployment/user-service
+        kubectl rollout status deployment/search-service
+        kubectl rollout status deployment/pricing-service
+        kubectl rollout status deployment/data-ingestion-service
+        kubectl rollout status deployment/frontend
