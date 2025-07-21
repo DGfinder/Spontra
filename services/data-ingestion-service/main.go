@@ -18,18 +18,21 @@ import (
 	"spontra/data-ingestion-service/internal/config"
 	"spontra/data-ingestion-service/internal/elasticsearch"
 	"spontra/data-ingestion-service/internal/models"
+	"spontra/data-ingestion-service/internal/services"
 	"spontra/data-ingestion-service/pkg/kafka"
 )
 
 // App represents the application
 type App struct {
-	config        *config.Config
-	router        *gin.Engine
-	amadeus       *amadeus.Client
-	kafka         *kafka.Producer
-	cassandra     *cassandra.Client
-	elasticsearch *elasticsearch.Client
-	validator     *validator.Validate
+	config                *config.Config
+	router                *gin.Engine
+	amadeus               *amadeus.Client
+	kafka                 *kafka.Producer
+	cassandra             *cassandra.Client
+	elasticsearch         *elasticsearch.Client
+	validator             *validator.Validate
+	csvImportService      *services.CSVImportService
+	recommendationEngine  *services.DestinationRecommendationEngine
 }
 
 func main() {
@@ -97,6 +100,12 @@ func (a *App) initializeServices() error {
 		return fmt.Errorf("failed to initialize Kafka producer: %w", err)
 	}
 
+	// Initialize CSV import service
+	a.csvImportService = services.NewCSVImportService(a.cassandra)
+
+	// Initialize recommendation engine
+	a.recommendationEngine = services.NewDestinationRecommendationEngine(a.cassandra, a.csvImportService)
+
 	return nil
 }
 
@@ -146,6 +155,22 @@ func (a *App) setupRoutes() {
 			kafkaRoutes.POST("/publish", a.publishToKafka)
 			kafkaRoutes.GET("/topics", a.getKafkaTopics)
 			kafkaRoutes.GET("/stats", a.getKafkaStats)
+		}
+
+		// Destination exploration routes
+		explore := v1.Group("/explore")
+		{
+			explore.POST("/destinations", a.exploreDestinations)
+			explore.GET("/destinations/:airport/insights", a.getDestinationInsights)
+			explore.GET("/destinations/:airport/similar", a.findSimilarDestinations)
+		}
+
+		// CSV import and data management routes
+		dataManagement := v1.Group("/data")
+		{
+			dataManagement.POST("/import/flight-routes", a.importFlightRoutes)
+			dataManagement.POST("/create/sample-destinations", a.createSampleDestinations)
+			dataManagement.GET("/destinations/:airport", a.getDestinationInfo)
 		}
 	}
 }
@@ -579,4 +604,193 @@ func (a *App) getKafkaStats(c *gin.Context) {
 		"stats": stats,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
+}
+
+// Destination exploration handlers
+
+// exploreDestinations handles destination discovery based on preferences
+func (a *App) exploreDestinations(c *gin.Context) {
+	var exploreReq models.DestinationExploreRequest
+	if err := c.ShouldBindJSON(&exploreReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request format",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Validate request
+	if err := a.validator.Struct(&exploreReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Validation failed",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Set default values if not provided
+	if exploreReq.ID == "" {
+		exploreReq.ID = "explore_" + time.Now().Format("20060102_150405")
+	}
+	if exploreReq.MaxResults == 0 {
+		exploreReq.MaxResults = 20
+	}
+	if exploreReq.BudgetLevel == "" {
+		exploreReq.BudgetLevel = "any"
+	}
+
+	// Store the explore request
+	if err := a.cassandra.StoreDestinationExploreRequest(c.Request.Context(), exploreReq); err != nil {
+		log.Printf("Failed to store explore request: %v", err)
+		// Don't fail the request, just log the error
+	}
+
+	// Get destination recommendations
+	response, err := a.recommendationEngine.RecommendDestinations(c.Request.Context(), exploreReq)
+	if err != nil {
+		log.Printf("Destination recommendation failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Destination recommendation failed",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+// getDestinationInsights provides insights about destinations reachable from an origin
+func (a *App) getDestinationInsights(c *gin.Context) {
+	airport := c.Param("airport")
+	if airport == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Airport parameter is required",
+		})
+		return
+	}
+
+	insights, err := a.recommendationEngine.GetDestinationInsights(c.Request.Context(), airport)
+	if err != nil {
+		log.Printf("Failed to get destination insights: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get destination insights",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, insights)
+}
+
+// findSimilarDestinations finds destinations similar to a given destination
+func (a *App) findSimilarDestinations(c *gin.Context) {
+	airport := c.Param("airport")
+	if airport == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Airport parameter is required",
+		})
+		return
+	}
+
+	origin := c.Query("origin")
+	if origin == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Origin query parameter is required",
+		})
+		return
+	}
+
+	similarDestinations, err := a.recommendationEngine.FindSimilarDestinations(c.Request.Context(), airport, origin)
+	if err != nil {
+		log.Printf("Failed to find similar destinations: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to find similar destinations",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"target_airport": airport,
+		"origin_airport": origin,
+		"similar_destinations": similarDestinations,
+		"total_results": len(similarDestinations),
+	})
+}
+
+// Data management handlers
+
+// importFlightRoutes handles CSV import of flight routes
+func (a *App) importFlightRoutes(c *gin.Context) {
+	var importReq struct {
+		FilePath string `json:"file_path" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&importReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid request format. Expected: {\"file_path\": \"/path/to/csv\"}",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	result, err := a.csvImportService.ImportFlightRoutesFromCSV(c.Request.Context(), importReq.FilePath)
+	if err != nil {
+		log.Printf("CSV import failed: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "CSV import failed",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
+// createSampleDestinations creates sample destination data
+func (a *App) createSampleDestinations(c *gin.Context) {
+	if err := a.csvImportService.CreateSampleDestinations(c.Request.Context()); err != nil {
+		log.Printf("Failed to create sample destinations: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to create sample destinations",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Sample destinations created successfully",
+		"timestamp": time.Now().Format(time.RFC3339),
+	})
+}
+
+// getDestinationInfo retrieves destination information
+func (a *App) getDestinationInfo(c *gin.Context) {
+	airport := c.Param("airport")
+	if airport == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Airport parameter is required",
+		})
+		return
+	}
+
+	destination, err := a.csvImportService.GetDestination(c.Request.Context(), airport)
+	if err != nil {
+		log.Printf("Failed to get destination info: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to get destination info",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	if destination == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Destination not found",
+			"airport": airport,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, destination)
 }

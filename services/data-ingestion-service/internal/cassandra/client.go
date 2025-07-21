@@ -2,6 +2,7 @@ package cassandra
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -106,6 +107,11 @@ func NewClient(config config.CassandraConfig) (*Client, error) {
 	// Initialize schema
 	if err := client.initSchema(); err != nil {
 		return nil, fmt.Errorf("failed to initialize schema: %w", err)
+	}
+	
+	// Initialize destination and flight routes schema
+	if err := client.initDestinationSchema(); err != nil {
+		return nil, fmt.Errorf("failed to initialize destination schema: %w", err)
 	}
 
 	return client, nil
@@ -478,6 +484,3 @@ func (c *Client) HealthCheck() error {
 	return nil
 }
 
-import (
-	"encoding/json"
-)

@@ -3,8 +3,37 @@
 import { useState } from 'react'
 import Link from 'next/link'
 
-export function Header() {
+interface HeaderProps {
+  isExploreMode?: boolean
+}
+
+export function Header({ isExploreMode = false }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  if (isExploreMode) {
+    return (
+      <header className="absolute top-0 left-0 right-0 z-30 bg-transparent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo for Explore Mode */}
+            <div className="flex items-center">
+              <Link href="/" className="flex items-center space-x-2">
+                <span className="text-2xl font-light text-white">spon</span>
+                <span className="text-2xl font-normal text-white/70">EXPLORE</span>
+              </Link>
+            </div>
+
+            {/* Right side - simplified for explore mode */}
+            <div className="flex items-center space-x-4">
+              <Link href="/login" className="text-white/80 hover:text-white transition-colors text-sm">
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+    )
+  }
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">

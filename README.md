@@ -1,6 +1,22 @@
-# Spontra - Flight Comparison Platform
+# Spontra - Spontaneous Travel Discovery Platform
 
-A modern, scalable flight comparison platform built with microservices architecture, designed to compete with industry leaders like Skyscanner and Google Flights.
+A revolutionary travel discovery platform that transforms how people find destinations by prioritizing spontaneous exploration over traditional flight search. Unlike conventional platforms that start with destinations, Spontra starts with time and activities to inspire spontaneous travel decisions.
+
+## 🚀 Unique User Experience
+
+### Spontaneous Discovery Flow
+1. **Time-First Approach**: Users specify flight duration ranges (e.g., 2-4 hours) instead of destinations
+2. **Activity Preferences**: Select interests like adventure, nightlife, culture, food, or shopping
+3. **Country Constellation**: Discover destinations through an interactive circular constellation interface
+4. **Activity Exploration**: Dive deeper into specific activities at chosen destinations with video previews
+5. **Smart Flight Selection**: Curated flight options with activity-contextual information and optimal timing
+
+### Key Innovations
+- **Constellation UI Pattern**: Visual, spatial exploration replacing traditional lists and tables
+- **Activity-Driven Recommendations**: Destinations matched to user interests rather than price-first searching
+- **YouTube Integration**: Real activity videos to inspire and validate destination choices
+- **User-Generated Content**: Community-driven travel experiences with GPS verification
+- **Atmospheric Design**: Full-screen backgrounds that change based on selected activities for immersive planning
 
 ## Architecture Overview
 
