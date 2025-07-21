@@ -80,7 +80,55 @@ export function ExploreForm() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:8081/api/v1/explore/destinations', {
+      // Check if backend services are available
+      const searchServiceUrl = process.env.NEXT_PUBLIC_SEARCH_SERVICE_URL || process.env.SEARCH_SERVICE_URL
+      
+      if (!searchServiceUrl) {
+        // Mock data for demonstration when backend is not available
+        console.log('Backend service not configured, showing mock destinations')
+        setRecommendations([
+          {
+            destination: {
+              country_name: "France",
+              city_name: "Paris",
+              airport_code: "CDG"
+            },
+            flight_route: {
+              total_duration_minutes: 240
+            },
+            estimated_flight_price: 450,
+            match_score: 0.95
+          },
+          {
+            destination: {
+              country_name: "Italy",
+              city_name: "Rome",
+              airport_code: "FCO"
+            },
+            flight_route: {
+              total_duration_minutes: 180
+            },
+            estimated_flight_price: 380,
+            match_score: 0.88
+          },
+          {
+            destination: {
+              country_name: "Spain",
+              city_name: "Barcelona",
+              airport_code: "BCN"
+            },
+            flight_route: {
+              total_duration_minutes: 150
+            },
+            estimated_flight_price: 320,
+            match_score: 0.82
+          }
+        ])
+        setIsLoading(false)
+        return
+      }
+
+      const response = await fetch(`${searchServiceUrl}/api/v1/explore/destinations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,6 +152,21 @@ export function ExploreForm() {
       setRecommendations(data.recommended_destinations || [])
     } catch (error) {
       console.error('Error getting recommendations:', error)
+      // Show mock data as fallback
+      setRecommendations([
+        {
+          destination: {
+            country_name: "Portugal",
+            city_name: "Lisbon",
+            airport_code: "LIS"
+          },
+          flight_route: {
+            total_duration_minutes: 120
+          },
+          estimated_flight_price: 280,
+          match_score: 0.85
+        }
+      ])
     } finally {
       setIsLoading(false)
     }

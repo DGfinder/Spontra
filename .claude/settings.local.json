@@ -10,7 +10,8 @@
       "Bash(rm:*)",
       "Bash(node dist/cli.js --help)",
       "Bash(node:*)",
-      "Bash(npm audit:*)"
+      "Bash(npm audit:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
