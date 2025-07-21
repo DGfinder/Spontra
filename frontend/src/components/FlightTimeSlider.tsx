@@ -90,14 +90,6 @@ export function FlightTimeSlider({
               background: `linear-gradient(to right, #f97316 0%, #f97316 ${getSliderPosition()}%, rgba(255,255,255,0.2) ${getSliderPosition()}%, rgba(255,255,255,0.2) 100%)`
             }}
           />
-          
-          {/* Custom thumb indicator */}
-          <div
-            className={`absolute top-1/2 w-5 h-5 bg-orange-500 border-2 border-white rounded-full transform -translate-y-1/2 -translate-x-1/2 shadow-lg transition-all duration-150 ${
-              isDragging ? 'scale-110 shadow-xl' : ''
-            }`}
-            style={{ left: `${getSliderPosition()}%` }}
-          />
         </div>
         
         {/* Tick marks */}

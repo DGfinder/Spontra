@@ -14,6 +14,16 @@ interface FormData {
   maxFlightTime: number
 }
 
+interface CountryResult {
+  name: string
+  code: string
+  flag: string
+  cities: string[]
+  averageFlightTime: number
+  priceRange: string
+  description: string
+}
+
 const THEMES = [
   { 
     id: 'adventure', 
@@ -52,6 +62,63 @@ const THEMES = [
   }
 ]
 
+const MOCK_COUNTRIES: CountryResult[] = [
+  {
+    name: "France",
+    code: "FR",
+    flag: "🇫🇷",
+    cities: ["Paris", "Lyon", "Nice", "Marseille"],
+    averageFlightTime: 2.5,
+    priceRange: "€180-450",
+    description: "Culture, cuisine, and romance"
+  },
+  {
+    name: "Italy", 
+    code: "IT",
+    flag: "🇮🇹",
+    cities: ["Rome", "Milan", "Venice", "Florence"],
+    averageFlightTime: 3,
+    priceRange: "€220-380",
+    description: "Art, history, and amazing food"
+  },
+  {
+    name: "Spain",
+    code: "ES", 
+    flag: "🇪🇸",
+    cities: ["Barcelona", "Madrid", "Seville", "Valencia"],
+    averageFlightTime: 2,
+    priceRange: "€160-320",
+    description: "Vibrant culture and beautiful beaches"
+  },
+  {
+    name: "Germany",
+    code: "DE",
+    flag: "🇩🇪", 
+    cities: ["Berlin", "Munich", "Hamburg", "Frankfurt"],
+    averageFlightTime: 1.5,
+    priceRange: "€120-280",
+    description: "Rich history and modern cities"
+  },
+  {
+    name: "Netherlands",
+    code: "NL",
+    flag: "🇳🇱",
+    cities: ["Amsterdam", "Rotterdam", "The Hague"],
+    averageFlightTime: 1,
+    priceRange: "€90-240",
+    description: "Canals, tulips, and friendly locals"
+  },
+  {
+    name: "Portugal",
+    code: "PT",
+    flag: "🇵🇹",
+    cities: ["Lisbon", "Porto", "Faro"],
+    averageFlightTime: 2.5,
+    priceRange: "€140-300",
+    description: "Coastal beauty and historic charm"
+  }
+]
+
 export function LandingPageForm() {
   const [formData, setFormData] = useState<FormData>({
     selectedTheme: 'adventure',
@@ -62,6 +129,9 @@ export function LandingPageForm() {
     tripType: 'return',
     maxFlightTime: 4
   })
+  
+  const [showResults, setShowResults] = useState(false)
+  const [searchResults, setSearchResults] = useState<CountryResult[]>([])
 
   const currentTheme = THEMES.find(t => t.id === formData.selectedTheme) || THEMES[0]
 
@@ -80,6 +150,17 @@ export function LandingPageForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
+    // Validate required fields
+    if (!formData.departureAirport) {
+      alert('Please select a departure airport')
+      return
+    }
+    
+    // Filter countries based on flight time
+    const filteredCountries = MOCK_COUNTRIES.filter(
+      country => country.averageFlightTime <= formData.maxFlightTime
+    )
+    
     // Implement flight time range logic: 0 to maxFlightTime
     const searchParams = {
       origin_airport_code: formData.departureAirport,
@@ -94,9 +175,16 @@ export function LandingPageForm() {
     
     console.log('Search flights with optimized parameters:', searchParams)
     console.log(`Flight time range: 0 hours to ${formData.maxFlightTime} hours`)
+    console.log(`Found ${filteredCountries.length} countries within ${formData.maxFlightTime} hours`)
     
-    // TODO: Implement actual search API call
-    // This would call the backend with the search parameters
+    // Show results
+    setSearchResults(filteredCountries)
+    setShowResults(true)
+  }
+  
+  const handleBackToSearch = () => {
+    setShowResults(false)
+    setSearchResults([])
   }
 
   return (
@@ -285,6 +373,102 @@ export function LandingPageForm() {
           </form>
         </div>
       </div>
+
+      {/* Countries Results Overlay */}
+      {showResults && (
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
+          {/* Results Header */}
+          <div className="p-6 border-b border-white/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  Countries within {formData.maxFlightTime}h from {formData.departureAirport}
+                </h2>
+                <p className="text-white/70 mt-1">
+                  Found {searchResults.length} destinations for your {formData.selectedTheme} adventure
+                </p>
+              </div>
+              <button
+                onClick={handleBackToSearch}
+                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+              >
+                ← Back to Search
+              </button>
+            </div>
+          </div>
+
+          {/* Results Grid */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {searchResults.map((country) => (
+                <div
+                  key={country.code}
+                  className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/20 hover:border-orange-500/50"
+                >
+                  {/* Country Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-3xl">{country.flag}</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{country.name}</h3>
+                        <p className="text-white/60 text-sm">{country.description}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Flight Info */}
+                  <div className="space-y-3 mb-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70 text-sm">Flight Time</span>
+                      <span className="text-white font-medium">{country.averageFlightTime}h</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-white/70 text-sm">Price Range</span>
+                      <span className="text-white font-medium">{country.priceRange}</span>
+                    </div>
+                  </div>
+
+                  {/* Cities */}
+                  <div className="mb-4">
+                    <p className="text-white/70 text-sm mb-2">Popular Cities</p>
+                    <div className="flex flex-wrap gap-2">
+                      {country.cities.slice(0, 3).map((city) => (
+                        <span
+                          key={city}
+                          className="bg-orange-500/20 text-orange-200 px-2 py-1 rounded text-xs"
+                        >
+                          {city}
+                        </span>
+                      ))}
+                      {country.cities.length > 3 && (
+                        <span className="text-white/50 text-xs">
+                          +{country.cities.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Select Button */}
+                  <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                    Explore {country.name}
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {searchResults.length === 0 && (
+              <div className="text-center py-12">
+                <div className="text-white/60 text-lg">
+                  No countries found within {formData.maxFlightTime} hours.
+                </div>
+                <div className="text-white/40 text-sm mt-2">
+                  Try increasing your flight time range.
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
