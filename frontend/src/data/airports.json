@@ -1,0 +1,248 @@
+[
+  {
+    "code": "LHR",
+    "name": "London Heathrow",
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  {
+    "code": "LGW",
+    "name": "London Gatwick",
+    "city": "London", 
+    "country": "United Kingdom"
+  },
+  {
+    "code": "STN",
+    "name": "London Stansted",
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  {
+    "code": "JFK",
+    "name": "John F. Kennedy International",
+    "city": "New York",
+    "country": "United States"
+  },
+  {
+    "code": "LAX",
+    "name": "Los Angeles International",
+    "city": "Los Angeles",
+    "country": "United States"
+  },
+  {
+    "code": "CDG",
+    "name": "Charles de Gaulle",
+    "city": "Paris",
+    "country": "France"
+  },
+  {
+    "code": "ORY",
+    "name": "Paris Orly",
+    "city": "Paris",
+    "country": "France"
+  },
+  {
+    "code": "FCO",
+    "name": "Leonardo da Vinci International",
+    "city": "Rome",
+    "country": "Italy"
+  },
+  {
+    "code": "BCN",
+    "name": "Barcelona-El Prat",
+    "city": "Barcelona",
+    "country": "Spain"
+  },
+  {
+    "code": "MAD",
+    "name": "Madrid-Barajas",
+    "city": "Madrid",
+    "country": "Spain"
+  },
+  {
+    "code": "AMS",
+    "name": "Amsterdam Schiphol",
+    "city": "Amsterdam",
+    "country": "Netherlands"
+  },
+  {
+    "code": "FRA",
+    "name": "Frankfurt am Main",
+    "city": "Frankfurt",
+    "country": "Germany"
+  },
+  {
+    "code": "MUC",
+    "name": "Munich",
+    "city": "Munich",
+    "country": "Germany"
+  },
+  {
+    "code": "VIE",
+    "name": "Vienna International",
+    "city": "Vienna",
+    "country": "Austria"
+  },
+  {
+    "code": "ZUR",
+    "name": "Zurich",
+    "city": "Zurich",
+    "country": "Switzerland"
+  },
+  {
+    "code": "CPH",
+    "name": "Copenhagen",
+    "city": "Copenhagen",
+    "country": "Denmark"
+  },
+  {
+    "code": "STO",
+    "name": "Stockholm Arlanda",
+    "city": "Stockholm",
+    "country": "Sweden"
+  },
+  {
+    "code": "OSL",
+    "name": "Oslo Gardermoen",
+    "city": "Oslo",
+    "country": "Norway"
+  },
+  {
+    "code": "DUB",
+    "name": "Dublin",
+    "city": "Dublin",
+    "country": "Ireland"
+  },
+  {
+    "code": "EDI",
+    "name": "Edinburgh",
+    "city": "Edinburgh",
+    "country": "Scotland"
+  },
+  {
+    "code": "GLA",
+    "name": "Glasgow",
+    "city": "Glasgow",
+    "country": "Scotland"
+  },
+  {
+    "code": "MAN",
+    "name": "Manchester",
+    "city": "Manchester",
+    "country": "United Kingdom"
+  },
+  {
+    "code": "BHX",
+    "name": "Birmingham",
+    "city": "Birmingham",
+    "country": "United Kingdom"
+  },
+  {
+    "code": "LIS",
+    "name": "Lisbon Portela",
+    "city": "Lisbon",
+    "country": "Portugal"
+  },
+  {
+    "code": "ATH",
+    "name": "Athens International",
+    "city": "Athens",
+    "country": "Greece"
+  },
+  {
+    "code": "IST",
+    "name": "Istanbul",
+    "city": "Istanbul",
+    "country": "Turkey"
+  },
+  {
+    "code": "PRG",
+    "name": "Prague Václav Havel",
+    "city": "Prague",
+    "country": "Czech Republic"
+  },
+  {
+    "code": "BUD",
+    "name": "Budapest Ferenc Liszt",
+    "city": "Budapest",
+    "country": "Hungary"
+  },
+  {
+    "code": "WAW",
+    "name": "Warsaw Chopin",
+    "city": "Warsaw",
+    "country": "Poland"
+  },
+  {
+    "code": "MXP",
+    "name": "Milan Malpensa",
+    "city": "Milan",
+    "country": "Italy"
+  },
+  {
+    "code": "NAP",
+    "name": "Naples International",
+    "city": "Naples",
+    "country": "Italy"
+  },
+  {
+    "code": "VCE",
+    "name": "Venice Marco Polo",
+    "city": "Venice",
+    "country": "Italy"
+  },
+  {
+    "code": "FLR",
+    "name": "Florence",
+    "city": "Florence",
+    "country": "Italy"
+  },
+  {
+    "code": "NCE",
+    "name": "Nice Côte d'Azur",
+    "city": "Nice",
+    "country": "France"
+  },
+  {
+    "code": "LYS",
+    "name": "Lyon-Saint Exupéry",
+    "city": "Lyon",
+    "country": "France"
+  },
+  {
+    "code": "BRU",
+    "name": "Brussels",
+    "city": "Brussels",
+    "country": "Belgium"
+  },
+  {
+    "code": "DUS",
+    "name": "Düsseldorf",
+    "city": "Düsseldorf",
+    "country": "Germany"
+  },
+  {
+    "code": "HAM",
+    "name": "Hamburg",
+    "city": "Hamburg",
+    "country": "Germany"
+  },
+  {
+    "code": "TXL",
+    "name": "Berlin Brandenburg",
+    "city": "Berlin",
+    "country": "Germany"
+  },
+  {
+    "code": "ARN",
+    "name": "Stockholm Arlanda",
+    "city": "Stockholm",
+    "country": "Sweden"
+  },
+  {
+    "code": "HEL",
+    "name": "Helsinki-Vantaa",
+    "city": "Helsinki",
+    "country": "Finland"
+  }
+]

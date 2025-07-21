@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { AirportSearch } from './AirportSearch'
+import { FlightTimeSlider } from './FlightTimeSlider'
 
 interface FormData {
   selectedTheme: string
@@ -9,7 +11,7 @@ interface FormData {
   returnDate: string
   passengers: number
   tripType: 'one-way' | 'return'
-  flightRange: { min: number; max: number }
+  maxFlightTime: number
 }
 
 const THEMES = [
@@ -58,7 +60,7 @@ export function LandingPageForm() {
     returnDate: '',
     passengers: 1,
     tripType: 'return',
-    flightRange: { min: 1, max: 4 }
+    maxFlightTime: 4
   })
 
   const currentTheme = THEMES.find(t => t.id === formData.selectedTheme) || THEMES[0]
@@ -77,8 +79,24 @@ export function LandingPageForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Search flights with:', formData)
-    // TODO: Implement search logic
+    
+    // Implement flight time range logic: 0 to maxFlightTime
+    const searchParams = {
+      origin_airport_code: formData.departureAirport,
+      min_flight_duration_hours: 0, // Always start from 0
+      max_flight_duration_hours: formData.maxFlightTime, // User-selected maximum
+      preferred_activities: [formData.selectedTheme],
+      departure_date: formData.departureDate,
+      return_date: formData.tripType === 'return' ? formData.returnDate : null,
+      passengers: formData.passengers,
+      trip_type: formData.tripType,
+    }
+    
+    console.log('Search flights with optimized parameters:', searchParams)
+    console.log(`Flight time range: 0 hours to ${formData.maxFlightTime} hours`)
+    
+    // TODO: Implement actual search API call
+    // This would call the backend with the search parameters
   }
 
   return (
@@ -172,17 +190,13 @@ export function LandingPageForm() {
               <label className="block text-sm font-medium mb-2 text-white/90">
                 FROM
               </label>
-              <input
-                type="text"
-                placeholder="Airport code (e.g., LHR)"
+              <AirportSearch
                 value={formData.departureAirport}
-                onChange={(e) => setFormData(prev => ({ 
+                onChange={(code) => setFormData(prev => ({ 
                   ...prev, 
-                  departureAirport: e.target.value.toUpperCase() 
+                  departureAirport: code 
                 }))}
-                className="w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 focus:ring-orange-500"
-                maxLength={3}
-                required
+                placeholder="Type city or airport name"
               />
             </div>
 
@@ -244,41 +258,18 @@ export function LandingPageForm() {
               </select>
             </div>
 
-            {/* Flight Range */}
+            {/* Flight Time Slider */}
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-2 text-white/90">
-                FLIGHT TIME (HOURS)
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <input
-                    type="number"
-                    placeholder="From"
-                    value={formData.flightRange.min}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      flightRange: { ...prev.flightRange, min: parseInt(e.target.value) || 1 }
-                    }))}
-                    className="w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 focus:ring-orange-500"
-                    min="1"
-                    max="12"
-                  />
-                </div>
-                <div>
-                  <input
-                    type="number"
-                    placeholder="To"
-                    value={formData.flightRange.max}
-                    onChange={(e) => setFormData(prev => ({ 
-                      ...prev, 
-                      flightRange: { ...prev.flightRange, max: parseInt(e.target.value) || 4 }
-                    }))}
-                    className="w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 focus:ring-orange-500"
-                    min="1"
-                    max="12"
-                  />
-                </div>
-              </div>
+              <FlightTimeSlider
+                value={formData.maxFlightTime}
+                onChange={(value) => setFormData(prev => ({ 
+                  ...prev, 
+                  maxFlightTime: value 
+                }))}
+                min={0}
+                max={12}
+                step={0.5}
+              />
             </div>
 
             {/* Search Button */}
