@@ -83,8 +83,14 @@ export function LandingPageForm() {
 
   return (
     <div 
-      className="h-screen w-full bg-cover bg-center bg-no-repeat relative transition-all duration-1000 overflow-hidden"
-      style={{ backgroundImage: `url('${currentTheme.background}')` }}
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative transition-all duration-1000 overflow-hidden"
+      style={{ 
+        backgroundImage: `url('${currentTheme.background}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center center',
+        backgroundAttachment: 'fixed',
+        height: '100vh'
+      }}
     >
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 p-6">
