@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { ArrowLeft, MapPin, Plane, Users, Star } from 'lucide-react'
+import { ArrowLeft, MapPin, Plane, Users, Star, Map } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 
 interface DestinationRecommendation {
@@ -54,6 +54,7 @@ interface CityCardProps {
 
 function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [isPressed, setIsPressed] = useState(false)
 
   const getThemeColor = (theme: string) => {
     switch (theme) {
@@ -86,110 +87,169 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
 
   return (
     <div
-      className="group cursor-pointer transition-all duration-300 hover:scale-105"
+      className="group cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
       onClick={onClick}
     >
-      {/* Main City Circle */}
-      <div className="relative">
+      {/* Luxury Card Container */}
+      <div className={`relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 transition-all duration-500 ease-out ${
+        isHovered 
+          ? 'transform -translate-y-2 shadow-2xl shadow-black/30 border-white/40 bg-gradient-to-br from-white/15 to-white/8' 
+          : 'shadow-lg shadow-black/10'
+      } ${
+        isPressed ? 'transform -translate-y-1 scale-98' : ''
+      } ${
+        selectedTheme === city.primary_theme ? 'ring-2 ring-yellow-400/60 ring-offset-2 ring-offset-transparent' : ''
+      }`}>
+        
         {/* Hidden Gem Badge */}
         {city.is_hidden_gem && (
-          <div className="absolute -top-2 -right-2 z-10">
-            <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black text-xs font-bold px-2 py-1 rounded-full flex items-center space-x-1">
-              <Star size={10} />
-              <span>Hidden Gem</span>
+          <div className="absolute -top-3 -right-3 z-10">
+            <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-black px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold tracking-wide">
+                <Star size={12} fill="currentColor" />
+                <span className="text-[10px] uppercase letter-spacing-wider">Hidden Gem</span>
+              </div>
             </div>
           </div>
         )}
 
-        {/* City Circle */}
-        <div className={`w-24 h-24 rounded-full border-2 border-white/30 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white transition-all duration-300 group-hover:border-white/60 group-hover:bg-black/60 ${
-          selectedTheme === city.primary_theme ? 'ring-2 ring-yellow-400' : ''
-        }`}>
-          <div className="text-center">
-            <div className="text-sm font-semibold leading-tight">
-              {city.name}
-            </div>
-            <div className="text-xs text-white/70 mt-1">
+        {/* City Header */}
+        <div className="text-center mb-4">
+          <h3 className="text-white font-light text-xl tracking-wide leading-tight mb-1">
+            {city.name}
+          </h3>
+          <div className="flex items-center justify-center space-x-2 text-white/60">
+            <MapPin size={12} />
+            <span className="text-sm font-medium tracking-wider uppercase">
               {city.airport_code}
+            </span>
+          </div>
+        </div>
+
+        {/* Flight Info */}
+        <div className="flex items-center justify-between mb-4 px-2">
+          <div className="text-center">
+            <div className="text-2xl font-light text-green-400 tracking-tight">
+              {city.estimated_price}
             </div>
+            <div className="text-xs text-white/50 uppercase tracking-wider">from</div>
+          </div>
+          <div className="w-px h-8 bg-white/20"></div>
+          <div className="text-center">
+            <div className="text-lg font-light text-white/90">
+              {Math.round(city.flight_duration * 10) / 10}h
+            </div>
+            <div className="text-xs text-white/50 uppercase tracking-wider">flight</div>
+          </div>
+        </div>
+
+        {/* Primary Theme */}
+        <div className="flex items-center justify-center mb-3">
+          <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm ${getThemeColor(city.primary_theme)}`}>
+            <span className="text-lg">{getThemeIcon(city.primary_theme)}</span>
+            <span className="text-sm font-medium capitalize tracking-wide">
+              {city.primary_theme}
+            </span>
           </div>
         </div>
 
         {/* Secondary Theme Indicators */}
         {relevantSecondaryThemes.length > 0 && (
-          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-            <div className="flex space-x-1">
-              {relevantSecondaryThemes.map((theme, index) => (
-                <div
-                  key={theme.theme}
-                  className="w-4 h-4 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 flex items-center justify-center text-xs"
-                  title={`${theme.theme} (${Math.round(theme.strength * 100)}%)`}
-                >
-                  {getThemeIcon(theme.theme)}
-                </div>
-              ))}
-            </div>
+          <div className="flex justify-center space-x-2">
+            {relevantSecondaryThemes.map((theme, index) => (
+              <div
+                key={theme.theme}
+                className="w-6 h-6 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center transition-all duration-300 hover:bg-white/20"
+                title={`${theme.theme} (${Math.round(theme.strength * 100)}%)`}
+              >
+                <span className="text-xs">{getThemeIcon(theme.theme)}</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Hover Details Card */}
+        {/* Luxury Interaction Indicator */}
+        <div className={`absolute bottom-2 right-2 w-2 h-2 rounded-full transition-all duration-300 ${
+          isHovered ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' : 'bg-white/20'
+        }`}></div>
+
+        {/* Luxury Hover Details Modal */}
         {isHovered && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 w-64 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="text-white text-sm">
-              {/* City Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h4 className="font-semibold text-yellow-400">{city.name}</h4>
-                  <p className="text-xs text-white/70">{city.airport_code} • {Math.round(city.flight_duration * 10) / 10}h flight</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-green-400 font-semibold">{city.estimated_price}</div>
-                  <div className="text-xs text-white/70">from</div>
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-80 z-50">
+            <div className="bg-black/95 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+              {/* Header Section */}
+              <div className="px-6 py-4 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-white font-light text-lg tracking-wide">{city.name}</h4>
+                    <div className="flex items-center space-x-2 text-white/60 mt-1">
+                      <MapPin size={12} />
+                      <span className="text-sm tracking-wider uppercase">{city.airport_code}</span>
+                      <span className="text-white/40">•</span>
+                      <span className="text-sm">{Math.round(city.flight_duration * 10) / 10}h flight</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-light text-green-400 tracking-tight">{city.estimated_price}</div>
+                    <div className="text-xs text-white/50 uppercase tracking-wider">from</div>
+                  </div>
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-white/90 text-xs mb-3 leading-relaxed">
-                {city.description}
-              </p>
-
-              {/* Primary Theme */}
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white/70 text-xs">Best for:</span>
-                <span className={`text-xs font-medium flex items-center space-x-1 ${getThemeColor(city.primary_theme)}`}>
-                  <span>{getThemeIcon(city.primary_theme)}</span>
-                  <span className="capitalize">{city.primary_theme}</span>
-                </span>
+              <div className="px-6 py-4 border-b border-white/10">
+                <p className="text-white/80 text-sm leading-relaxed font-light">
+                  {city.description}
+                </p>
               </div>
 
-              {/* Secondary Themes */}
-              {relevantSecondaryThemes.length > 0 && (
-                <div className="border-t border-white/20 pt-2">
-                  <div className="text-white/70 text-xs mb-1">Also great for:</div>
-                  <div className="flex flex-wrap gap-1">
-                    {relevantSecondaryThemes.map((theme) => (
-                      <span
-                        key={theme.theme}
-                        className="text-xs bg-white/10 text-white/80 px-2 py-1 rounded-full capitalize"
-                      >
-                        {theme.theme}
-                      </span>
-                    ))}
+              {/* Themes Section */}
+              <div className="px-6 py-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-white/60 text-sm font-medium tracking-wide">BEST FOR</span>
+                  <div className={`flex items-center space-x-2 px-3 py-1 rounded-full bg-white/10 ${getThemeColor(city.primary_theme)}`}>
+                    <span>{getThemeIcon(city.primary_theme)}</span>
+                    <span className="text-sm font-medium capitalize">{city.primary_theme}</span>
                   </div>
                 </div>
-              )}
 
-              {/* Stats */}
-              <div className="border-t border-white/20 pt-2 mt-2 grid grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center space-x-1 text-white/70">
-                  <Users size={10} />
-                  <span>{(city.population / 1000000).toFixed(1)}M people</span>
-                </div>
-                <div className="flex items-center space-x-1 text-white/70">
-                  <Plane size={10} />
-                  <span>{city.flight_frequency}/week</span>
+                {/* Secondary Themes */}
+                {relevantSecondaryThemes.length > 0 && (
+                  <div>
+                    <div className="text-white/60 text-xs font-medium tracking-wide mb-2 uppercase">Also Great For</div>
+                    <div className="flex flex-wrap gap-2">
+                      {relevantSecondaryThemes.map((theme) => (
+                        <span
+                          key={theme.theme}
+                          className="text-xs bg-white/10 text-white/70 px-3 py-1 rounded-full capitalize font-medium tracking-wide"
+                        >
+                          {theme.theme}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Stats Section */}
+              <div className="px-6 py-4 bg-white/5 border-t border-white/10">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <Users size={14} className="text-white/40" />
+                    <span className="text-white/70 font-light">
+                      {(city.population / 1000000).toFixed(1)}M people
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Plane size={14} className="text-white/40" />
+                    <span className="text-white/70 font-light">
+                      {city.flight_frequency} flights/week
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -337,60 +397,118 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
         destination={{ city_name: 'Cities', country_name: country.name }}
       />
 
-      {/* Header */}
-      <header className="relative z-10 p-6 border-b border-white/10">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
+      {/* Luxury Header */}
+      <header className="relative z-10 px-8 py-8 border-b border-white/10 bg-black/20 backdrop-blur-sm">
+        <div className="flex items-center justify-between max-w-8xl mx-auto">
           <button 
             onClick={onBack}
-            className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors group"
+            className="flex items-center space-x-3 text-white/70 hover:text-white transition-all duration-300 group px-4 py-2 rounded-xl hover:bg-white/10"
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Countries</span>
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform duration-300" />
+            <span className="font-light tracking-wide">Back to Countries</span>
           </button>
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-              CHOOSE YOUR CITY IN {country.name.toUpperCase()}
+            <h1 className="text-4xl font-extralight tracking-wider text-white mb-2">
+              {country.name}
             </h1>
-            <p className="text-white/60 text-sm mt-2">
-              From {originAirport} • Ordered by accessibility and discovery potential
-              {selectedTheme && <span className="ml-2">• Best for {selectedTheme}</span>}
-            </p>
+            <div className="flex items-center justify-center space-x-4 text-white/60">
+              <div className="flex items-center space-x-2">
+                <Plane size={14} />
+                <span className="text-sm font-light tracking-wide">From {originAirport}</span>
+              </div>
+              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+              <span className="text-sm font-light tracking-wide">Curated by accessibility</span>
+              {selectedTheme && (
+                <>
+                  <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                  <span className="text-sm font-light tracking-wide capitalize">Best for {selectedTheme}</span>
+                </>
+              )}
+            </div>
           </div>
           
-          <div className="text-right">
-            <div className="text-white/80 text-sm">Found</div>
-            <div className="text-yellow-400 font-semibold">{cities.length} Cities</div>
+          <div className="flex items-center space-x-4">
+            {/* Optional Map Discovery Toggle */}
+            <button 
+              className="flex items-center space-x-2 text-white/60 hover:text-white/80 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-white/10 border border-white/20 hover:border-white/30"
+              onClick={() => {
+                // TODO: Implement map modal
+                console.log('Map discovery mode coming soon...')
+              }}
+            >
+              <Map size={16} />
+              <span className="text-sm font-light tracking-wide">Explore on Map</span>
+            </button>
+            
+            <div className="text-right">
+              <div className="text-3xl font-extralight text-white">{cities.length}</div>
+              <div className="text-white/60 text-sm font-light tracking-wider uppercase">Cities</div>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Instructions */}
-      <div className="relative z-10 text-center py-6">
-        <p className="text-white/60 text-sm tracking-wider">
-          Major destinations first • Scroll down to discover hidden gems • Hover for details
+      {/* Luxury Instructions */}
+      <div className="relative z-10 text-center py-8">
+        <p className="text-white/50 text-sm font-light tracking-wider leading-relaxed">
+          Premium destinations curated by population and accessibility<br />
+          <span className="text-white/40">Discover hidden gems as you explore further</span>
         </p>
       </div>
 
-      {/* City Grid */}
-      <main className="relative z-10 flex-1 px-6 pb-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 justify-items-center">
-            {sortedCities.map((city) => (
-              <CityCard
-                key={city.id}
-                city={city}
-                selectedTheme={selectedTheme}
-                onClick={() => onCitySelect(city)}
-              />
-            ))}
+      {/* Luxury City Grid */}
+      <main className="relative z-10 flex-1 px-8 pb-16">
+        <div className="max-w-7xl mx-auto">
+          {/* Major Cities Section */}
+          <div className="mb-12">
+            <h2 className="text-white/60 text-sm font-light tracking-widest uppercase mb-6 text-center">
+              Premier Destinations
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
+              {sortedCities.slice(0, 3).map((city) => (
+                <CityCard
+                  key={city.id}
+                  city={city}
+                  selectedTheme={selectedTheme}
+                  onClick={() => onCitySelect(city)}
+                />
+              ))}
+            </div>
           </div>
 
-          {/* Discovery Encouragement */}
-          <div className="text-center mt-12 pt-8 border-t border-white/10">
-            <p className="text-white/50 text-sm">
-              🔍 Scroll down to discover more hidden gems and off-the-beaten-path destinations
-            </p>
+          {/* Hidden Gems Section */}
+          {sortedCities.length > 3 && (
+            <div className="relative">
+              <div className="flex items-center mb-6">
+                <div className="flex-1 h-px bg-gradient-to-r from-transparent to-white/20"></div>
+                <h2 className="text-white/60 text-sm font-light tracking-widest uppercase mx-6">
+                  Hidden Gems
+                </h2>
+                <div className="flex-1 h-px bg-gradient-to-l from-transparent to-white/20"></div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
+                {sortedCities.slice(3).map((city) => (
+                  <CityCard
+                    key={city.id}
+                    city={city}
+                    selectedTheme={selectedTheme}
+                    onClick={() => onCitySelect(city)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Luxury Discovery Footer */}
+          <div className="text-center mt-16 pt-8 border-t border-white/10">
+            <div className="inline-flex items-center space-x-3 text-white/40">
+              <div className="w-1 h-1 bg-white/30 rounded-full"></div>
+              <span className="text-sm font-light tracking-wider">
+                Each destination carefully curated for the discerning traveler
+              </span>
+              <div className="w-1 h-1 bg-white/30 rounded-full"></div>
+            </div>
           </div>
         </div>
       </main>
