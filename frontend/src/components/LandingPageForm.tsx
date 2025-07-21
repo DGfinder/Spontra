@@ -387,6 +387,12 @@ export function LandingPageForm() {
                 <p className="text-white/70 mt-1">
                   Found {searchResults.length} destinations for your {formData.selectedTheme} adventure
                 </p>
+                <div className="flex items-center space-x-2 mt-2">
+                  <span className="text-xs text-white/50">Sorted by proximity:</span>
+                  <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">
+                    Closest first ✈️
+                  </span>
+                </div>
               </div>
               <button
                 onClick={handleBackToSearch}
@@ -400,10 +406,24 @@ export function LandingPageForm() {
           {/* Results Grid */}
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              {searchResults.map((country) => (
+              {searchResults
+                .sort((a, b) => a.averageFlightTime - b.averageFlightTime) // Sort by flight time
+                .map((country, index) => (
                 <div
                   key={country.code}
-                  className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/20 hover:border-orange-500/50"
+                  className={`bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-500 cursor-pointer border border-white/20 hover:border-orange-500/50 group hover:scale-105 hover:shadow-2xl ${
+                    formData.selectedTheme === 'adventure' ? 'hover:bg-orange-500/10' :
+                    formData.selectedTheme === 'party' ? 'hover:bg-purple-500/10' :
+                    formData.selectedTheme === 'learn' ? 'hover:bg-green-500/10' :
+                    formData.selectedTheme === 'shopping' ? 'hover:bg-pink-500/10' :
+                    'hover:bg-blue-500/10'
+                  }`}
+                  style={{
+                    animationDelay: `${index * 150}ms`,
+                    animation: 'slideInUp 0.6s ease-out forwards',
+                    opacity: 0,
+                    transform: 'translateY(30px)'
+                  }}
                 >
                   {/* Country Header */}
                   <div className="flex items-center justify-between mb-4">
@@ -416,15 +436,38 @@ export function LandingPageForm() {
                     </div>
                   </div>
 
-                  {/* Flight Info */}
+                  {/* Flight Info with Visual Indicators */}
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-white/70 text-sm">Flight Time</span>
-                      <span className="text-white font-medium">{country.averageFlightTime}h</span>
+                      <span className="text-white/70 text-sm flex items-center">
+                        ✈️ Flight Time
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-orange-500 rounded-full transition-all duration-300 group-hover:bg-orange-400"
+                            style={{ width: `${(country.averageFlightTime / formData.maxFlightTime) * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-white font-medium">{country.averageFlightTime}h</span>
+                      </div>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-white/70 text-sm">Price Range</span>
+                      <span className="text-white/70 text-sm flex items-center">
+                        💰 Price Range
+                      </span>
                       <span className="text-white font-medium">{country.priceRange}</span>
+                    </div>
+                    
+                    {/* Flight Path Hint on Hover */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center py-2">
+                      <div className="text-white/60 text-xs flex items-center justify-center space-x-2">
+                        <span>{formData.departureAirport}</span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-orange-500/50 to-orange-500/20 relative">
+                          <div className="absolute right-0 w-2 h-2 bg-orange-500 rounded-full transform translate-x-1"></div>
+                        </div>
+                        <span>{country.code}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -448,9 +491,15 @@ export function LandingPageForm() {
                     </div>
                   </div>
 
-                  {/* Select Button */}
-                  <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
-                    Explore {country.name}
+                  {/* Select Button with Theme Colors */}
+                  <button className={`w-full text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg ${
+                    formData.selectedTheme === 'adventure' ? 'bg-orange-500 hover:bg-orange-600' :
+                    formData.selectedTheme === 'party' ? 'bg-purple-500 hover:bg-purple-600' :
+                    formData.selectedTheme === 'learn' ? 'bg-green-500 hover:bg-green-600' :
+                    formData.selectedTheme === 'shopping' ? 'bg-pink-500 hover:bg-pink-600' :
+                    'bg-blue-500 hover:bg-blue-600'
+                  }`}>
+                    Explore {country.name} ✨
                   </button>
                 </div>
               ))}
@@ -469,6 +518,33 @@ export function LandingPageForm() {
           </div>
         </div>
       )}
+      
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes pulseGlow {
+          0%, 100% {
+            box-shadow: 0 0 5px rgba(249, 115, 22, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+          }
+        }
+        
+        .group:hover {
+          animation: pulseGlow 2s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   )
 }
