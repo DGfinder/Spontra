@@ -11,7 +11,9 @@
       "Bash(node dist/cli.js --help)",
       "Bash(node:*)",
       "Bash(npm audit:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(ls:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

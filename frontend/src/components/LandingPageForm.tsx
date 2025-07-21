@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface FormData {
   selectedTheme: string
@@ -17,35 +17,35 @@ const THEMES = [
     id: 'adventure', 
     label: 'Adventure', 
     icon: '🏔️',
-    background: '/Explore Home Template - Adventure.png',
+    background: '/adventure-background.jpg',
     color: 'orange'
   },
   { 
     id: 'activities', 
     label: 'Activities', 
     icon: '🎯',
-    background: '/Explore Home Template - Adventure.png',
+    background: '/adventure-background.jpg',
     color: 'blue'
   },
   { 
     id: 'shopping', 
     label: 'Shopping', 
     icon: '🛍️',
-    background: '/Explore Home Template - Shopping.png',
+    background: '/shopping-background.jpg',
     color: 'pink'
   },
   { 
     id: 'party', 
     label: 'Party', 
     icon: '🌃',
-    background: '/Explore Home Template - Party.png',
+    background: '/party-background.jpg',
     color: 'purple'
   },
   { 
     id: 'learn', 
     label: 'Learn', 
     icon: '🎭',
-    background: '/Explore Home Template - Learn.png',
+    background: '/learn-background.jpg',
     color: 'green'
   }
 ]
@@ -63,6 +63,14 @@ export function LandingPageForm() {
 
   const currentTheme = THEMES.find(t => t.id === formData.selectedTheme) || THEMES[0]
 
+  // Preload background images for smooth transitions
+  useEffect(() => {
+    THEMES.forEach(theme => {
+      const img = new Image()
+      img.src = theme.background
+    })
+  }, [])
+
   const handleThemeSelect = (themeId: string) => {
     setFormData(prev => ({ ...prev, selectedTheme: themeId }))
   }
@@ -75,18 +83,15 @@ export function LandingPageForm() {
 
   return (
     <div 
-      className="h-screen w-full bg-cover bg-center bg-no-repeat relative transition-all duration-1000"
+      className="h-screen w-full bg-cover bg-center bg-no-repeat relative transition-all duration-1000 overflow-hidden"
       style={{ backgroundImage: `url('${currentTheme.background}')` }}
     >
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/20"></div>
-      
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 p-6">
+      <div className="absolute top-0 left-0 right-0 z-30 p-6">
         <div className="flex items-center justify-between">
           <div className="text-white">
-            <span className="text-xl font-light">spon</span>
-            <span className="text-xl font-bold">EXPLORE</span>
+            <span className="text-2xl font-light">spon</span>
+            <span className="text-2xl font-bold">EXPLORE</span>
           </div>
           <div className="text-white/80 text-sm hover:text-white cursor-pointer">
             Sign In
@@ -94,8 +99,8 @@ export function LandingPageForm() {
         </div>
       </div>
 
-      {/* Left Form Panel */}
-      <div className="absolute left-0 top-0 bottom-0 w-80 bg-black/70 backdrop-blur-sm z-20">
+      {/* Left Form Panel with Dark Overlay */}
+      <div className="absolute left-0 top-0 bottom-0 w-96 bg-black/80 backdrop-blur-sm z-20">
         <div className="p-6 h-full flex flex-col">
           {/* Form Header */}
           <div className="mb-6 pt-16">
@@ -275,19 +280,12 @@ export function LandingPageForm() {
               <button
                 type="submit"
                 disabled={!formData.departureAirport}
-                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded text-sm transition-colors duration-200"
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-lg text-sm transition-colors duration-200 shadow-lg"
               >
                 SEARCH FLIGHTS
               </button>
             </div>
           </form>
-        </div>
-      </div>
-
-      {/* Logo on the right side */}
-      <div className="absolute bottom-8 right-8 z-10">
-        <div className="w-16 h-20 bg-orange-400 rounded-lg flex items-center justify-center">
-          <div className="text-white text-xl font-bold">S</div>
         </div>
       </div>
     </div>
