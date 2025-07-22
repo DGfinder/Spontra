@@ -1,161 +1,207 @@
-'use client'
+import { ValidatedAirportSearch } from './ValidatedAirportSearch'
+import { FlightTimeSlider } from './FlightTimeSlider'
+import { ThemeSelector } from './ThemeSelector'
+import { TripTypeToggle } from './TripTypeToggle'
+import { useSearchForm } from '@/hooks/useSearchForm'
 
-import { useState } from 'react'
-
-interface SearchFormData {
-  origin: string
-  destination: string
-  departureDate: string
-  returnDate?: string
-  passengers: number
-  tripType: 'roundtrip' | 'oneway'
+interface Theme {
+  id: string
+  label: string
+  icon: string
+  background: string
+  color: string
 }
 
-export function SearchForm() {
-  const [formData, setFormData] = useState<SearchFormData>({
-    origin: '',
-    destination: '',
-    departureDate: '',
-    returnDate: '',
-    passengers: 1,
-    tripType: 'roundtrip'
-  })
+interface FormData {
+  selectedTheme: string
+  departureAirport: string
+  departureDate: string
+  returnDate: string
+  passengers: number
+  tripType: 'one-way' | 'return'
+  maxFlightTime: number
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // TODO: Implement search functionality
-    console.log('Search form submitted:', formData)
-  }
+interface SearchFormProps {
+  themes: Theme[]
+  onSubmit: (data: FormData) => Promise<void>
+  isLoading: boolean
+}
 
-  const handleInputChange = (field: keyof SearchFormData, value: string | number) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }))
+export function SearchForm({ 
+  themes, 
+  onSubmit, 
+  isLoading 
+}: SearchFormProps) {
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formValues,
+    errors,
+    isValid,
+    getFieldError,
+    hasFieldError
+  } = useSearchForm()
+
+  const handleFormSubmit = async (data: FormData) => {
+    await onSubmit(data)
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      {/* Trip Type Selector */}
-      <div className="flex mb-6">
-        <button
-          type="button"
-          onClick={() => handleInputChange('tripType', 'roundtrip')}
-          className={`px-4 py-2 rounded-l-lg font-medium transition-colors ${
-            formData.tripType === 'roundtrip'
-              ? 'bg-primary-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          Roundtrip
-        </button>
-        <button
-          type="button"
-          onClick={() => handleInputChange('tripType', 'oneway')}
-          className={`px-4 py-2 rounded-r-lg font-medium transition-colors ${
-            formData.tripType === 'oneway'
-              ? 'bg-primary-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          }`}
-        >
-          One way
-        </button>
+    <div className="p-4 md:p-6 h-full flex flex-col">
+      {/* Form Header */}
+      <div className="mb-4 md:mb-6 pt-12 md:pt-16">
+        <h2 className="text-white text-base md:text-lg font-medium mb-1">
+          WHERE ARE YOU LOOKING TO GO?
+        </h2>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {/* Origin */}
-          <div>
-            <label htmlFor="origin" className="block text-sm font-medium text-gray-700 mb-1">
-              From
-            </label>
-            <input
-              type="text"
-              id="origin"
-              placeholder="Origin city or airport"
-              value={formData.origin}
-              onChange={(e) => handleInputChange('origin', e.target.value)}
-              className="input-field"
-              required
-            />
-          </div>
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col">
+        {/* Theme Selection */}
+        <ThemeSelector
+          themes={themes}
+          selectedTheme={formValues.selectedTheme}
+          onThemeSelect={(themeId) => setValue('selectedTheme', themeId)}
+        />
 
-          {/* Destination */}
-          <div>
-            <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-1">
-              To
-            </label>
-            <input
-              type="text"
-              id="destination"
-              placeholder="Destination city or airport"
-              value={formData.destination}
-              onChange={(e) => handleInputChange('destination', e.target.value)}
-              className="input-field"
-              required
-            />
-          </div>
+        {/* Trip Type Toggle */}
+        <TripTypeToggle
+          tripType={formValues.tripType}
+          onTripTypeChange={(tripType) => setValue('tripType', tripType)}
+        />
 
-          {/* Departure Date */}
-          <div>
-            <label htmlFor="departureDate" className="block text-sm font-medium text-gray-700 mb-1">
-              Departure
-            </label>
-            <input
-              type="date"
-              id="departureDate"
-              value={formData.departureDate}
-              onChange={(e) => handleInputChange('departureDate', e.target.value)}
-              className="input-field"
-              required
-              min={new Date().toISOString().split('T')[0]}
-            />
-          </div>
+        {/* From Airport */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2 text-white/90" htmlFor="departure-airport">
+            FROM
+          </label>
+          <ValidatedAirportSearch
+            value={formValues.departureAirport}
+            onChange={(code) => setValue('departureAirport', code)}
+            placeholder="Type city or airport name"
+            error={getFieldError('departureAirport')}
+            required
+          />
+        </div>
 
-          {/* Return Date */}
-          {formData.tripType === 'roundtrip' && (
-            <div>
-              <label htmlFor="returnDate" className="block text-sm font-medium text-gray-700 mb-1">
-                Return
-              </label>
-              <input
-                type="date"
-                id="returnDate"
-                value={formData.returnDate}
-                onChange={(e) => handleInputChange('returnDate', e.target.value)}
-                className="input-field"
-                min={formData.departureDate || new Date().toISOString().split('T')[0]}
-              />
+        {/* To Airport - Disabled */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2 text-white/90" htmlFor="destination">
+            TO
+          </label>
+          <input
+            id="destination"
+            type="text"
+            value="Anywhere"
+            disabled
+            className="w-full px-4 py-3 bg-white/20 text-white/60 rounded text-sm border-0"
+            aria-label="Destination set to anywhere"
+          />
+        </div>
+
+        {/* Dates */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2 text-white/90" htmlFor="departure-date">
+            DEPARTURE
+          </label>
+          <input
+            id="departure-date"
+            type="date"
+            {...register('departureDate')}
+            className={`w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 transition-colors ${
+              hasFieldError('departureDate') 
+                ? 'focus:ring-red-500 ring-1 ring-red-500' 
+                : 'focus:ring-orange-500'
+            }`}
+          />
+          {getFieldError('departureDate') && (
+            <div className="text-red-400 text-xs mt-1">
+              {getFieldError('departureDate')}
             </div>
           )}
+        </div>
 
-          {/* Passengers */}
-          <div className={formData.tripType === 'oneway' ? 'lg:col-start-4' : ''}>
-            <label htmlFor="passengers" className="block text-sm font-medium text-gray-700 mb-1">
-              Passengers
+        {formValues.tripType === 'return' && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2 text-white/90" htmlFor="return-date">
+              RETURN
             </label>
-            <select
-              id="passengers"
-              value={formData.passengers}
-              onChange={(e) => handleInputChange('passengers', parseInt(e.target.value))}
-              className="input-field"
-            >
-              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                <option key={num} value={num}>
-                  {num} {num === 1 ? 'passenger' : 'passengers'}
-                </option>
-              ))}
-            </select>
+            <input
+              id="return-date"
+              type="date"
+              {...register('returnDate')}
+              className={`w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 transition-colors ${
+                hasFieldError('returnDate') 
+                  ? 'focus:ring-red-500 ring-1 ring-red-500' 
+                  : 'focus:ring-orange-500'
+              }`}
+            />
+            {getFieldError('returnDate') && (
+              <div className="text-red-400 text-xs mt-1">
+                {getFieldError('returnDate')}
+              </div>
+            )}
           </div>
+        )}
+
+        {/* Passengers */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-2 text-white/90" htmlFor="passengers">
+            PASSENGERS
+          </label>
+          <select
+            id="passengers"
+            {...register('passengers', { valueAsNumber: true })}
+            className={`w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 transition-colors ${
+              hasFieldError('passengers') 
+                ? 'focus:ring-red-500 ring-1 ring-red-500' 
+                : 'focus:ring-orange-500'
+            }`}
+          >
+            {[1,2,3,4,5,6,7,8].map(num => (
+              <option key={num} value={num}>{num} {num === 1 ? 'Passenger' : 'Passengers'}</option>
+            ))}
+          </select>
+          {getFieldError('passengers') && (
+            <div className="text-red-400 text-xs mt-1">
+              {getFieldError('passengers')}
+            </div>
+          )}
+        </div>
+
+        {/* Flight Time Slider */}
+        <div className="mb-6">
+          <FlightTimeSlider
+            value={formValues.maxFlightTime}
+            onChange={(value) => setValue('maxFlightTime', value)}
+            min={0}
+            max={12}
+            step={0.5}
+          />
+          {getFieldError('maxFlightTime') && (
+            <div className="text-red-400 text-xs mt-1">
+              {getFieldError('maxFlightTime')}
+            </div>
+          )}
         </div>
 
         {/* Search Button */}
-        <div className="flex justify-center">
+        <div className="mt-auto">
           <button
             type="submit"
-            className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200 text-lg"
+            disabled={!isValid || isLoading}
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white font-bold py-4 px-6 rounded-lg text-sm transition-colors duration-200 shadow-lg flex items-center justify-center"
+            aria-label={isLoading ? 'Searching for flights' : 'Search for flights'}
           >
-            Search Flights
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" aria-hidden="true"></div>
+                SEARCHING...
+              </>
+            ) : (
+              'SEARCH FLIGHTS'
+            )}
           </button>
         </div>
       </form>
