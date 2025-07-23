@@ -54,7 +54,7 @@ export function SearchForm({
       {/* Form Header */}
       <div className="mb-6">
         <h2 className="text-white font-bold mb-1" style={{ fontSize: '18px' }}>
-          WHERE ARE YOU LOOKING TO GO?
+          WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 

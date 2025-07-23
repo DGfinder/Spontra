@@ -36,11 +36,11 @@ const THEMES = [
     color: 'orange'
   },
   { 
-    id: 'activities', 
-    label: 'Activities', 
-    icon: '🎯',
-    background: '/adventure-background.jpg',
-    color: 'blue'
+    id: 'nature', 
+    label: 'Nature', 
+    icon: '🌿',
+    background: '/nature-background.jpg',
+    color: 'green'
   },
   { 
     id: 'shopping', 
@@ -229,12 +229,6 @@ export function LandingPageForm() {
         width: '100vw'
       }}
     >
-      {/* 70.2% Black Overlay */}
-      <div 
-        className="absolute inset-0 z-10"
-        style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
-      />
-
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 p-4 md:p-6">
         <div className="flex items-center justify-between">
@@ -250,18 +244,25 @@ export function LandingPageForm() {
 
       {/* Layout - Desktop: Two Panels, Mobile: Single Panel */}
       <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
-        {/* Form Panel */}
+        {/* Form Panel with Overlay */}
         <div 
-          className="bg-transparent p-4 md:p-6 w-full lg:w-[370px] lg:p-5"
+          className="relative p-4 md:p-6 w-full lg:w-[370px] lg:p-5"
           style={{ 
             maxWidth: '100vw'
           }}
         >
-          <SearchForm
-            themes={THEMES}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
+          {/* Form Panel Overlay */}
+          <div 
+            className="absolute inset-0 z-0"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
           />
+          <div className="relative z-10">
+            <SearchForm
+              themes={THEMES}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
 
         {/* Details Panel - Hidden on mobile/tablet, visible on large screens */}
