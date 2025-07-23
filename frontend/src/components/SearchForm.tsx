@@ -51,15 +51,15 @@ export function SearchForm({
   return (
     <div className="h-full flex flex-col font-muli">
       {/* Form Header */}
-      <div className="mb-6">
+      <div className="mb-4">
         <h2 className="text-white font-bold mb-1" style={{ fontSize: '18px' }}>
           WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-4 md:gap-5">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3">
         {/* Form Content */}
-        <div className="flex-1 flex flex-col gap-4 md:gap-5">
+        <div className="flex-1 flex flex-col gap-3">
           {/* Theme Selection */}
           <VerticalThemeSelector
             themes={themes}
@@ -213,7 +213,7 @@ export function SearchForm({
         </div>
 
         {/* Search Button */}
-        <div className="mt-auto">
+        <div className="mt-2">
           <button
             type="submit"
             disabled={!isValid || isLoading}

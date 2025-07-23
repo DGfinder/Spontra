@@ -242,9 +242,9 @@ export function LandingPageForm() {
       <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
         {/* Form Panel with Overlay */}
         <div 
-          className="relative p-4 md:p-6 w-full lg:w-[370px] lg:p-5"
+          className="relative p-5 w-[370px] h-full overflow-y-auto"
           style={{ 
-            maxWidth: '100vw'
+            maxHeight: 'calc(100vh - 60px)'
           }}
         >
           {/* Form Panel Overlay */}
