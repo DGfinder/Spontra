@@ -232,9 +232,17 @@ export function LandingPageForm() {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 p-4 md:p-6">
         <div className="flex items-center justify-between">
-          <div className="text-white font-muli">
-            <span className="text-xl md:text-2xl font-normal">spon</span>
-            <span className="text-xl md:text-2xl font-bold">EXPLORE</span>
+          <div className="flex items-center gap-2">
+            <img 
+              src="/logo-main.png" 
+              alt="Logo" 
+              className="h-8 md:h-10 w-auto"
+            />
+            <img 
+              src="/logo-text.png" 
+              alt="Explore" 
+              className="h-6 md:h-8 w-auto"
+            />
           </div>
           <div className="text-white/80 text-xs md:text-sm hover:text-white cursor-pointer font-muli">
             Sign In

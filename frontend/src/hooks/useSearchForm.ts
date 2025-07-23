@@ -28,11 +28,16 @@ export function useSearchForm() {
   const watchedValues = watch()
 
   useEffect(() => {
-    // Only update store if form is valid and has changes
+    // Always update selectedTheme immediately for background switching
+    if (watchedValues.selectedTheme !== formData.selectedTheme) {
+      updateFormData({ ...formData, selectedTheme: watchedValues.selectedTheme })
+    }
+    
+    // Update other fields only if form is valid and has changes
     if (isDirty && isValid) {
       updateFormData(watchedValues)
     }
-  }, [watchedValues, isDirty, isValid, updateFormData])
+  }, [watchedValues, isDirty, isValid, updateFormData, formData])
 
   // Sync store changes back to form (useful for external updates)
   useEffect(() => {

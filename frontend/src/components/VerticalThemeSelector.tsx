@@ -19,18 +19,26 @@ export function VerticalThemeSelector({
   selectedTheme,
   onThemeSelect
 }: VerticalThemeSelectorProps) {
+  const getIconPath = (themeId: string) => {
+    switch (themeId) {
+      case 'party': return '/party-icon.png'
+      case 'nature': return '/nature-icon.png'
+      case 'shopping': return '/shopping-icon.png'
+      case 'learn': return '/learn-icon.png'
+      case 'adventure': return null // No icon yet
+      default: return null
+    }
+  }
+
   return (
     <div className="mb-4">
-      <label className="block text-white/90 mb-2 font-muli" style={{ fontSize: '12px' }}>
-        THEME
-      </label>
-      
       <div className="flex flex-col gap-2">
         {themes.map((theme) => {
           const isSelected = selectedTheme === theme.id
           const themeKey = theme.id as ThemeKey
           const primaryColor = getThemeColor(themeKey)
           const hoverColor = getThemeHoverColor(themeKey)
+          const iconPath = getIconPath(theme.id)
           
           return (
             <button
@@ -54,17 +62,38 @@ export function VerticalThemeSelector({
               }}
               aria-label={`Select ${theme.label} theme`}
             >
-              {/* Theme Color Box */}
-              <div
-                className="flex-shrink-0 rounded"
-                style={{
-                  width: '30px',
-                  height: isSelected ? '34px' : '24px',
-                  backgroundColor: primaryColor,
-                  boxShadow: isSelected ? `0 0 8px ${primaryColor}40` : 'none',
-                  transition: 'all 300ms ease-out'
-                }}
-              />
+              {/* Theme Icon or Color Box */}
+              {iconPath ? (
+                <div
+                  className="flex-shrink-0 rounded flex items-center justify-center"
+                  style={{
+                    width: '30px',
+                    height: isSelected ? '34px' : '24px',
+                    transition: 'all 300ms ease-out'
+                  }}
+                >
+                  <img
+                    src={iconPath}
+                    alt={`${theme.label} icon`}
+                    className="w-full h-full object-contain"
+                    style={{
+                      filter: isSelected ? `brightness(0) saturate(100%) invert(1)` : 'none',
+                      transition: 'all 300ms ease-out'
+                    }}
+                  />
+                </div>
+              ) : (
+                <div
+                  className="flex-shrink-0 rounded"
+                  style={{
+                    width: '30px',
+                    height: isSelected ? '34px' : '24px',
+                    backgroundColor: primaryColor,
+                    boxShadow: isSelected ? `0 0 8px ${primaryColor}40` : 'none',
+                    transition: 'all 300ms ease-out'
+                  }}
+                />
+              )}
               
               {/* Theme Label */}
               <span
