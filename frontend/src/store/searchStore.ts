@@ -6,7 +6,7 @@ export interface FormData {
   selectedTheme: string
   departureAirport: string
   departureDate: string
-  returnDate: string
+  returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
   maxFlightTime: number

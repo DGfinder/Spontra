@@ -1,6 +1,8 @@
 import { DestinationRecommendation } from '@/services/apiClient'
 import { DestinationCard } from './DestinationCard'
 import { LoadingSkeleton } from './LoadingSkeleton'
+import { SearchSummaryBar } from './SearchSummaryBar'
+import { useFormData } from '@/store/searchStore'
 
 interface SearchResultsProps {
   results: DestinationRecommendation[]
@@ -27,8 +29,13 @@ export function SearchResults({
   onRetry,
   onExploreDestination
 }: SearchResultsProps) {
+  // Get current search data for the summary bar
+  const formData = useFormData()
+
   return (
     <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
+      {/* Search Summary Bar */}
+      <SearchSummaryBar searchData={formData} />
       {/* Results Header */}
       <div className="p-4 md:p-6 border-b border-white/20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

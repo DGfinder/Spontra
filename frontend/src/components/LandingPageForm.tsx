@@ -11,7 +11,7 @@ interface FormData {
   selectedTheme: string
   departureAirport: string
   departureDate: string
-  returnDate: string
+  returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
   maxFlightTime: number
@@ -252,13 +252,9 @@ export function LandingPageForm() {
       <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
         {/* Form Panel */}
         <div 
-          className="bg-transparent p-4 md:p-6 lg:p-5 w-full lg:w-auto"
+          className="bg-transparent p-4 md:p-6 w-full lg:w-[370px] lg:p-5"
           style={{ 
-            maxWidth: '100vw',
-            '@media (min-width: 1024px)': {
-              width: '370px',
-              padding: '20px'
-            }
+            maxWidth: '100vw'
           }}
         >
           <SearchForm
