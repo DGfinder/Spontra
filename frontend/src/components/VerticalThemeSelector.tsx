@@ -88,7 +88,7 @@ export function VerticalThemeSelector({
                     onError={(e) => {
                       // Fallback to emoji if image fails to load
                       e.currentTarget.style.display = 'none'
-                      const fallback = e.currentTarget.parentNode?.querySelector('.fallback-icon')
+                      const fallback = e.currentTarget.parentNode?.querySelector('.fallback-icon') as HTMLElement
                       if (fallback) fallback.style.display = 'block'
                     }}
                   />

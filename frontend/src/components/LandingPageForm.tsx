@@ -240,7 +240,7 @@ export function LandingPageForm() {
               onError={(e) => {
                 // Fallback to text if logo fails to load
                 e.currentTarget.style.display = 'none'
-                const fallback = e.currentTarget.parentNode?.querySelector('.logo-fallback')
+                const fallback = e.currentTarget.parentNode?.querySelector('.logo-fallback') as HTMLElement
                 if (fallback) fallback.style.display = 'inline'
               }}
             />
@@ -251,7 +251,7 @@ export function LandingPageForm() {
               onError={(e) => {
                 // Fallback to text if logo fails to load
                 e.currentTarget.style.display = 'none'
-                const fallback = e.currentTarget.parentNode?.querySelector('.text-fallback')
+                const fallback = e.currentTarget.parentNode?.querySelector('.text-fallback') as HTMLElement
                 if (fallback) fallback.style.display = 'inline'
               }}
             />
