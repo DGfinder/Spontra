@@ -21,7 +21,7 @@ export function VerticalThemeSelector({
 }: VerticalThemeSelectorProps) {
   const getThemeIcon = (themeId: string, isSelected: boolean, primaryColor: string) => {
     const iconProps = {
-      size: 16,
+      size: 18,
       color: isSelected ? 'white' : primaryColor,
       strokeWidth: isSelected ? 2.5 : 2
     }
@@ -37,8 +37,8 @@ export function VerticalThemeSelector({
   }
 
   return (
-    <div className="mb-2 sm:mb-4">
-      <div className="flex flex-col gap-1 sm:gap-2">
+    <div className="mb-4">
+      <div className="flex flex-col gap-2 md:gap-3">
         {themes.map((theme) => {
           const isSelected = selectedTheme === theme.id
           const themeKey = theme.id as ThemeKey
@@ -51,7 +51,7 @@ export function VerticalThemeSelector({
               key={theme.id}
               type="button"
               onClick={() => onThemeSelect(theme.id)}
-              className="flex items-center gap-2 sm:gap-3 p-1 sm:p-2 rounded group"
+              className="flex items-center gap-3 p-2 md:p-3 rounded group"
               style={{
                 backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
                 transition: 'all 300ms ease-out'
@@ -72,10 +72,10 @@ export function VerticalThemeSelector({
               <div
                 className="flex-shrink-0 rounded flex items-center justify-center"
                 style={{
-                  width: '28px',
-                  height: isSelected ? '32px' : '24px',
+                  width: '32px',
+                  height: isSelected ? '36px' : '32px',
                   backgroundColor: isSelected ? primaryColor : 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: '4px',
+                  borderRadius: '6px',
                   border: isSelected ? `2px solid ${primaryColor}` : '2px solid transparent',
                   transition: 'all 300ms ease-out'
                 }}
@@ -87,7 +87,7 @@ export function VerticalThemeSelector({
               <span
                 className="font-muli text-white"
                 style={{
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: isSelected ? 700 : 400,
                   color: isSelected ? primaryColor : 'rgb(255, 255, 255)',
                   transition: 'all 300ms ease-out'

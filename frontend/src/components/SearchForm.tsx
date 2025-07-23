@@ -49,17 +49,17 @@ export function SearchForm({
   }
 
   return (
-    <div className="h-full flex flex-col font-muli min-h-0">
+    <div className="h-full flex flex-col font-muli">
       {/* Form Header */}
-      <div className="mb-4 sm:mb-6 flex-shrink-0">
+      <div className="mb-6">
         <h2 className="text-white font-bold mb-1" style={{ fontSize: '18px' }}>
           WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3 sm:gap-4 min-h-0">
-        {/* Form Content - Scrollable */}
-        <div className="flex-1 flex flex-col gap-3 sm:gap-4 overflow-y-auto min-h-0">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-4 md:gap-5">
+        {/* Form Content */}
+        <div className="flex-1 flex flex-col gap-4 md:gap-5">
           {/* Theme Selection */}
           <VerticalThemeSelector
             themes={themes}
@@ -212,8 +212,8 @@ export function SearchForm({
           </div>
         </div>
 
-        {/* Search Button - Fixed at bottom */}
-        <div className="flex-shrink-0 mt-4">
+        {/* Search Button */}
+        <div className="mt-auto">
           <button
             type="submit"
             disabled={!isValid || isLoading}
