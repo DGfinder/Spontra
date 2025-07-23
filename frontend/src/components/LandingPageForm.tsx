@@ -31,35 +31,30 @@ const THEMES = [
   { 
     id: 'adventure', 
     label: 'Adventure', 
-    icon: '🏔️',
     background: '/adventure-background.jpg',
     color: 'adventure'
   },
   { 
     id: 'nature', 
     label: 'Nature', 
-    icon: '🌿',
     background: '/nature-background.jpg',
     color: 'nature'
   },
   { 
     id: 'shopping', 
     label: 'Shopping', 
-    icon: '🛍️',
     background: '/shopping-background.jpg',
     color: 'shopping'
   },
   { 
     id: 'party', 
     label: 'Party', 
-    icon: '🌃',
     background: '/party-background.jpg',
     color: 'party'
   },
   { 
     id: 'learn', 
     label: 'Learn', 
-    icon: '🎭',
     background: '/learn-background.jpg',
     color: 'learn'
   }
@@ -232,35 +227,10 @@ export function LandingPageForm() {
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 p-4 md:p-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img 
-              src="/logo-main.jpg" 
-              alt="Logo" 
-              className="h-6 md:h-7 w-auto"
-              onError={(e) => {
-                // Fallback to text if logo fails to load
-                e.currentTarget.style.display = 'none'
-                const fallback = e.currentTarget.parentNode?.querySelector('.logo-fallback') as HTMLElement
-                if (fallback) fallback.style.display = 'inline'
-              }}
-            />
-            <img 
-              src="/logo-text.jpg" 
-              alt="Explore" 
-              className="h-4 md:h-5 w-auto"
-              onError={(e) => {
-                // Fallback to text if logo fails to load
-                e.currentTarget.style.display = 'none'
-                const fallback = e.currentTarget.parentNode?.querySelector('.text-fallback') as HTMLElement
-                if (fallback) fallback.style.display = 'inline'
-              }}
-            />
-            <div className="logo-fallback text-white font-muli" style={{ display: 'none' }}>
-              <span className="text-xl md:text-2xl font-normal">spon</span>
-            </div>
-            <div className="text-fallback text-white font-muli" style={{ display: 'none' }}>
-              <span className="text-xl md:text-2xl font-bold">EXPLORE</span>
-            </div>
+          <div className="flex items-center text-white font-muli">
+            <span className="text-xl md:text-2xl font-bold tracking-wide">SPONTRA</span>
+            <span className="mx-2 text-lg md:text-xl text-white/60">|</span>
+            <span className="text-lg md:text-xl font-normal tracking-wide">EXPLORE</span>
           </div>
           <div className="text-white/80 text-xs md:text-sm hover:text-white cursor-pointer font-muli">
             Sign In
@@ -272,9 +242,10 @@ export function LandingPageForm() {
       <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
         {/* Form Panel with Overlay */}
         <div 
-          className="relative p-4 md:p-6 w-full lg:w-[370px] lg:p-5"
+          className="relative p-4 md:p-6 w-full lg:w-[370px] lg:p-5 h-full overflow-y-auto"
           style={{ 
-            maxWidth: '100vw'
+            maxWidth: '100vw',
+            maxHeight: 'calc(100vh - 60px)'
           }}
         >
           {/* Form Panel Overlay */}

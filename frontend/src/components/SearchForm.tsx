@@ -50,21 +50,23 @@ export function SearchForm({
   }
 
   return (
-    <div className="h-full flex flex-col font-muli">
+    <div className="h-full flex flex-col font-muli min-h-0">
       {/* Form Header */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6 flex-shrink-0">
         <h2 className="text-white font-bold mb-1" style={{ fontSize: '18px' }}>
           WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col" style={{ gap: '10px' }}>
-        {/* Theme Selection */}
-        <VerticalThemeSelector
-          themes={themes}
-          selectedTheme={formValues.selectedTheme}
-          onThemeSelect={(themeId) => setValue('selectedTheme', themeId)}
-        />
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3 sm:gap-4 min-h-0">
+        {/* Form Content - Scrollable */}
+        <div className="flex-1 flex flex-col gap-3 sm:gap-4 overflow-y-auto min-h-0">
+          {/* Theme Selection */}
+          <VerticalThemeSelector
+            themes={themes}
+            selectedTheme={formValues.selectedTheme}
+            onThemeSelect={(themeId) => setValue('selectedTheme', themeId)}
+          />
 
         {/* Trip Type Toggle */}
         <TripTypeToggle
@@ -194,24 +196,25 @@ export function SearchForm({
           )}
         </div>
 
-        {/* Flight Time Slider */}
-        <div className="flex-1">
-          <FlightTimeSlider
-            value={formValues.maxFlightTime}
-            onChange={(value) => setValue('maxFlightTime', value)}
-            min={0}
-            max={12}
-            step={0.5}
-          />
-          {getFieldError('maxFlightTime') && (
-            <div className="text-red-400 mt-1" style={{ fontSize: '10px' }}>
-              {getFieldError('maxFlightTime')}
-            </div>
-          )}
+          {/* Flight Time Slider */}
+          <div>
+            <FlightTimeSlider
+              value={formValues.maxFlightTime}
+              onChange={(value) => setValue('maxFlightTime', value)}
+              min={0}
+              max={12}
+              step={0.5}
+            />
+            {getFieldError('maxFlightTime') && (
+              <div className="text-red-400 mt-1" style={{ fontSize: '10px' }}>
+                {getFieldError('maxFlightTime')}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Search Button */}
-        <div className="mt-auto">
+        {/* Search Button - Fixed at bottom */}
+        <div className="flex-shrink-0 mt-4">
           <button
             type="submit"
             disabled={!isValid || isLoading}
