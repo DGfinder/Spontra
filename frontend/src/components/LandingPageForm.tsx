@@ -3,8 +3,12 @@
 import { useEffect } from 'react'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
+import { CitySelection } from './CitySelection'
+import { ActivityConstellation } from './ActivityConstellation'
+import { FlightResults } from './FlightResults'
+import { BookingConfirmation } from './BookingConfirmation'
 import { useDestinationExplore } from '@/hooks/useDestinationExplore'
-import { useFormData, useSearchState, useSearchActions } from '@/store/searchStore'
+import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
 
 interface FormData {
@@ -122,7 +126,16 @@ export function LandingPageForm() {
   // Get state from Zustand store
   const formData = useFormData()
   const { isLoading, isError, error, results, showResults } = useSearchState()
+  const navigation = useNavigationState()
   const { updateFormData, setShowResults, clearResults } = useSearchActions()
+  const { 
+    navigateToStep, 
+    navigateBack, 
+    setSelectedDestination, 
+    setSelectedCity, 
+    setSelectedActivity, 
+    setSelectedFlight 
+  } = useNavigationActions()
   
   // Use the destination explore hook
   const { exploreDestinations, retry } = useDestinationExplore()
@@ -147,6 +160,8 @@ export function LandingPageForm() {
       console.log(`Found ${response.recommended_destinations.length} destinations for ${data.selectedTheme} theme`)
       
       // Results are automatically set by the hook via store
+      // Navigate to results step
+      navigateToStep('results')
     } catch (error) {
       console.error('Destination exploration failed:', error)
       
@@ -211,6 +226,90 @@ export function LandingPageForm() {
   const handleBackToSearch = () => {
     setShowResults(false)
     clearResults()
+    navigateToStep('search')
+  }
+
+  const handleExploreDestination = (destination: DestinationRecommendation) => {
+    console.log('Exploring destination:', destination.destination.city_name)
+    setSelectedDestination(destination)
+    navigateToStep('cities')
+  }
+
+  const handleCitySelect = (city: any) => {
+    setSelectedCity(city)
+    // Create destination object compatible with ActivityConstellation
+    const destinationForActivity: DestinationRecommendation = {
+      destination: {
+        id: city.id || city.airport_code,
+        airport_code: city.airport_code,
+        city_name: city.name,
+        country_name: navigation.selectedDestination?.destination.country_name || 'Unknown',
+        country_code: navigation.selectedDestination?.destination.country_code || 'ES',
+        description: city.description || 'Beautiful destination',
+        image_url: '',
+        activities: [],
+        popularity_score: 75,
+        climate_info: {
+          average_temperature: '15-25°C',
+          rainy_months: [],
+          sunny_months: [],
+          climate_type: 'Temperate'
+        },
+        best_time_to_visit: [],
+        budget: {
+          level: 'mid-range',
+          daily_budget_range: city.estimated_price || '€200-400',
+          currency: 'EUR'
+        },
+        timezone: 'Europe/Madrid',
+        language: ['English', 'Spanish'],
+        currency: 'EUR',
+        visa_required: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      flight_route: {
+        id: `${formData.departureAirport}-${city.airport_code}`,
+        origin_airport_code: formData.departureAirport,
+        destination_airport_code: city.airport_code,
+        estimated_duration_hours: Math.floor(city.flight_duration),
+        estimated_duration_minutes: Math.round((city.flight_duration % 1) * 60),
+        total_duration_minutes: city.flight_duration * 60,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      match_score: 90,
+      activity_matches: [formData.selectedTheme] as any,
+      reason_for_recommendation: `Perfect for ${formData.selectedTheme} activities`,
+      estimated_flight_price: city.estimated_price || '€250'
+    }
+    setSelectedDestination(destinationForActivity)
+    navigateToStep('activities')
+  }
+
+  const handleActivitySelect = (activity: any) => {
+    setSelectedActivity(activity)
+    navigateToStep('flights')
+  }
+
+  const handleFlightSelect = (flight: any) => {
+    setSelectedFlight(flight)
+    navigateToStep('booking')
+  }
+
+  const handleBackToResults = () => {
+    navigateBack()
+  }
+
+  const handleStartNewSearch = () => {
+    // Reset all navigation and search state
+    clearResults()
+    setShowResults(false)
+    navigateToStep('search')
+    setSelectedDestination(null)
+    setSelectedCity(null)
+    setSelectedActivity(null)
+    setSelectedFlight(null)
   }
 
   return (
@@ -282,8 +381,8 @@ export function LandingPageForm() {
         </div>
       </div>
 
-      {/* Search Results Overlay */}
-      {showResults && (
+      {/* Navigation-based Rendering */}
+      {navigation.currentStep === 'results' && showResults && (
         <SearchResults
           results={results}
           isLoading={isLoading}
@@ -294,10 +393,66 @@ export function LandingPageForm() {
           selectedTheme={formData.selectedTheme}
           onBackToSearch={handleBackToSearch}
           onRetry={retry}
-          onExploreDestination={(destination) => {
-            console.log('Exploring destination:', destination.destination.city_name)
-            // TODO: Navigate to destination details or booking
+          onExploreDestination={handleExploreDestination}
+        />
+      )}
+
+      {navigation.currentStep === 'cities' && navigation.selectedDestination && (
+        <CitySelection
+          country={{
+            name: navigation.selectedDestination.destination.country_name,
+            region: 'Europe' // TODO: Get from country data
           }}
+          originAirport={formData.departureAirport}
+          selectedTheme={formData.selectedTheme}
+          onBack={handleBackToResults}
+          onCitySelect={handleCitySelect}
+        />
+      )}
+
+      {navigation.currentStep === 'activities' && navigation.selectedDestination && (
+        <ActivityConstellation
+          recommendation={navigation.selectedDestination}
+          originAirport={formData.departureAirport}
+          onBack={handleBackToResults}
+          onActivitySelect={handleActivitySelect}
+          onBookFlight={() => navigateToStep('flights')}
+        />
+      )}
+
+      {navigation.currentStep === 'flights' && navigation.selectedDestination && (
+        <FlightResults
+          recommendation={navigation.selectedDestination}
+          originAirport={formData.departureAirport}
+          selectedActivity={navigation.selectedActivity?.category}
+          onBack={handleBackToResults}
+          onFlightSelect={handleFlightSelect}
+        />
+      )}
+
+      {navigation.currentStep === 'booking' && navigation.selectedDestination && navigation.selectedFlight && (
+        <BookingConfirmation
+          destination={navigation.selectedDestination}
+          flight={navigation.selectedFlight}
+          activity={navigation.selectedActivity}
+          originAirport={formData.departureAirport}
+          onStartNewSearch={handleStartNewSearch}
+        />
+      )}
+
+      {/* Legacy Search Results Overlay - Show when not using navigation flow */}
+      {showResults && navigation.currentStep === 'search' && (
+        <SearchResults
+          results={results}
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          maxFlightTime={formData.maxFlightTime}
+          departureAirport={formData.departureAirport}
+          selectedTheme={formData.selectedTheme}
+          onBackToSearch={handleBackToSearch}
+          onRetry={retry}
+          onExploreDestination={handleExploreDestination}
         />
       )}
       

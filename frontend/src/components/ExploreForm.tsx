@@ -54,10 +54,10 @@ export function ExploreForm() {
   // Dynamic background based on selected activities
   const getBackgroundImage = () => {
     if (formData.preferredActivities.length === 0) {
-      return '/Nature Master.png' // Default to the nature image
+      return '/nature-background.jpg' // Default to the nature image
     }
     
-    // Priority order for background selection
+    // Priority order for background selection - matches LandingPageForm themes
     if (formData.preferredActivities.includes('shopping')) {
       return '/shopping-background.jpg'
     }
@@ -67,12 +67,15 @@ export function ExploreForm() {
     if (formData.preferredActivities.includes('nightlife')) {
       return '/party-background.jpg'
     }
-    if (formData.preferredActivities.includes('adventure') || formData.preferredActivities.includes('nature')) {
+    if (formData.preferredActivities.includes('adventure')) {
       return '/adventure-background.jpg'
+    }
+    if (formData.preferredActivities.includes('nature') || formData.preferredActivities.includes('beaches') || formData.preferredActivities.includes('relaxation')) {
+      return '/nature-background.jpg'
     }
     
     // Fallback to nature image
-    return '/Nature Master.png'
+    return '/nature-background.jpg'
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -465,11 +468,12 @@ export function ExploreForm() {
             /* Background Attribution when no results */
             <div className="flex items-end justify-end p-8 h-full">
               <div className="text-white/60 text-xs bg-black/30 px-3 py-1 rounded">
-                {formData.preferredActivities.length === 0 ? 'Default View' : 
+                {formData.preferredActivities.length === 0 ? 'Nature & Relaxation' : 
                  formData.preferredActivities.includes('shopping') ? 'Shopping Districts' :
                  formData.preferredActivities.includes('culture') || formData.preferredActivities.includes('sightseeing') ? 'Cultural Experiences' :
                  formData.preferredActivities.includes('nightlife') ? 'Nightlife Scene' :
-                 formData.preferredActivities.includes('adventure') || formData.preferredActivities.includes('nature') ? 'Adventure Awaits' :
+                 formData.preferredActivities.includes('adventure') ? 'Adventure Awaits' :
+                 formData.preferredActivities.includes('nature') || formData.preferredActivities.includes('beaches') || formData.preferredActivities.includes('relaxation') ? 'Nature & Serenity' :
                  'Explore More'}
               </div>
             </div>

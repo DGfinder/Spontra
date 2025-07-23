@@ -373,12 +373,15 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
 
   const getActivityTheme = () => {
     switch (selectedTheme) {
-      case 'nightlife': return 'from-purple-900 via-pink-900 to-slate-900'
       case 'adventure': return 'from-orange-900 via-amber-900 to-slate-900'
-      case 'culture': return 'from-blue-900 via-indigo-900 to-slate-900'
-      case 'food': return 'from-green-900 via-emerald-900 to-slate-900'
       case 'nature': return 'from-green-900 via-teal-900 to-slate-900'
       case 'shopping': return 'from-pink-900 via-rose-900 to-slate-900'
+      case 'party': return 'from-purple-900 via-pink-900 to-slate-900'
+      case 'learn': return 'from-blue-900 via-indigo-900 to-slate-900'
+      // Legacy theme mappings for backward compatibility
+      case 'nightlife': return 'from-purple-900 via-pink-900 to-slate-900'
+      case 'culture': return 'from-blue-900 via-indigo-900 to-slate-900'
+      case 'food': return 'from-green-900 via-emerald-900 to-slate-900'
       default: return 'from-slate-900 via-slate-800 to-slate-900'
     }
   }

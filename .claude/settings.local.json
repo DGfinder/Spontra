@@ -15,7 +15,9 @@
       "Bash(ls:*)",
       "Bash(mv:*)",
       "Bash(find:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

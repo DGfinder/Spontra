@@ -5,10 +5,26 @@ import Link from 'next/link'
 
 interface HeaderProps {
   isExploreMode?: boolean
+  onNavigateToSearch?: () => void
 }
 
-export function Header({ isExploreMode = false }: HeaderProps) {
+export function Header({ isExploreMode = false, onNavigateToSearch }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [showComingSoon, setShowComingSoon] = useState(false)
+
+  const handleComingSoonClick = (feature: string) => {
+    setShowComingSoon(true)
+    setTimeout(() => setShowComingSoon(false), 3000)
+  }
+
+  const handleFlightsClick = () => {
+    // Navigate to search/home
+    if (onNavigateToSearch) {
+      onNavigateToSearch()
+    } else {
+      window.location.href = '/'
+    }
+  }
 
   if (isExploreMode) {
     return (
@@ -25,9 +41,12 @@ export function Header({ isExploreMode = false }: HeaderProps) {
 
             {/* Right side - simplified for explore mode */}
             <div className="flex items-center space-x-4">
-              <Link href="/login" className="text-white/80 hover:text-white transition-colors text-sm">
+              <button 
+                onClick={() => handleComingSoonClick('sign-in')}
+                className="text-white/80 hover:text-white transition-colors text-sm"
+              >
                 Sign In
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -53,28 +72,46 @@ export function Header({ isExploreMode = false }: HeaderProps) {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/flights" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button 
+              onClick={handleFlightsClick}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Flights
-            </Link>
-            <Link href="/hotels" className="text-gray-600 hover:text-gray-900 transition-colors">
+            </button>
+            <button 
+              onClick={() => handleComingSoonClick('hotels')}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Hotels
-            </Link>
-            <Link href="/deals" className="text-gray-600 hover:text-gray-900 transition-colors">
+            </button>
+            <button 
+              onClick={() => handleComingSoonClick('deals')}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Deals
-            </Link>
-            <Link href="/my-trips" className="text-gray-600 hover:text-gray-900 transition-colors">
+            </button>
+            <button 
+              onClick={() => handleComingSoonClick('my-trips')}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               My Trips
-            </Link>
+            </button>
           </nav>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+            <button 
+              onClick={() => handleComingSoonClick('sign-in')}
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
               Sign In
-            </Link>
-            <Link href="/register" className="btn-primary">
+            </button>
+            <button 
+              onClick={() => handleComingSoonClick('sign-up')}
+              className="btn-primary"
+            >
               Sign Up
-            </Link>
+            </button>
           </div>
 
           {/* Mobile menu button */}
@@ -98,30 +135,62 @@ export function Header({ isExploreMode = false }: HeaderProps) {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-4">
-              <Link href="/flights" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <button 
+                onClick={handleFlightsClick}
+                className="text-gray-600 hover:text-gray-900 transition-colors text-left"
+              >
                 Flights
-              </Link>
-              <Link href="/hotels" className="text-gray-600 hover:text-gray-900 transition-colors">
+              </button>
+              <button 
+                onClick={() => handleComingSoonClick('hotels')}
+                className="text-gray-600 hover:text-gray-900 transition-colors text-left"
+              >
                 Hotels
-              </Link>
-              <Link href="/deals" className="text-gray-600 hover:text-gray-900 transition-colors">
+              </button>
+              <button 
+                onClick={() => handleComingSoonClick('deals')}
+                className="text-gray-600 hover:text-gray-900 transition-colors text-left"
+              >
                 Deals
-              </Link>
-              <Link href="/my-trips" className="text-gray-600 hover:text-gray-900 transition-colors">
+              </button>
+              <button 
+                onClick={() => handleComingSoonClick('my-trips')}
+                className="text-gray-600 hover:text-gray-900 transition-colors text-left"
+              >
                 My Trips
-              </Link>
+              </button>
               <div className="pt-4 border-t border-gray-200 flex flex-col space-y-2">
-                <Link href="/login" className="text-gray-600 hover:text-gray-900 transition-colors">
+                <button 
+                  onClick={() => handleComingSoonClick('sign-in')}
+                  className="text-gray-600 hover:text-gray-900 transition-colors text-left"
+                >
                   Sign In
-                </Link>
-                <Link href="/register" className="btn-primary inline-block text-center">
+                </button>
+                <button 
+                  onClick={() => handleComingSoonClick('sign-up')}
+                  className="btn-primary inline-block text-center"
+                >
                   Sign Up
-                </Link>
+                </button>
               </div>
             </nav>
           </div>
         )}
       </div>
+
+      {/* Coming Soon Notification */}
+      {showComingSoon && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <div className="flex items-center space-x-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="font-medium">Coming Soon!</span>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

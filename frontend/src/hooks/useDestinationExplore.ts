@@ -5,10 +5,12 @@ import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
 // Theme to activity mapping
 const THEME_TO_ACTIVITY: Record<string, ActivityType> = {
   adventure: 'adventure',
-  activities: 'activities',
+  nature: 'nature',
   shopping: 'shopping',
   party: 'nightlife',
-  learn: 'culture'
+  learn: 'culture',
+  // Legacy mappings for compatibility
+  activities: 'activities'
 }
 
 export function useDestinationExplore() {
@@ -78,10 +80,27 @@ export function useDestinationExplore() {
   const { clearResults } = useSearchActions()
 
   const retry = useCallback(async () => {
-    // For retry, we need the last search parameters
-    // This could be stored in the store or passed as a parameter
-    console.log('Retry functionality would need last search parameters')
-  }, [])
+    // Get the current form data for retry
+    const { formData } = useSearchStore.getState()
+    
+    if (!formData.departureAirport) {
+      console.error('Cannot retry: No departure airport in form data')
+      return
+    }
+
+    console.log('Retrying destination exploration with stored parameters...')
+    
+    try {
+      // Clear any existing error state
+      setError(null)
+      
+      // Retry the search with current form data
+      await exploreDestinations(formData)
+    } catch (error) {
+      console.error('Retry failed:', error)
+      // Error is already handled by exploreDestinations
+    }
+  }, [exploreDestinations, setError])
 
   return {
     exploreDestinations,

@@ -20,6 +20,21 @@ export interface SearchHistory {
   searchDuration: number
 }
 
+// Navigation flow types
+type NavigationStep = 'search' | 'results' | 'cities' | 'activities' | 'flights' | 'booking'
+
+interface NavigationState {
+  currentStep: NavigationStep
+  selectedDestination: DestinationRecommendation | null
+  selectedCity: any | null
+  selectedActivity: any | null
+  selectedFlight: any | null
+  canGoBack: boolean
+  navigationHistory: NavigationStep[]
+  isNavigating: boolean
+  navigationMessage: string | null
+}
+
 interface SearchState {
   // Form data
   formData: FormData
@@ -30,6 +45,9 @@ interface SearchState {
   error: string | null
   results: DestinationRecommendation[]
   showResults: boolean
+  
+  // Navigation state
+  navigation: NavigationState
   
   // Search history
   searchHistory: SearchHistory[]
@@ -54,6 +72,16 @@ interface SearchActions {
   setResults: (results: DestinationRecommendation[]) => void
   setShowResults: (show: boolean) => void
   clearResults: () => void
+  
+  // Navigation actions
+  navigateToStep: (step: NavigationStep) => void
+  navigateBack: () => void
+  setSelectedDestination: (destination: DestinationRecommendation | null) => void
+  setSelectedCity: (city: any | null) => void
+  setSelectedActivity: (activity: any | null) => void
+  setSelectedFlight: (flight: any | null) => void
+  resetNavigation: () => void
+  setIsNavigating: (isNavigating: boolean, message?: string) => void
   
   // History actions
   addToHistory: (search: Omit<SearchHistory, 'id' | 'timestamp'>) => void
@@ -86,6 +114,18 @@ const initialPreferences = {
   recentAirports: []
 }
 
+const initialNavigationState: NavigationState = {
+  currentStep: 'search',
+  selectedDestination: null,
+  selectedCity: null,
+  selectedActivity: null,
+  selectedFlight: null,
+  canGoBack: false,
+  navigationHistory: ['search'],
+  isNavigating: false,
+  navigationMessage: null
+}
+
 export const useSearchStore = create<SearchStore>()(
   devtools(
     persist(
@@ -97,6 +137,7 @@ export const useSearchStore = create<SearchStore>()(
         error: null,
         results: [],
         showResults: false,
+        navigation: initialNavigationState,
         searchHistory: [],
         preferences: initialPreferences,
 
@@ -158,6 +199,113 @@ export const useSearchStore = create<SearchStore>()(
             },
             false,
             'clearResults'
+          ),
+
+        // Navigation actions
+        navigateToStep: (step) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                currentStep: step,
+                navigationHistory: [...state.navigation.navigationHistory, step],
+                canGoBack: state.navigation.navigationHistory.length > 0,
+                isNavigating: false,
+                navigationMessage: null
+              }
+            }),
+            false,
+            'navigateToStep'
+          ),
+
+        navigateBack: () =>
+          set(
+            (state) => {
+              const history = [...state.navigation.navigationHistory]
+              history.pop() // Remove current step
+              const previousStep = history[history.length - 1] || 'search'
+              
+              return {
+                navigation: {
+                  ...state.navigation,
+                  currentStep: previousStep,
+                  navigationHistory: history,
+                  canGoBack: history.length > 1
+                }
+              }
+            },
+            false,
+            'navigateBack'
+          ),
+
+        setSelectedDestination: (destination) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                selectedDestination: destination
+              }
+            }),
+            false,
+            'setSelectedDestination'
+          ),
+
+        setSelectedCity: (city) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                selectedCity: city
+              }
+            }),
+            false,
+            'setSelectedCity'
+          ),
+
+        setSelectedActivity: (activity) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                selectedActivity: activity
+              }
+            }),
+            false,
+            'setSelectedActivity'
+          ),
+
+        setSelectedFlight: (flight) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                selectedFlight: flight
+              }
+            }),
+            false,
+            'setSelectedFlight'
+          ),
+
+        resetNavigation: () =>
+          set(
+            {
+              navigation: initialNavigationState
+            },
+            false,
+            'resetNavigation'
+          ),
+
+        setIsNavigating: (isNavigating, message) =>
+          set(
+            (state) => ({
+              navigation: {
+                ...state.navigation,
+                isNavigating,
+                navigationMessage: message || null
+              }
+            }),
+            false,
+            'setIsNavigating'
           ),
 
         // History actions
@@ -271,6 +419,7 @@ export const useSearchState = () => useSearchStore((state) => ({
   results: state.results,
   showResults: state.showResults
 }))
+export const useNavigationState = () => useSearchStore((state) => state.navigation)
 export const useSearchHistory = () => useSearchStore((state) => state.searchHistory)
 export const usePreferences = () => useSearchStore((state) => state.preferences)
 
@@ -290,4 +439,16 @@ export const useSearchActions = () => useSearchStore((state) => ({
   addRecentAirport: state.addRecentAirport,
   addPreferredTheme: state.addPreferredTheme,
   removePreferredTheme: state.removePreferredTheme
+}))
+
+// Navigation action selectors
+export const useNavigationActions = () => useSearchStore((state) => ({
+  navigateToStep: state.navigateToStep,
+  navigateBack: state.navigateBack,
+  setSelectedDestination: state.setSelectedDestination,
+  setSelectedCity: state.setSelectedCity,
+  setSelectedActivity: state.setSelectedActivity,
+  setSelectedFlight: state.setSelectedFlight,
+  resetNavigation: state.resetNavigation,
+  setIsNavigating: state.setIsNavigating
 }))

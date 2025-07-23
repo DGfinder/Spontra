@@ -203,7 +203,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         aircraftType: 'A320',
         badge: 'Best Overall',
         arrivalContext: 'Perfect for morning exploration',
-        bookingLink: '#',
+        bookingLink: 'https://www.eurowings.com/booking/search',
         confidence: 95
       },
       {
@@ -218,7 +218,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         aircraftType: 'A319',
         badge: selectedActivity === 'nightlife' ? 'Party Ready' : 'Weekend Perfect',
         arrivalContext: selectedActivity === 'nightlife' ? 'Arrives in time for evening festivities' : 'Great for weekend breaks',
-        bookingLink: '#',
+        bookingLink: 'https://www.lufthansa.com/booking',
         confidence: 92
       },
       {
@@ -233,7 +233,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         aircraftType: 'B737',
         badge: 'Budget Choice',
         arrivalContext: 'Early start, full day ahead',
-        bookingLink: '#',
+        bookingLink: 'https://www.ryanair.com/gb/en/book',
         confidence: 78
       },
       {
@@ -248,7 +248,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         aircraftType: 'E190',
         badge: selectedActivity === 'adventure' ? 'Early Explorer' : undefined,
         arrivalContext: selectedActivity === 'adventure' ? 'Rest tonight, adventure tomorrow' : 'Evening arrival, night in the city',
-        bookingLink: '#',
+        bookingLink: 'https://www.klm.com/booking',
         confidence: 85
       }
     ]
@@ -382,7 +382,22 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
                   </div>
                 </div>
                 
-                <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-8 py-3 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105">
+                <button 
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-8 py-3 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105"
+                  onClick={() => {
+                    // Simulate realistic booking flow
+                    const bookingUrl = selectedFlight.bookingLink
+                    if (bookingUrl.includes('example.com')) {
+                      // For demo purposes, proceed to confirmation
+                      onFlightSelect?.(selectedFlight)
+                    } else {
+                      // Open real airline website in new tab
+                      window.open(bookingUrl, '_blank', 'noopener,noreferrer')
+                      // Still proceed to confirmation for demo
+                      setTimeout(() => onFlightSelect?.(selectedFlight), 1000)
+                    }
+                  }}
+                >
                   Book & Plan Activities
                 </button>
               </div>
