@@ -8,7 +8,6 @@ import { getThemeColor, getThemeHoverColor } from '@/lib/theme'
 interface Theme {
   id: string
   label: string
-  icon: string
   background: string
   color: string
 }
