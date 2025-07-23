@@ -33,35 +33,35 @@ const THEMES = [
     label: 'Adventure', 
     icon: '🏔️',
     background: '/adventure-background.jpg',
-    color: 'orange'
+    color: 'adventure'
   },
   { 
     id: 'nature', 
     label: 'Nature', 
     icon: '🌿',
     background: '/nature-background.jpg',
-    color: 'green'
+    color: 'nature'
   },
   { 
     id: 'shopping', 
     label: 'Shopping', 
     icon: '🛍️',
     background: '/shopping-background.jpg',
-    color: 'pink'
+    color: 'shopping'
   },
   { 
     id: 'party', 
     label: 'Party', 
     icon: '🌃',
     background: '/party-background.jpg',
-    color: 'purple'
+    color: 'party'
   },
   { 
     id: 'learn', 
     label: 'Learn', 
     icon: '🎭',
     background: '/learn-background.jpg',
-    color: 'green'
+    color: 'learn'
   }
 ]
 
@@ -234,15 +234,33 @@ export function LandingPageForm() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
-              src="/logo-main.png" 
+              src="/logo-main.jpg" 
               alt="Logo" 
-              className="h-8 md:h-10 w-auto"
+              className="h-6 md:h-7 w-auto"
+              onError={(e) => {
+                // Fallback to text if logo fails to load
+                e.currentTarget.style.display = 'none'
+                const fallback = e.currentTarget.parentNode?.querySelector('.logo-fallback')
+                if (fallback) fallback.style.display = 'inline'
+              }}
             />
             <img 
-              src="/logo-text.png" 
+              src="/logo-text.jpg" 
               alt="Explore" 
-              className="h-6 md:h-8 w-auto"
+              className="h-4 md:h-5 w-auto"
+              onError={(e) => {
+                // Fallback to text if logo fails to load
+                e.currentTarget.style.display = 'none'
+                const fallback = e.currentTarget.parentNode?.querySelector('.text-fallback')
+                if (fallback) fallback.style.display = 'inline'
+              }}
             />
+            <div className="logo-fallback text-white font-muli" style={{ display: 'none' }}>
+              <span className="text-xl md:text-2xl font-normal">spon</span>
+            </div>
+            <div className="text-fallback text-white font-muli" style={{ display: 'none' }}>
+              <span className="text-xl md:text-2xl font-bold">EXPLORE</span>
+            </div>
           </div>
           <div className="text-white/80 text-xs md:text-sm hover:text-white cursor-pointer font-muli">
             Sign In

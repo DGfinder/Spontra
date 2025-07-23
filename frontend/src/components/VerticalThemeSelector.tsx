@@ -21,10 +21,10 @@ export function VerticalThemeSelector({
 }: VerticalThemeSelectorProps) {
   const getIconPath = (themeId: string) => {
     switch (themeId) {
-      case 'party': return '/party-icon.png'
-      case 'nature': return '/nature-icon.png'
-      case 'shopping': return '/shopping-icon.png'
-      case 'learn': return '/learn-icon.png'
+      case 'party': return '/party-icon.jpg'
+      case 'nature': return '/nature-icon.jpg'
+      case 'shopping': return '/shopping-icon.jpg'
+      case 'learn': return '/learn-icon.jpg'
       case 'adventure': return null // No icon yet
       default: return null
     }
@@ -65,10 +65,14 @@ export function VerticalThemeSelector({
               {/* Theme Icon or Color Box */}
               {iconPath ? (
                 <div
-                  className="flex-shrink-0 rounded flex items-center justify-center"
+                  className="flex-shrink-0 rounded flex items-center justify-center relative"
                   style={{
-                    width: '30px',
-                    height: isSelected ? '34px' : '24px',
+                    width: '32px',
+                    height: isSelected ? '36px' : '28px',
+                    backgroundColor: isSelected ? primaryColor : 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '6px',
+                    padding: '4px',
+                    border: isSelected ? `2px solid ${primaryColor}` : '2px solid transparent',
                     transition: 'all 300ms ease-out'
                   }}
                 >
@@ -77,10 +81,23 @@ export function VerticalThemeSelector({
                     alt={`${theme.label} icon`}
                     className="w-full h-full object-contain"
                     style={{
-                      filter: isSelected ? `brightness(0) saturate(100%) invert(1)` : 'none',
+                      filter: isSelected ? 'brightness(0) invert(1)' : 'none',
+                      opacity: isSelected ? 0.9 : 0.8,
                       transition: 'all 300ms ease-out'
                     }}
+                    onError={(e) => {
+                      // Fallback to emoji if image fails to load
+                      e.currentTarget.style.display = 'none'
+                      const fallback = e.currentTarget.parentNode?.querySelector('.fallback-icon')
+                      if (fallback) fallback.style.display = 'block'
+                    }}
                   />
+                  <div 
+                    className="fallback-icon absolute inset-0 flex items-center justify-center text-lg"
+                    style={{ display: 'none' }}
+                  >
+                    {theme.icon}
+                  </div>
                 </div>
               ) : (
                 <div
