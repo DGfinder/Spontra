@@ -60,16 +60,16 @@ export function FlightTimeSlider({
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-3">
-        <label className="block text-sm font-medium text-white/90">
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-white/90 font-muli" style={{ fontSize: '12px' }}>
           FLIGHT TIME
         </label>
-        <div className="text-sm text-white font-medium">
+        <div className="text-white font-muli" style={{ fontSize: '11px' }}>
           Up to {formatTime(value)}
         </div>
       </div>
       
-      <div className="relative pb-8">
+      <div className="relative pb-6">
         {/* Custom styled range input */}
         <div className="relative">
           <input
@@ -83,11 +83,11 @@ export function FlightTimeSlider({
             onMouseUp={() => setIsDragging(false)}
             onTouchStart={() => setIsDragging(true)}
             onTouchEnd={() => setIsDragging(false)}
-            className={`w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider ${
+            className={`w-full h-1 bg-white/20 rounded appearance-none cursor-pointer slider ${
               isDragging ? 'active' : ''
             }`}
             style={{
-              background: `linear-gradient(to right, #f97316 0%, #f97316 ${getSliderPosition()}%, rgba(255,255,255,0.2) ${getSliderPosition()}%, rgba(255,255,255,0.2) 100%)`
+              background: `linear-gradient(to right, rgb(230, 230, 230) 0%, rgb(230, 230, 230) ${getSliderPosition()}%, rgba(255,255,255,0.2) ${getSliderPosition()}%, rgba(255,255,255,0.2) 100%)`
             }}
           />
         </div>
@@ -96,50 +96,40 @@ export function FlightTimeSlider({
         <div className="relative">
           {generateTicks()}
         </div>
-        
-        {/* Range description */}
-        <div className="mt-3 text-xs text-white/60">
-          Shows flights from 0 hours up to {formatTime(value)}
-        </div>
       </div>
 
       <style jsx>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
-          width: 20px;
-          height: 20px;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
-          background: #f97316;
-          border: 2px solid white;
+          background: rgb(230, 230, 230);
+          border: none;
           cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
           transition: all 0.15s ease;
         }
         
         .slider::-webkit-slider-thumb:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          background: rgb(220, 220, 220);
         }
         
         .slider::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
+          width: 12px;
+          height: 12px;
           border-radius: 50%;
-          background: #f97316;
-          border: 2px solid white;
+          background: rgb(230, 230, 230);
+          border: none;
           cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
           transition: all 0.15s ease;
         }
         
         .slider::-moz-range-thumb:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          background: rgb(220, 220, 220);
         }
         
         .slider.active::-webkit-slider-thumb {
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          background: rgb(220, 220, 220);
         }
         
         .slider::-webkit-slider-track {

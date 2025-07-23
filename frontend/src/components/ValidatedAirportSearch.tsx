@@ -201,11 +201,16 @@ export function ValidatedAirportSearch({
         onFocus={handleFocus}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 transition-colors ${
+        className={`w-full bg-white text-black rounded border-0 font-muli transition-colors ${
           displayError 
-            ? 'focus:ring-red-500 ring-1 ring-red-500' 
-            : 'focus:ring-orange-500'
+            ? 'ring-1 ring-red-500' 
+            : ''
         }`}
+        style={{ 
+          height: '32px',
+          fontSize: '11px',
+          padding: '0 8px'
+        }}
         autoComplete="off"
         aria-expanded={showSuggestions}
         aria-haspopup="listbox"
@@ -215,7 +220,7 @@ export function ValidatedAirportSearch({
 
       {/* Error message */}
       {displayError && (
-        <div id="airport-error" className="text-red-400 text-xs mt-1">
+        <div id="airport-error" className="text-red-400 mt-1 font-muli" style={{ fontSize: '10px' }}>
           {displayError}
         </div>
       )}

@@ -220,34 +220,73 @@ export function LandingPageForm() {
 
   return (
     <div 
-      className="min-h-screen w-full bg-cover bg-center bg-no-repeat relative transition-all duration-1000 overflow-hidden bg-fixed md:bg-fixed"
+      className="h-screen w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
       style={{ 
         backgroundImage: `url('${currentTheme.background}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
-        minHeight: '100vh'
+        height: '100vh',
+        width: '100vw'
       }}
     >
+      {/* 70.2% Black Overlay */}
+      <div 
+        className="absolute inset-0 z-10"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
+      />
+
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-30 p-4 md:p-6">
         <div className="flex items-center justify-between">
-          <div className="text-white">
-            <span className="text-xl md:text-2xl font-light">spon</span>
+          <div className="text-white font-muli">
+            <span className="text-xl md:text-2xl font-normal">spon</span>
             <span className="text-xl md:text-2xl font-bold">EXPLORE</span>
           </div>
-          <div className="text-white/80 text-sm hover:text-white cursor-pointer">
+          <div className="text-white/80 text-xs md:text-sm hover:text-white cursor-pointer font-muli">
             Sign In
           </div>
         </div>
       </div>
 
-      {/* Search Form Panel - Mobile First Responsive */}
-      <div className="absolute inset-0 md:left-0 md:top-0 md:bottom-0 md:w-96 bg-black/80 backdrop-blur-sm z-20 md:relative">
-        <SearchForm
-          themes={THEMES}
-          onSubmit={handleSubmit}
-          isLoading={isLoading}
-        />
+      {/* Layout - Desktop: Two Panels, Mobile: Single Panel */}
+      <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
+        {/* Form Panel */}
+        <div 
+          className="bg-transparent p-4 md:p-6 lg:p-5 w-full lg:w-auto"
+          style={{ 
+            maxWidth: '100vw',
+            '@media (min-width: 1024px)': {
+              width: '370px',
+              padding: '20px'
+            }
+          }}
+        >
+          <SearchForm
+            themes={THEMES}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* Details Panel - Hidden on mobile/tablet, visible on large screens */}
+        <div 
+          className="hidden lg:block bg-transparent"
+          style={{ 
+            width: '369px',
+            padding: '20px'
+          }}
+        >
+          <div className="text-white font-muli">
+            <h3 className="font-bold mb-4" style={{ fontSize: '18px' }}>
+              Discover Amazing Destinations
+            </h3>
+            <p className="opacity-80" style={{ fontSize: '12px', lineHeight: '1.637' }}>
+              Find your perfect getaway based on your interests and travel style. 
+              From adventure-packed destinations to cultural experiences, 
+              we'll help you discover places that match your mood.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Search Results Overlay */}
