@@ -29,6 +29,7 @@ export const searchFormSchema = z.object({
   
   returnDate: z
     .string()
+    .transform((val) => val === '' ? undefined : val)
     .optional(),
   
   passengers: z

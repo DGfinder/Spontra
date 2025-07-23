@@ -39,16 +39,40 @@ export function useSearchForm() {
     reset(formData)
   }, [formData, reset])
 
-  // Helper function to set individual field values
-  const updateField = <K extends keyof SearchFormData>(
+  // Helper function to set individual field values with proper type handling
+  function updateField<K extends keyof SearchFormData>(
     field: K,
     value: SearchFormData[K]
-  ) => {
-    setValue(field, value, {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true
-    })
+  ): void
+  function updateField(field: 'returnDate', value: string | undefined): void
+  function updateField<K extends keyof SearchFormData>(
+    field: K,
+    value: SearchFormData[K] | undefined
+  ): void {
+    try {
+      // Handle optional fields specifically
+      if (field === 'returnDate') {
+        // For optional returnDate, handle both undefined and empty string
+        const processedValue = value === undefined || value === '' ? '' : value
+        setValue(field as any, processedValue as any, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
+        return
+      }
+      
+      // For all other cases, use the value directly with null checks
+      if (value !== undefined && value !== null) {
+        setValue(field as any, value as any, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        })
+      }
+    } catch (error) {
+      console.warn(`Failed to update field ${String(field)}:`, error)
+    }
   }
 
   // Helper function to validate specific field

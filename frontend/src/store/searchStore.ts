@@ -73,7 +73,7 @@ const initialFormData: FormData = {
   selectedTheme: 'adventure',
   departureAirport: '',
   departureDate: '',
-  returnDate: '',
+  returnDate: undefined,
   passengers: 1,
   tripType: 'return',
   maxFlightTime: 4
