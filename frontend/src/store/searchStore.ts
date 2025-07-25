@@ -21,7 +21,7 @@ export interface SearchHistory {
 }
 
 // Navigation flow types
-type NavigationStep = 'search' | 'results' | 'cities' | 'activities' | 'flights' | 'booking'
+type NavigationStep = 'search' | 'results' | 'countries' | 'cities' | 'activities' | 'flights' | 'booking'
 
 interface NavigationState {
   currentStep: NavigationStep
