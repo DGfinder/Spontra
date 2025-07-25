@@ -63,7 +63,7 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
 
   const handleClick = (e: React.MouseEvent) => {
     if (window.innerWidth >= 768) {
-      onClick()
+      onClick?.()
     } else {
       setShowMobileDetails(!showMobileDetails)
     }
@@ -202,7 +202,7 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      onClick()
+                      onClick?.()
                       setShowMobileDetails(false)
                     }}
                     className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-semibold rounded px-3 py-2 text-sm transition-all duration-200 flex items-center justify-center space-x-1"
