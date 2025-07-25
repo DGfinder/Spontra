@@ -3,10 +3,12 @@
 import { useEffect } from 'react'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
+import { CountryConstellation } from './CountryConstellation'
 import { CitySelection } from './CitySelection'
 import { ActivityConstellation } from './ActivityConstellation'
 import { FlightResults } from './FlightResults'
 import { BookingConfirmation } from './BookingConfirmation'
+import { BreadcrumbNavigation } from './BreadcrumbNavigation'
 import { useDestinationExplore } from '@/hooks/useDestinationExplore'
 import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
@@ -231,6 +233,7 @@ export function LandingPageForm() {
 
   const handleExploreDestination = (destination: DestinationRecommendation) => {
     console.log('Exploring destination:', destination.destination.city_name)
+    // For now, go directly to cities until CountryConstellation is properly integrated
     setSelectedDestination(destination)
     navigateToStep('cities')
   }
@@ -301,6 +304,16 @@ export function LandingPageForm() {
     navigateBack()
   }
 
+  const handleViewCountryConstellation = () => {
+    navigateToStep('countries')
+  }
+
+  const handleCountryExplore = (destination: DestinationRecommendation) => {
+    console.log('Exploring country:', destination.destination.country_name)
+    setSelectedDestination(destination)
+    navigateToStep('cities')
+  }
+
   const handleStartNewSearch = () => {
     // Reset all navigation and search state
     clearResults()
@@ -323,27 +336,30 @@ export function LandingPageForm() {
         width: '100vw'
       }}
     >
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-30 p-4 md:p-6">
+      {/* Header - Mobile Responsive */}
+      <div className="absolute top-0 left-0 right-0 z-30 p-3 md:p-4 lg:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center text-white font-muli">
-            <span className="text-xl md:text-2xl font-bold tracking-wide">SPONTRA</span>
-            <span className="mx-2 text-lg md:text-xl text-white/60">|</span>
-            <span className="text-lg md:text-xl font-normal tracking-wide">EXPLORE</span>
+            <span className="text-lg sm:text-xl md:text-2xl font-bold tracking-wide">SPONTRA</span>
+            <span className="mx-1 sm:mx-2 text-base sm:text-lg md:text-xl text-white/60">|</span>
+            <span className="text-base sm:text-lg md:text-xl font-normal tracking-wide">EXPLORE</span>
           </div>
-          <div className="text-white/80 text-xs md:text-sm hover:text-white cursor-pointer font-muli">
+          <div className="text-white/80 text-xs sm:text-sm hover:text-white cursor-pointer font-muli transition-colors duration-200">
             Sign In
           </div>
         </div>
       </div>
 
-      {/* Layout - Desktop: Two Panels, Mobile: Single Panel */}
-      <div className="absolute inset-0 z-20 flex flex-col lg:flex-row" style={{ top: '60px' }}>
-        {/* Form Panel with Overlay */}
+      {/* Breadcrumb Navigation */}
+      <BreadcrumbNavigation />
+
+      {/* Layout - Responsive: Mobile first, then desktop */}
+      <div className="absolute inset-0 z-20 flex flex-col lg:flex-row pt-24 sm:pt-28 md:pt-32">
+        {/* Form Panel with Overlay - Responsive */}
         <div 
-          className="relative p-5 w-[370px] h-full overflow-y-auto"
+          className="relative p-4 md:p-5 w-full lg:w-[370px] xl:w-[400px] h-full overflow-y-auto"
           style={{ 
-            maxHeight: 'calc(100vh - 60px)'
+            maxHeight: 'calc(100vh - 6rem)' 
           }}
         >
           {/* Form Panel Overlay */}
@@ -360,19 +376,19 @@ export function LandingPageForm() {
           </div>
         </div>
 
-        {/* Details Panel - Hidden on mobile/tablet, visible on large screens */}
+        {/* Details Panel - Responsive visibility and sizing */}
         <div 
-          className="hidden lg:block bg-transparent"
+          className="hidden lg:flex lg:flex-col bg-transparent"
           style={{ 
             width: '369px',
             padding: '20px'
           }}
         >
           <div className="text-white font-muli">
-            <h3 className="font-bold mb-4" style={{ fontSize: '18px' }}>
+            <h3 className="font-bold mb-4 text-lg xl:text-xl">
               Discover Amazing Destinations
             </h3>
-            <p className="opacity-80" style={{ fontSize: '12px', lineHeight: '1.637' }}>
+            <p className="opacity-80 text-sm xl:text-base leading-relaxed">
               Find your perfect getaway based on your interests and travel style. 
               From adventure-packed destinations to cultural experiences, 
               we'll help you discover places that match your mood.
@@ -394,6 +410,14 @@ export function LandingPageForm() {
           onBackToSearch={handleBackToSearch}
           onRetry={retry}
           onExploreDestination={handleExploreDestination}
+        />
+      )}
+
+      {navigation.currentStep === 'countries' && results.length > 0 && (
+        <CountryConstellation
+          originAirport={formData.departureAirport}
+          recommendations={results}
+          onCountryClick={handleCountryExplore}
         />
       )}
 

@@ -57,7 +57,7 @@ export function SearchForm({
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3" role="search" aria-label="Travel search form">
         {/* Form Content */}
         <div className="flex-1 flex flex-col gap-3">
           {/* Theme Selection */}
@@ -86,7 +86,13 @@ export function SearchForm({
               placeholder="Type city or airport name"
               error={getFieldError('departureAirport')}
               required
+              aria-describedby={hasFieldError('departureAirport') ? 'departure-airport-error' : undefined}
             />
+            {hasFieldError('departureAirport') && (
+              <div id="departure-airport-error" role="alert" className="text-red-400 text-xs mt-1">
+                {getFieldError('departureAirport')}
+              </div>
+            )}
           </div>
 
           {/* To Airport - Disabled */}
@@ -97,6 +103,7 @@ export function SearchForm({
             <input
               id="destination"
               type="text"
+              aria-label="Destination will be determined by your preferences"
               value="Anywhere"
               disabled
               className="w-full bg-white/20 text-white/60 rounded border-0 font-muli"

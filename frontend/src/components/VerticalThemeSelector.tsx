@@ -38,20 +38,25 @@ export function VerticalThemeSelector({
 
   return (
     <div className="mb-3">
-      <div className="flex flex-col gap-1">
-        {themes.map((theme) => {
-          const isSelected = selectedTheme === theme.id
-          const themeKey = theme.id as ThemeKey
-          const primaryColor = getThemeColor(themeKey)
-          const hoverColor = getThemeHoverColor(themeKey)
-          const themeIcon = getThemeIcon(theme.id, isSelected, primaryColor)
-          
-          return (
-            <button
-              key={theme.id}
-              type="button"
-              onClick={() => onThemeSelect(theme.id)}
-              className="flex items-center gap-2 p-1 rounded group"
+      <fieldset>
+        <legend className="sr-only">Choose your travel theme</legend>
+        <div className="flex flex-col gap-1" role="radiogroup" aria-label="Travel themes">
+          {themes.map((theme) => {
+            const isSelected = selectedTheme === theme.id
+            const themeKey = theme.id as ThemeKey
+            const primaryColor = getThemeColor(themeKey)
+            const hoverColor = getThemeHoverColor(themeKey)
+            const themeIcon = getThemeIcon(theme.id, isSelected, primaryColor)
+            
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                onClick={() => onThemeSelect(theme.id)}
+                className="flex items-center gap-2 p-1 rounded group"
+                role="radio"
+                aria-checked={isSelected}
+                aria-describedby={`theme-${theme.id}-description`}
               style={{
                 backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
                 transition: 'all 300ms ease-out'
@@ -92,13 +97,15 @@ export function VerticalThemeSelector({
                   color: isSelected ? primaryColor : 'rgb(255, 255, 255)',
                   transition: 'all 300ms ease-out'
                 }}
+                id={`theme-${theme.id}-description`}
               >
                 {theme.label}
               </span>
             </button>
           )
         })}
-      </div>
+        </div>
+      </fieldset>
     </div>
   )
 }

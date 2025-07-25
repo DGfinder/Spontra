@@ -54,6 +54,20 @@ interface ActivityCircleProps {
 
 function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadClick }: ActivityCircleProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [showMobileDetails, setShowMobileDetails] = useState(false)
+
+  const handleTouch = (e: React.TouchEvent) => {
+    e.preventDefault()
+    setShowMobileDetails(!showMobileDetails)
+  }
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (window.innerWidth >= 768) {
+      onClick()
+    } else {
+      setShowMobileDetails(!showMobileDetails)
+    }
+  }
 
   return (
     <div
@@ -65,11 +79,12 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
+      onTouchStart={handleTouch}
+      onClick={handleClick}
     >
-      {/* Activity Circle with Image */}
+      {/* Activity Circle with Image - Touch-friendly size */}
       <div className="relative">
-        <div className="w-28 h-28 rounded-full overflow-hidden border-3 border-yellow-400 hover:border-yellow-300 hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 backdrop-blur-sm">
+        <div className="w-32 h-32 sm:w-28 sm:h-28 rounded-full overflow-hidden border-3 border-yellow-400 hover:border-yellow-300 hover:shadow-lg hover:shadow-yellow-400/30 transition-all duration-300 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 backdrop-blur-sm">
           {/* Placeholder for activity image */}
           <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center relative overflow-hidden">
             {/* Activity Category Icon as Background */}
@@ -113,9 +128,21 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
           </div>
         </div>
 
-        {/* Hover Tooltip with Activity Details */}
-        {isHovered && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-64 bg-black/90 backdrop-blur-sm text-white p-4 rounded-lg text-xs z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+        {/* Activity Details - Desktop hover or Mobile touch */}
+        {(isHovered || showMobileDetails) && (
+          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 w-72 sm:w-64 bg-black/95 backdrop-blur-sm text-white p-4 sm:p-3 rounded-lg text-sm sm:text-xs z-50 animate-in fade-in slide-in-from-bottom-2 duration-200 border border-white/20">
+            {/* Mobile close button */}
+            {showMobileDetails && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMobileDetails(false)
+                }}
+                className="absolute top-2 right-2 sm:hidden w-6 h-6 bg-white/20 rounded-full flex items-center justify-center text-white/70 hover:text-white"
+              >
+                ×
+              </button>
+            )}
             <div className="font-semibold text-yellow-400 mb-2 text-sm">
               {activity.name}
             </div>
@@ -168,8 +195,23 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
                 </div>
               )}
               
-              {/* UGC Upload Button */}
-              <div className="mt-3 pt-2 border-t border-white/20">
+              {/* Mobile action buttons */}
+              <div className="mt-3 pt-2 border-t border-white/20 space-y-2">
+                {/* Select Activity Button - Mobile only */}
+                {showMobileDetails && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onClick()
+                      setShowMobileDetails(false)
+                    }}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 text-black font-semibold rounded px-3 py-2 text-sm transition-all duration-200 flex items-center justify-center space-x-1"
+                  >
+                    <span>Select This Activity</span>
+                  </button>
+                )}
+                
+                {/* UGC Upload Button */}
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
@@ -417,38 +459,40 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
         destination={recommendation.destination}
       />
 
-      {/* Header */}
-      <header className="relative z-10 p-6 border-b border-white/10">
+      {/* Responsive Header */}
+      <header className="relative z-10 p-4 sm:p-6 border-b border-white/10">
         <div className="flex items-center justify-between max-w-6xl mx-auto">
           <button 
             onClick={onBack}
-            className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
+            className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors min-h-[44px] px-2"
           >
             <ArrowLeft size={20} />
-            <span>Back to Countries</span>
+            <span className="hidden sm:inline">Back to Cities</span>
+            <span className="sm:hidden">Back</span>
           </button>
           
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">EXPLORE THIS COUNTRY</h1>
-            <p className="text-white/60 text-sm mt-1">
-              Choose activities in {recommendation.destination.city_name}, {recommendation.destination.country_name}
+          <div className="text-center flex-1 mx-4">
+            <h1 className="text-lg sm:text-2xl font-bold">EXPLORE ACTIVITIES</h1>
+            <p className="text-white/60 text-xs sm:text-sm mt-1">
+              Choose activities in {recommendation.destination.city_name}
             </p>
           </div>
           
-          <div className="flex space-x-3">
+          <div className="flex space-x-2 sm:space-x-3">
             <button 
               onClick={() => setIsUGCUploadOpen(true)}
-              className="bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+              className="hidden sm:flex bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 items-center space-x-2"
             >
               <Upload size={16} />
-              <span>Share Your Experience</span>
+              <span>Share Experience</span>
             </button>
             
             <button 
               onClick={() => onBookFlight?.(recommendation)}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold px-6 py-2 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300"
+              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold px-4 sm:px-6 py-2 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 min-h-[44px]"
             >
-              Book Flight
+              <span className="hidden sm:inline">Book Flight</span>
+              <span className="sm:hidden">Book</span>
             </button>
           </div>
         </div>
@@ -458,9 +502,10 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
       <main className="relative z-10 flex-1 h-screen">
         <div className="relative w-full h-full">
           {/* Instructions */}
-          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10">
-            <p className="text-white/60 text-sm text-center tracking-wider">
-              Hover over activities to see details • Click to add to your itinerary
+          <div className="absolute top-4 sm:top-8 left-1/2 transform -translate-x-1/2 z-10 px-4">
+            <p className="text-white/60 text-xs sm:text-sm text-center tracking-wider">
+              <span className="hidden sm:inline">Hover over activities to see details • Click to add to your itinerary</span>
+              <span className="sm:hidden">Tap activities to see details and select them</span>
             </p>
           </div>
 

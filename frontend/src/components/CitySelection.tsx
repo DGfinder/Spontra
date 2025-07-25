@@ -55,6 +55,7 @@ interface CityCardProps {
 function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isPressed, setIsPressed] = useState(false)
+  const [showDetails, setShowDetails] = useState(false)
 
   const getThemeColor = (theme: string) => {
     switch (theme) {
@@ -85,14 +86,26 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
     .sort((a, b) => b.strength - a.strength)
     .slice(0, 3)
 
+  const handleCardInteraction = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (e.type === 'click') {
+      onClick()
+    }
+  }
+
+  const toggleDetails = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setShowDetails(!showDetails)
+  }
+
   return (
     <div
-      className="group cursor-pointer"
+      className="group cursor-pointer w-full max-w-sm"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
-      onClick={onClick}
+      onClick={handleCardInteraction}
     >
       {/* Luxury Card Container */}
       <div className={`relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-3xl p-6 transition-all duration-500 ease-out ${
@@ -172,15 +185,34 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
           </div>
         )}
 
-        {/* Luxury Interaction Indicator */}
-        <div className={`absolute bottom-2 right-2 w-2 h-2 rounded-full transition-all duration-300 ${
+        {/* Mobile Info Button - visible on small screens */}
+        <button
+          onClick={toggleDetails}
+          className="absolute bottom-3 right-3 sm:hidden w-8 h-8 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/30 transition-all duration-300"
+          aria-label="View details"
+        >
+          <span className="text-xs">ⓘ</span>
+        </button>
+
+        {/* Desktop Interaction Indicator */}
+        <div className={`hidden sm:block absolute bottom-2 right-2 w-2 h-2 rounded-full transition-all duration-300 ${
           isHovered ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' : 'bg-white/20'
         }`}></div>
 
-        {/* Luxury Hover Details Modal */}
-        {isHovered && (
-          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-80 z-50">
+        {/* Details Modal - Desktop hover or Mobile toggle */}
+        {(isHovered || showDetails) && (
+          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 w-full max-w-sm sm:max-w-md lg:w-80 z-50 mx-2">
             <div className="bg-black/95 backdrop-blur-xl border border-white/30 rounded-2xl shadow-2xl shadow-black/40 overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+              {/* Mobile Close Button */}
+              {showDetails && (
+                <button
+                  onClick={toggleDetails}
+                  className="absolute top-2 right-2 sm:hidden w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white/70 hover:text-white z-10"
+                  aria-label="Close details"
+                >
+                  <span className="text-xs">×</span>
+                </button>
+              )}
               {/* Header Section */}
               <div className="px-6 py-4 border-b border-white/10">
                 <div className="flex items-center justify-between">
@@ -400,53 +432,52 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
         destination={{ city_name: 'Cities', country_name: country.name }}
       />
 
-      {/* Luxury Header */}
-      <header className="relative z-10 px-8 py-8 border-b border-white/10 bg-black/20 backdrop-blur-sm">
+      {/* Responsive Header */}
+      <header className="relative z-10 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 border-b border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="flex items-center justify-between max-w-8xl mx-auto">
           <button 
             onClick={onBack}
-            className="flex items-center space-x-3 text-white/70 hover:text-white transition-all duration-300 group px-4 py-2 rounded-xl hover:bg-white/10"
+            className="flex items-center space-x-2 sm:space-x-3 text-white/70 hover:text-white transition-all duration-300 group px-2 sm:px-4 py-2 rounded-xl hover:bg-white/10 min-h-[44px]"
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform duration-300" />
-            <span className="font-light tracking-wide">Back to Countries</span>
+            <span className="font-light tracking-wide text-sm sm:text-base">Back to Results</span>
           </button>
           
-          <div className="text-center">
-            <h1 className="text-4xl font-extralight tracking-wider text-white mb-2">
+          <div className="text-center flex-1 mx-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extralight tracking-wider text-white mb-1 sm:mb-2">
               {country.name}
             </h1>
-            <div className="flex items-center justify-center space-x-4 text-white/60">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-4 text-white/60">
               <div className="flex items-center space-x-2">
                 <Plane size={14} />
-                <span className="text-sm font-light tracking-wide">From {originAirport}</span>
+                <span className="text-xs sm:text-sm font-light tracking-wide">From {originAirport}</span>
               </div>
-              <div className="w-1 h-1 bg-white/40 rounded-full"></div>
-              <span className="text-sm font-light tracking-wide">Curated by accessibility</span>
+              <div className="hidden sm:block w-1 h-1 bg-white/40 rounded-full"></div>
+              <span className="hidden sm:inline text-xs sm:text-sm font-light tracking-wide">Curated destinations</span>
               {selectedTheme && (
                 <>
-                  <div className="w-1 h-1 bg-white/40 rounded-full"></div>
-                  <span className="text-sm font-light tracking-wide capitalize">Best for {selectedTheme}</span>
+                  <div className="hidden sm:block w-1 h-1 bg-white/40 rounded-full"></div>
+                  <span className="text-xs sm:text-sm font-light tracking-wide capitalize">Best for {selectedTheme}</span>
                 </>
               )}
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            {/* Optional Map Discovery Toggle */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Map button - hidden on small screens */}
             <button 
-              className="flex items-center space-x-2 text-white/60 hover:text-white/80 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-white/10 border border-white/20 hover:border-white/30"
+              className="hidden lg:flex items-center space-x-2 text-white/60 hover:text-white/80 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-white/10 border border-white/20 hover:border-white/30"
               onClick={() => {
-                // TODO: Implement map modal
                 console.log('Map discovery mode coming soon...')
               }}
             >
               <Map size={16} />
-              <span className="text-sm font-light tracking-wide">Explore on Map</span>
+              <span className="text-sm font-light tracking-wide">Map</span>
             </button>
             
             <div className="text-right">
-              <div className="text-3xl font-extralight text-white">{cities.length}</div>
-              <div className="text-white/60 text-sm font-light tracking-wider uppercase">Cities</div>
+              <div className="text-xl sm:text-2xl lg:text-3xl font-extralight text-white">{cities.length}</div>
+              <div className="text-white/60 text-xs sm:text-sm font-light tracking-wider uppercase">Cities</div>
             </div>
           </div>
         </div>
@@ -460,15 +491,15 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
         </p>
       </div>
 
-      {/* Luxury City Grid */}
-      <main className="relative z-10 flex-1 px-8 pb-16">
+      {/* Responsive City Grid */}
+      <main className="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto">
           {/* Major Cities Section */}
-          <div className="mb-12">
-            <h2 className="text-white/60 text-sm font-light tracking-widest uppercase mb-6 text-center">
+          <div className="mb-8 sm:mb-12">
+            <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mb-4 sm:mb-6 text-center">
               Premier Destinations
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
               {sortedCities.slice(0, 3).map((city) => (
                 <CityCard
                   key={city.id}
@@ -483,14 +514,14 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
           {/* Hidden Gems Section */}
           {sortedCities.length > 3 && (
             <div className="relative">
-              <div className="flex items-center mb-6">
+              <div className="flex items-center mb-4 sm:mb-6">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent to-white/20"></div>
-                <h2 className="text-white/60 text-sm font-light tracking-widest uppercase mx-6">
+                <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mx-4 sm:mx-6">
                   Hidden Gems
                 </h2>
                 <div className="flex-1 h-px bg-gradient-to-l from-transparent to-white/20"></div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
                 {sortedCities.slice(3).map((city) => (
                   <CityCard
                     key={city.id}

@@ -41,137 +41,63 @@ export function SearchSummaryBar({ searchData }: SearchSummaryBarProps) {
 
   return (
     <>
-      {/* Desktop Layout - Exact positioning from 2015 design */}
-      <div 
-        className="hidden lg:block absolute"
-        style={{
-          left: '0px',
-          top: '0px',
-          width: '1920px',
-          height: '1080px',
-          zIndex: 69
-        }}
-      >
-        {/* Small gray rectangle separator */}
-        <div
-          className="absolute"
-          style={{
-            backgroundColor: 'rgb(246, 246, 246)',
-            left: '387px',
-            top: '129px',
-            width: '7px',
-            height: '13px',
-            zIndex: 68
-          }}
-        />
+      {/* Desktop Layout - Responsive positioning */}
+      <div className="hidden lg:block absolute inset-x-0 top-0 z-30">
+        <div className="flex items-center justify-center pt-20 xl:pt-24">
+          <div className="bg-black/40 backdrop-blur-sm rounded-lg px-6 py-3 mx-4">
+            <div className="flex items-center gap-6 xl:gap-8">
+              {/* Selected theme */}
+              <div 
+                className="font-muli font-bold text-lg xl:text-xl"
+                style={{ color: summary.themeColor }}
+              >
+                {summary.themeDisplay}
+              </div>
 
-        {/* Origin and travel time info */}
-        <div
-          className="absolute font-muli"
-          style={{
-            fontSize: '12px',
-            color: 'rgb(220, 220, 220)',
-            lineHeight: 1.5,
-            textAlign: 'left',
-            left: '680.402px',
-            top: '141.742px',
-            width: '139.071px',
-            height: '28.099px',
-            zIndex: 67
-          }}
-        >
-          {summary.originInfo}
-        </div>
+              {/* Separator */}
+              <div className="w-px h-6 bg-gray-300" />
 
-        {/* Passenger info */}
-        <div
-          className="absolute font-muli font-bold"
-          style={{
-            fontSize: '12px',
-            color: 'rgb(220, 220, 220)',
-            lineHeight: 1.5,
-            textAlign: 'left',
-            left: '1076.202px',
-            top: '140.791px',
-            width: '98.909px',
-            height: '12.875px',
-            zIndex: 66
-          }}
-        >
-          {summary.passengerInfo}
-        </div>
+              {/* Origin and travel time info */}
+              <div className="font-muli text-xs xl:text-sm text-gray-300">
+                {summary.originInfo}
+              </div>
 
-        {/* Date range */}
-        <div
-          className="absolute font-muli uppercase"
-          style={{
-            fontSize: '12px',
-            color: 'rgb(220, 220, 220)',
-            lineHeight: 1.5,
-            textAlign: 'left',
-            left: '878.451px',
-            top: '140.736px',
-            width: '145.972px',
-            height: '28.984px',
-            zIndex: 65
-          }}
-        >
-          {summary.dateRange}
-        </div>
+              {/* Date range */}
+              <div className="font-muli text-xs xl:text-sm text-gray-300 uppercase">
+                {summary.dateRange}
+              </div>
 
-        {/* Selected theme */}
-        <div
-          className="absolute font-muli font-bold"
-          style={{
-            fontSize: '18px',
-            color: summary.themeColor,
-            lineHeight: 1.667,
-            textAlign: 'left',
-            left: '524.221px',
-            top: '157.59px',
-            width: '88.559px',
-            height: '13px',
-            zIndex: 63
-          }}
-        >
-          {summary.themeDisplay}
+              {/* Passenger info */}
+              <div className="font-muli font-bold text-xs xl:text-sm text-gray-300">
+                {summary.passengerInfo}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Mobile/Tablet Layout - Compact horizontal summary */}
-      <div className="lg:hidden bg-black/60 border-b border-white/20 p-3 z-50">
-        <div className="flex flex-col gap-2">
+      {/* Mobile/Tablet Layout - Improved compact layout */}
+      <div className="lg:hidden fixed top-14 sm:top-16 md:top-20 left-0 right-0 bg-black/60 backdrop-blur-sm border-b border-white/20 px-3 py-2 z-40">
+        <div className="flex flex-col gap-1.5">
           {/* Theme and Origin row */}
           <div className="flex items-center justify-between">
             <div 
-              className="font-muli font-bold"
-              style={{
-                fontSize: '16px',
-                color: summary.themeColor
-              }}
+              className="font-muli font-bold text-sm sm:text-base"
+              style={{ color: summary.themeColor }}
             >
               {summary.themeDisplay}
             </div>
-            <div 
-              className="font-muli text-xs"
-              style={{ color: 'rgb(220, 220, 220)' }}
-            >
+            <div className="font-muli text-xs text-gray-300">
               From {searchData.departureAirport}
             </div>
           </div>
 
           {/* Details row */}
           <div className="flex items-center justify-between text-xs">
-            <div 
-              className="font-muli"
-              style={{ color: 'rgb(220, 220, 220)' }}
-            >
+            <div className="font-muli text-gray-300">
               {summary.passengerInfo}
             </div>
-            <div 
-              className="font-muli"
-              style={{ color: 'rgb(220, 220, 220)' }}
-            >
+            <div className="font-muli text-gray-300">
               Max {searchData.maxFlightTime}h flight
             </div>
           </div>
