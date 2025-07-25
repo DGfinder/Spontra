@@ -53,11 +53,12 @@ function SkeletonCircle({ size = 'md', className = '', animate = true }: Skeleto
   )
 }
 
-function CardSkeleton({ size = 'md', animate = true }: { size?: 'sm' | 'md' | 'lg', animate?: boolean }) {
+function CardSkeleton({ size = 'md', animate = true }: { size?: 'sm' | 'md' | 'lg' | 'xl', animate?: boolean }) {
   const cardSizes = {
     sm: 'p-4 space-y-3',
     md: 'p-6 space-y-4',
-    lg: 'p-8 space-y-6'
+    lg: 'p-8 space-y-6',
+    xl: 'p-10 space-y-8'
   }
 
   return (

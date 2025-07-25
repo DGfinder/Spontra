@@ -137,7 +137,7 @@ class AmadeusService {
   // Search for flights between specific destinations
   async searchFlights(params: FlightSearchParams): Promise<AmadeusFlightOffer[]> {
     try {
-      const response = await this.client.searchFlights(params)
+      const response = await this.client.searchFlights(params) as any
       return response.data || []
     } catch (error) {
       console.error('Flight search failed:', error)
@@ -153,7 +153,7 @@ class AmadeusService {
   // Search for destination inspiration
   async searchDestinations(params: DestinationSearchParams): Promise<AmadeusDestination[]> {
     try {
-      const response = await this.client.searchDestinations(params)
+      const response = await this.client.searchDestinations(params) as any
       return response.data || []
     } catch (error) {
       console.error('Destination search failed:', error)
@@ -169,7 +169,7 @@ class AmadeusService {
   // Search for airports and cities
   async searchLocations(keyword: string, subType?: 'AIRPORT' | 'CITY'): Promise<AmadeusLocationSearchResult[]> {
     try {
-      const response = await this.client.searchLocations(keyword, subType)
+      const response = await this.client.searchLocations(keyword, subType) as any
       return response.data || []
     } catch (error) {
       console.error('Location search failed:', error)
@@ -185,7 +185,7 @@ class AmadeusService {
   // Get detailed airport information
   async getAirportInfo(iataCode: string): Promise<AmadeusLocationSearchResult> {
     try {
-      const response = await this.client.getAirportInfo(iataCode)
+      const response = await this.client.getAirportInfo(iataCode) as any
       return response.data
     } catch (error) {
       console.error('Airport info fetch failed:', error)

@@ -6,20 +6,7 @@ import { ExplorationProgress } from './ExplorationProgress'
 import { VideoModal } from './VideoModal'
 import { UGCUpload } from './UGCUpload'
 import { youtubeService, YouTubeVideo } from '../services/youtubeService'
-
-interface DestinationRecommendation {
-  destination: {
-    city_name: string
-    country_name: string
-    airport_code: string
-  }
-  flight_route: {
-    total_duration_minutes: number
-  }
-  match_score: number
-  estimated_flight_price?: string
-  reason_for_recommendation?: string
-}
+import { DestinationRecommendation } from '@/services/apiClient'
 
 interface ActivityOption {
   id: string

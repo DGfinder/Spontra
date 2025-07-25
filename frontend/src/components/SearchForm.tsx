@@ -103,7 +103,6 @@ export function SearchForm({
             <input
               id="destination"
               type="text"
-              aria-label="Destination will be determined by your preferences"
               value="Anywhere"
               disabled
               className="w-full bg-white/20 text-white/60 rounded border-0 font-muli"
