@@ -1,20 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-
-interface DestinationRecommendation {
-  destination: {
-    city_name: string
-    country_name: string
-    airport_code: string
-  }
-  flight_route: {
-    total_duration_minutes: number
-  }
-  match_score: number
-  estimated_flight_price?: string
-  reason_for_recommendation?: string
-}
+import { DestinationRecommendation } from '@/services/apiClient'
 
 interface CountryConstellationProps {
   originAirport: string
