@@ -147,4 +147,20 @@ export interface SearchForm {
   returnDate?: string
   passengers: number
   tripType: 'roundtrip' | 'oneway'
+  maxFlightTime?: number // For backward compatibility
+  minFlightTime?: number
+  maxFlightTimeRange?: number
+  flightTimeRange?: [number, number]
+}
+
+// Extended search form for destination exploration
+export interface DestinationSearchForm {
+  selectedTheme: string
+  departureAirport: string
+  departureDate: string
+  returnDate?: string
+  passengers: number
+  tripType: 'one-way' | 'return'
+  flightTimeRange: [number, number]
+  passengerClass?: string
 }

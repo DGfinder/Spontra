@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/gocql/gocql"
-	"github.com/spontra/data-ingestion-service/internal/models"
+	"spontra/data-ingestion-service/internal/models"
 )
 
 type UGCService struct {

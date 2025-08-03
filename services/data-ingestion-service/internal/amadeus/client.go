@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/shopspring/decimal"
 	"spontra/data-ingestion-service/internal/config"
 	"spontra/data-ingestion-service/internal/models"
 	"spontra/data-ingestion-service/pkg/httpclient"
@@ -770,9 +771,3 @@ func (c *Client) getAircraftName(code string, dictionaries *Dictionaries) string
 	}
 	return ""
 }
-
-import (
-	"io"
-	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
-)

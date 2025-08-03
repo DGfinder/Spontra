@@ -19,7 +19,10 @@ interface FormData {
   returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
-  maxFlightTime: number
+  maxFlightTime?: number // For backward compatibility
+  flightTimeRange?: [number, number]
+  minFlightTime?: number
+  maxFlightTimeRange?: number
 }
 
 interface SearchFormProps {
@@ -204,15 +207,22 @@ export function SearchForm({
           {/* Flight Time Slider */}
           <div>
             <FlightTimeSlider
-              value={formValues.maxFlightTime}
-              onChange={(value) => setValue('maxFlightTime', value)}
-              min={0}
+              mode="range"
+              rangeValue={formValues.flightTimeRange || [1, formValues.maxFlightTime || 8]}
+              onRangeChange={(range) => {
+                setValue('flightTimeRange', range)
+                setValue('minFlightTime', range[0])
+                setValue('maxFlightTimeRange', range[1])
+                // Keep backward compatibility
+                setValue('maxFlightTime', range[1])
+              }}
+              min={0.5}
               max={12}
               step={0.5}
             />
-            {getFieldError('maxFlightTime') && (
+            {(getFieldError('flightTimeRange') || getFieldError('maxFlightTime')) && (
               <div className="text-red-400 mt-1" style={{ fontSize: '10px' }}>
-                {getFieldError('maxFlightTime')}
+                {getFieldError('flightTimeRange') || getFieldError('maxFlightTime')}
               </div>
             )}
           </div>

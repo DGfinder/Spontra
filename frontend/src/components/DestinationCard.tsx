@@ -3,7 +3,7 @@ import { DestinationRecommendation } from '@/services/apiClient'
 interface DestinationCardProps {
   result: DestinationRecommendation
   selectedTheme: string
-  maxFlightTime: number
+  maxFlightTime?: number // Made optional for backward compatibility
   departureAirport: string
   index: number
   onExplore?: (destination: DestinationRecommendation) => void
@@ -118,10 +118,10 @@ export function DestinationCard({
             <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-orange-500 rounded-full transition-all duration-300 group-hover:bg-orange-400"
-                style={{ width: `${(flightTime / maxFlightTime) * 100}%` }}
+                style={{ width: `${(flightTime / (maxFlightTime || 12)) * 100}%` }}
                 role="progressbar"
                 aria-valuenow={flightTime}
-                aria-valuemax={maxFlightTime}
+                aria-valuemax={maxFlightTime || 12}
                 aria-label={`Flight time: ${flightTime.toFixed(1)} hours`}
               />
             </div>

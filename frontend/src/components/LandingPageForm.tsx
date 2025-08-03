@@ -20,7 +20,10 @@ interface FormData {
   returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
-  maxFlightTime: number
+  maxFlightTime?: number // Made optional for backward compatibility
+  flightTimeRange?: [number, number]
+  minFlightTime?: number
+  maxFlightTimeRange?: number
 }
 
 interface CountryResult {
@@ -169,8 +172,11 @@ export function LandingPageForm() {
       
       // Fallback to mock data on API failure
       console.log('Falling back to mock data...')
+      // Get max flight time from range or fallback
+      const maxFlightTime = data.flightTimeRange?.[1] ?? data.maxFlightTimeRange ?? data.maxFlightTime ?? 8
+      
       const filteredCountries = MOCK_COUNTRIES.filter(
-        country => country.averageFlightTime <= data.maxFlightTime
+        country => country.averageFlightTime <= maxFlightTime
       )
       
       // Convert mock data to API format for consistency  

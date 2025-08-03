@@ -9,7 +9,7 @@ interface SearchResultsProps {
   isLoading: boolean
   isError: boolean
   error: string | null
-  maxFlightTime: number
+  maxFlightTime?: number // Made optional for backward compatibility
   departureAirport: string
   selectedTheme: string
   onBackToSearch: () => void
@@ -41,7 +41,11 @@ export function SearchResults({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg md:text-2xl font-bold text-white">
-              Countries within {maxFlightTime}h from {departureAirport}
+              Countries within {
+                formData.flightTimeRange 
+                  ? `${formData.flightTimeRange[0]}h - ${formData.flightTimeRange[1]}h` 
+                  : `${maxFlightTime || formData.maxFlightTime || 8}h`
+              } from {departureAirport}
             </h2>
             <p className="text-white/70 mt-1 text-sm md:text-base">
               Found {results.length} destinations for your {selectedTheme} adventure

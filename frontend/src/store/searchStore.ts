@@ -9,7 +9,10 @@ export interface FormData {
   returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
-  maxFlightTime: number
+  maxFlightTime?: number // For backward compatibility
+  flightTimeRange?: [number, number]
+  minFlightTime?: number
+  maxFlightTimeRange?: number
 }
 
 export interface SearchHistory {
@@ -104,7 +107,10 @@ const initialFormData: FormData = {
   returnDate: undefined,
   passengers: 1,
   tripType: 'return',
-  maxFlightTime: 4
+  maxFlightTime: 8, // Keep for backward compatibility
+  flightTimeRange: [1, 8], // Default range: 1-8 hours
+  minFlightTime: 1,
+  maxFlightTimeRange: 8
 }
 
 const initialPreferences = {

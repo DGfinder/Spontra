@@ -22,18 +22,33 @@ export function SearchSummaryBar({ searchData }: SearchSummaryBarProps) {
       }).replace(/\//g, '/')
     }
 
+    // Format flight time info
+    const formatFlightTime = () => {
+      if (data.flightTimeRange) {
+        const [min, max] = data.flightTimeRange
+        return `${min}h - ${max}h flight time`
+      } else if (data.minFlightTime && data.maxFlightTimeRange) {
+        return `${data.minFlightTime}h - ${data.maxFlightTimeRange}h flight time`
+      } else if (data.maxFlightTime) {
+        return `Up to ${data.maxFlightTime}h flight time`
+      }
+      return '1h - 8h flight time' // fallback
+    }
+
     const departureFormatted = formatDate(data.departureDate)
     const dateRange = data.tripType === 'return' && data.returnDate
       ? `Departure Date: ${departureFormatted} Return Date: ${formatDate(data.returnDate)}`
       : `Departure Date: ${departureFormatted}`
 
+    const flightTimeDisplay = formatFlightTime()
+
     return {
       themeDisplay: themeName,
       themeColor,
-      originInfo: `Origin: ${data.departureAirport} Ideal travel Time: ${data.maxFlightTime}h`,
+      originInfo: `Origin: ${data.departureAirport} Ideal travel Time: ${flightTimeDisplay.replace(' flight time', 'h')}`,
       dateRange,
       passengerInfo: `${data.passengers} ${data.passengers === 1 ? 'Adult' : 'Adults'}, Economy`,
-      travelTimeInfo: `${data.maxFlightTime}h max flight time`
+      travelTimeInfo: flightTimeDisplay
     }
   }
 

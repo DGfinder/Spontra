@@ -20,7 +20,13 @@
       "Bash(git add:*)",
       "Bash(git config:*)",
       "Bash(git stash:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(go mod:*)",
+      "Bash(docker-compose:*)",
+      "Bash(go:*)",
+      "Bash(docker exec:*)",
+      "Bash(grep:*)",
+      "Bash(./monitoring/setup_monitoring.sh:*)"
     ],
     "deny": []
   }

@@ -5,7 +5,10 @@ export interface SearchSummaryData {
   returnDate?: string
   passengers: number
   tripType: 'one-way' | 'return'
-  maxFlightTime: number
+  maxFlightTime?: number // For backward compatibility
+  minFlightTime?: number
+  maxFlightTimeRange?: number
+  flightTimeRange?: [number, number]
   passengerClass?: string
 }
 

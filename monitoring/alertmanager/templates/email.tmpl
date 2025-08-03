@@ -1,0 +1,33 @@
+{{ define "email.spontra.subject" }}
+[{{ .Status | toUpper }}] {{ .GroupLabels.SortedPairs.Values | join " " }} ({{ len .Alerts }})
+{{ end }}
+
+{{ define "email.spontra.html" }}
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .alert { margin: 10px 0; padding: 10px; border-left: 5px solid #ddd; }
+    .critical { border-left-color: #d32f2f; background-color: #ffebee; }
+    .warning { border-left-color: #f57c00; background-color: #fff3e0; }
+    .info { border-left-color: #1976d2; background-color: #e3f2fd; }
+  </style>
+</head>
+<body>
+  <h2>Spontra Platform Alert</h2>
+  {{ range .Alerts }}
+  <div class="alert {{ .Labels.severity }}">
+    <h3>{{ .Annotations.summary }}</h3>
+    <p><strong>Description:</strong> {{ .Annotations.description }}</p>
+    <p><strong>Service:</strong> {{ .Labels.service }}</p>
+    <p><strong>Instance:</strong> {{ .Labels.instance }}</p>
+    <p><strong>Severity:</strong> {{ .Labels.severity }}</p>
+    <p><strong>Started:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05" }}</p>
+    {{ if .EndsAt }}
+    <p><strong>Ended:</strong> {{ .EndsAt.Format "2006-01-02 15:04:05" }}</p>
+    {{ end }}
+  </div>
+  {{ end }}
+</body>
+</html>
+{{ end }}

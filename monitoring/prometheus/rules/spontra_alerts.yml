@@ -1,0 +1,241 @@
+groups:
+  # System Health Alerts
+  - name: system.health
+    rules:
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 85% for instance {{ $labels.instance }}"
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        for: 5m
+        labels:
+          severity: critical
+          team: infrastructure
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 90% for instance {{ $labels.instance }}"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_size_bytes{fstype!="tmpfs"} - node_filesystem_free_bytes{fstype!="tmpfs"}) / node_filesystem_size_bytes{fstype!="tmpfs"} * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: infrastructure
+        annotations:
+          summary: "Disk space is running low"
+          description: "Disk usage is above 85% for {{ $labels.device }} on {{ $labels.instance }}"
+
+  # Service Health Alerts
+  - name: service.health
+    rules:
+      - alert: ServiceDown
+        expr: up{job=~"user-service|search-service|pricing-service|data-ingestion-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "{{ $labels.job }} is down"
+          description: "Service {{ $labels.job }} has been down for more than 1 minute"
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "Error rate is above 5% for {{ $labels.service }}"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "High response time on {{ $labels.service }}"
+          description: "95th percentile response time is above 2 seconds for {{ $labels.service }}"
+
+  # Database Alerts
+  - name: database.health
+    rules:
+      - alert: PostgreSQLDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 1 minute"
+
+      - alert: PostgreSQLHighConnections
+        expr: pg_stat_database_numbackends / pg_settings_max_connections * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "PostgreSQL connection usage is high"
+          description: "PostgreSQL is using more than 80% of max connections"
+
+      - alert: PostgreSQLSlowQueries
+        expr: rate(pg_stat_database_tup_returned[5m]) / rate(pg_stat_database_tup_fetched[5m]) < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: database
+        annotations:
+          summary: "PostgreSQL has many slow queries"
+          description: "Query efficiency is below 80% - many rows fetched but few returned"
+
+  # Redis Alerts
+  - name: redis.health
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: cache
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute"
+
+      - alert: RedisHighMemoryUsage
+        expr: redis_memory_used_bytes / redis_memory_max_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+          team: cache
+        annotations:
+          summary: "Redis memory usage is high"
+          description: "Redis is using more than 85% of max memory"
+
+      - alert: RedisLowHitRate
+        expr: rate(redis_keyspace_hits_total[5m]) / (rate(redis_keyspace_hits_total[5m]) + rate(redis_keyspace_misses_total[5m])) < 0.8
+        for: 10m
+        labels:
+          severity: warning
+          team: cache
+        annotations:
+          summary: "Redis hit rate is low"
+          description: "Redis cache hit rate is below 80%"
+
+  # Business Logic Alerts
+  - name: business.metrics
+    rules:
+      - alert: HighSearchFailureRate
+        expr: rate(spontra_search_requests_failed_total[5m]) / rate(spontra_search_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "High search failure rate"
+          description: "Search failure rate is above 10%"
+
+      - alert: LowUserRegistrations
+        expr: rate(spontra_user_registrations_total[1h]) < 1
+        for: 30m
+        labels:
+          severity: info
+          team: product
+        annotations:
+          summary: "Low user registration rate"
+          description: "User registrations are below 1 per hour"
+
+      - alert: HighPriceAlertVolume
+        expr: rate(spontra_price_alerts_sent_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+          team: product
+        annotations:
+          summary: "High volume of price alerts"
+          description: "Price alert rate is above 100 per 5 minutes"
+
+      - alert: AmadeusAPIQuotaExceeded
+        expr: rate(spontra_amadeus_requests_quota_exceeded_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Amadeus API quota exceeded"
+          description: "Amadeus API quota has been exceeded - flight searches may be impacted"
+
+  # Elasticsearch Alerts
+  - name: elasticsearch.health
+    rules:
+      - alert: ElasticsearchDown
+        expr: up{job="elasticsearch"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: search
+        annotations:
+          summary: "Elasticsearch is down"
+          description: "Elasticsearch cluster has been down for more than 1 minute"
+
+      - alert: ElasticsearchClusterRed
+        expr: elasticsearch_cluster_health_status{color="red"} == 1
+        for: 5m
+        labels:
+          severity: critical
+          team: search
+        annotations:
+          summary: "Elasticsearch cluster status is red"
+          description: "Elasticsearch cluster health is red - data loss may have occurred"
+
+      - alert: ElasticsearchHighIndexingRate
+        expr: rate(elasticsearch_indices_indexing_index_total[5m]) > 1000
+        for: 5m
+        labels:
+          severity: warning
+          team: search
+        annotations:
+          summary: "High Elasticsearch indexing rate"
+          description: "Elasticsearch indexing rate is above 1000 documents per second"
+
+  # Security Alerts
+  - name: security.alerts
+    rules:
+      - alert: HighFailedLoginAttempts
+        expr: rate(spontra_auth_failed_attempts_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High number of failed login attempts"
+          description: "Failed login attempts rate is above 10 per 5 minutes"
+
+      - alert: SuspiciousAPIUsage
+        expr: rate(http_requests_total{status="429"}[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High rate limiting triggers"
+          description: "Rate limiting is being triggered frequently - possible attack"
+
+      - alert: UnauthorizedAccessAttempts
+        expr: rate(http_requests_total{status="401"}[5m]) > 20
+        for: 5m
+        labels:
+          severity: warning
+          team: security
+        annotations:
+          summary: "High number of unauthorized access attempts"
+          description: "401 Unauthorized responses are above 20 per 5 minutes"
