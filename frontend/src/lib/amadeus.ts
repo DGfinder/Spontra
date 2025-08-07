@@ -174,11 +174,11 @@ export class AmadeusClient {
 
 // Configuration factory
 export function createAmadeusConfig(): AmadeusConfig {
-  const environment = process.env.AMADEUS_ENVIRONMENT as 'test' | 'production' || 'test'
+  const environment = process.env.NEXT_PUBLIC_AMADEUS_ENVIRONMENT as 'test' | 'production' || 'test'
   
   return {
-    clientId: process.env.AMADEUS_CLIENT_ID || '',
-    clientSecret: process.env.AMADEUS_CLIENT_SECRET || '',
+    clientId: process.env.NEXT_PUBLIC_AMADEUS_CLIENT_ID || '',
+    clientSecret: process.env.NEXT_PUBLIC_AMADEUS_CLIENT_SECRET || '',
     baseUrl: environment === 'production' 
       ? 'https://api.amadeus.com' 
       : 'https://test.api.amadeus.com',
@@ -202,7 +202,7 @@ export function getAmadeusClient(): AmadeusClient | null {
         return null
       } else {
         // In browser at runtime, throw error as this means misconfiguration
-        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
+        throw new Error('Amadeus API credentials not configured. Please set NEXT_PUBLIC_AMADEUS_CLIENT_ID and NEXT_PUBLIC_AMADEUS_CLIENT_SECRET environment variables.')
       }
     }
     

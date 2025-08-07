@@ -42,9 +42,9 @@ export function SearchResults({
           <div>
             <h2 className="text-lg md:text-2xl font-bold text-white">
               Countries within {
-                formData.flightTimeRange 
+                formData?.flightTimeRange 
                   ? `${formData.flightTimeRange[0]}h - ${formData.flightTimeRange[1]}h` 
-                  : `${maxFlightTime || formData.maxFlightTime || 8}h`
+                  : `${maxFlightTime || formData?.maxFlightTime || 8}h`
               } from {departureAirport}
             </h2>
             <p className="text-white/70 mt-1 text-sm md:text-base">

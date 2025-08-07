@@ -6,6 +6,11 @@ interface SearchSummaryBarProps {
 }
 
 export function SearchSummaryBar({ searchData }: SearchSummaryBarProps) {
+  // Handle null/undefined searchData
+  if (!searchData) {
+    return null
+  }
+
   // Format the search data for display
   const formatSearchSummary = (data: SearchSummaryData): FormattedSearchSummary => {
     const themeEntry = Object.entries(THEME_COLORS).find(([key]) => key === data.selectedTheme)
