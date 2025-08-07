@@ -70,7 +70,10 @@ export function VideoModal({
     })
   }
 
-  if (!isOpen || !currentVideo) return null
+  // Don't render modal if not open or no video available
+  if (!isOpen || !currentVideo) {
+    return <></>
+  }
 
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">

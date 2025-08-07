@@ -161,8 +161,16 @@ export function CountryConstellation({ originAirport, recommendations, onCountry
 
   const positions = getConstellationPositions(recommendations.length)
 
+  // Show loading or empty state instead of null
   if (recommendations.length === 0) {
-    return null
+    return (
+      <div className="relative w-full h-full min-h-96 flex items-center justify-center">
+        <div className="text-center text-white/60">
+          <div className="text-lg mb-2">No destinations found</div>
+          <div className="text-sm">Try adjusting your search criteria</div>
+        </div>
+      </div>
+    )
   }
 
   return (

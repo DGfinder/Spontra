@@ -32,7 +32,8 @@
       "Bash(docker exec:*)",
       "Bash(grep:*)",
       "Bash(./monitoring/setup_monitoring.sh:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

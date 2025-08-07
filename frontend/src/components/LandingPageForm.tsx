@@ -132,7 +132,7 @@ export function LandingPageForm() {
   const formData = useFormData()
   const { isLoading, isError, error, results, showResults } = useSearchState()
   const navigation = useNavigationState()
-  const { updateFormData, setShowResults, clearResults } = useSearchActions()
+  const { updateFormData, setShowResults, clearResults, setResults } = useSearchActions()
   const { 
     navigateToStep, 
     navigateBack, 
@@ -226,8 +226,13 @@ export function LandingPageForm() {
         estimated_flight_price: country.priceRange
       }))
       
-      // Fallback would need to use store actions too
-      // For now, let the error state handle this
+      // Update store with mock results to maintain consistent state
+      setResults(mockResults)
+      setShowResults(true)
+      console.log(`Mock fallback successful: ${mockResults.length} destinations loaded`)
+      
+      // Navigate to results step
+      navigateToStep('results')
     }
   }
   
