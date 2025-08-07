@@ -238,9 +238,11 @@ export function ValidatedAirportSearch({
               <li className="px-4 py-2 text-xs font-medium text-gray-500 border-b">
                 Recent Airports
               </li>
-              {preferences.recentAirports.slice(0, 5).map((airportCode) => {
-                const airport = AIRPORTS.find(a => a.code === airportCode)
-                if (!airport) return null
+              {preferences.recentAirports
+                .slice(0, 5)
+                .map((airportCode) => AIRPORTS.find(a => a.code === airportCode))
+                .filter((airport) => airport !== undefined)
+                .map((airport) => {
                 
                 return (
                   <li

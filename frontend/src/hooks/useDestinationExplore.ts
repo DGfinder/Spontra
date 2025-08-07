@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
+import { amadeusService } from '@/services/amadeusService'
 
 // Theme to activity mapping
 const THEME_TO_ACTIVITY: Record<string, ActivityType> = {
@@ -51,9 +52,36 @@ export function useDestinationExplore() {
 
       console.log('Exploring destinations with parameters:', request)
 
-      // Call API
+      // Try Amadeus service first (direct API access with your credentials)
       const startTime = Date.now()
-      const response = await apiClient.exploreDestinations(request)
+      let response: DestinationExploreResponse
+      
+      try {
+        console.log('Using Amadeus API for destination exploration...')
+        const amadeusResults = await amadeusService.exploreDestinations({
+          origin: formData.departureAirport,
+          maxFlightTime: maxFlightTime,
+          theme: formData.selectedTheme,
+          departureDate: formData.departureDate
+        })
+        
+        // Convert to expected response format
+        response = {
+          id: `amadeus-${Date.now()}`,
+          explore_request_id: `req-${Date.now()}`,
+          recommended_destinations: amadeusResults,
+          total_results: amadeusResults.length,
+          searched_at: new Date().toISOString(),
+          processing_time_ms: Date.now() - startTime
+        }
+        
+        console.log(`Amadeus API successful: Found ${amadeusResults.length} destinations`)
+      } catch (amadeusError) {
+        console.warn('Amadeus API failed, falling back to backend API:', amadeusError)
+        // Fallback to original backend API
+        response = await apiClient.exploreDestinations(request)
+      }
+      
       const searchDuration = Date.now() - startTime
 
       // Update store with results

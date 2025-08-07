@@ -156,7 +156,10 @@ export function UGCUpload({
     }
   }
 
-  if (!isOpen) return null
+  // Don't render modal if not open
+  if (!isOpen) {
+    return <></>
+  }
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">

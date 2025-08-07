@@ -32,7 +32,7 @@ export function VerticalThemeSelector({
       case 'shopping': return <ShoppingBag {...iconProps} />
       case 'party': return <Music {...iconProps} />
       case 'learn': return <BookOpen {...iconProps} />
-      default: return null
+      default: return <></>  // Return empty fragment instead of null
     }
   }
 
