@@ -34,11 +34,15 @@ export function useDestinationExplore() {
     setError(null)
 
     try {
+      // Extract flight time range from form data
+      const minFlightTime = formData.flightTimeRange?.[0] ?? formData.minFlightTime ?? 0.5
+      const maxFlightTime = formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8
+
       // Map form data to API request
       const request: DestinationExploreRequest = {
         origin_airport_code: formData.departureAirport,
-        min_flight_duration_hours: 0, // Always start from 0
-        max_flight_duration_hours: formData.maxFlightTime,
+        min_flight_duration_hours: minFlightTime,
+        max_flight_duration_hours: maxFlightTime,
         preferred_activities: [THEME_TO_ACTIVITY[formData.selectedTheme] || 'adventure'],
         budget_level: 'any',
         max_results: 20,

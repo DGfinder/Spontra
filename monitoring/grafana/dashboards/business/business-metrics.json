@@ -1,0 +1,61 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Spontra Business Metrics",
+    "tags": ["business", "metrics"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "User Registrations",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(spontra_user_registrations_total[24h])",
+            "legendFormat": "Daily Registrations"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Flight Searches",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "increase(spontra_search_requests_total[24h])",
+            "legendFormat": "Daily Searches"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Search Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(spontra_search_requests_total[5m]) - rate(spontra_search_requests_failed_total[5m]) / rate(spontra_search_requests_total[5m]) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 90},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      }
+    ],
+    "time": {"from": "now-24h", "to": "now"},
+    "refresh": "1m"
+  }
+}

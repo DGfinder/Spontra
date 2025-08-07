@@ -24,7 +24,14 @@
       "WebFetch(domain:react.dev)",
       "Bash(npm run dev:*)",
       "Bash(npm run lint)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(git stash:*)",
+      "Bash(go mod:*)",
+      "Bash(docker-compose:*)",
+      "Bash(go:*)",
+      "Bash(docker exec:*)",
+      "Bash(grep:*)",
+      "Bash(./monitoring/setup_monitoring.sh:*)"
     ],
     "deny": []
   }

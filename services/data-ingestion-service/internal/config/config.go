@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -225,8 +227,3 @@ func getSliceEnv(key string, defaultValue []string) []string {
 	}
 	return defaultValue
 }
-
-import (
-	"fmt"
-	"strings"
-)

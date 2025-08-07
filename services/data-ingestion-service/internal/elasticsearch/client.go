@@ -1,11 +1,11 @@
 package elasticsearch
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 
@@ -340,15 +340,15 @@ func (c *Client) convertFlightOfferToDocument(offer *models.FlightOffer, searchR
 	doc := FlightDocument{
 		ID:                offer.ID,
 		FlightOfferID:     offer.ID,
-		Price:             float64(offer.Price.Total),
+		Price:             offer.Price.Total.InexactFloat64(),
 		Currency:          offer.Price.Currency,
 		AvailableSeats:    offer.NumberOfBookableSeats,
 		CabinClass:        offer.GetCabinClass(),
 		SearchTimestamp:   searchResp.SearchedAt,
 		ExpiresAt:         searchResp.ExpiresAt,
 		Provider:          searchResp.Provider,
-		BasePrice:         float64(offer.Price.Base),
-		TaxesAndFees:      float64(offer.Price.Total) - float64(offer.Price.Base),
+		BasePrice:         offer.Price.Base.InexactFloat64(),
+		TaxesAndFees:      offer.Price.Total.InexactFloat64() - offer.Price.Base.InexactFloat64(),
 		CreatedAt:         now,
 		UpdatedAt:         now,
 	}
@@ -624,7 +624,3 @@ func parseDurationToMinutes(duration string) int {
 	
 	return totalMinutes
 }
-
-import (
-	"strconv"
-)

@@ -342,7 +342,6 @@ func NewConsumer(config ConsumerConfig) (*Consumer, error) {
 			MinBytes:    10e3, // 10KB
 			MaxBytes:    10e6, // 10MB
 			MaxWait:     1 * time.Second,
-			ReadTimeout: 10 * time.Second,
 		})
 		readers[name] = reader
 	}

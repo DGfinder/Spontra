@@ -17,6 +17,19 @@ export const futureDateSchema = z
     return inputDate >= today
   }, 'Date must be today or in the future')
 
+// Flight time range validation
+const flightTimeRangeSchema = z
+  .tuple([z.number(), z.number()])
+  .refine(([min, max]) => min <= max, {
+    message: 'Minimum flight time must be less than or equal to maximum'
+  })
+  .refine(([min]) => min >= 0.5, {
+    message: 'Minimum flight time must be at least 0.5 hours'
+  })
+  .refine(([, max]) => max <= 12, {
+    message: 'Maximum flight time cannot exceed 12 hours'
+  })
+
 // Flight search form validation schema
 export const searchFormSchema = z.object({
   selectedTheme: z
@@ -42,10 +55,26 @@ export const searchFormSchema = z.object({
       errorMap: () => ({ message: 'Invalid trip type' })
     }),
   
+  // Support both single value (backward compatibility) and range
   maxFlightTime: z
     .number()
     .min(0.5, 'Minimum flight time is 0.5 hours')
     .max(12, 'Maximum flight time is 12 hours')
+    .optional(),
+  
+  flightTimeRange: flightTimeRangeSchema.optional(),
+  
+  minFlightTime: z
+    .number()
+    .min(0.5, 'Minimum flight time is 0.5 hours')
+    .max(12, 'Maximum flight time is 12 hours')
+    .optional(),
+  
+  maxFlightTimeRange: z
+    .number()
+    .min(0.5, 'Minimum flight time is 0.5 hours')
+    .max(12, 'Maximum flight time is 12 hours')
+    .optional()
 }).refine((data) => {
   // If return trip, return date is required and must be after departure
   if (data.tripType === 'return') {
@@ -60,6 +89,27 @@ export const searchFormSchema = z.object({
 }, {
   message: 'Return date must be after departure date',
   path: ['returnDate']
+}).refine((data) => {
+  // Validate consistency between range and individual values
+  if (data.flightTimeRange && (data.minFlightTime !== undefined || data.maxFlightTimeRange !== undefined)) {
+    const [rangeMin, rangeMax] = data.flightTimeRange
+    if (data.minFlightTime !== undefined && data.minFlightTime !== rangeMin) {
+      return false
+    }
+    if (data.maxFlightTimeRange !== undefined && data.maxFlightTimeRange !== rangeMax) {
+      return false
+    }
+  }
+  
+  // Validate individual min/max consistency
+  if (data.minFlightTime !== undefined && data.maxFlightTimeRange !== undefined) {
+    return data.minFlightTime <= data.maxFlightTimeRange
+  }
+  
+  return true
+}, {
+  message: 'Flight time range values must be consistent',
+  path: ['flightTimeRange']
 })
 
 // Type inference from schema
