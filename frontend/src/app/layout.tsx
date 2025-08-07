@@ -1,4 +1,5 @@
-import type { Metadata } from 'next'
+'use client'
+
 import { Inter, Mulish } from 'next/font/google'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import './globals.css'
@@ -11,11 +12,7 @@ const mulish = Mulish({
   display: 'swap'
 })
 
-export const metadata: Metadata = {
-  title: 'Spontra - Flight Comparison Platform',
-  description: 'Find and compare the best flight deals across multiple airlines and booking platforms.',
-  keywords: 'flights, travel, booking, comparison, cheap flights, airline tickets',
-}
+// Metadata moved to page.tsx since client components can't export metadata
 
 export default function RootLayout({
   children,
