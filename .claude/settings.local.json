@@ -31,7 +31,8 @@
       "Bash(go:*)",
       "Bash(docker exec:*)",
       "Bash(grep:*)",
-      "Bash(./monitoring/setup_monitoring.sh:*)"
+      "Bash(./monitoring/setup_monitoring.sh:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }
