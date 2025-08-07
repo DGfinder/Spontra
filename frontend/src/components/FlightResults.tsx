@@ -301,7 +301,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
             </h1>
             <p className="text-white/60 text-sm mt-2">
               {originAirport} → {recommendation.destination.city_name}, {recommendation.destination.country_name}
-              {selectedActivity && <span className="ml-2">• For {selectedActivity} activities</span>}
+              {Boolean(selectedActivity) && <span className="ml-2">• For {selectedActivity} activities</span>}
             </p>
           </div>
           

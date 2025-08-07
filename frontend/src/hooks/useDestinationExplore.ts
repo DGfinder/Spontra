@@ -57,7 +57,14 @@ export function useDestinationExplore() {
       let response: DestinationExploreResponse
       
       try {
-        console.log('Using Amadeus API for destination exploration...')
+        console.log('🛫 ATTEMPTING AMADEUS API for destination exploration...')
+        console.log('📋 Amadeus parameters:', {
+          origin: formData.departureAirport,
+          maxFlightTime: maxFlightTime,
+          theme: formData.selectedTheme,
+          departureDate: formData.departureDate
+        })
+        
         const amadeusResults = await amadeusService.exploreDestinations({
           origin: formData.departureAirport,
           maxFlightTime: maxFlightTime,
@@ -75,11 +82,18 @@ export function useDestinationExplore() {
           processing_time_ms: Date.now() - startTime
         }
         
-        console.log(`Amadeus API successful: Found ${amadeusResults.length} destinations`)
+        console.log(`✅ AMADEUS API SUCCESSFUL: Found ${amadeusResults.length} real destinations!`)
+        console.log('📊 First result sample:', amadeusResults[0]?.destination?.city_name)
       } catch (amadeusError) {
-        console.warn('Amadeus API failed, falling back to backend API:', amadeusError)
-        // Fallback to original backend API
-        response = await apiClient.exploreDestinations(request)
+        console.error('❌ AMADEUS API FAILED:', amadeusError)
+        console.warn('🔄 Falling back to backend API (localhost:8081)...')
+        try {
+          response = await apiClient.exploreDestinations(request)
+          console.log('✅ Backend API successful')
+        } catch (backendError) {
+          console.error('❌ Backend API also failed:', backendError)
+          throw backendError  // This will trigger the existing fallback in LandingPageForm
+        }
       }
       
       const searchDuration = Date.now() - startTime

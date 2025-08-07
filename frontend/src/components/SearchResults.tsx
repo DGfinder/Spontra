@@ -70,7 +70,7 @@ export function SearchResults({
       {/* Results Content */}
       <div className="flex-1 p-4 md:p-6 overflow-y-auto">
         {/* Loading State */}
-        {isLoading && <LoadingSkeleton count={6} />}
+        {Boolean(isLoading) && <LoadingSkeleton count={6} />}
 
         {/* Results */}
         {!isLoading && !isError && results.length > 0 && (

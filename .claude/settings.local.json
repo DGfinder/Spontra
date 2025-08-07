@@ -33,7 +33,13 @@
       "Bash(grep:*)",
       "Bash(./monitoring/setup_monitoring.sh:*)",
       "Bash(git push:*)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(curl:*)",
+      "Bash(for file in *.tsx)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(tail:*)",
+      "Bash(echo)",
+      "Bash(done)"
     ],
     "deny": []
   }

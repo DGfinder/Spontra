@@ -51,7 +51,9 @@ export function BreadcrumbNavigation({ className = '' }: BreadcrumbNavigationPro
   })
 
   // Only show breadcrumbs after the search step
-  if (currentStepIndex <= 0) return null
+  if (currentStepIndex <= 0) {
+    return <></>
+  }
 
   return (
     <nav className={`bg-black/20 backdrop-blur-sm border-b border-white/10 ${className}`} aria-label="Navigation breadcrumb">
