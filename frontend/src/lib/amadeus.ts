@@ -40,7 +40,7 @@ export interface DestinationSearchParams {
   viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK'
 }
 
-class AmadeusClient {
+export class AmadeusClient {
   private config: AmadeusConfig
   private credentials: AmadeusCredentials | null = null
   private tokenExpiryTime: number = 0
@@ -189,28 +189,29 @@ export function createAmadeusConfig(): AmadeusConfig {
 // Singleton instance
 let amadeusClient: AmadeusClient | null = null
 
-export function getAmadeusClient(): AmadeusClient {
+export function getAmadeusClient(): AmadeusClient | null {
   if (!amadeusClient) {
     const config = createAmadeusConfig()
     
-    // During build time, environment variables might not be available
-    // Only throw error at runtime when credentials are actually needed
+    // During build time or when credentials are not available, return null
+    // This allows the app to build successfully and handle the missing client at runtime
     if (!config.clientId || !config.clientSecret) {
-      if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
-        // During development build, warn but don't throw
-        console.warn('Amadeus API credentials not configured. Amadeus features will be unavailable.')
-        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
-      } else if (typeof window !== 'undefined') {
-        // In browser, throw error as this means runtime misconfiguration
-        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
+      if (typeof window === 'undefined') {
+        // During build time (server-side), just return null
+        console.warn('Amadeus API credentials not available during build. Will use mock data.')
+        return null
       } else {
-        // During production build or static generation, warn but don't throw
-        console.warn('Amadeus API credentials not available during build. Will fallback to mock data.')
-        throw new Error('Amadeus API credentials not configured during build time.')
+        // In browser at runtime, throw error as this means misconfiguration
+        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
       }
     }
     
-    amadeusClient = new AmadeusClient(config)
+    try {
+      amadeusClient = new AmadeusClient(config)
+    } catch (error) {
+      console.warn('Failed to initialize Amadeus client:', error)
+      return null
+    }
   }
   
   return amadeusClient

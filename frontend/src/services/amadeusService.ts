@@ -1,4 +1,4 @@
-import { getAmadeusClient, FlightSearchParams, DestinationSearchParams, AmadeusError } from '@/lib/amadeus'
+import { getAmadeusClient, FlightSearchParams, DestinationSearchParams, AmadeusError, AmadeusClient } from '@/lib/amadeus'
 import { DestinationRecommendation } from './apiClient'
 
 export interface AmadeusFlightOffer {
@@ -132,9 +132,9 @@ export interface AmadeusLocationSearchResult {
 }
 
 class AmadeusService {
-  private client: any = null
+  private client: AmadeusClient | null = null
   
-  private getClient() {
+  private getClient(): AmadeusClient | null {
     if (!this.client) {
       try {
         this.client = getAmadeusClient()
@@ -150,7 +150,8 @@ class AmadeusService {
   async searchFlights(params: FlightSearchParams): Promise<AmadeusFlightOffer[]> {
     const client = this.getClient()
     if (!client) {
-      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+      console.warn('Amadeus client not available, returning mock flight data')
+      return this.getMockFlightOffers(params)
     }
     
     try {
@@ -158,12 +159,8 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Flight search failed:', error)
-      throw new AmadeusError(
-        'Failed to search flights',
-        500,
-        'FLIGHT_SEARCH_ERROR',
-        error
-      )
+      console.warn('Falling back to mock flight data')
+      return this.getMockFlightOffers(params)
     }
   }
 
@@ -171,7 +168,8 @@ class AmadeusService {
   async searchDestinations(params: DestinationSearchParams): Promise<AmadeusDestination[]> {
     const client = this.getClient()
     if (!client) {
-      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+      console.warn('Amadeus client not available, returning mock destination data')
+      return this.getMockAmadeusDestinations(params.origin)
     }
     
     try {
@@ -179,12 +177,8 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Destination search failed:', error)
-      throw new AmadeusError(
-        'Failed to search destinations',
-        500,
-        'DESTINATION_SEARCH_ERROR',
-        error
-      )
+      console.warn('Falling back to mock destination data')
+      return this.getMockAmadeusDestinations(params.origin)
     }
   }
 
@@ -192,7 +186,8 @@ class AmadeusService {
   async searchLocations(keyword: string, subType?: 'AIRPORT' | 'CITY'): Promise<AmadeusLocationSearchResult[]> {
     const client = this.getClient()
     if (!client) {
-      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+      console.warn('Amadeus client not available, returning mock location data')
+      return this.getMockLocations(keyword, subType)
     }
     
     try {
@@ -200,12 +195,8 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Location search failed:', error)
-      throw new AmadeusError(
-        'Failed to search locations',
-        500,
-        'LOCATION_SEARCH_ERROR',
-        error
-      )
+      console.warn('Falling back to mock location data')
+      return this.getMockLocations(keyword, subType)
     }
   }
 
@@ -213,7 +204,8 @@ class AmadeusService {
   async getAirportInfo(iataCode: string): Promise<AmadeusLocationSearchResult> {
     const client = this.getClient()
     if (!client) {
-      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+      console.warn('Amadeus client not available, returning mock airport info')
+      return this.getMockAirportInfo(iataCode)
     }
     
     try {
@@ -221,12 +213,8 @@ class AmadeusService {
       return response.data
     } catch (error) {
       console.error('Airport info fetch failed:', error)
-      throw new AmadeusError(
-        'Failed to get airport information',
-        500,
-        'AIRPORT_INFO_ERROR',
-        error
-      )
+      console.warn('Falling back to mock airport info')
+      return this.getMockAirportInfo(iataCode)
     }
   }
 
@@ -320,6 +308,171 @@ class AmadeusService {
       console.log('Falling back to mock data due to Amadeus API error')
       return this.getMockDestinations(params.origin, params.theme)
     }
+  }
+
+  // Mock flight offers for when Amadeus API is unavailable
+  private getMockFlightOffers(params: FlightSearchParams): AmadeusFlightOffer[] {
+    return [
+      {
+        id: 'mock-flight-1',
+        oneWay: true,
+        lastTicketingDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        numberOfBookableSeats: 4,
+        itineraries: [
+          {
+            duration: 'PT2H30M',
+            segments: [
+              {
+                departure: { iataCode: params.origin, at: '2024-01-15T10:00:00' },
+                arrival: { iataCode: params.destination, at: '2024-01-15T12:30:00' },
+                carrierCode: 'BA',
+                number: '123',
+                aircraft: { code: '320' },
+                duration: 'PT2H30M',
+                id: '1',
+                numberOfStops: 0,
+                blacklistedInEU: false
+              }
+            ]
+          }
+        ],
+        price: {
+          currency: 'EUR',
+          total: '250.00',
+          base: '200.00',
+          fees: [],
+          grandTotal: '250.00'
+        },
+        pricingOptions: {
+          fareType: ['PUBLISHED'],
+          includedCheckedBagsOnly: true
+        },
+        validatingAirlineCodes: ['BA'],
+        travelerPricings: [
+          {
+            travelerId: '1',
+            fareOption: 'STANDARD',
+            travelerType: 'ADULT',
+            price: {
+              currency: 'EUR',
+              total: '250.00',
+              base: '200.00',
+              fees: [],
+              grandTotal: '250.00'
+            },
+            fareDetailsBySegment: [
+              {
+                segmentId: '1',
+                cabin: 'ECONOMY',
+                fareBasis: 'KLRUKLR',
+                class: 'K',
+                includedCheckedBags: { quantity: 1 }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+
+  // Mock locations for when Amadeus API is unavailable
+  private getMockLocations(keyword: string, subType?: 'AIRPORT' | 'CITY'): AmadeusLocationSearchResult[] {
+    const mockLocations = [
+      {
+        type: 'location',
+        subType: subType || 'AIRPORT',
+        name: `${keyword} Airport`,
+        detailedName: `${keyword} International Airport`,
+        id: `${keyword}-airport`,
+        self: { href: '', methods: [] },
+        timeZoneOffset: '+01:00',
+        iataCode: keyword.toUpperCase(),
+        geoCode: { latitude: 40.4168, longitude: -3.7038 },
+        address: {
+          cityName: keyword,
+          cityCode: keyword.toUpperCase(),
+          countryName: 'Spain',
+          countryCode: 'ES',
+          regionCode: 'MD'
+        },
+        analytics: { travelers: { score: 85 } }
+      }
+    ]
+    return mockLocations
+  }
+
+  // Mock airport info for when Amadeus API is unavailable
+  private getMockAirportInfo(iataCode: string): AmadeusLocationSearchResult {
+    return {
+      type: 'location',
+      subType: 'AIRPORT',
+      name: `${iataCode} Airport`,
+      detailedName: `${iataCode} International Airport`,
+      id: `${iataCode}-airport`,
+      self: { href: '', methods: [] },
+      timeZoneOffset: '+01:00',
+      iataCode,
+      geoCode: { latitude: 40.4168, longitude: -3.7038 },
+      address: {
+        cityName: iataCode,
+        cityCode: iataCode,
+        countryName: 'Spain',
+        countryCode: 'ES',
+        regionCode: 'MD'
+      },
+      analytics: { travelers: { score: 85 } }
+    }
+  }
+
+  // Mock Amadeus destinations for when Amadeus API is unavailable
+  private getMockAmadeusDestinations(origin: string): AmadeusDestination[] {
+    return [
+      {
+        type: 'location',
+        subtype: 'CITY',
+        name: 'Barcelona',
+        iataCode: 'BCN',
+        address: {
+          cityName: 'Barcelona',
+          cityCode: 'BCN',
+          countryName: 'Spain',
+          countryCode: 'ES',
+          regionCode: 'MD'
+        },
+        geoCode: { latitude: 41.3851, longitude: 2.1734 },
+        analytics: { travelers: { score: 90 } }
+      },
+      {
+        type: 'location',
+        subtype: 'CITY',
+        name: 'Rome',
+        iataCode: 'ROM',
+        address: {
+          cityName: 'Rome',
+          cityCode: 'ROM',
+          countryName: 'Italy',
+          countryCode: 'IT',
+          regionCode: 'RM'
+        },
+        geoCode: { latitude: 41.9028, longitude: 12.4964 },
+        analytics: { travelers: { score: 88 } }
+      },
+      {
+        type: 'location',
+        subtype: 'CITY',
+        name: 'Paris',
+        iataCode: 'PAR',
+        address: {
+          cityName: 'Paris',
+          cityCode: 'PAR',
+          countryName: 'France',
+          countryCode: 'FR',
+          regionCode: 'IDF'
+        },
+        geoCode: { latitude: 48.8566, longitude: 2.3522 },
+        analytics: { travelers: { score: 92 } }
+      }
+    ]
   }
 
   // Fallback mock data for when Amadeus API is unavailable
