@@ -193,8 +193,21 @@ export function getAmadeusClient(): AmadeusClient {
   if (!amadeusClient) {
     const config = createAmadeusConfig()
     
+    // During build time, environment variables might not be available
+    // Only throw error at runtime when credentials are actually needed
     if (!config.clientId || !config.clientSecret) {
-      throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
+      if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
+        // During development build, warn but don't throw
+        console.warn('Amadeus API credentials not configured. Amadeus features will be unavailable.')
+        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
+      } else if (typeof window !== 'undefined') {
+        // In browser, throw error as this means runtime misconfiguration
+        throw new Error('Amadeus API credentials not configured. Please set AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET environment variables.')
+      } else {
+        // During production build or static generation, warn but don't throw
+        console.warn('Amadeus API credentials not available during build. Will fallback to mock data.')
+        throw new Error('Amadeus API credentials not configured during build time.')
+      }
     }
     
     amadeusClient = new AmadeusClient(config)

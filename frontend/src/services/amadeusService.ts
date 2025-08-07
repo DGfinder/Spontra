@@ -132,12 +132,29 @@ export interface AmadeusLocationSearchResult {
 }
 
 class AmadeusService {
-  private client = getAmadeusClient()
+  private client: any = null
+  
+  private getClient() {
+    if (!this.client) {
+      try {
+        this.client = getAmadeusClient()
+      } catch (error) {
+        console.warn('Amadeus client initialization failed:', error)
+        return null
+      }
+    }
+    return this.client
+  }
 
   // Search for flights between specific destinations
   async searchFlights(params: FlightSearchParams): Promise<AmadeusFlightOffer[]> {
+    const client = this.getClient()
+    if (!client) {
+      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+    }
+    
     try {
-      const response = await this.client.searchFlights(params) as any
+      const response = await client.searchFlights(params) as any
       return response.data || []
     } catch (error) {
       console.error('Flight search failed:', error)
@@ -152,8 +169,13 @@ class AmadeusService {
 
   // Search for destination inspiration
   async searchDestinations(params: DestinationSearchParams): Promise<AmadeusDestination[]> {
+    const client = this.getClient()
+    if (!client) {
+      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+    }
+    
     try {
-      const response = await this.client.searchDestinations(params) as any
+      const response = await client.searchDestinations(params) as any
       return response.data || []
     } catch (error) {
       console.error('Destination search failed:', error)
@@ -168,8 +190,13 @@ class AmadeusService {
 
   // Search for airports and cities
   async searchLocations(keyword: string, subType?: 'AIRPORT' | 'CITY'): Promise<AmadeusLocationSearchResult[]> {
+    const client = this.getClient()
+    if (!client) {
+      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+    }
+    
     try {
-      const response = await this.client.searchLocations(keyword, subType) as any
+      const response = await client.searchLocations(keyword, subType) as any
       return response.data || []
     } catch (error) {
       console.error('Location search failed:', error)
@@ -184,8 +211,13 @@ class AmadeusService {
 
   // Get detailed airport information
   async getAirportInfo(iataCode: string): Promise<AmadeusLocationSearchResult> {
+    const client = this.getClient()
+    if (!client) {
+      throw new AmadeusError('Amadeus client not available', 503, 'CLIENT_UNAVAILABLE')
+    }
+    
     try {
-      const response = await this.client.getAirportInfo(iataCode) as any
+      const response = await client.getAirportInfo(iataCode) as any
       return response.data
     } catch (error) {
       console.error('Airport info fetch failed:', error)
