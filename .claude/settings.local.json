@@ -18,7 +18,13 @@
       "Bash(npx tsc:*)",
       "Bash(npm run type-check:*)",
       "Bash(git add:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "WebFetch(domain:reactjs.org)",
+      "WebFetch(domain:legacy.reactjs.org)",
+      "WebFetch(domain:react.dev)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

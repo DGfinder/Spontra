@@ -1,12 +1,16 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { searchFormSchema, SearchFormData } from '@/lib/validations'
 import { useFormData, useSearchActions } from '@/store/searchStore'
 
 export function useSearchForm() {
   const formData = useFormData()
   const { updateFormData } = useSearchActions()
+  
+  // Use refs to track if updates are from external store changes to prevent loops
+  const isExternalUpdate = useRef(false)
+  const lastFormData = useRef(formData)
 
   const form = useForm<SearchFormData>({
     resolver: zodResolver(searchFormSchema),
@@ -28,6 +32,12 @@ export function useSearchForm() {
   const watchedValues = watch()
 
   useEffect(() => {
+    // Skip if this is from an external store update
+    if (isExternalUpdate.current) {
+      isExternalUpdate.current = false
+      return
+    }
+
     // Always update selectedTheme immediately for background switching
     if (watchedValues.selectedTheme !== formData.selectedTheme) {
       updateFormData({ ...formData, selectedTheme: watchedValues.selectedTheme })
@@ -37,11 +47,25 @@ export function useSearchForm() {
     if (isDirty && isValid) {
       updateFormData(watchedValues)
     }
-  }, [watchedValues, isDirty, isValid, updateFormData, formData])
+  }, [watchedValues, isDirty, isValid, updateFormData])
 
   // Sync store changes back to form (useful for external updates)
   useEffect(() => {
-    reset(formData)
+    // Only update if formData actually changed (deep comparison of key fields)
+    const hasChanged = 
+      formData.selectedTheme !== lastFormData.current.selectedTheme ||
+      formData.departureAirport !== lastFormData.current.departureAirport ||
+      formData.departureDate !== lastFormData.current.departureDate ||
+      formData.returnDate !== lastFormData.current.returnDate ||
+      formData.passengers !== lastFormData.current.passengers ||
+      formData.tripType !== lastFormData.current.tripType ||
+      formData.maxFlightTime !== lastFormData.current.maxFlightTime
+
+    if (hasChanged) {
+      isExternalUpdate.current = true
+      reset(formData)
+      lastFormData.current = formData
+    }
   }, [formData, reset])
 
   // Helper function to set individual field values with proper type handling

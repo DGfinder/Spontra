@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react'
+import { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react'
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -39,9 +39,10 @@ interface ToastProviderProps {
 
 export function ToastProvider({ children }: ToastProviderProps) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const timeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map())
 
   const addToast = (toast: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substr(2, 9)
+    const id = Math.random().toString(36).substring(2, 11)
     const newToast: Toast = {
       ...toast,
       id,
@@ -50,21 +51,47 @@ export function ToastProvider({ children }: ToastProviderProps) {
     
     setToasts(prev => [...prev, newToast])
 
-    // Auto-remove after duration
+    // Auto-remove after duration with proper cleanup
     if (newToast.duration && newToast.duration > 0) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         removeToast(id)
+        timeoutsRef.current.delete(id)
       }, newToast.duration)
+      
+      timeoutsRef.current.set(id, timeoutId)
     }
   }
 
   const removeToast = (id: string) => {
+    // Clear any existing timeout for this toast
+    const timeoutId = timeoutsRef.current.get(id)
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutsRef.current.delete(id)
+    }
+    
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }
 
   const clearToasts = () => {
+    // Clear all timeouts
+    timeoutsRef.current.forEach((timeoutId) => {
+      clearTimeout(timeoutId)
+    })
+    timeoutsRef.current.clear()
+    
     setToasts([])
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      timeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId)
+      })
+      timeoutsRef.current.clear()
+    }
+  }, [])
 
   return (
     <ToastContext.Provider value={{ toasts, addToast, removeToast, clearToasts }}>
