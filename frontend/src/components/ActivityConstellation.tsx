@@ -77,12 +77,12 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
             {/* Activity Category Icon as Background */}
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-4xl opacity-30">
-                {activity.category === 'adventure' && '🏔️'}
-                {activity.category === 'culture' && '🏛️'}
-                {activity.category === 'food' && '🍽️'}
-                {activity.category === 'nightlife' && '🌃'}
-                {activity.category === 'nature' && '🌿'}
-                {activity.category === 'shopping' && '🛍️'}
+                {activity.category === 'adventure' ? '🏔️' : 
+                 activity.category === 'culture' ? '🏛️' : 
+                 activity.category === 'food' ? '🍽️' : 
+                 activity.category === 'nightlife' ? '🌃' : 
+                 activity.category === 'nature' ? '🌿' : 
+                 activity.category === 'shopping' ? '🛍️' : ''}
               </div>
             </div>
             

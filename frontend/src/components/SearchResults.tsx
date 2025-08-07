@@ -73,13 +73,14 @@ export function SearchResults({
         {Boolean(isLoading) && <LoadingSkeleton count={6} />}
 
         {/* Results */}
-        {!isLoading && !isError && results.length > 0 && (
+        {!isLoading && !isError && Array.isArray(results) && results.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
             {results
+              .filter(result => result && result.destination && result.flight_route)
               .sort((a, b) => a.flight_route.total_duration_minutes - b.flight_route.total_duration_minutes)
               .map((result, index) => (
                 <DestinationCard
-                  key={result.destination.id}
+                  key={result.destination.id || `dest-${index}`}
                   result={result}
                   selectedTheme={selectedTheme}
                   maxFlightTime={maxFlightTime}
@@ -111,7 +112,7 @@ export function SearchResults({
         )}
 
         {/* Empty State */}
-        {!isError && !isLoading && results.length === 0 && (
+        {!isError && !isLoading && (!results || results.length === 0) && (
           <div className="text-center py-12">
             <div className="text-white/60 text-lg">
               No destinations found within {maxFlightTime} hours.
