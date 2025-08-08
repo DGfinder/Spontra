@@ -364,7 +364,8 @@ export function LandingPageForm() {
       {/* Breadcrumb Navigation */}
       <BreadcrumbNavigation />
 
-      {/* Layout - Responsive: Mobile first, then desktop */}
+      {/* Layout - show search panel only on the initial Search step */}
+      {navigation.currentStep === 'search' && (
       <div className="absolute inset-0 z-20 flex flex-col lg:flex-row pt-24 sm:pt-28 md:pt-32">
         {/* Form Panel with Overlay - Responsive */}
         <div 
@@ -407,6 +408,7 @@ export function LandingPageForm() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Navigation-based Rendering */}
       {navigation.currentStep === 'results' && showResults && (

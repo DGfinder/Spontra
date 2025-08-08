@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, MapPin, Plane, Users, Star, Map } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { DestinationRecommendation } from '@/services/apiClient'
@@ -280,108 +280,29 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
 }
 
 export function CitySelection({ country, originAirport, selectedTheme, onBack, onCitySelect }: CitySelectionProps) {
-  // Sample city data - in real implementation, this would come from the API based on selected country
-  const generateCityOptions = (): CityOption[] => {
-    const baseCities: Omit<CityOption, 'estimated_price' | 'flight_duration'>[] = [
-      {
-        id: 'madrid',
-        name: 'Madrid',
-        airport_code: 'MAD',
-        population: 3200000,
-        flight_frequency: 45,
-        primary_theme: 'culture',
-        secondary_themes: [
-          { theme: 'food', strength: 0.7 },
-          { theme: 'nightlife', strength: 0.6 },
-          { theme: 'shopping', strength: 0.4 }
-        ],
-        is_hidden_gem: false,
-        description: 'Spain\'s vibrant capital with world-class museums, royal palaces, and legendary tapas culture.'
-      },
-      {
-        id: 'barcelona',
-        name: 'Barcelona',
-        airport_code: 'BCN',
-        population: 1600000,
-        flight_frequency: 42,
-        primary_theme: 'culture',
-        secondary_themes: [
-          { theme: 'food', strength: 0.8 },
-          { theme: 'nightlife', strength: 0.7 },
-          { theme: 'adventure', strength: 0.4 }
-        ],
-        is_hidden_gem: false,
-        description: 'Artistic Mediterranean city famous for Gaudí architecture, beaches, and innovative cuisine.'
-      },
-      {
-        id: 'valencia',
-        name: 'Valencia',
-        airport_code: 'VLC',
-        population: 800000,
-        flight_frequency: 18,
-        primary_theme: 'food',
-        secondary_themes: [
-          { theme: 'culture', strength: 0.6 },
-          { theme: 'adventure', strength: 0.5 },
-          { theme: 'nature', strength: 0.4 }
-        ],
-        is_hidden_gem: true,
-        description: 'Birthplace of paella with futuristic architecture, beautiful beaches, and authentic Spanish culture.'
-      },
-      {
-        id: 'seville',
-        name: 'Seville',
-        airport_code: 'SVQ',
-        population: 690000,
-        flight_frequency: 12,
-        primary_theme: 'culture',
-        secondary_themes: [
-          { theme: 'food', strength: 0.7 },
-          { theme: 'nightlife', strength: 0.5 }
-        ],
-        is_hidden_gem: true,
-        description: 'Andalusian jewel with Moorish architecture, flamenco dancing, and enchanting old-world charm.'
-      },
-      {
-        id: 'bilbao',
-        name: 'Bilbao',
-        airport_code: 'BIO',
-        population: 345000,
-        flight_frequency: 8,
-        primary_theme: 'culture',
-        secondary_themes: [
-          { theme: 'food', strength: 0.8 },
-          { theme: 'adventure', strength: 0.4 }
-        ],
-        is_hidden_gem: true,
-        description: 'Basque cultural capital with the iconic Guggenheim Museum and extraordinary pintxos cuisine.'
-      },
-      {
-        id: 'malaga',
-        name: 'Málaga',
-        airport_code: 'AGP',
-        population: 574000,
-        flight_frequency: 25,
-        primary_theme: 'adventure',
-        secondary_themes: [
-          { theme: 'culture', strength: 0.5 },
-          { theme: 'food', strength: 0.6 },
-          { theme: 'nature', strength: 0.7 }
-        ],
-        is_hidden_gem: false,
-        description: 'Costa del Sol gateway with beautiful beaches, historic center, and gateway to Andalusia.'
-      }
-    ]
+  const [cities, setCities] = useState<CityOption[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-    // Add price and duration estimates
-    return baseCities.map(city => ({
-      ...city,
-      estimated_price: `€${220 + Math.floor(Math.random() * 180)}`,
-      flight_duration: 2.5 + Math.random() * 1.5
-    }))
-  }
-
-  const cities = generateCityOptions()
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    setError(null)
+    fetch('/api/amadeus/cities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ countryName: country.name, origin: originAirport })
+    })
+      .then(res => res.json())
+      .then(json => {
+        if (!active) return
+        if (!json.ok) throw new Error(json.error || 'Failed to load cities')
+        setCities(json.data as CityOption[])
+      })
+      .catch((e) => { if (active) setError(e.message) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [country?.name, originAirport])
 
   // Sort cities by importance: population + flight frequency, with hidden gems getting slight boost
   const sortedCities = [...cities].sort((a, b) => {
