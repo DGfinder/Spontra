@@ -29,9 +29,9 @@ export async function POST(req: NextRequest) {
 
     const filtered = (locations || [])
       .filter((loc: any) => {
-        if (countryCode) return loc.address?.countryCode === countryCode
-        if (countryName) return (loc.address?.countryName || '').toLowerCase().includes(countryName.toLowerCase())
-        return true
+        // Note: amadeus-simple.ts AmadeusDestination doesn't have address property
+        // Filtering by keyword match should be sufficient for city search
+        return loc.name && loc.iataCode
       })
       .slice(0, 6)
 
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
       results.push({
         id: city.id || city.iataCode,
-        name: city.name || city.address?.cityName,
+        name: city.name || city.address?.cityName || city.iataCode,
         airport_code: city.iataCode,
         population: 0,
         flight_frequency: 0,
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         is_hidden_gem: false,
         estimated_price: estimated_price || '',
         flight_duration: flight_duration || 0,
-        description: `Explore ${city.name || city.address?.cityName}`,
+        description: `Explore ${city.name || city.address?.cityName || city.iataCode}`,
       })
     }
 

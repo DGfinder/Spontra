@@ -1,4 +1,3 @@
-import { Button } from './Button'
 import { ExclamationTriangleIcon, WifiIcon, ServerIcon } from '@heroicons/react/24/outline'
 import { ErrorType } from '@/lib/environment'
 
@@ -53,14 +52,12 @@ export function ErrorState({
         {message}
       </p>
       {onRetry && (
-        <Button 
+        <button 
           onClick={onRetry}
-          variant="primary"
-          size="md"
-          className="mx-auto"
+          className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-6 py-3 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105 mx-auto"
         >
           {retryLabel}
-        </Button>
+        </button>
       )}
     </div>
   )

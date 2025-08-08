@@ -9,6 +9,12 @@ interface AmadeusDestination {
   subType: string;
   name: string;
   iataCode: string;
+  id?: string;
+  address?: {
+    cityName?: string;
+    countryName?: string;
+    countryCode?: string;
+  };
   geoCode: {
     latitude: number;
     longitude: number;
