@@ -26,7 +26,6 @@ function CountryCircle({ recommendation, position, onClick }: CountryCircleProps
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
-        animationDelay: `${Math.random() * 0.3}s`, // Staggered entrance
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

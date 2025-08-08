@@ -244,9 +244,9 @@ export function LandingPageForm() {
 
   const handleExploreDestination = (destination: DestinationRecommendation) => {
     console.log('Exploring destination:', destination.destination.city_name)
-    // For now, go directly to cities until CountryConstellation is properly integrated
+    // Jump straight to flights to show real options; avoids mock city layer
     setSelectedDestination(destination)
-    navigateToStep('cities')
+    navigateToStep('flights')
   }
 
   const handleCitySelect = (city: any) => {
@@ -476,7 +476,7 @@ export function LandingPageForm() {
       )}
 
       {/* Legacy Search Results Overlay - Show when not using navigation flow */}
-      {showResults && navigation.currentStep === 'search' && (
+      {false && showResults && navigation.currentStep === 'search' && (
         <SearchResults
           results={results}
           isLoading={isLoading}
