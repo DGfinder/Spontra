@@ -1,5 +1,6 @@
 import { getAmadeusClient, FlightSearchParams, DestinationSearchParams, AmadeusError, AmadeusClient } from '@/lib/amadeus'
 import { DestinationRecommendation } from './apiClient'
+import { enableMockFallbacks, getErrorMessage, ErrorType } from '@/lib/environment'
 
 export interface AmadeusFlightOffer {
   id: string
@@ -150,8 +151,11 @@ class AmadeusService {
   async searchFlights(params: FlightSearchParams): Promise<AmadeusFlightOffer[]> {
     const client = this.getClient()
     if (!client) {
-      console.warn('Amadeus client not available, returning mock flight data')
-      return this.getMockFlightOffers(params)
+      if (enableMockFallbacks) {
+        console.warn('Amadeus client not available, returning mock flight data')
+        return this.getMockFlightOffers(params)
+      }
+      throw new Error('Flight search service is unavailable')
     }
     
     try {
@@ -159,8 +163,11 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Flight search failed:', error)
-      console.warn('Falling back to mock flight data')
-      return this.getMockFlightOffers(params)
+      if (enableMockFallbacks) {
+        console.warn('Falling back to mock flight data')
+        return this.getMockFlightOffers(params)
+      }
+      throw getErrorMessage(error, 'Flight search').message
     }
   }
 
@@ -168,8 +175,11 @@ class AmadeusService {
   async searchDestinations(params: DestinationSearchParams): Promise<AmadeusDestination[]> {
     const client = this.getClient()
     if (!client) {
-      console.warn('Amadeus client not available, returning mock destination data')
-      return this.getMockAmadeusDestinations(params.origin)
+      if (enableMockFallbacks) {
+        console.warn('Amadeus client not available, returning mock destination data')
+        return this.getMockAmadeusDestinations(params.origin)
+      }
+      throw new Error('Destination search service is unavailable')
     }
     
     try {
@@ -177,8 +187,11 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Destination search failed:', error)
-      console.warn('Falling back to mock destination data')
-      return this.getMockAmadeusDestinations(params.origin)
+      if (enableMockFallbacks) {
+        console.warn('Falling back to mock destination data')
+        return this.getMockAmadeusDestinations(params.origin)
+      }
+      throw getErrorMessage(error, 'Destination search').message
     }
   }
 
@@ -186,8 +199,11 @@ class AmadeusService {
   async searchLocations(keyword: string, subType?: 'AIRPORT' | 'CITY'): Promise<AmadeusLocationSearchResult[]> {
     const client = this.getClient()
     if (!client) {
-      console.warn('Amadeus client not available, returning mock location data')
-      return this.getMockLocations(keyword, subType)
+      if (enableMockFallbacks) {
+        console.warn('Amadeus client not available, returning mock location data')
+        return this.getMockLocations(keyword, subType)
+      }
+      throw new Error('Location search service is unavailable')
     }
     
     try {
@@ -195,8 +211,11 @@ class AmadeusService {
       return response.data || []
     } catch (error) {
       console.error('Location search failed:', error)
-      console.warn('Falling back to mock location data')
-      return this.getMockLocations(keyword, subType)
+      if (enableMockFallbacks) {
+        console.warn('Falling back to mock location data')
+        return this.getMockLocations(keyword, subType)
+      }
+      throw getErrorMessage(error, 'Location search').message
     }
   }
 
@@ -204,8 +223,11 @@ class AmadeusService {
   async getAirportInfo(iataCode: string): Promise<AmadeusLocationSearchResult> {
     const client = this.getClient()
     if (!client) {
-      console.warn('Amadeus client not available, returning mock airport info')
-      return this.getMockAirportInfo(iataCode)
+      if (enableMockFallbacks) {
+        console.warn('Amadeus client not available, returning mock airport info')
+        return this.getMockAirportInfo(iataCode)
+      }
+      throw new Error('Airport information service is unavailable')
     }
     
     try {
@@ -213,8 +235,11 @@ class AmadeusService {
       return response.data
     } catch (error) {
       console.error('Airport info fetch failed:', error)
-      console.warn('Falling back to mock airport info')
-      return this.getMockAirportInfo(iataCode)
+      if (enableMockFallbacks) {
+        console.warn('Falling back to mock airport info')
+        return this.getMockAirportInfo(iataCode)
+      }
+      throw getErrorMessage(error, 'Airport information').message
     }
   }
 

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
+import { ErrorState } from './ErrorState'
+import { getErrorMessage } from '@/lib/environment'
 import { DestinationRecommendation } from '@/services/apiClient'
 
 interface FlightOption {
@@ -171,6 +173,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
   const [flights, setFlights] = useState<FlightOption[]>([])
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<{ message: string; type?: string } | null>(null)
 
   // Fetch real flight options from our server route (Amadeus)
   const fetchFlightOptions = async (): Promise<FlightOption[]> => {
@@ -189,23 +192,30 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
     return json.data as FlightOption[]
   }
 
-  useEffect(() => {
+  const handleRetry = () => {
+    setError(null)
     let isActive = true
     setIsLoading(true)
     fetchFlightOptions()
       .then((flightOptions) => {
         if (!isActive) return
         setFlights(flightOptions)
+        setError(null)
       })
-      .catch(() => {
+      .catch((err) => {
         if (!isActive) return
+        const errorInfo = getErrorMessage(err, 'Flight search')
+        setError({ message: errorInfo.userMessage, type: errorInfo.type })
         setFlights([])
       })
       .finally(() => {
         if (!isActive) return
         setIsLoading(false)
       })
-    return () => { isActive = false }
+  }
+
+  useEffect(() => {
+    handleRetry()
   }, [recommendation, selectedActivity])
 
   const handleFlightSelect = (flight: FlightOption) => {
@@ -292,7 +302,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
           )}
 
           {/* Flight Options Grid */}
-          {!isLoading && (
+          {!isLoading && !error && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {flights.map((flight) => (
                 <FlightCard
@@ -304,6 +314,20 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
                   onClick={() => handleFlightSelect(flight)}
                 />
               ))}
+            </div>
+          )}
+
+          {/* Error State */}
+          {!isLoading && error && (
+            <div className="mb-8">
+              <ErrorState
+                title="Unable to Load Flights"
+                message={error.message}
+                type={error.type as any}
+                onRetry={handleRetry}
+                retryLabel="Search Flights Again"
+                className="bg-black/20 backdrop-blur-md border-white/20"
+              />
             </div>
           )}
 
