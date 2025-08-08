@@ -1,7 +1,11 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
 
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
+// Prefer server-provided API_BASE_URL, then public var, then sensible dev default
+const API_BASE_URL =
+  process.env.API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  'http://localhost:8081'
 
 // Types from the Go backend
 export interface DestinationExploreRequest {

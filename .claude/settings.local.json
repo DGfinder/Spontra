@@ -41,7 +41,10 @@
       "Bash(echo)",
       "Bash(done)",
       "Bash(git commit:*)",
-      "Bash(git remote get-url:*)"
+      "Bash(git remote get-url:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

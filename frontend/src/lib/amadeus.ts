@@ -174,11 +174,12 @@ export class AmadeusClient {
 
 // Configuration factory
 export function createAmadeusConfig(): AmadeusConfig {
-  const environment = process.env.NEXT_PUBLIC_AMADEUS_ENVIRONMENT as 'test' | 'production' || 'test'
+  // Prefer server-only env vars when available, fallback to public for backward compatibility
+  const environment = (process.env.AMADEUS_ENVIRONMENT || process.env.NEXT_PUBLIC_AMADEUS_ENVIRONMENT || 'test') as 'test' | 'production'
   
   return {
-    clientId: process.env.NEXT_PUBLIC_AMADEUS_CLIENT_ID || '',
-    clientSecret: process.env.NEXT_PUBLIC_AMADEUS_CLIENT_SECRET || '',
+    clientId: process.env.AMADEUS_CLIENT_ID || process.env.NEXT_PUBLIC_AMADEUS_CLIENT_ID || '',
+    clientSecret: process.env.AMADEUS_CLIENT_SECRET || process.env.NEXT_PUBLIC_AMADEUS_CLIENT_SECRET || '',
     baseUrl: environment === 'production' 
       ? 'https://api.amadeus.com' 
       : 'https://test.api.amadeus.com',

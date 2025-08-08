@@ -70,6 +70,24 @@ data:
             proxy_set_header X-Forwarded-Proto $scheme;
         }
         
+        # Destination exploration (search-service proxies to data-ingestion-service)
+        location /api/v1/explore/ {
+            proxy_pass http://search-service/api/v1/explore/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Destination data
+        location /api/v1/destinations/ {
+            proxy_pass http://search-service/api/v1/destinations/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
         location /api/v1/pricing/ {
             proxy_pass http://pricing-service/api/v1/pricing/;
             proxy_set_header Host $host;
