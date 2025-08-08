@@ -172,84 +172,40 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // Sample flight data - in real implementation, this would come from Amadeus API
-  const generateFlightOptions = (): FlightOption[] => {
-    const basePrice = 220
-    const destination = recommendation.destination
-    
-    return [
-      {
-        id: 'flight-1',
-        price: basePrice + 50,
-        currency: '€',
-        departureTime: '08:15',
-        arrivalTime: '11:30',
-        duration: '3h 15m',
-        stops: 0,
-        airline: 'EuroWings',
-        aircraftType: 'A320',
-        badge: 'Best Overall',
-        arrivalContext: 'Perfect for morning exploration',
-        bookingLink: 'https://www.eurowings.com/booking/search',
-        confidence: 95
-      },
-      {
-        id: 'flight-2', 
-        price: basePrice + 80,
-        currency: '€',
-        departureTime: '14:30',
-        arrivalTime: '17:45',
-        duration: '3h 15m',
-        stops: 0,
-        airline: 'Lufthansa',
-        aircraftType: 'A319',
-        badge: selectedActivity === 'nightlife' ? 'Party Ready' : 'Weekend Perfect',
-        arrivalContext: selectedActivity === 'nightlife' ? 'Arrives in time for evening festivities' : 'Great for weekend breaks',
-        bookingLink: 'https://www.lufthansa.com/booking',
-        confidence: 92
-      },
-      {
-        id: 'flight-3',
-        price: basePrice - 30,
-        currency: '€', 
-        departureTime: '06:45',
-        arrivalTime: '11:20',
-        duration: '4h 35m',
-        stops: 1,
-        airline: 'Ryanair',
-        aircraftType: 'B737',
-        badge: 'Budget Choice',
-        arrivalContext: 'Early start, full day ahead',
-        bookingLink: 'https://www.ryanair.com/gb/en/book',
-        confidence: 78
-      },
-      {
-        id: 'flight-4',
-        price: basePrice + 120,
-        currency: '€',
-        departureTime: '19:20',
-        arrivalTime: '22:35',
-        duration: '3h 15m',
-        stops: 0,
-        airline: 'KLM',
-        aircraftType: 'E190',
-        badge: selectedActivity === 'adventure' ? 'Early Explorer' : undefined,
-        arrivalContext: selectedActivity === 'adventure' ? 'Rest tonight, adventure tomorrow' : 'Evening arrival, night in the city',
-        bookingLink: 'https://www.klm.com/booking',
-        confidence: 85
-      }
-    ]
+  // Fetch real flight options from our server route (Amadeus)
+  const fetchFlightOptions = async (): Promise<FlightOption[]> => {
+    const res = await fetch('/api/amadeus/flights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        origin: originAirport,
+        destination: recommendation.destination.airport_code,
+        departureDate: new Date().toISOString().slice(0,10),
+        passengers: 1,
+      }),
+    })
+    const json = await res.json()
+    if (!json.ok) throw new Error(json.error || 'Failed to fetch flights')
+    return json.data as FlightOption[]
   }
 
   useEffect(() => {
+    let isActive = true
     setIsLoading(true)
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      const flightOptions = generateFlightOptions()
-      setFlights(flightOptions)
-      setIsLoading(false)
-    }, 1500)
+    fetchFlightOptions()
+      .then((flightOptions) => {
+        if (!isActive) return
+        setFlights(flightOptions)
+      })
+      .catch(() => {
+        if (!isActive) return
+        setFlights([])
+      })
+      .finally(() => {
+        if (!isActive) return
+        setIsLoading(false)
+      })
+    return () => { isActive = false }
   }, [recommendation, selectedActivity])
 
   const handleFlightSelect = (flight: FlightOption) => {

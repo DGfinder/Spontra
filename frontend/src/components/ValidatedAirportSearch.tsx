@@ -18,24 +18,22 @@ interface ValidatedAirportSearchProps {
   onValidation?: (isValid: boolean, error?: string) => void
 }
 
-// Mock airport data - in real app this would come from API
-const AIRPORTS: Airport[] = [
-  { code: 'LHR', name: 'Heathrow Airport', city: 'London', country: 'United Kingdom' },
-  { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris', country: 'France' },
-  { code: 'FRA', name: 'Frankfurt Airport', city: 'Frankfurt', country: 'Germany' },
-  { code: 'AMS', name: 'Amsterdam Airport Schiphol', city: 'Amsterdam', country: 'Netherlands' },
-  { code: 'MAD', name: 'Madrid-Barajas Airport', city: 'Madrid', country: 'Spain' },
-  { code: 'FCO', name: 'Leonardo da Vinci Airport', city: 'Rome', country: 'Italy' },
-  { code: 'ZUR', name: 'Zurich Airport', city: 'Zurich', country: 'Switzerland' },
-  { code: 'VIE', name: 'Vienna International Airport', city: 'Vienna', country: 'Austria' },
-  { code: 'BRU', name: 'Brussels Airport', city: 'Brussels', country: 'Belgium' },
-  { code: 'CPH', name: 'Copenhagen Airport', city: 'Copenhagen', country: 'Denmark' },
-  { code: 'JFK', name: 'John F. Kennedy International Airport', city: 'New York', country: 'United States' },
-  { code: 'LAX', name: 'Los Angeles International Airport', city: 'Los Angeles', country: 'United States' },
-  { code: 'SIN', name: 'Singapore Changi Airport', city: 'Singapore', country: 'Singapore' },
-  { code: 'NRT', name: 'Narita International Airport', city: 'Tokyo', country: 'Japan' },
-  { code: 'SYD', name: 'Sydney Kingsford Smith Airport', city: 'Sydney', country: 'Australia' }
-]
+  // Use richer list from data file (still static client-side, but more options)
+  // Falls back to minimal set if import fails for any reason
+  const AIRPORTS: Airport[] = (() => {
+    try {
+      const json = require('@/data/airports.json') as Array<{code:string,name:string,city:string,country:string}>
+      return json.map(a => ({ code: a.code, name: a.name, city: a.city, country: a.country }))
+    } catch {
+      return [
+        { code: 'LHR', name: 'Heathrow Airport', city: 'London', country: 'United Kingdom' },
+        { code: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris', country: 'France' },
+        { code: 'JFK', name: 'John F. Kennedy International Airport', city: 'New York', country: 'United States' },
+        { code: 'LAX', name: 'Los Angeles International Airport', city: 'Los Angeles', country: 'United States' },
+        { code: 'SYD', name: 'Sydney Kingsford Smith Airport', city: 'Sydney', country: 'Australia' }
+      ]
+    }
+  })()
 
 export function ValidatedAirportSearch({
   value,
@@ -99,8 +97,8 @@ export function ValidatedAirportSearch({
     setQuery(inputValue)
     setSelectedIndex(-1)
 
-    // Clear current selection if user is typing
-    if (inputValue !== query) {
+    // Avoid clearing valid entered code on every keystroke; clear only when user deletes entirely
+    if (inputValue.length === 0) {
       onChange('')
     }
 
