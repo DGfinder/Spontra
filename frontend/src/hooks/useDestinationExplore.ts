@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
-import { amadeusService } from '@/services/amadeusService'
+// Client will call our server route instead of hitting Amadeus directly
 
 // Theme to activity mapping
 const THEME_TO_ACTIVITY: Record<string, ActivityType> = {
@@ -57,33 +57,32 @@ export function useDestinationExplore() {
       let response: DestinationExploreResponse
       
       try {
-        console.log('🛫 ATTEMPTING AMADEUS API for destination exploration...')
-        console.log('📋 Amadeus parameters:', {
-          origin: formData.departureAirport,
-          maxFlightTime: maxFlightTime,
-          theme: formData.selectedTheme,
-          departureDate: formData.departureDate
+        console.log('🛫 Calling server route for Amadeus destination exploration...')
+        const res = await fetch('/api/amadeus/destinations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origin: formData.departureAirport,
+            maxFlightTime,
+            theme: formData.selectedTheme,
+            departureDate: formData.departureDate,
+          }),
         })
-        
-        const amadeusResults = await amadeusService.exploreDestinations({
-          origin: formData.departureAirport,
-          maxFlightTime: maxFlightTime,
-          theme: formData.selectedTheme,
-          departureDate: formData.departureDate
-        })
-        
-        // Convert to expected response format
+        const json = await res.json()
+        if (!json.ok) throw new Error(json.error || 'Server route error')
+
+        const amadeusResults = json.data
+
         response = {
           id: `amadeus-${Date.now()}`,
           explore_request_id: `req-${Date.now()}`,
           recommended_destinations: amadeusResults,
           total_results: amadeusResults.length,
           searched_at: new Date().toISOString(),
-          processing_time_ms: Date.now() - startTime
+          processing_time_ms: Date.now() - startTime,
         }
-        
-        console.log(`✅ AMADEUS API SUCCESSFUL: Found ${amadeusResults.length} real destinations!`)
-        console.log('📊 First result sample:', amadeusResults[0]?.destination?.city_name)
+
+        console.log(`✅ AMADEUS API SUCCESSFUL (server): Found ${amadeusResults.length} destinations`)
       } catch (amadeusError) {
         console.error('❌ AMADEUS API FAILED:', amadeusError)
         console.warn('🔄 Falling back to backend API (localhost:8081)...')
