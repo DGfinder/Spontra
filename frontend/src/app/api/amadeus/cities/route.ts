@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusService } from '@/services/amadeusService'
+import { amadeusClient } from '@/lib/amadeus-simple'
 
 export const runtime = 'nodejs'
 
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     // Find cities in the country
     const keyword = countryName || countryCode
-    const locations = await amadeusService.searchLocations(keyword, 'CITY' as any)
+    const locations = await amadeusClient.searchLocations(keyword, 'CITY')
 
     const filtered = (locations || [])
       .filter((loc: any) => {
@@ -42,13 +42,13 @@ export async function POST(req: NextRequest) {
       let flight_duration = undefined as number | undefined
       const destCode = city.iataCode
       try {
-        const offers = await amadeusService.searchFlights({
+        const offers = await amadeusClient.searchFlights({
           origin,
           destination: destCode,
           departureDate: departureDate || new Date().toISOString().slice(0, 10),
           adults: 1,
           max: 1,
-        } as any)
+        })
         const offer = (offers || [])[0]
         if (offer) {
           const total = offer?.price?.total

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusService } from '@/services/amadeusService'
+import { amadeusClient } from '@/lib/amadeus-simple'
 
 export const runtime = 'nodejs'
 
@@ -11,15 +11,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Missing required params: origin, destination, departureDate' }, { status: 400 })
     }
 
-    // Use existing server-side service to fetch offers
-    const offers = await amadeusService.searchFlights({
+    // Use simple Amadeus client to fetch offers
+    const offers = await amadeusClient.searchFlights({
       origin,
       destination,
       departureDate,
       adults: passengers,
       travelClass,
       max: 20,
-    } as any)
+    })
 
     // Map to a lightweight shape for the UI
     const flights = (offers || []).slice(0, 12).map((offer: any, idx: number) => {
