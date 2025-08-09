@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { themeDestinationService } from '@/services/themeDestinationService'
 import { amadeusService } from '@/services/amadeusService'
 
 // Ensure this runs in a Node.js runtime so server env vars are available
@@ -9,16 +10,48 @@ export async function POST(req: NextRequest) {
   
   try {
     const body = await req.json()
-    const { origin, maxFlightTime, theme, departureDate } = body
+    const { origin, maxFlightTime, theme, departureDate, priceRange, countries } = body
     
-    console.log('📝 Request parameters:', { origin, maxFlightTime, theme, departureDate })
+    console.log('📝 Request parameters:', { origin, maxFlightTime, theme, departureDate, priceRange, countries })
 
     if (!origin) {
       console.log('❌ Missing origin parameter')
       return NextResponse.json({ ok: false, error: 'Missing required parameter: origin' }, { status: 400 })
     }
 
-    console.log('🛫 Calling amadeusService.exploreDestinations with cached pricing...')
+    // Check if backend service is available
+    const isBackendHealthy = await themeDestinationService.healthCheck()
+    
+    if (isBackendHealthy) {
+      console.log('🎯 Using enhanced backend theme destination service')
+      
+      try {
+        const response = await themeDestinationService.getDestinationsByTheme({
+          origin,
+          theme,
+          maxFlightTime,
+          priceRange,
+          countries,
+          maxResults: 20
+        })
+
+        console.log('✅ Backend API call successful, recommendations count:', response.destinations.length)
+        return NextResponse.json({ 
+          ok: true, 
+          data: response.destinations,
+          metadata: response.searchMetadata,
+          countrySummary: response.countrySummary,
+          totalResults: response.totalResults,
+          source: 'backend'
+        })
+      } catch (backendError) {
+        console.warn('⚠️ Backend service failed, falling back to legacy service:', backendError)
+        // Continue to fallback below
+      }
+    }
+
+    // Fallback to legacy Amadeus service with theme city logic
+    console.log('🔄 Using legacy amadeusService with theme-based filtering')
     const recommendations = await amadeusService.exploreDestinations({
       origin,
       maxFlightTime,
@@ -27,8 +60,12 @@ export async function POST(req: NextRequest) {
       viewBy: 'PRICE' // Use PRICE view for cached pricing sorted by cost
     })
 
-    console.log('✅ API call successful, recommendations count:', recommendations?.length || 0)
-    return NextResponse.json({ ok: true, data: recommendations })
+    console.log('✅ Legacy API call successful, recommendations count:', recommendations?.length || 0)
+    return NextResponse.json({ 
+      ok: true, 
+      data: recommendations,
+      source: 'legacy'
+    })
   } catch (e: any) {
     console.error('💥 Destinations API error:', {
       message: e?.message,

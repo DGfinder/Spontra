@@ -76,11 +76,11 @@ export function DestinationCard({
   const flightTime = result.flight_route.total_duration_minutes / 60
   const flagEmoji = getCountryFlag(destination.country_code)
   
-  // Generate analytics data
-  const analytics = generateDestinationAnalytics(result, allDestinations)
-  const trendDisplay = getTrendDisplay(analytics.priceTrend)
-  const urgencyDisplay = getBookingUrgencyDisplay(analytics.bookingInsight.urgency)
-  const rankingDisplay = getPriceRankingDisplay(analytics.priceRanking)
+  // Generate analytics data with error handling
+  const analytics = generateDestinationAnalytics(result, allDestinations || [])
+  const trendDisplay = getTrendDisplay(analytics?.priceTrend || { direction: 'stable', change: 0, confidence: 'low', period: '30d', description: 'Price data unavailable' })
+  const urgencyDisplay = getBookingUrgencyDisplay(analytics?.bookingInsight?.urgency || 'medium')
+  const rankingDisplay = getPriceRankingDisplay(analytics?.priceRanking || 'fair')
   
   const handleExplore = () => {
     if (onExplore) {
@@ -153,7 +153,7 @@ export function DestinationCard({
             </span>
             <div className={`${trendDisplay.bgColor} ${trendDisplay.color} px-1 py-0.5 rounded text-xs flex items-center gap-1`}>
               <span>{trendDisplay.icon}</span>
-              <span>{analytics.priceTrend.change > 0 ? `+${analytics.priceTrend.change}%` : analytics.priceTrend.change === 0 ? 'Stable' : `${analytics.priceTrend.change}%`}</span>
+              <span>{(analytics?.priceTrend?.change || 0) > 0 ? `+${analytics?.priceTrend?.change || 0}%` : (analytics?.priceTrend?.change || 0) === 0 ? 'Stable' : `${analytics?.priceTrend?.change || 0}%`}</span>
             </div>
           </div>
         </div>
@@ -196,7 +196,7 @@ export function DestinationCard({
             <span className="text-lg">{trendDisplay.icon}</span>
             <span className={`text-xs font-medium ${trendDisplay.color}`}>Price Trend</span>
           </div>
-          <p className="text-white/80 text-xs">{analytics.priceTrend.description}</p>
+          <p className="text-white/80 text-xs">{analytics?.priceTrend?.description || 'Price data unavailable'}</p>
         </div>
         
         {/* Booking Recommendation */}
@@ -205,7 +205,7 @@ export function DestinationCard({
             <span className="text-lg">{urgencyDisplay.icon}</span>
             <div>
               <span className="text-xs font-medium">{urgencyDisplay.text}</span>
-              <p className="text-xs opacity-80">{analytics.bookingInsight.reasoning}</p>
+              <p className="text-xs opacity-80">{analytics?.bookingInsight?.reasoning || 'Booking recommendation unavailable'}</p>
             </div>
           </div>
         </div>
@@ -216,7 +216,7 @@ export function DestinationCard({
             <span className="text-lg">🌍</span>
             <span className="text-xs font-medium text-blue-400">Seasonal Tip</span>
           </div>
-          <p className="text-white/80 text-xs">{analytics.seasonalInsight.recommendation}</p>
+          <p className="text-white/80 text-xs">{analytics?.seasonalInsight?.recommendation || 'Seasonal information unavailable'}</p>
         </div>
       </div>
       

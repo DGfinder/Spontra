@@ -22,14 +22,14 @@ export function CountryCard({
   const [showAllDestinations, setShowAllDestinations] = useState(false)
   const themeColor = getThemeColor(selectedTheme as any)
   
-  // Generate analytics for the cheapest destination (country representative)
+  // Generate analytics for the cheapest destination (country representative) with error handling
   const countryAnalytics = generateDestinationAnalytics(
     aggregation.cheapestDestination, 
-    aggregation.allDestinations
+    aggregation.allDestinations || []
   )
-  const trendDisplay = getTrendDisplay(countryAnalytics.priceTrend)
-  const urgencyDisplay = getBookingUrgencyDisplay(countryAnalytics.bookingInsight.urgency)
-  const rankingDisplay = getPriceRankingDisplay(countryAnalytics.priceRanking)
+  const trendDisplay = getTrendDisplay(countryAnalytics?.priceTrend || { direction: 'stable', change: 0, confidence: 'low', period: '30d', description: 'Price data unavailable' })
+  const urgencyDisplay = getBookingUrgencyDisplay(countryAnalytics?.bookingInsight?.urgency || 'medium')
+  const rankingDisplay = getPriceRankingDisplay(countryAnalytics?.priceRanking || 'fair')
 
   const formatFlightTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)
@@ -63,7 +63,7 @@ export function CountryCard({
             </div>
             <div className={`${trendDisplay.bgColor} ${trendDisplay.color} px-1 py-0.5 rounded text-xs flex items-center gap-1`}>
               <span>{trendDisplay.icon}</span>
-              <span>{countryAnalytics.priceTrend.change > 0 ? `+${countryAnalytics.priceTrend.change}%` : countryAnalytics.priceTrend.change === 0 ? 'Stable' : `${countryAnalytics.priceTrend.change}%`}</span>
+              <span>{(countryAnalytics?.priceTrend?.change || 0) > 0 ? `+${countryAnalytics?.priceTrend?.change || 0}%` : (countryAnalytics?.priceTrend?.change || 0) === 0 ? 'Stable' : `${countryAnalytics?.priceTrend?.change || 0}%`}</span>
             </div>
           </div>
           <div className="text-white/50 text-xs mb-1">from</div>
@@ -129,7 +129,7 @@ export function CountryCard({
         <div className={`${urgencyDisplay.bgColor} ${urgencyDisplay.color} rounded px-2 py-1 flex items-center gap-1`}>
           <span className="text-sm">{urgencyDisplay.icon}</span>
           <span className="text-xs font-medium">{urgencyDisplay.text}</span>
-          <span className="text-xs opacity-80">- {countryAnalytics.bookingInsight.reasoning}</span>
+          <span className="text-xs opacity-80">- {countryAnalytics?.bookingInsight?.reasoning || 'Booking recommendation unavailable'}</span>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ export function CountryCard({
             <span className="text-sm">{trendDisplay.icon}</span>
             <span className={`text-xs font-medium ${trendDisplay.color}`}>Trend</span>
           </div>
-          <p className="text-white/80 text-xs">{countryAnalytics.priceTrend.description}</p>
+          <p className="text-white/80 text-xs">{countryAnalytics?.priceTrend?.description || 'Price data unavailable'}</p>
         </div>
         
         {/* Seasonal Insight */}
@@ -172,7 +172,7 @@ export function CountryCard({
             <span className="text-sm">🌍</span>
             <span className="text-xs font-medium text-blue-400">Season</span>
           </div>
-          <p className="text-white/80 text-xs">{countryAnalytics.seasonalInsight.recommendation}</p>
+          <p className="text-white/80 text-xs">{countryAnalytics?.seasonalInsight?.recommendation || 'Seasonal information unavailable'}</p>
         </div>
       </div>
       

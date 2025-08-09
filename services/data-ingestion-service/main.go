@@ -17,6 +17,7 @@ import (
 	"spontra/data-ingestion-service/internal/cassandra"
 	"spontra/data-ingestion-service/internal/config"
 	"spontra/data-ingestion-service/internal/elasticsearch"
+	"spontra/data-ingestion-service/internal/handlers"
 	"spontra/data-ingestion-service/internal/models"
 	"spontra/data-ingestion-service/internal/services"
 	"spontra/data-ingestion-service/pkg/kafka"
@@ -33,6 +34,7 @@ type App struct {
 	validator             *validator.Validate
 	csvImportService      *services.CSVImportService
 	recommendationEngine  *services.DestinationRecommendationEngine
+	themeDestHandler      *handlers.ThemeDestinationHandler
 }
 
 func main() {
@@ -106,6 +108,9 @@ func (a *App) initializeServices() error {
 	// Initialize recommendation engine
 	a.recommendationEngine = services.NewDestinationRecommendationEngine(a.cassandra, a.csvImportService)
 
+	// Initialize theme destination handler
+	a.themeDestHandler = handlers.NewThemeDestinationHandler(a.cassandra, a.validator)
+
 	return nil
 }
 
@@ -171,6 +176,14 @@ func (a *App) setupRoutes() {
 			dataManagement.POST("/import/flight-routes", a.importFlightRoutes)
 			dataManagement.POST("/create/sample-destinations", a.createSampleDestinations)
 			dataManagement.GET("/destinations/:airport", a.getDestinationInfo)
+		}
+
+		// Theme-based destination routes
+		themes := v1.Group("/themes")
+		{
+			themes.GET("/definitions", a.themeDestHandler.GetThemeDefinitions)
+			themes.POST("/destinations", a.themeDestHandler.GetDestinationsByTheme)
+			themes.GET("/countries/:country/destinations", a.themeDestHandler.GetDestinationsByCountry)
 		}
 	}
 }

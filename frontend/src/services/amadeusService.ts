@@ -1,6 +1,7 @@
 import { getAmadeusClient, FlightSearchParams, DestinationSearchParams, AmadeusError, AmadeusClient } from '@/lib/amadeus'
 import { DestinationRecommendation } from './apiClient'
 import { enableMockFallbacks, getErrorMessage, ErrorType } from '@/lib/environment'
+import { getCitiesForTheme, isThemeSupported, ThemeCity, getTopCitiesForTheme } from '@/data/themeCities'
 
 export interface AmadeusFlightOffer {
   id: string
@@ -296,7 +297,7 @@ class AmadeusService {
     }))
   }
 
-  // Enhanced destination search with cached prices
+  // Theme-based destination search with cached prices (RECREATES ORIGINAL SPONTRA LOGIC!)
   async exploreDestinations(params: {
     origin: string
     maxFlightTime?: number
@@ -304,46 +305,192 @@ class AmadeusService {
     departureDate?: string
     viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK' | 'COUNTRY' | 'PRICE'
   }): Promise<DestinationRecommendation[]> {
-    // Import the simple client for flight destinations with cached pricing
+    console.log(`🎯 Theme-based destination exploration: ${params.theme}`)
+    
+    // Step 1: Check if theme is supported
+    if (!isThemeSupported(params.theme)) {
+      console.warn(`❌ Unsupported theme: ${params.theme}`)
+      throw new Error(`Theme "${params.theme}" is not supported. Please choose from: party, adventure, learn, shopping, beach`)
+    }
+
+    // Step 2: Get curated cities for this theme (THIS IS THE KEY FIX!)
+    const themeCities = getTopCitiesForTheme(params.theme, 15) // Limit to top 15 cities
+    console.log(`📋 Found ${themeCities.length} curated cities for theme: ${params.theme}`)
+    console.log(`🌆 Theme cities: ${themeCities.map(c => c.cityName).join(', ')}`)
+
+    // Step 3: Filter by flight time if specified
+    let filteredCities = themeCities
+    if (params.maxFlightTime) {
+      filteredCities = themeCities.filter(city => city.averageFlightTime <= params.maxFlightTime!)
+      console.log(`✈️ After flight time filter (${params.maxFlightTime}h): ${filteredCities.length} cities`)
+    }
+
+    if (filteredCities.length === 0) {
+      console.warn(`❌ No cities found for theme "${params.theme}" within ${params.maxFlightTime} hours`)
+      return []
+    }
+
+    // Step 4: Get cached pricing for each theme-appropriate city
     const { amadeusClient } = await import('@/lib/amadeus-simple')
+    const recommendations: DestinationRecommendation[] = []
     
     try {
-      console.log('🌍 Exploring destinations with cached prices...')
+      console.log('💰 Getting cached prices for theme-specific cities...')
       
-      // Call the Flight Inspiration API directly with viewBy parameter for cached prices
-      const flightDestinations = await amadeusClient.exploreDestinations({
-        origin: params.origin,
-        maxFlightTime: params.maxFlightTime,
-        departureDate: params.departureDate,
-        theme: params.theme,
-        viewBy: params.viewBy || 'PRICE' // Default to price view for best results
-      })
+      // Process cities in smaller batches to avoid overwhelming the API
+      const batchSize = 5
+      for (let i = 0; i < filteredCities.length; i += batchSize) {
+        const batch = filteredCities.slice(i, i + batchSize)
+        
+        // Get flight pricing for each city in the batch
+        const batchPromises = batch.map(async (city) => {
+          try {
+            // Try to get cached flight pricing to this specific city
+            const flightDestinations = await amadeusClient.exploreDestinations({
+              origin: params.origin,
+              maxFlightTime: city.averageFlightTime + 2, // Add buffer
+              departureDate: params.departureDate,
+              viewBy: 'PRICE'
+            })
 
-      console.log(`✅ Found ${flightDestinations.length} flight destinations with cached prices`)
+            // Find flights to this specific city
+            const cityFlights = flightDestinations.filter(flight => 
+              flight.destination === city.iataCode
+            )
 
-      // Convert flight-destination objects to destination recommendations with real prices
-      const recommendations = await this.convertFlightDestinationsToRecommendations(
-        flightDestinations,
-        params.origin,
-        params.theme
-      )
+            if (cityFlights.length > 0) {
+              // Create recommendation with real cached price
+              const bestFlight = cityFlights[0] // Already sorted by price
+              return this.createThemeBasedRecommendation(city, bestFlight, params.origin, params.theme)
+            } else {
+              // No direct flights found, create recommendation with estimated price
+              console.log(`🔄 No direct flights to ${city.cityName}, using estimated pricing`)
+              return this.createThemeBasedRecommendation(city, null, params.origin, params.theme)
+            }
+          } catch (error) {
+            console.warn(`⚠️ Error getting price for ${city.cityName}:`, error)
+            // Still include city but with estimated pricing
+            return this.createThemeBasedRecommendation(city, null, params.origin, params.theme)
+          }
+        })
 
-      // Sort by price (already sorted by API when using viewBy=PRICE)
+        // Wait for batch to complete
+        const batchResults = await Promise.all(batchPromises)
+        recommendations.push(...batchResults.filter(rec => rec !== null))
+        
+        // Small delay between batches to be API-friendly
+        if (i + batchSize < filteredCities.length) {
+          await new Promise(resolve => setTimeout(resolve, 200))
+        }
+      }
+
+      console.log(`✅ Created ${recommendations.length} theme-based recommendations`)
+      
+      // Sort by price and theme relevance
       return recommendations.sort((a, b) => {
-        const priceA = parseFloat((a.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
-        const priceB = parseFloat((b.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+        const priceA = parseFloat((a.estimated_flight_price || '999').replace(/[^0-9.-]/g, ''))
+        const priceB = parseFloat((b.estimated_flight_price || '999').replace(/[^0-9.-]/g, ''))
         return priceA - priceB
       })
 
     } catch (error) {
-      console.error('Explore destinations failed:', error)
+      console.error('Theme-based destination exploration failed:', error)
       
-      // Fallback to mock data if Amadeus fails
+      // Fallback: Create recommendations from theme cities without pricing
       if (enableMockFallbacks) {
-        console.log('Falling back to mock data due to Amadeus API error')
-        return this.getMockDestinations(params.origin, params.theme)
+        console.log('🔄 Falling back to theme cities without real pricing')
+        return filteredCities.map(city => 
+          this.createThemeBasedRecommendation(city, null, params.origin, params.theme)
+        ).filter(rec => rec !== null)
       }
-      throw getErrorMessage(error, 'Destination exploration').message
+      
+      throw getErrorMessage(error, 'Theme-based destination exploration').message
+    }
+  }
+
+  // Map theme to valid ActivityType values
+  private mapThemeToActivityTypes(theme: string): ('activities' | 'shopping' | 'restaurants' | 'nature' | 'culture')[] {
+    switch (theme.toLowerCase()) {
+      case 'party':
+      case 'nightlife':
+        return ['activities', 'restaurants']
+      case 'adventure':
+      case 'outdoor':
+        return ['nature', 'activities']
+      case 'learn':
+      case 'culture':
+        return ['culture', 'activities']
+      case 'shopping':
+        return ['shopping', 'activities']
+      case 'beach':
+        return ['nature', 'activities']
+      default:
+        return ['activities']
+    }
+  }
+
+  // Create recommendation from theme city data
+  private createThemeBasedRecommendation(
+    city: ThemeCity, 
+    flightData: any | null, 
+    origin: string, 
+    theme: string
+  ): DestinationRecommendation {
+    // Extract real price if available, otherwise estimate based on flight time
+    let estimatedPrice = '€200-400' // Default fallback
+    if (flightData?.price?.total) {
+      estimatedPrice = `€${flightData.price.total}`
+    } else {
+      // Estimate price based on flight time (rough approximation)
+      const basePrice = Math.round(city.averageFlightTime * 50 + 100)
+      const variation = Math.round(basePrice * 0.3)
+      estimatedPrice = `€${basePrice - variation}-${basePrice + variation}`
+    }
+
+    return {
+      destination: {
+        id: city.iataCode,
+        airport_code: city.iataCode,
+        city_name: city.cityName,
+        country_name: city.countryName,
+        country_code: city.countryCode,
+        description: `${city.cityName} - ${city.highlights.join(', ')}`,
+        image_url: '',
+        activities: [], // Will be populated later with proper ActivityInfo objects
+        popularity_score: Math.max(...Object.values(city.themeScores)), // Use highest theme score as popularity
+        climate_info: {
+          average_temperature: '15-25°C',
+          rainy_months: [],
+          sunny_months: [],
+          climate_type: 'Temperate'
+        },
+        best_time_to_visit: [],
+        budget: {
+          level: 'mid-range',
+          daily_budget_range: '€80-150',
+          currency: 'EUR'
+        },
+        timezone: 'Europe/Central',
+        language: ['English'],
+        currency: 'EUR',
+        visa_required: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      flight_route: {
+        id: `${origin}-${city.iataCode}`,
+        origin_airport_code: origin,
+        destination_airport_code: city.iataCode,
+        estimated_duration_hours: Math.floor(city.averageFlightTime),
+        estimated_duration_minutes: Math.round((city.averageFlightTime % 1) * 60),
+        total_duration_minutes: Math.round(city.averageFlightTime * 60),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      match_score: Math.min(city.themeScores[theme as keyof typeof city.themeScores] + 5, 98), // Use theme-specific score
+      activity_matches: this.mapThemeToActivityTypes(theme), // Map theme to valid activity types
+      reason_for_recommendation: `Perfect ${theme} destination: ${city.highlights[0]}`,
+      estimated_flight_price: estimatedPrice
     }
   }
 

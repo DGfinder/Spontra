@@ -1,4 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import {
+  EnhancedDestinationRecommendation,
+  ThemeDestinationSearchRequest,
+  ThemeDestinationSearchResponse,
+  HealthCheckResponse
+} from '@/types/destinations'
 
 // API Configuration
 // Prefer server-provided API_BASE_URL, then public var, then sensible dev default
@@ -149,8 +155,8 @@ class ApiClient {
   }
 
   // Health check
-  async healthCheck(): Promise<any> {
-    const response = await this.client.get('/health')
+  async healthCheck(): Promise<HealthCheckResponse> {
+    const response: AxiosResponse<HealthCheckResponse> = await this.client.get('/health')
     return response.data
   }
 

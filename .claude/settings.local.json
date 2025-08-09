@@ -46,7 +46,8 @@
       "Bash(git merge:*)",
       "Bash(rg:*)",
       "Bash(env)",
-      "WebFetch(domain:developers.amadeus.com)"
+      "WebFetch(domain:developers.amadeus.com)",
+      "Bash(npx next lint:*)"
     ],
     "deny": []
   }
