@@ -2,6 +2,7 @@ import { DestinationRecommendation } from '@/services/apiClient'
 import { DestinationCard } from './DestinationCard'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { SearchSummaryBar } from './SearchSummaryBar'
+import { CacheIndicator } from './CacheIndicator'
 import { useFormData } from '@/store/searchStore'
 
 interface SearchResultsProps {
@@ -51,10 +52,11 @@ export function SearchResults({
               Found {results.length} destinations for your {selectedTheme} adventure
             </p>
             <div className="flex items-center space-x-2 mt-2">
-              <span className="text-xs text-white/50">Sorted by proximity:</span>
+              <span className="text-xs text-white/50">Sorted by price:</span>
               <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">
-                Closest first ✈️
+                Best deals first 💰
               </span>
+              <CacheIndicator className="ml-2" />
             </div>
           </div>
           <button

@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
+import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cache'
 // Client will call our server route instead of hitting Amadeus directly
 
 // Theme to activity mapping
@@ -35,6 +36,47 @@ export function useDestinationExplore() {
     setError(null)
 
     try {
+      // Create cache key from search parameters
+      const cacheKey = createDestinationCacheKey({
+        origin: formData.departureAirport,
+        maxFlightTime: formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8,
+        theme: formData.selectedTheme,
+        departureDate: formData.departureDate,
+        viewBy: 'PRICE'
+      })
+
+      // Check cache first
+      const cachedSearch = destinationCache.get<CachedDestinationSearch>(cacheKey)
+      if (cachedSearch) {
+        console.log('🚀 Using cached destination results')
+        
+        // Create response from cached data
+        const cachedResponse: DestinationExploreResponse = {
+          id: `cached-${Date.now()}`,
+          explore_request_id: `cache-req-${Date.now()}`,
+          recommended_destinations: cachedSearch.results,
+          total_results: cachedSearch.results.length,
+          searched_at: cachedSearch.meta.searchTimestamp,
+          processing_time_ms: 0, // Instant from cache
+        }
+
+        // Update store with cached results
+        setResults(cachedResponse.recommended_destinations)
+        addToHistory({
+          formData,
+          resultCount: cachedResponse.recommended_destinations.length,
+          searchDuration: 0 // Instant from cache
+        })
+        
+        // Track preferences
+        addRecentAirport(formData.departureAirport)
+        addPreferredTheme(formData.selectedTheme)
+        
+        setLoading(false)
+        return cachedResponse
+      }
+
+      console.log('🔍 No cache hit, fetching fresh destination data')
       // Extract flight time range from form data
       const minFlightTime = formData.flightTimeRange?.[0] ?? formData.minFlightTime ?? 0.5
       const maxFlightTime = formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8
@@ -110,6 +152,26 @@ export function useDestinationExplore() {
       
       const searchDuration = Date.now() - startTime
 
+      // Cache the successful response (24 hour TTL to match Amadeus cache refresh)
+      const cacheData: CachedDestinationSearch = {
+        results: response.recommended_destinations,
+        searchParams: {
+          origin: formData.departureAirport,
+          maxFlightTime,
+          theme: formData.selectedTheme,
+          departureDate: formData.departureDate,
+          viewBy: 'PRICE'
+        },
+        meta: {
+          searchTimestamp: response.searched_at,
+          totalResults: response.total_results,
+          dataSource: 'amadeus-api'
+        }
+      }
+      
+      destinationCache.set(cacheKey, cacheData, 24) // 24 hour TTL
+      console.log('💾 Cached destination search results for future requests')
+
       // Update store with results
       setResults(response.recommended_destinations)
 
@@ -124,6 +186,7 @@ export function useDestinationExplore() {
       addRecentAirport(formData.departureAirport)
       addPreferredTheme(formData.selectedTheme)
 
+      setLoading(false)
       return response
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to explore destinations'
