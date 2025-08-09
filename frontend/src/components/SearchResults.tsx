@@ -1,8 +1,12 @@
+import { useState } from 'react'
+import { Map, List, Globe } from 'lucide-react'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { DestinationCard } from './DestinationCard'
+import { CountryCard } from './CountryCard'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { SearchSummaryBar } from './SearchSummaryBar'
 import { CacheIndicator } from './CacheIndicator'
+import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
 import { useFormData } from '@/store/searchStore'
 
 interface SearchResultsProps {
@@ -32,6 +36,11 @@ export function SearchResults({
 }: SearchResultsProps) {
   // Get current search data for the summary bar
   const formData = useFormData()
+  const [viewMode, setViewMode] = useState<'destinations' | 'countries'>('destinations')
+
+  // Aggregate results by country
+  const countryAggregations = aggregateDestinationsByCountry(results)
+  const countryStats = getCountryStats(countryAggregations)
 
   return (
     <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
@@ -42,14 +51,17 @@ export function SearchResults({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg md:text-2xl font-bold text-white">
-              Countries within {
+              {viewMode === 'countries' ? 'Countries' : 'Destinations'} within {
                 formData?.flightTimeRange 
                   ? `${formData.flightTimeRange[0]}h - ${formData.flightTimeRange[1]}h` 
                   : `${maxFlightTime || formData?.maxFlightTime || 8}h`
               } from {departureAirport}
             </h2>
             <p className="text-white/70 mt-1 text-sm md:text-base">
-              Found {results.length} destinations for your {selectedTheme} adventure
+              {viewMode === 'countries' 
+                ? `Found ${countryStats.totalCountries} countries with ${countryStats.totalDestinations} destinations`
+                : `Found ${results.length} destinations for your ${selectedTheme} adventure`
+              }
             </p>
             <div className="flex items-center space-x-2 mt-2">
               <span className="text-xs text-white/50">Sorted by price:</span>
@@ -57,6 +69,32 @@ export function SearchResults({
                 Best deals first 💰
               </span>
               <CacheIndicator className="ml-2" />
+              
+              {/* View Mode Toggle */}
+              <div className="flex items-center ml-4 bg-white/10 rounded-full p-1">
+                <button
+                  onClick={() => setViewMode('destinations')}
+                  className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
+                    viewMode === 'destinations'
+                      ? 'bg-blue-500 text-white'
+                      : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  <List size={12} />
+                  <span>Cities</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('countries')}
+                  className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
+                    viewMode === 'countries'
+                      ? 'bg-blue-500 text-white'
+                      : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  <Globe size={12} />
+                  <span>Countries</span>
+                </button>
+              </div>
             </div>
           </div>
           <button
@@ -74,12 +112,63 @@ export function SearchResults({
         {/* Loading State */}
         {Boolean(isLoading) && <LoadingSkeleton count={6} />}
 
-        {/* Results */}
-        {!isLoading && !isError && Array.isArray(results) && results.length > 0 && (
+        {/* Results - Country View */}
+        {!isLoading && !isError && Array.isArray(results) && results.length > 0 && viewMode === 'countries' && (
+          <div className="max-w-6xl mx-auto">
+            {/* Country Stats Summary */}
+            {countryStats.totalCountries > 0 && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-lg">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-blue-400">{countryStats.totalCountries}</div>
+                    <div className="text-white/60 text-xs">Countries</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-green-400">€{countryStats.averagePrice}</div>
+                    <div className="text-white/60 text-xs">Avg Price</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-yellow-400">{countryStats.cheapestCountry}</div>
+                    <div className="text-white/60 text-xs">Cheapest</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-purple-400">{countryStats.continents.length}</div>
+                    <div className="text-white/60 text-xs">Continents</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Country Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {countryAggregations.map((aggregation, index) => (
+                <CountryCard
+                  key={aggregation.country.code || `country-${index}`}
+                  aggregation={aggregation}
+                  selectedTheme={selectedTheme}
+                  onExploreCountry={(agg) => {
+                    console.log('Exploring country:', agg.country.name)
+                    // Switch to destinations view showing only this country's cities
+                    setViewMode('destinations')
+                  }}
+                  onSelectDestination={onExploreDestination}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Results - Destinations View */}
+        {!isLoading && !isError && Array.isArray(results) && results.length > 0 && viewMode === 'destinations' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
             {results
               .filter(result => result && result.destination && result.flight_route)
-              .sort((a, b) => a.flight_route.total_duration_minutes - b.flight_route.total_duration_minutes)
+              .sort((a, b) => {
+                // Sort by price (extracted from estimated_flight_price)
+                const priceA = parseFloat((a.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+                const priceB = parseFloat((b.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+                return priceA - priceB
+              })
               .map((result, index) => (
                 <DestinationCard
                   key={result.destination.id || `dest-${index}`}
