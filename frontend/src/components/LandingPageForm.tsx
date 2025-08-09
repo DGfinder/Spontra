@@ -238,8 +238,9 @@ export function LandingPageForm() {
       } else {
         // Production: Show honest error, no fake data
         const errorInfo = getErrorMessage(error, 'Destination search')
-        setError(errorInfo.userMessage)
         console.error('Production error - no fallback:', errorInfo.userMessage)
+        // Re-throw to let the UI handle the error state
+        throw new Error(errorInfo.userMessage)
       }
     }
   }

@@ -323,7 +323,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
               <ErrorState
                 title="Unable to Load Flights"
                 message={error.message}
-                type={error.type}
+                type={error.type as any}
                 onRetry={handleRetry}
                 retryLabel="Search Flights Again"
                 className="bg-black/20 backdrop-blur-md border-white/20"
