@@ -85,13 +85,24 @@ export function useDestinationExplore() {
         console.log(`✅ AMADEUS API SUCCESSFUL (server): Found ${amadeusResults.length} destinations`)
       } catch (amadeusError) {
         console.error('❌ AMADEUS API FAILED:', amadeusError)
-        console.warn('🔄 Falling back to backend API (localhost:8081)...')
-        try {
-          response = await apiClient.exploreDestinations(request)
-          console.log('✅ Backend API successful')
-        } catch (backendError) {
-          console.error('❌ Backend API also failed:', backendError)
-          throw backendError  // This will trigger the existing fallback in LandingPageForm
+        
+        // Only attempt backend fallback if the Amadeus error doesn't indicate a fallback should be used
+        const shouldTryBackend = process.env.NODE_ENV === 'development' && 
+          process.env.NEXT_PUBLIC_API_BASE_URL && 
+          !amadeusError.message?.includes('fallback')
+        
+        if (shouldTryBackend) {
+          console.warn('🔄 Falling back to backend API (localhost:8081)...')
+          try {
+            response = await apiClient.exploreDestinations(request)
+            console.log('✅ Backend API successful')
+          } catch (backendError) {
+            console.error('❌ Backend API also failed:', backendError)
+            throw new Error('Destination exploration failed: ' + (backendError.message || 'Network Error'))
+          }
+        } else {
+          console.log('🔄 No backend fallback available, throwing original error')
+          throw new Error('Destination exploration failed: ' + (amadeusError.message || 'Service unavailable'))
         }
       }
       

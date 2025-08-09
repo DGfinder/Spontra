@@ -21,6 +21,13 @@ interface AmadeusDestination {
   };
 }
 
+// Airport code mapping for closed/renamed airports
+const AIRPORT_CODE_MAPPING: Record<string, string> = {
+  'TXL': 'BER', // Berlin Tegel closed 2020, replaced by Brandenburg
+  'THF': 'BER', // Berlin Tempelhof closed 2008, use Brandenburg
+  'SXF': 'BER', // Berlin Schönefeld replaced by Brandenburg
+};
+
 class SimpleAmadeusClient {
   private clientId: string;
   private clientSecret: string;
@@ -40,6 +47,15 @@ class SimpleAmadeusClient {
       return this.accessToken;
     }
 
+    console.log('🔐 Requesting Amadeus access token...')
+    console.log('📡 Base URL:', this.baseUrl)
+    console.log('🆔 Client ID:', this.clientId ? `${this.clientId.substring(0, 8)}...` : 'NOT_SET')
+    console.log('🔑 Client Secret:', this.clientSecret ? `${this.clientSecret.substring(0, 4)}...` : 'NOT_SET')
+
+    if (!this.clientId || !this.clientSecret) {
+      throw new Error('Amadeus credentials not configured. Missing CLIENT_ID or CLIENT_SECRET');
+    }
+
     const response = await fetch(`${this.baseUrl}/v1/security/oauth2/token`, {
       method: 'POST',
       headers: {
@@ -52,12 +68,17 @@ class SimpleAmadeusClient {
       }),
     });
 
+    console.log('🌐 Token response status:', response.status)
+
     if (!response.ok) {
-      throw new Error(`Token request failed: ${response.status}`);
+      const errorText = await response.text()
+      console.error('❌ Token request failed:', errorText)
+      throw new Error(`Token request failed: ${response.status} - ${errorText}`);
     }
 
     const data: AmadeusTokenResponse = await response.json();
     this.accessToken = data.access_token;
+    console.log('✅ Access token acquired successfully')
     return this.accessToken;
   }
 
@@ -117,39 +138,79 @@ class SimpleAmadeusClient {
     return data.data || [];
   }
 
+  private mapAirportCode(code: string): string {
+    const upperCode = code.toUpperCase();
+    const mappedCode = AIRPORT_CODE_MAPPING[upperCode] || upperCode;
+    
+    if (mappedCode !== upperCode) {
+      console.log(`🔄 Airport code mapped: ${upperCode} → ${mappedCode}`);
+    }
+    
+    return mappedCode;
+  }
+
   async exploreDestinations(params: {
     origin: string;
     maxFlightTime?: number;
     theme?: string;
     departureDate?: string;
   }): Promise<any[]> {
+    console.log('🌍 Starting destination exploration with params:', params)
+    
     const token = await this.getAccessToken();
     
+    // Map airport codes for closed/renamed airports
+    const mappedOrigin = this.mapAirportCode(params.origin);
+    
     const searchParams = new URLSearchParams({
-      origin: params.origin,
+      origin: mappedOrigin,
     });
+
+    // Amadeus requires a departure date for flight-destinations endpoint
+    const departureDate = params.departureDate || (() => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return tomorrow.toISOString().split('T')[0];
+    })();
+    
+    searchParams.append('departureDate', departureDate);
+    console.log('📅 Using departure date:', departureDate);
 
     if (params.maxFlightTime) {
       searchParams.append('maxFlightTime', params.maxFlightTime.toString());
     }
-    if (params.departureDate) {
-      searchParams.append('departureDate', params.departureDate);
-    }
 
-    const response = await fetch(
-      `${this.baseUrl}/v1/shopping/flight-destinations?${searchParams}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const url = `${this.baseUrl}/v1/shopping/flight-destinations?${searchParams}`
+    console.log('🌐 Calling Amadeus API:', url)
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('📡 Amadeus API response status:', response.status)
 
     if (!response.ok) {
-      throw new Error(`Destination exploration failed: ${response.status}`);
+      const errorText = await response.text()
+      console.error('❌ Amadeus API error response:', errorText)
+      
+      // Parse error details
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.errors && errorData.errors.length > 0) {
+          const error = errorData.errors[0];
+          throw new Error(`Amadeus API Error ${error.code}: ${error.title} - ${error.detail}`);
+        }
+      } catch (parseError) {
+        // Fall back to original error format
+      }
+      
+      throw new Error(`Destination exploration failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('✅ Amadeus API success, data count:', data.data?.length || 0)
     return data.data || [];
   }
 
