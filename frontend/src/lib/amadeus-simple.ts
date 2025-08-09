@@ -154,6 +154,7 @@ class SimpleAmadeusClient {
     maxFlightTime?: number;
     theme?: string;
     departureDate?: string;
+    viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK' | 'COUNTRY' | 'PRICE';
   }): Promise<any[]> {
     console.log('🌍 Starting destination exploration with params:', params)
     
@@ -179,6 +180,11 @@ class SimpleAmadeusClient {
     if (params.maxFlightTime) {
       searchParams.append('maxFlightTime', params.maxFlightTime.toString());
     }
+
+    // Add viewBy parameter - PRICE gives best results sorted by cost
+    const viewBy = params.viewBy || 'PRICE';
+    searchParams.append('viewBy', viewBy);
+    console.log(`📊 Using viewBy: ${viewBy}`);
 
     const url = `${this.baseUrl}/v1/shopping/flight-destinations?${searchParams}`
     console.log('🌐 Calling Amadeus API:', url)
@@ -238,6 +244,34 @@ class SimpleAmadeusClient {
 
     const data = await response.json();
     return data.data || [];
+  }
+
+  // Get location details by IATA code
+  async getLocationByIataCode(iataCode: string): Promise<AmadeusDestination | null> {
+    const token = await this.getAccessToken();
+    
+    const searchParams = new URLSearchParams({
+      keyword: iataCode,
+      subType: 'AIRPORT,CITY',
+      'page[limit]': '1',
+    });
+
+    const response = await fetch(
+      `${this.baseUrl}/v1/reference-data/locations?${searchParams}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn(`Location lookup failed for ${iataCode}: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data?.[0] || null;
   }
 }
 

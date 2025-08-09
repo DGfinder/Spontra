@@ -296,43 +296,149 @@ class AmadeusService {
     }))
   }
 
-  // Enhanced destination search with better error handling and caching
+  // Enhanced destination search with cached prices
   async exploreDestinations(params: {
     origin: string
     maxFlightTime?: number
     theme: string
     departureDate?: string
+    viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK' | 'COUNTRY' | 'PRICE'
   }): Promise<DestinationRecommendation[]> {
+    // Import the simple client for flight destinations with cached pricing
+    const { amadeusClient } = await import('@/lib/amadeus-simple')
+    
     try {
-      // Build Amadeus search parameters
-      const searchParams: DestinationSearchParams = {
+      console.log('🌍 Exploring destinations with cached prices...')
+      
+      // Call the Flight Inspiration API directly with viewBy parameter for cached prices
+      const flightDestinations = await amadeusClient.exploreDestinations({
         origin: params.origin,
         maxFlightTime: params.maxFlightTime,
-        departureDate: params.departureDate || new Date().toISOString().split('T')[0],
-        oneWay: true,
-        viewBy: 'DESTINATION'
-      }
+        departureDate: params.departureDate,
+        theme: params.theme,
+        viewBy: params.viewBy || 'PRICE' // Default to price view for best results
+      })
 
-      // Search destinations using Amadeus
-      const destinations = await this.searchDestinations(searchParams)
-      
-      // Convert to Spontra format
-      const recommendations = this.convertToDestinationRecommendations(
-        destinations,
+      console.log(`✅ Found ${flightDestinations.length} flight destinations with cached prices`)
+
+      // Convert flight-destination objects to destination recommendations with real prices
+      const recommendations = await this.convertFlightDestinationsToRecommendations(
+        flightDestinations,
         params.origin,
         params.theme
       )
 
-      // Sort by relevance score
-      return recommendations.sort((a, b) => b.match_score - a.match_score)
+      // Sort by price (already sorted by API when using viewBy=PRICE)
+      return recommendations.sort((a, b) => {
+        const priceA = parseFloat((a.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+        const priceB = parseFloat((b.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+        return priceA - priceB
+      })
 
     } catch (error) {
       console.error('Explore destinations failed:', error)
       
       // Fallback to mock data if Amadeus fails
-      console.log('Falling back to mock data due to Amadeus API error')
-      return this.getMockDestinations(params.origin, params.theme)
+      if (enableMockFallbacks) {
+        console.log('Falling back to mock data due to Amadeus API error')
+        return this.getMockDestinations(params.origin, params.theme)
+      }
+      throw getErrorMessage(error, 'Destination exploration').message
     }
+  }
+
+  // Convert flight-destination objects with cached prices to destination recommendations
+  async convertFlightDestinationsToRecommendations(
+    flightDestinations: any[],
+    originAirport: string,
+    theme: string
+  ): Promise<DestinationRecommendation[]> {
+    const { amadeusClient } = await import('@/lib/amadeus-simple')
+
+    const recommendations: DestinationRecommendation[] = []
+    
+    // Process destinations with location lookup (limit to avoid too many API calls)
+    const destinationsToProcess = flightDestinations.slice(0, 20)
+    
+    for (let i = 0; i < destinationsToProcess.length; i++) {
+      const flightDest = destinationsToProcess[i]
+      
+      try {
+        // Extract cached price - this is the key improvement!
+        const cachedPrice = flightDest.price?.total || '0'
+        const currency = 'EUR' // Default, could extract from API response if available
+        const formattedPrice = `€${cachedPrice}`
+        
+        // Get location details for the destination
+        const destinationLocation = await amadeusClient.getLocationByIataCode(flightDest.destination)
+        
+        if (!destinationLocation) {
+          console.warn(`Could not find location details for ${flightDest.destination}`)
+          continue
+        }
+
+        // Create recommendation with real cached price
+        const recommendation: DestinationRecommendation = {
+          destination: {
+            id: flightDest.destination,
+            airport_code: flightDest.destination,
+            city_name: destinationLocation.address?.cityName || destinationLocation.name || flightDest.destination,
+            country_name: destinationLocation.address?.countryName || 'Unknown',
+            country_code: destinationLocation.address?.countryCode || 'XX',
+            description: `Discover ${destinationLocation.address?.cityName || destinationLocation.name} and experience amazing ${theme} activities`,
+            image_url: '',
+            activities: [],
+            popularity_score: 75,
+            climate_info: {
+              average_temperature: '15-25°C',
+              rainy_months: [],
+              sunny_months: [],
+              climate_type: 'Temperate'
+            },
+            best_time_to_visit: [],
+            budget: {
+              level: 'mid-range',
+              daily_budget_range: '€100-200',
+              currency: currency
+            },
+            timezone: 'UTC+1',
+            language: ['English'],
+            currency: currency,
+            visa_required: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          flight_route: {
+            id: `${originAirport}-${flightDest.destination}`,
+            origin_airport_code: originAirport,
+            destination_airport_code: flightDest.destination,
+            estimated_duration_hours: 2,
+            estimated_duration_minutes: 30,
+            total_duration_minutes: 150,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          },
+          match_score: Math.max(95 - i * 2, 60), // Higher scores for cheaper flights
+          activity_matches: [theme] as any,
+          reason_for_recommendation: `Great value destination for ${theme} activities`,
+          estimated_flight_price: formattedPrice // ✨ REAL CACHED PRICE FROM AMADEUS!
+        }
+
+        recommendations.push(recommendation)
+        
+        // Add small delay to be respectful to API rate limits
+        if (i < destinationsToProcess.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100))
+        }
+
+      } catch (error) {
+        console.error(`Error processing destination ${flightDest.destination}:`, error)
+        continue
+      }
+    }
+
+    console.log(`✅ Successfully converted ${recommendations.length} destinations with cached prices`)
+    return recommendations
   }
 
   // Mock flight offers for when Amadeus API is unavailable

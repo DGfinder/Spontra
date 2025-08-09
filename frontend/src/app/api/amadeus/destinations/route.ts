@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusClient } from '@/lib/amadeus-simple'
+import { amadeusService } from '@/services/amadeusService'
 
 // Ensure this runs in a Node.js runtime so server env vars are available
 export const runtime = 'nodejs'
@@ -18,22 +18,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Missing required parameter: origin' }, { status: 400 })
     }
 
-    console.log('🔍 Checking amadeusClient availability...')
-    if (!amadeusClient) {
-      console.error('❌ AmadeusClient is null/undefined')
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Travel search service temporarily unavailable. Please try again later.',
-        fallback: true
-      }, { status: 503 })
-    }
-
-    console.log('🛫 Calling amadeusClient.exploreDestinations...')
-    const recommendations = await amadeusClient.exploreDestinations({
+    console.log('🛫 Calling amadeusService.exploreDestinations with cached pricing...')
+    const recommendations = await amadeusService.exploreDestinations({
       origin,
       maxFlightTime,
       theme,
       departureDate,
+      viewBy: 'PRICE' // Use PRICE view for cached pricing sorted by cost
     })
 
     console.log('✅ API call successful, recommendations count:', recommendations?.length || 0)
