@@ -1,9 +1,13 @@
 // Environment detection and configuration
-export const isProduction = process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'production'
+export const isProduction = process.env.NODE_ENV === 'production' || 
+                            process.env.NEXT_PUBLIC_APP_ENV === 'production' ||
+                            process.env.VERCEL_ENV === 'production'
 export const isDevelopment = !isProduction
 
-// Mock data control - only allow in development
-export const enableMockFallbacks = isDevelopment && process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACKS !== 'false'
+// Mock data control - NEVER allow in production, regardless of environment variables
+export const enableMockFallbacks = isDevelopment && 
+                                   process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACKS !== 'false' &&
+                                   process.env.VERCEL_ENV !== 'production'
 
 // Error handling configuration
 export const showDetailedErrors = isDevelopment
