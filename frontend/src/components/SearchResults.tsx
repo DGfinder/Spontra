@@ -178,6 +178,7 @@ export function SearchResults({
                   departureAirport={departureAirport}
                   index={index}
                   onExplore={onExploreDestination}
+                  allDestinations={results}
                 />
               ))}
           </div>

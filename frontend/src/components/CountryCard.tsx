@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, MapPin, Plane, Users, ChevronDown, ChevronUp } from 'lucide-react'
+import { Clock, MapPin, Plane, Users, ChevronDown, ChevronUp, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react'
 import { CountryAggregation } from '@/lib/countryAggregation'
 import { getThemeColor } from '@/lib/theme'
+import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
 
 interface CountryCardProps {
   aggregation: CountryAggregation
@@ -20,6 +21,15 @@ export function CountryCard({
 }: CountryCardProps) {
   const [showAllDestinations, setShowAllDestinations] = useState(false)
   const themeColor = getThemeColor(selectedTheme as any)
+  
+  // Generate analytics for the cheapest destination (country representative)
+  const countryAnalytics = generateDestinationAnalytics(
+    aggregation.cheapestDestination, 
+    aggregation.allDestinations
+  )
+  const trendDisplay = getTrendDisplay(countryAnalytics.priceTrend)
+  const urgencyDisplay = getBookingUrgencyDisplay(countryAnalytics.bookingInsight.urgency)
+  const rankingDisplay = getPriceRankingDisplay(countryAnalytics.priceRanking)
 
   const formatFlightTime = (minutes: number) => {
     const hours = Math.floor(minutes / 60)
@@ -47,10 +57,20 @@ export function CountryCard({
         </div>
         
         <div className="text-right">
-          <div className="text-2xl font-bold text-green-400">
-            €{Math.round(aggregation.priceRange.min)}
+          <div className="flex items-center gap-2 mb-1">
+            <div className="text-2xl font-bold text-green-400">
+              €{Math.round(aggregation.priceRange.min)}
+            </div>
+            <div className={`${trendDisplay.bgColor} ${trendDisplay.color} px-1 py-0.5 rounded text-xs flex items-center gap-1`}>
+              <span>{trendDisplay.icon}</span>
+              <span>{countryAnalytics.priceTrend.change > 0 ? `+${countryAnalytics.priceTrend.change}%` : countryAnalytics.priceTrend.change === 0 ? 'Stable' : `${countryAnalytics.priceTrend.change}%`}</span>
+            </div>
           </div>
-          <div className="text-white/50 text-xs">from</div>
+          <div className="text-white/50 text-xs mb-1">from</div>
+          <div className={`${rankingDisplay.bgColor} ${rankingDisplay.color} px-2 py-1 rounded text-xs flex items-center gap-1`}>
+            <span>{rankingDisplay.icon}</span>
+            <span>{rankingDisplay.text}</span>
+          </div>
         </div>
       </div>
 
@@ -89,9 +109,9 @@ export function CountryCard({
         </div>
       </div>
 
-      {/* Best Deal Highlight */}
+      {/* Best Deal Highlight with Analytics */}
       <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-2">
           <div>
             <div className="text-white font-medium">
               {aggregation.cheapestDestination.destination.city_name}
@@ -103,6 +123,13 @@ export function CountryCard({
           <div className="text-green-400 font-bold">
             {aggregation.cheapestDestination.estimated_flight_price}
           </div>
+        </div>
+        
+        {/* Booking Urgency Indicator */}
+        <div className={`${urgencyDisplay.bgColor} ${urgencyDisplay.color} rounded px-2 py-1 flex items-center gap-1`}>
+          <span className="text-sm">{urgencyDisplay.icon}</span>
+          <span className="text-xs font-medium">{urgencyDisplay.text}</span>
+          <span className="text-xs opacity-80">- {countryAnalytics.bookingInsight.reasoning}</span>
         </div>
       </div>
 
@@ -128,6 +155,27 @@ export function CountryCard({
         </div>
       </div>
 
+      {/* Analytics Summary */}
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        {/* Price Trend */}
+        <div className={`${trendDisplay.bgColor} border ${trendDisplay.borderColor} rounded-lg p-2`}>
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-sm">{trendDisplay.icon}</span>
+            <span className={`text-xs font-medium ${trendDisplay.color}`}>Trend</span>
+          </div>
+          <p className="text-white/80 text-xs">{countryAnalytics.priceTrend.description}</p>
+        </div>
+        
+        {/* Seasonal Insight */}
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-2">
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-sm">🌍</span>
+            <span className="text-xs font-medium text-blue-400">Season</span>
+          </div>
+          <p className="text-white/80 text-xs">{countryAnalytics.seasonalInsight.recommendation}</p>
+        </div>
+      </div>
+      
       {/* Top Activities */}
       {aggregation.topActivities.length > 0 && (
         <div className="mb-4">

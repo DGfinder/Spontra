@@ -1,4 +1,5 @@
 import { DestinationRecommendation } from '@/services/apiClient'
+import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
 
 interface DestinationCardProps {
   result: DestinationRecommendation
@@ -7,6 +8,7 @@ interface DestinationCardProps {
   departureAirport: string
   index: number
   onExplore?: (destination: DestinationRecommendation) => void
+  allDestinations?: DestinationRecommendation[] // For analytics comparison
 }
 
 // Helper function to get country flag emoji
@@ -67,11 +69,18 @@ export function DestinationCard({
   maxFlightTime, 
   departureAirport, 
   index,
-  onExplore 
+  onExplore,
+  allDestinations = [] 
 }: DestinationCardProps) {
   const destination = result.destination
   const flightTime = result.flight_route.total_duration_minutes / 60
   const flagEmoji = getCountryFlag(destination.country_code)
+  
+  // Generate analytics data
+  const analytics = generateDestinationAnalytics(result, allDestinations)
+  const trendDisplay = getTrendDisplay(analytics.priceTrend)
+  const urgencyDisplay = getBookingUrgencyDisplay(analytics.bookingInsight.urgency)
+  const rankingDisplay = getPriceRankingDisplay(analytics.priceRanking)
   
   const handleExplore = () => {
     if (onExplore) {
@@ -102,9 +111,15 @@ export function DestinationCard({
             <p className="text-white/60 text-sm">{destination.description}</p>
           </div>
         </div>
-        {/* Match Score Badge */}
-        <div className="bg-orange-500/20 text-orange-200 px-2 py-1 rounded text-xs">
-          {Math.round(result.match_score)}% match
+        {/* Analytics Badges */}
+        <div className="flex flex-col gap-1">
+          <div className="bg-orange-500/20 text-orange-200 px-2 py-1 rounded text-xs">
+            {Math.round(result.match_score)}% match
+          </div>
+          <div className={`${rankingDisplay.bgColor} ${rankingDisplay.color} px-2 py-1 rounded text-xs flex items-center gap-1`}>
+            <span>{rankingDisplay.icon}</span>
+            <span>{rankingDisplay.text}</span>
+          </div>
         </div>
       </div>
 
@@ -132,9 +147,15 @@ export function DestinationCard({
           <span className="text-white/70 text-sm flex items-center">
             💰 Price Range
           </span>
-          <span className="text-white font-medium">
-            {result.estimated_flight_price || destination.budget.daily_budget_range}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-white font-medium">
+              {result.estimated_flight_price || destination.budget.daily_budget_range}
+            </span>
+            <div className={`${trendDisplay.bgColor} ${trendDisplay.color} px-1 py-0.5 rounded text-xs flex items-center gap-1`}>
+              <span>{trendDisplay.icon}</span>
+              <span>{analytics.priceTrend.change > 0 ? `+${analytics.priceTrend.change}%` : analytics.priceTrend.change === 0 ? 'Stable' : `${analytics.priceTrend.change}%`}</span>
+            </div>
+          </div>
         </div>
         
         {/* Flight Path Hint on Hover */}
@@ -167,6 +188,38 @@ export function DestinationCard({
         </div>
       </div>
 
+      {/* Analytics Insights */}
+      <div className="mb-4 space-y-2">
+        {/* Price Trend Insight */}
+        <div className={`${trendDisplay.bgColor} border ${trendDisplay.borderColor} rounded-lg p-2`}>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg">{trendDisplay.icon}</span>
+            <span className={`text-xs font-medium ${trendDisplay.color}`}>Price Trend</span>
+          </div>
+          <p className="text-white/80 text-xs">{analytics.priceTrend.description}</p>
+        </div>
+        
+        {/* Booking Recommendation */}
+        <div className={`${urgencyDisplay.bgColor} ${urgencyDisplay.color} rounded-lg p-2 flex items-center justify-between`}>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">{urgencyDisplay.icon}</span>
+            <div>
+              <span className="text-xs font-medium">{urgencyDisplay.text}</span>
+              <p className="text-xs opacity-80">{analytics.bookingInsight.reasoning}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Seasonal Insight */}
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-2">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-lg">🌍</span>
+            <span className="text-xs font-medium text-blue-400">Seasonal Tip</span>
+          </div>
+          <p className="text-white/80 text-xs">{analytics.seasonalInsight.recommendation}</p>
+        </div>
+      </div>
+      
       {/* Recommendation Reason */}
       {result.reason_for_recommendation && (
         <div className="mb-4">
