@@ -106,35 +106,57 @@ class SimpleAmadeusClient {
     origin: string;
     destination: string;
     departureDate: string;
+    returnDate?: string;
     adults?: number;
     travelClass?: string;
     max?: number;
+    nonStop?: boolean;
   }): Promise<any[]> {
+    console.log('✈️ Searching real-time flights with params:', params);
+    
     const token = await this.getAccessToken();
     
+    // Map airport codes for closed/renamed airports
+    const mappedOrigin = this.mapAirportCode(params.origin);
+    const mappedDestination = this.mapAirportCode(params.destination);
+    
     const searchParams = new URLSearchParams({
-      originLocationCode: params.origin,
-      destinationLocationCode: params.destination,
+      originLocationCode: mappedOrigin,
+      destinationLocationCode: mappedDestination,
       departureDate: params.departureDate,
       adults: (params.adults || 1).toString(),
       travelClass: params.travelClass || 'ECONOMY',
       max: (params.max || 20).toString(),
     });
 
-    const response = await fetch(
-      `${this.baseUrl}/v2/shopping/flight-offers?${searchParams}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    if (params.returnDate) {
+      searchParams.append('returnDate', params.returnDate);
+    }
+
+    if (params.nonStop) {
+      searchParams.append('nonStop', 'true');
+    }
+
+    const url = `${this.baseUrl}/v2/shopping/flight-offers?${searchParams}`;
+    console.log('🌐 Calling Flight Offers Search API:', url);
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log('📡 Flight search response status:', response.status);
 
     if (!response.ok) {
-      throw new Error(`Flight search failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Flight search error response:', errorText);
+      throw new Error(`Flight search failed: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('✅ Flight search successful, found:', data.data?.length || 0, 'offers');
+    
     return data.data || [];
   }
 

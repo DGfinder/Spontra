@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin } from 'lucide-react'
+import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin, TrendingDown, TrendingUp } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { ErrorState } from './ErrorState'
 import { getErrorMessage } from '@/lib/environment'
 import { DestinationRecommendation } from '@/services/apiClient'
+import { useFormData } from '@/store/searchStore'
 
 interface FlightOption {
   id: string
@@ -174,21 +175,35 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<{ message: string; type?: string } | null>(null)
+  const [showPriceComparison, setShowPriceComparison] = useState(true)
+  
+  // Get form data for flight search
+  const formData = useFormData()
+
+  // Extract cached price from recommendation for comparison
+  const cachedPrice = parseFloat((recommendation.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
 
   // Fetch real flight options from our server route (Amadeus)
   const fetchFlightOptions = async (): Promise<FlightOption[]> => {
+    console.log('🛫 Fetching real-time flights with form data:', formData)
+    
     const res = await fetch('/api/amadeus/flights', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         origin: originAirport,
         destination: recommendation.destination.airport_code,
-        departureDate: new Date().toISOString().slice(0,10),
-        passengers: 1,
+        departureDate: formData.departureDate || new Date().toISOString().slice(0,10),
+        returnDate: formData.tripType === 'return' ? formData.returnDate : undefined,
+        passengers: formData.passengers || 1,
+        travelClass: 'ECONOMY', // Could be made configurable
+        nonStop: false, // Could be made configurable
       }),
     })
     const json = await res.json()
     if (!json.ok) throw new Error(json.error || 'Failed to fetch flights')
+    
+    console.log('✅ Real-time flights fetched:', json.data?.length || 0, 'options')
     return json.data as FlightOption[]
   }
 
@@ -280,6 +295,64 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         </div>
       </header>
 
+      {/* Price Comparison Banner */}
+      {showPriceComparison && cachedPrice > 0 && !isLoading && flights.length > 0 && (
+        <div className="relative z-10 px-6 py-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border-b border-white/10">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="text-center">
+                  <div className="text-white/60 text-xs uppercase tracking-wider">Estimated Price</div>
+                  <div className="text-yellow-400 font-bold text-lg">{recommendation.estimated_flight_price}</div>
+                  <div className="text-white/40 text-xs">From destination search</div>
+                </div>
+                
+                <ArrowLeft className="text-white/40 rotate-180" size={20} />
+                
+                <div className="text-center">
+                  <div className="text-white/60 text-xs uppercase tracking-wider">Live Prices From</div>
+                  <div className="text-green-400 font-bold text-lg">
+                    €{Math.min(...flights.map(f => f.price))}
+                  </div>
+                  <div className="text-white/40 text-xs">Real-time search results</div>
+                </div>
+                
+                {(() => {
+                  const liveMin = Math.min(...flights.map(f => f.price))
+                  const difference = liveMin - cachedPrice
+                  const isLower = difference < 0
+                  return (
+                    <div className="flex items-center space-x-1">
+                      {isLower ? (
+                        <TrendingDown className="text-green-400" size={16} />
+                      ) : (
+                        <TrendingUp className="text-red-400" size={16} />
+                      )}
+                      <span className={`text-sm font-medium ${isLower ? 'text-green-400' : 'text-red-400'}`}>
+                        {isLower ? '-' : '+'}€{Math.abs(difference).toFixed(0)}
+                      </span>
+                    </div>
+                  )
+                })()}
+              </div>
+              
+              <button 
+                onClick={() => setShowPriceComparison(false)}
+                className="text-white/40 hover:text-white/60 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="mt-2 text-center">
+              <p className="text-white/50 text-xs">
+                💡 Live prices are updated in real-time and may vary based on availability
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="relative z-10 flex-1 p-6">
         <div className="max-w-6xl mx-auto">
@@ -296,7 +369,8 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
                 <div className="animate-spin w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-white/80">Finding the best flights for your journey...</p>
+                <p className="text-white/80">Searching real-time flight prices...</p>
+                <p className="text-white/50 text-sm mt-2">Getting live availability and pricing from airlines</p>
               </div>
             </div>
           )}
