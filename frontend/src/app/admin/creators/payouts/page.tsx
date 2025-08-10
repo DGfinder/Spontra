@@ -13,7 +13,7 @@ import {
   User,
   Calendar,
   CreditCard,
-  Bank,
+  Building,
   Eye,
   FileText,
   TrendingUp,
@@ -200,7 +200,7 @@ export default function CreatorPayouts() {
 
   const getPaymentMethodIcon = (type: string) => {
     switch (type) {
-      case 'bank_transfer': return <Bank size={16} />
+      case 'bank_transfer': return <Building size={16} />
       case 'paypal': return <CreditCard size={16} />
       default: return <DollarSign size={16} />
     }

@@ -14,8 +14,8 @@ import {
   TrendingUp,
   TrendingDown,
   Cpu,
-  HardDrive,
-  MemoryStick,
+  HardDisk,
+  Memory,
   Zap,
   Users,
   Shield,
@@ -481,7 +481,7 @@ export default function SystemMonitor() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <MemoryStick size={16} className="text-green-600" />
+                    <Memory size={16} className="text-green-600" />
                     <span className="text-sm font-medium text-gray-900">Memory</span>
                   </div>
                   <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.memory}%</span>
@@ -497,7 +497,7 @@ export default function SystemMonitor() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <HardDrive size={16} className="text-purple-600" />
+                    <HardDisk size={16} className="text-purple-600" />
                     <span className="text-sm font-medium text-gray-900">Disk</span>
                   </div>
                   <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.disk}%</span>
