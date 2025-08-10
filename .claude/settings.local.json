@@ -47,7 +47,8 @@
       "Bash(rg:*)",
       "Bash(env)",
       "WebFetch(domain:developers.amadeus.com)",
-      "Bash(npx next lint:*)"
+      "Bash(npx next lint:*)",
+      "Bash(git rev-parse:*)"
     ],
     "deny": []
   }
