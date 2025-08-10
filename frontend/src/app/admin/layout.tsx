@@ -31,7 +31,7 @@ interface AdminLayoutProps {
 interface NavigationItem {
   id: string
   label: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: React.ComponentType<{ size?: string | number; className?: string }>
   href: string
   badge?: number
   permissions?: string[]

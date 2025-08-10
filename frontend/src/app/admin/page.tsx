@@ -25,7 +25,7 @@ interface MetricCard {
   value: string | number
   change: number
   changeLabel: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: React.ComponentType<{ size?: string | number; className?: string }>
   color: string
 }
 

@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
       fullName: user.fullName,
       role: user.role,
       permissions: user.permissions,
-      profilePicture: user.profilePicture,
+      profilePicture: user.profilePicture || undefined,
       createdAt: user.createdAt,
       lastLoginAt: user.lastLoginAt,
       isActive: user.isActive,

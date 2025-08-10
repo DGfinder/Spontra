@@ -255,6 +255,10 @@ export interface AdminDestination {
   description?: string
   imageUrl?: string
   lastUpdated: string
+  // Additional properties from legacy interface (optional for compatibility)
+  averageFlightTime?: number
+  priceRange?: 'budget' | 'mid-range' | 'luxury'
+  bestMonths?: string[]
 }
 
 // ============================================================================
@@ -315,8 +319,8 @@ export interface SystemAlert {
   resolvedAt?: string
 }
 
-// Destination Management Types
-export interface AdminDestination {
+// Legacy Destination Profile (renamed to avoid conflicts)
+export interface DestinationProfile {
   iataCode: string
   cityName: string
   countryName: string

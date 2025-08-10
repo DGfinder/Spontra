@@ -147,14 +147,16 @@ export default function SystemMonitor() {
         level: 'warning',
         message: 'Amadeus API response time above threshold (1.8s)',
         service: 'Amadeus API',
-        timestamp: new Date(Date.now() - 300000).toISOString() // 5 minutes ago
+        timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
+        acknowledged: false
       },
       {
         id: 'alert_002',
         level: 'info',
         message: 'Scheduled backup completed successfully',
         service: 'Database',
-        timestamp: new Date(Date.now() - 1800000).toISOString() // 30 minutes ago
+        timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
+        acknowledged: true
       }
     ],
     lastUpdated: new Date().toISOString()

@@ -134,6 +134,11 @@ class AdminAuthService {
       return this.currentSession.user
     }
 
+    // Only access localStorage in browser environment
+    if (typeof window === 'undefined') {
+      return null
+    }
+
     // Try to restore from localStorage
     const savedSession = localStorage.getItem('admin-session')
     if (savedSession) {
@@ -172,6 +177,11 @@ class AdminAuthService {
   getToken(): string | null {
     if (this.currentSession && this.isTokenValid()) {
       return this.currentSession.token
+    }
+
+    // Only access document.cookie in browser environment
+    if (typeof window === 'undefined') {
+      return null
     }
 
     // Try to get from cookie

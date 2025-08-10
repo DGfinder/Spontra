@@ -501,7 +501,7 @@ export default function DestinationManagement() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900">{selectedDestination.city}, {selectedDestination.country}</h3>
+                    <h3 className="text-xl font-semibold text-gray-900">{selectedDestination.cityName}, {selectedDestination.countryName}</h3>
                     <p className="text-gray-600">Popularity Score: {selectedDestination.metrics.popularityScore.toFixed(1)}/10</p>
                   </div>
                 </div>
