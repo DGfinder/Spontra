@@ -222,8 +222,9 @@ export interface PayoutRequest {
 
 export interface AdminDestination {
   iataCode: string
-  city: string
-  country: string
+  cityName: string
+  countryName: string
+  countryCode: string
   continent: string
   coordinates: {
     lat: number
@@ -231,6 +232,7 @@ export interface AdminDestination {
   }
   isActive: boolean
   isPopular: boolean
+  highlights: string[]
   themeScores: {
     nightlife: number
     culture: number
@@ -250,6 +252,8 @@ export interface AdminDestination {
     contentCount: number
     creatorCount: number
   }
+  description?: string
+  imageUrl?: string
   lastUpdated: string
 }
 

@@ -58,12 +58,14 @@ export default function DestinationManagement() {
   const mockDestinations: AdminDestination[] = [
     {
       iataCode: 'BCN',
-      city: 'Barcelona',
-      country: 'Spain',
+      cityName: 'Barcelona',
+      countryName: 'Spain',
+      countryCode: 'ES',
       continent: 'Europe',
       coordinates: { lat: 41.3851, lng: 2.1734 },
       isActive: true,
       isPopular: true,
+      highlights: ['Gothic Quarter', 'Park Güell', 'Sagrada Família', 'Las Ramblas'],
       themeScores: {
         nightlife: 9.2,
         culture: 8.7,
@@ -83,16 +85,20 @@ export default function DestinationManagement() {
         contentCount: 234,
         creatorCount: 67
       },
+      description: 'Vibrant Mediterranean city known for art, architecture, and nightlife',
+      imageUrl: '/images/destinations/barcelona.jpg',
       lastUpdated: '2024-01-15T10:00:00Z'
     },
     {
       iataCode: 'AMS',
-      city: 'Amsterdam',
-      country: 'Netherlands',
+      cityName: 'Amsterdam',
+      countryName: 'Netherlands',
+      countryCode: 'NL',
       continent: 'Europe',
       coordinates: { lat: 52.3676, lng: 4.9041 },
       isActive: true,
       isPopular: true,
+      highlights: ['Anne Frank House', 'Van Gogh Museum', 'Canal District', 'Jordaan District'],
       themeScores: {
         nightlife: 8.1,
         culture: 9.0,
@@ -112,16 +118,20 @@ export default function DestinationManagement() {
         contentCount: 189,
         creatorCount: 45
       },
+      description: 'Canal-lined city known for museums, cycling culture, and liberal atmosphere',
+      imageUrl: '/images/destinations/amsterdam.jpg',
       lastUpdated: '2024-01-14T15:30:00Z'
     },
     {
       iataCode: 'ROM',
-      city: 'Rome',
-      country: 'Italy',
+      cityName: 'Rome',
+      countryName: 'Italy',
+      countryCode: 'IT',
       continent: 'Europe',
       coordinates: { lat: 41.9028, lng: 12.4964 },
       isActive: true,
       isPopular: true,
+      highlights: ['Colosseum', 'Vatican City', 'Trevi Fountain', 'Roman Forum'],
       themeScores: {
         nightlife: 7.5,
         culture: 9.8,
@@ -141,16 +151,20 @@ export default function DestinationManagement() {
         contentCount: 156,
         creatorCount: 38
       },
+      description: 'Eternal City with ancient history, incredible cuisine, and romantic atmosphere',
+      imageUrl: '/images/destinations/rome.jpg',
       lastUpdated: '2024-01-13T09:15:00Z'
     },
     {
       iataCode: 'PRG',
-      city: 'Prague',
-      country: 'Czech Republic',
+      cityName: 'Prague',
+      countryName: 'Czech Republic',
+      countryCode: 'CZ',
       continent: 'Europe',
       coordinates: { lat: 50.0755, lng: 14.4378 },
       isActive: false,
       isPopular: false,
+      highlights: ['Prague Castle', 'Charles Bridge', 'Old Town Square', 'Wenceslas Square'],
       themeScores: {
         nightlife: 8.3,
         culture: 8.6,
@@ -170,6 +184,8 @@ export default function DestinationManagement() {
         contentCount: 78,
         creatorCount: 23
       },
+      description: 'Fairy-tale city with Gothic architecture, rich history, and vibrant beer culture',
+      imageUrl: '/images/destinations/prague.jpg',
       lastUpdated: '2024-01-10T12:00:00Z'
     }
   ]
@@ -211,15 +227,15 @@ export default function DestinationManagement() {
   }
 
   const filteredDestinations = destinations.filter(dest => {
-    if (searchQuery && !dest.city.toLowerCase().includes(searchQuery.toLowerCase()) && 
-        !dest.country.toLowerCase().includes(searchQuery.toLowerCase())) return false
-    if (filterCountry !== 'all' && dest.country !== filterCountry) return false
+    if (searchQuery && !dest.cityName.toLowerCase().includes(searchQuery.toLowerCase()) && 
+        !dest.countryName.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    if (filterCountry !== 'all' && dest.countryName !== filterCountry) return false
     if (filterStatus === 'active' && !dest.isActive) return false
     if (filterStatus === 'inactive' && dest.isActive) return false
     return true
   }).sort((a, b) => b.metrics.popularityScore - a.metrics.popularityScore)
 
-  const uniqueCountries = Array.from(new Set(destinations.map(d => d.country))).sort()
+  const uniqueCountries = Array.from(new Set(destinations.map(d => d.countryName))).sort()
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-EU', {
@@ -414,8 +430,8 @@ export default function DestinationManagement() {
                       </span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{destination.city}</h3>
-                      <p className="text-sm text-gray-600">{destination.country}</p>
+                      <h3 className="font-semibold text-gray-900">{destination.cityName}</h3>
+                      <p className="text-sm text-gray-600">{destination.countryName}</p>
                     </div>
                   </div>
                   
