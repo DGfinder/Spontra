@@ -153,7 +153,7 @@ export default function AdminDashboard() {
     },
     {
       title: 'Pending Content',
-      value: metrics?.content.pendingApproval || 0,
+      value: (metrics?.content.pendingApproval || 0).toString(),
       change: -12.5,
       changeLabel: 'vs yesterday',
       icon: Video,

@@ -35,6 +35,57 @@ class AdminAuthService {
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
+      // DEMO MODE: Check for demo credentials first
+      if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
+        const demoUser: AdminUser = {
+          id: 'demo-admin',
+          email: 'demo@spontra.com',
+          username: 'demo_admin',
+          fullName: 'Demo Administrator',
+          role: 'super_admin',
+          permissions: [
+            'content.view', 'content.moderate', 'content.delete', 'content.featured',
+            'creators.view', 'creators.manage', 'creators.payouts', 'creators.suspend',
+            'analytics.view', 'analytics.export', 'analytics.configure',
+            'destinations.view', 'destinations.edit', 'destinations.create',
+            'system.monitor', 'system.configure', 'system.users', 'system.logs',
+            'finance.view', 'finance.manage', 'finance.payouts',
+            'support.view', 'support.manage', 'support.escalate'
+          ],
+          profilePicture: undefined,
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          isActive: true,
+          mfaEnabled: false
+        }
+
+        const demoToken = 'demo-jwt-token-' + Date.now()
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+
+        // Store demo session
+        this.currentSession = {
+          user: demoUser,
+          token: demoToken,
+          expiresAt,
+          lastActivity: new Date().toISOString(),
+          ipAddress: '127.0.0.1',
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Demo Client'
+        }
+
+        // Store in localStorage for persistence
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+          document.cookie = `admin-token=${demoToken}; path=/admin; max-age=86400; samesite=strict`
+        }
+
+        return {
+          success: true,
+          user: demoUser,
+          token: demoToken
+        }
+      }
+
+      // Production mode: Try API authentication
       const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
@@ -47,7 +98,9 @@ class AdminAuthService {
 
       if (result.success && result.token) {
         // Store token in cookie
-        document.cookie = `admin-token=${result.token}; path=/admin; max-age=86400; samesite=strict`
+        if (typeof window !== 'undefined') {
+          document.cookie = `admin-token=${result.token}; path=/admin; max-age=86400; samesite=strict`
+        }
         
         // Store session data
         this.currentSession = {
@@ -56,11 +109,13 @@ class AdminAuthService {
           expiresAt: result.expiresAt,
           lastActivity: new Date().toISOString(),
           ipAddress: '', // Will be set by server
-          userAgent: navigator.userAgent
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'
         }
 
         // Store in localStorage for persistence
-        localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+        }
       }
 
       return result

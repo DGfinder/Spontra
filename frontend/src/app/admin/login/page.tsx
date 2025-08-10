@@ -224,6 +224,31 @@ export default function AdminLoginPage() {
           </form>
         </div>
 
+        {/* Demo Credentials */}
+        <div className="bg-blue-500/20 border border-blue-500/30 rounded-2xl p-4 mt-6">
+          <div className="text-center">
+            <h3 className="text-white font-medium mb-2">Demo Access</h3>
+            <p className="text-blue-200 text-sm mb-3">Try the admin dashboard with demo credentials:</p>
+            <div className="bg-white/10 rounded-lg p-3 text-left">
+              <p className="text-white text-sm font-mono">Email: demo@spontra.com</p>
+              <p className="text-white text-sm font-mono">Password: demo123</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  email: 'demo@spontra.com',
+                  password: 'demo123',
+                  mfaCode: ''
+                })
+              }}
+              className="mt-3 text-blue-300 hover:text-blue-200 text-sm transition-colors"
+            >
+              Fill Demo Credentials
+            </button>
+          </div>
+        </div>
+
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-xs text-slate-400">

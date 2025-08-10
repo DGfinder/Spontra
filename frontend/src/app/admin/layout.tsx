@@ -131,24 +131,30 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    // Check authentication and get user data
-    const currentUser = adminAuthService.getCurrentUser()
-    if (!currentUser) {
-      router.push('/admin/login')
-      return
+    // Only run authentication check on client side
+    const checkAuth = () => {
+      const currentUser = adminAuthService.getCurrentUser()
+      if (!currentUser) {
+        router.push('/admin/login')
+        return
+      }
+      
+      setUser(currentUser)
     }
-    
-    setUser(currentUser)
+
+    // Delay to ensure hydration is complete
+    const timeoutId = setTimeout(checkAuth, 100)
+    return () => clearTimeout(timeoutId)
   }, [router])
 
   const handleLogout = async () => {
     await adminAuthService.logout()
   }
 
-  const filteredNavigation = navigation.filter(item => {
+  const filteredNavigation = user ? navigation.filter(item => {
     if (!item.permissions) return true
     return adminAuthService.hasAnyPermission(item.permissions as any[])
-  })
+  }) : []
 
   const isActive = (href: string) => {
     if (href === '/admin') {
@@ -241,7 +247,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             {sidebarOpen && (
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-medium truncate">{user.fullName}</p>
-                <p className="text-slate-400 text-xs capitalize">{user.role.replace('_', ' ')}</p>
+                <p className="text-slate-400 text-xs capitalize">{user.role ? user.role.replace('_', ' ') : 'Admin'}</p>
               </div>
             )}
           </div>
