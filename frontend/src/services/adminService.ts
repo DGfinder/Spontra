@@ -4,7 +4,7 @@ import {
   CreatorDashboard, 
   PayoutRequest, 
   SystemHealth, 
-  DestinationAdmin, 
+  AdminDestination, 
   SupportTicket,
   AdminApiResponse,
   PaginatedResponse
@@ -277,13 +277,13 @@ class AdminService {
       page?: number
       limit?: number 
     } = {}
-  ): Promise<PaginatedResponse<DestinationAdmin>> {
+  ): Promise<PaginatedResponse<AdminDestination>> {
     const params = new URLSearchParams()
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined) params.set(key, value.toString())
     })
 
-    const response = await this.apiRequest<PaginatedResponse<DestinationAdmin>>(
+    const response = await this.apiRequest<PaginatedResponse<AdminDestination>>(
       `/destinations/admin?${params}`
     )
     return response.data!
@@ -294,7 +294,7 @@ class AdminService {
    */
   async updateDestination(
     iataCode: string, 
-    updates: Partial<DestinationAdmin>
+    updates: Partial<AdminDestination>
   ): Promise<boolean> {
     const response = await this.apiRequest<{ success: boolean }>(
       `/destinations/${iataCode}`,
@@ -310,7 +310,7 @@ class AdminService {
   /**
    * Create new destination
    */
-  async createDestination(destination: Omit<DestinationAdmin, 'metrics' | 'lastUpdated'>): Promise<boolean> {
+  async createDestination(destination: Omit<AdminDestination, 'metrics' | 'lastUpdated'>): Promise<boolean> {
     const response = await this.apiRequest<{ success: boolean }>(`/destinations`, {
       method: 'POST',
       body: JSON.stringify(destination)

@@ -23,7 +23,7 @@ import {
   XCircle,
   AlertTriangle
 } from 'lucide-react'
-import { DestinationAdmin } from '@/types/admin'
+import { AdminDestination } from '@/types/admin'
 
 interface DestinationStats {
   totalDestinations: number
@@ -35,15 +35,15 @@ interface DestinationStats {
 }
 
 export default function DestinationManagement() {
-  const [destinations, setDestinations] = useState<DestinationAdmin[]>([])
+  const [destinations, setDestinations] = useState<AdminDestination[]>([])
   const [stats, setStats] = useState<DestinationStats | null>(null)
-  const [selectedDestination, setSelectedDestination] = useState<DestinationAdmin | null>(null)
+  const [selectedDestination, setSelectedDestination] = useState<AdminDestination | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCountry, setFilterCountry] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [showDestinationModal, setShowDestinationModal] = useState(false)
-  const [editingDestination, setEditingDestination] = useState<DestinationAdmin | null>(null)
+  const [editingDestination, setEditingDestination] = useState<AdminDestination | null>(null)
 
   // Mock data
   const mockStats: DestinationStats = {
@@ -55,7 +55,7 @@ export default function DestinationManagement() {
     totalRevenue: 1245670
   }
 
-  const mockDestinations: DestinationAdmin[] = [
+  const mockDestinations: AdminDestination[] = [
     {
       iataCode: 'BCN',
       city: 'Barcelona',
@@ -193,7 +193,7 @@ export default function DestinationManagement() {
     return isActive ? 'text-green-600 bg-green-100' : 'text-gray-600 bg-gray-100'
   }
 
-  const handleUpdateDestination = async (destination: DestinationAdmin, updates: Partial<DestinationAdmin>) => {
+  const handleUpdateDestination = async (destination: AdminDestination, updates: Partial<AdminDestination>) => {
     try {
       console.log('Updating destination:', { destination: destination.iataCode, updates })
       

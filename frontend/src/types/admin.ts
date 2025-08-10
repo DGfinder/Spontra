@@ -220,7 +220,7 @@ export interface PayoutRequest {
 // DESTINATION MANAGEMENT
 // ============================================================================
 
-export interface DestinationAdmin {
+export interface AdminDestination {
   iataCode: string
   city: string
   country: string
@@ -312,7 +312,7 @@ export interface SystemAlert {
 }
 
 // Destination Management Types
-export interface DestinationAdmin {
+export interface AdminDestination {
   iataCode: string
   cityName: string
   countryName: string
