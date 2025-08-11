@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-// Define protected admin routes
-const adminRoutes = ['/admin']
+// Define protected admin routes - use exact matching to avoid false positives
+const adminRoutes = ['/admin/']
 const publicAdminRoutes = ['/admin/login', '/admin/register']
 
 // JWT secret key
@@ -14,8 +14,8 @@ const JWT_SECRET = new TextEncoder().encode(
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Check if this is an admin route
-  if (adminRoutes.some(route => pathname.startsWith(route))) {
+  // Check if this is an admin route (exact match for /admin or starts with /admin/)
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
     // Allow public admin routes
     if (publicAdminRoutes.some(route => pathname.startsWith(route))) {
       return NextResponse.next()
