@@ -131,7 +131,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-    // Only run authentication check on client side
+    // Skip authentication check for login page
+    if (pathname === '/admin/login') {
+      return
+    }
+
+    // Only run authentication check on client side for protected routes
     const checkAuth = () => {
       const currentUser = adminAuthService.getCurrentUser()
       if (!currentUser) {
@@ -145,7 +150,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     // Delay to ensure hydration is complete
     const timeoutId = setTimeout(checkAuth, 100)
     return () => clearTimeout(timeoutId)
-  }, [router])
+  }, [router, pathname])
 
   const handleLogout = async () => {
     await adminAuthService.logout()
@@ -163,6 +168,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return pathname.startsWith(href)
   }
 
+  // For login page, render children without layout
+  if (pathname === '/admin/login') {
+    return <>{children}</>
+  }
+
+  // For protected routes, show loading if no user
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
