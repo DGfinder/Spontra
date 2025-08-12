@@ -37,7 +37,7 @@ export interface DestinationSearchParams {
   duration?: string
   nonStop?: boolean
   maxPrice?: number
-  viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK'
+  viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK' | 'PRICE' | 'COUNTRY'
 }
 
 export class AmadeusClient {
