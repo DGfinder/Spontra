@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { airportCodeSchema } from '@/lib/validations'
 import { usePreferences, useSearchActions } from '@/store/searchStore'
 
@@ -8,6 +8,7 @@ interface Airport {
   city: string
   country: string
 }
+type Suggestion = Airport & { type: 'AIRPORT' | 'CITY' }
 
 interface ValidatedAirportSearchProps {
   value: string
@@ -35,6 +36,23 @@ interface ValidatedAirportSearchProps {
     }
   })()
 
+// Map legacy/closed airport codes to their modern replacements
+const LEGACY_CODE_MAPPING: Record<string, { code: string; note?: string }> = {
+  TXL: { code: 'BER', note: 'formerly TXL' },
+  THF: { code: 'BER', note: 'formerly THF' },
+  SXF: { code: 'BER', note: 'formerly SXF' },
+}
+
+function normalize(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export function ValidatedAirportSearch({
   value,
   onChange,
@@ -44,14 +62,16 @@ export function ValidatedAirportSearch({
   onValidation
 }: ValidatedAirportSearchProps) {
   const [query, setQuery] = useState('')
-  const [suggestions, setSuggestions] = useState<Airport[]>([])
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
   const [validationError, setValidationError] = useState<string>('')
   const [isFocused, setIsFocused] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const suggestionsRef = useRef<HTMLUListElement>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const preferences = usePreferences()
   const { addRecentAirport } = useSearchActions()
@@ -79,10 +99,7 @@ export function ValidatedAirportSearch({
     if (code) {
       try {
         airportCodeSchema.parse(code)
-        const airport = AIRPORTS.find(a => a.code === code)
-        if (!airport) {
-          return 'Airport not found'
-        }
+        // Accept any valid IATA code (airport or city)
       } catch {
         return 'Invalid airport code format'
       }
@@ -91,7 +108,22 @@ export function ValidatedAirportSearch({
     return ''
   }
 
-  // Handle input change
+  // Precompute a normalized index for faster client-side fuzzy search
+  const indexedAirports = useMemo(
+    () =>
+      AIRPORTS.map((a) => ({
+        raw: a,
+        n: {
+          code: normalize(a.code),
+          name: normalize(a.name),
+          city: normalize(a.city),
+          country: normalize(a.country),
+        },
+      })),
+    [AIRPORTS]
+  )
+
+  // Client + server-backed search with debounce and legacy mapping
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     setQuery(inputValue)
@@ -100,35 +132,103 @@ export function ValidatedAirportSearch({
     // Avoid clearing valid entered code on every keystroke; clear only when user deletes entirely
     if (inputValue.length === 0) {
       onChange('')
-    }
-
-    // Search for suggestions
-    if (inputValue.length >= 1) {
-      const filtered = AIRPORTS.filter(airport =>
-        airport.code.toLowerCase().includes(inputValue.toLowerCase()) ||
-        airport.name.toLowerCase().includes(inputValue.toLowerCase()) ||
-        airport.city.toLowerCase().includes(inputValue.toLowerCase()) ||
-        airport.country.toLowerCase().includes(inputValue.toLowerCase())
-      ).slice(0, 10)
-
-      setSuggestions(filtered)
-      setShowSuggestions(true)
-    } else {
       setSuggestions([])
       setShowSuggestions(false)
+      return
+    }
+
+    const normalized = normalize(inputValue)
+
+    // If the user types a 3-letter code, handle legacy mapping immediately
+    if (/^[a-zA-Z]{3}$/.test(inputValue)) {
+      const upper = inputValue.toUpperCase()
+      const mapped = LEGACY_CODE_MAPPING[upper]
+      if (mapped) {
+        const airport = AIRPORTS.find((a) => a.code === mapped.code)
+        if (airport) {
+          setSuggestions([{ ...airport }])
+          setShowSuggestions(true)
+          return
+        }
+      }
+    }
+
+    // Local fuzzy search first
+    const local = indexedAirports
+      .filter(({ n }) =>
+        n.code.includes(normalized) ||
+        n.name.includes(normalized) ||
+        n.city.includes(normalized) ||
+        n.country.includes(normalized)
+      )
+      .slice(0, 10)
+      .map(({ raw }) => ({ ...raw, type: 'AIRPORT' as const }))
+
+    setSuggestions(local)
+    setShowSuggestions(true)
+
+    // Remote fallback to improve coverage (Amadeus locations API)
+    if (normalized.length >= 2) {
+      if (abortRef.current) abortRef.current.abort()
+      const controller = new AbortController()
+      abortRef.current = controller
+      setIsFetching(true)
+      const timer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/amadeus/locations?keyword=${encodeURIComponent(inputValue)}&subType=AIRPORT,CITY`, {
+            signal: controller.signal,
+          })
+          if (!res.ok) throw new Error('remote search failed')
+          const json = await res.json()
+          const remote: Suggestion[] = Array.isArray(json.data)
+            ? json.data.map((d: any) => ({
+                code: d.iataCode,
+                name: d.name,
+                city: d.address?.cityName || d.name,
+                country: d.address?.countryName || '',
+                type: (d.subType === 'CITY' ? 'CITY' : 'AIRPORT') as 'AIRPORT' | 'CITY',
+              }))
+            : []
+
+          // Apply legacy mapping to remote results too
+          const mappedRemote = remote.map((a) => {
+            const legacy = Object.entries(LEGACY_CODE_MAPPING).find(([, v]) => v.code === a.code)
+            if (legacy?.[0]) {
+              return { ...a }
+            }
+            return a
+          })
+
+          // Merge and de-duplicate by code
+          const mergedByCode = new Map<string, Suggestion>()
+          ;[...local, ...mappedRemote].forEach((a) => {
+            if (!mergedByCode.has(a.code)) mergedByCode.set(a.code, a)
+          })
+          const merged = Array.from(mergedByCode.values())
+          merged.sort((a, b) => (a.type === b.type ? 0 : a.type === 'CITY' ? -1 : 1))
+          setSuggestions(merged.slice(0, 10))
+        } catch {
+          // ignore network errors; keep local results
+        } finally {
+          setIsFetching(false)
+        }
+      }, 200)
+
+      // Cleanup timer if user keeps typing
+      return () => clearTimeout(timer)
     }
   }
 
   // Handle suggestion selection
-  const handleSuggestionSelect = async (airport: Airport) => {
-    setQuery(`${airport.code} - ${airport.name}`)
-    onChange(airport.code)
+  const handleSuggestionSelect = async (item: Suggestion) => {
+    setQuery(`${item.code} - ${item.name}`)
+    onChange(item.code)
     setShowSuggestions(false)
     setSelectedIndex(-1)
-    addRecentAirport(airport.code)
+    addRecentAirport(item.code)
 
     // Validate and notify parent
-    const error = validateAirport(airport.code)
+    const error = validateAirport(item.code)
     setValidationError(error)
     onValidation?.(error === '', error || undefined)
 
@@ -137,17 +237,29 @@ export function ValidatedAirportSearch({
       const res = await fetch('/api/amadeus/airport', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: airport.code })
+        body: JSON.stringify({ code: item.code })
       })
       const json = await res.json()
       if (json.ok) {
-        const detailed = json.data?.detailedName || `${json.data?.address?.cityName || airport.city}${airport.name ? ' - ' + airport.name : ''}`
+        const detailed = json.data?.detailedName || `${json.data?.address?.cityName || item.city}${item.name ? ' - ' + item.name : ''}`
         const { useSearchStore } = await import('@/store/searchStore')
         useSearchStore.getState().updateFormData({ departureAirportDetailed: detailed })
       }
     } catch {
       // ignore
     }
+  }
+
+  // Quick-select via recent chips
+  const handleRecentChipClick = (code: string) => {
+    setQuery(code)
+    onChange(code)
+    setShowSuggestions(false)
+    setSelectedIndex(-1)
+    addRecentAirport(code)
+    const err = validateAirport(code)
+    setValidationError(err)
+    onValidation?.(err === '', err || undefined)
   }
 
   // Handle keyboard navigation
@@ -215,7 +327,7 @@ export function ValidatedAirportSearch({
         onKeyDown={handleKeyDown}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        placeholder={placeholder}
+        placeholder={placeholder || 'City, airport name or code'}
         className={`w-full bg-white text-black rounded border-0 font-muli transition-colors ${
           displayError 
             ? 'ring-1 ring-red-500' 
@@ -274,21 +386,50 @@ export function ValidatedAirportSearch({
             </>
           )}
 
-          {/* Search suggestions */}
-          {suggestions.map((airport, index) => (
-            <li
-              key={airport.code}
-              className={`px-4 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 ${
-                index === selectedIndex ? 'bg-orange-50' : ''
-              }`}
-              onClick={() => handleSuggestionSelect(airport)}
-              role="option"
-              aria-selected={index === selectedIndex}
-            >
-              <div className="font-medium text-sm">{airport.code} - {airport.name}</div>
-              <div className="text-xs text-gray-500">{airport.city}, {airport.country}</div>
-            </li>
-          ))}
+          {/* Grouped suggestions: Cities then Airports */}
+          {(() => {
+            const indexMap = new Map(suggestions.map((s, i) => [`${s.type}:${s.code}`, i]))
+            const cities = suggestions.filter(s => s.type === 'CITY')
+            const airports = suggestions.filter(s => s.type === 'AIRPORT')
+            const blocks: JSX.Element[] = []
+            if (cities.length) {
+              blocks.push(<li key="hdr-cities" className="px-4 py-1 text-[11px] font-semibold text-gray-600 bg-gray-50 sticky top-0">Cities</li>)
+              cities.forEach((item) => {
+                const idx = indexMap.get(`CITY:${item.code}`) ?? -1
+                blocks.push(
+                  <li
+                    key={`city-${item.code}`}
+                    className={`px-4 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 ${idx === selectedIndex ? 'bg-orange-50' : ''}`}
+                    onClick={() => handleSuggestionSelect(item)}
+                    role="option"
+                    aria-selected={idx === selectedIndex}
+                  >
+                    <div className="font-medium text-sm">{item.code} - {item.city}</div>
+                    <div className="text-xs text-gray-500">{item.name}{item.country ? ` • ${item.country}` : ''}</div>
+                  </li>
+                )
+              })
+            }
+            if (airports.length) {
+              blocks.push(<li key="hdr-airports" className="px-4 py-1 text-[11px] font-semibold text-gray-600 bg-gray-50 sticky top-0">Airports</li>)
+              airports.forEach((item) => {
+                const idx = indexMap.get(`AIRPORT:${item.code}`) ?? -1
+                blocks.push(
+                  <li
+                    key={`apt-${item.code}`}
+                    className={`px-4 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0 ${idx === selectedIndex ? 'bg-orange-50' : ''}`}
+                    onClick={() => handleSuggestionSelect(item)}
+                    role="option"
+                    aria-selected={idx === selectedIndex}
+                  >
+                    <div className="font-medium text-sm">{item.code} - {item.name}</div>
+                    <div className="text-xs text-gray-500">{item.city}, {item.country}</div>
+                  </li>
+                )
+              })
+            }
+            return blocks
+          })()}
 
           {/* No results message */}
           {query.length >= 1 && suggestions.length === 0 && (
@@ -296,7 +437,29 @@ export function ValidatedAirportSearch({
               No airports found matching "{query}"
             </li>
           )}
+
+          {/* Loading state for remote search */}
+          {isFetching && (
+            <li className="px-4 py-2 text-xs text-gray-500 text-center">Searching…</li>
+          )}
         </ul>
+      )}
+
+      {/* Inline recent chips */}
+      {preferences.recentAirports.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-1">
+          {preferences.recentAirports.slice(0, 6).map((code) => (
+            <button
+              type="button"
+              key={`chip-${code}`}
+              className="px-2 py-0.5 rounded-full text-[10px] bg-white/80 text-black hover:bg-white shadow-sm border border-black/5"
+              onClick={() => handleRecentChipClick(code)}
+              aria-label={`Use recent origin ${code}`}
+            >
+              {code}
+            </button>
+          ))}
+        </div>
       )}
     </div>
   )

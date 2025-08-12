@@ -397,23 +397,25 @@ export function LandingPageForm() {
           </div>
         </div>
 
-        {/* Details Panel - Responsive visibility and sizing */}
-        <div 
-          className="hidden lg:flex lg:flex-col bg-transparent"
-          style={{ 
-            width: '480px',
-            padding: '28px'
-          }}
+        {/* Emphasized Blurb - floats over hero for better visibility */}
+        <div
+          className="hidden md:flex"
+          style={{ position: 'relative' }}
         >
-          <div className="text-white font-muli">
-            <h3 className="font-bold mb-4 text-lg xl:text-xl">
-              Discover Amazing Destinations
-            </h3>
-            <p className="opacity-80 text-sm xl:text-base leading-relaxed">
-              Find your perfect getaway based on your interests and travel style. 
-              From adventure-packed destinations to cultural experiences, 
-              we'll help you discover places that match your mood.
-            </p>
+          <div
+            className="absolute md:right-6 lg:right-10 xl:right-14 top-20 md:top-24 lg:top-32 w-[min(560px,44vw)] bg-black/55 backdrop-blur-sm border border-white/10 rounded-xl p-5 md:p-6 lg:p-7 shadow-2xl"
+          >
+            <div className="text-white font-muli">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="inline-block h-1.5 w-8 rounded bg-orange-400" aria-hidden="true"></span>
+                <h3 className="font-extrabold tracking-tight text-xl md:text-2xl">
+                  Discover Amazing Destinations
+                </h3>
+              </div>
+              <p className="opacity-90 text-sm md:text-base leading-relaxed">
+                Find your perfect getaway based on your interests and travel style. From adventure-packed destinations to cultural experiences, we’ll help you discover places that match your mood.
+              </p>
+            </div>
           </div>
         </div>
       </div>
