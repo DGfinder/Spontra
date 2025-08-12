@@ -2,6 +2,7 @@ import { ValidatedAirportSearch } from './ValidatedAirportSearch'
 import { FlightTimeSlider } from './FlightTimeSlider'
 import { VerticalThemeSelector } from './VerticalThemeSelector'
 import { TripTypeToggle } from './TripTypeToggle'
+import { useEffect, useState } from 'react'
 import { useSearchForm } from '@/hooks/useSearchForm'
 import { getThemeColor, getThemeHoverColor } from '@/lib/theme'
 
@@ -15,6 +16,7 @@ interface Theme {
 interface FormData {
   selectedTheme: string
   departureAirport: string
+  destinationAirport?: string
   departureDate: string
   returnDate?: string
   passengers: number
@@ -23,6 +25,8 @@ interface FormData {
   flightTimeRange?: [number, number]
   minFlightTime?: number
   maxFlightTimeRange?: number
+  directFlightsOnly?: boolean
+  cabinClass?: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'
 }
 
 interface SearchFormProps {
@@ -51,6 +55,53 @@ export function SearchForm({
     await onSubmit(data)
   }
 
+  // Debounced matching count via server route (and density overlay)
+  const [matchingCount, setMatchingCount] = useState<number | null>(null)
+  const [density, setDensity] = useState<{ hour: number; value: number }[]>([])
+  useEffect(() => {
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      const [minH, maxH] = formValues.flightTimeRange || [1, formValues.maxFlightTime || 8]
+      try {
+        // Compose ETag key to use If-None-Match client-side as well
+        const slot = Math.floor(Date.now() / (2 * 60 * 1000))
+        const etagKey = `${formValues.departureAirport}|${formValues.departureDate}|${formValues.directFlightsOnly ? '1' : '0'}|${Math.round(minH*2)/2}|${Math.round(maxH*2)/2}|${slot}`
+        const res = await fetch('/api/amadeus/destinations/count', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origin: formValues.departureAirport,
+            minFlightTime: minH,
+            maxFlightTime: maxH,
+            departureDate: formValues.departureDate,
+            nonStop: !!formValues.directFlightsOnly
+          }),
+          signal: controller.signal,
+        })
+        const json = await res.json()
+        if (res.status === 304) {
+          // No change; keep existing state
+          return
+        }
+        if (json.ok) {
+          setMatchingCount(json.data.count)
+          const hist = json.data.histogram as Array<{ hour: number; count: number }>
+          if (Array.isArray(hist) && hist.length > 0) {
+            const maxCount = Math.max(...hist.map(h => h.count)) || 1
+            setDensity(hist.map(h => ({ hour: h.hour, value: Math.min(1, h.count / maxCount) })))
+          } else {
+            setDensity([])
+          }
+        } else {
+          setMatchingCount(null)
+        }
+      } catch {
+        setMatchingCount(null)
+      }
+    }, 250)
+    return () => { clearTimeout(timer); controller.abort() }
+  }, [formValues.flightTimeRange, formValues.maxFlightTime, formValues.directFlightsOnly, formValues.departureAirport, formValues.departureDate])
+
   return (
     <div className="h-full flex flex-col font-muli">
       {/* Form Header */}
@@ -76,7 +127,8 @@ export function SearchForm({
           onTripTypeChange={(tripType) => setValue('tripType', tripType)}
         />
 
-        {/* Origin/Destination Layout - Two columns on desktop, stacked on mobile */}
+          {/* Origin/Destination Layout - Two columns on desktop, stacked on mobile */
+          }
         <div className="flex flex-col sm:flex-row gap-2">
           {/* From Airport */}
           <div className="flex-1">
@@ -98,24 +150,21 @@ export function SearchForm({
             )}
           </div>
 
-          {/* To Airport - Disabled */}
+          {/* To Airport - Optional destination for classic search */}
           <div className="flex-1">
-            <label className="block text-white/90 mb-2 font-muli" style={{ fontSize: '12px' }} htmlFor="destination">
-              TO
+            <label className="block text-white/90 mb-2 font-muli" style={{ fontSize: '12px' }} htmlFor="destination-airport">
+              TO (optional)
             </label>
-            <input
-              id="destination"
-              type="text"
-              value="Anywhere"
-              disabled
-              className="w-full bg-white/20 text-white/60 rounded border-0 font-muli"
-              style={{ 
-                height: '32px',
-                fontSize: '11px',
-                padding: '0 8px'
-              }}
-              aria-label="Destination set to anywhere"
+            <ValidatedAirportSearch
+              value={formValues.destinationAirport || ''}
+              onChange={(code) => setValue('destinationAirport', code as any)}
+              placeholder="Anywhere"
+              aria-label="Destination airport (optional)"
             />
+            {/* Inline validation hint when both airports are set to same code */}
+            {formValues.destinationAirport && formValues.departureAirport === formValues.destinationAirport && (
+              <div className="text-yellow-300 text-[10px] mt-1">Origin and destination cannot be the same.</div>
+            )}
           </div>
         </div>
 
@@ -204,6 +253,63 @@ export function SearchForm({
           )}
         </div>
 
+        {/* Cabin Class */}
+        <div>
+          <label className="block text-white/90 mb-2 font-muli" style={{ fontSize: '12px' }} htmlFor="cabin-class">
+            CABIN CLASS
+          </label>
+          <select
+            id="cabin-class"
+            value={formValues.cabinClass || 'ECONOMY'}
+            onChange={(e) => setValue('cabinClass', e.target.value as any)}
+            className="w-full bg-white text-black rounded border-0 font-muli"
+            style={{ height: '32px', fontSize: '11px', padding: '0 8px' }}
+          >
+            {['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST'].map(c => (
+              <option key={c} value={c}>{c.replace('_',' ')}</option>
+            ))}
+          </select>
+        </div>
+
+          {/* Flight Time Presets + Direct Toggle */}
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex flex-wrap gap-1">
+              {[
+                { label: 'Short', range: [0.5, 2] as [number, number] },
+                { label: 'Weekend', range: [1, 4] as [number, number] },
+                { label: 'Medium', range: [2, 6] as [number, number] },
+                { label: 'Long', range: [6, 12] as [number, number] },
+                { label: 'Any', range: [0.5, 12] as [number, number] },
+              ].map((preset) => {
+                const isActive = (formValues.flightTimeRange?.[0] ?? 1) === preset.range[0] && (formValues.flightTimeRange?.[1] ?? (formValues.maxFlightTime || 8)) === preset.range[1]
+                return (
+                  <button
+                    key={preset.label}
+                    type="button"
+                    className={`px-2 py-0.5 rounded text-[10px] font-muli ${isActive ? 'bg-white text-black' : 'bg-white/20 text-white'} transition-colors`}
+                    onClick={() => {
+                      setValue('flightTimeRange', preset.range)
+                      setValue('minFlightTime', preset.range[0])
+                      setValue('maxFlightTimeRange', preset.range[1])
+                      setValue('maxFlightTime', preset.range[1])
+                    }}
+                    aria-pressed={isActive}
+                  >
+                    {preset.label}
+                  </button>
+                )
+              })}
+            </div>
+            <label className="flex items-center gap-2 text-white text-[11px] font-muli">
+              <input
+                type="checkbox"
+                checked={!!formValues.directFlightsOnly}
+                onChange={(e) => setValue('directFlightsOnly', e.target.checked as any)}
+              />
+              Only direct
+            </label>
+          </div>
+
           {/* Flight Time Slider */}
           <div>
             <FlightTimeSlider
@@ -219,10 +325,18 @@ export function SearchForm({
               min={0.5}
               max={12}
               step={0.5}
+              density={density}
             />
             {(getFieldError('flightTimeRange') || getFieldError('maxFlightTime')) && (
               <div className="text-red-400 mt-1" style={{ fontSize: '10px' }}>
                 {getFieldError('flightTimeRange') || getFieldError('maxFlightTime')}
+              </div>
+            )}
+
+            {/* Matching destinations count */}
+            {matchingCount !== null && (
+              <div className="mt-1 text-white/80 text-[11px] font-muli">
+                ~{matchingCount} matching destinations
               </div>
             )}
           </div>

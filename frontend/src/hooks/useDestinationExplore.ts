@@ -66,6 +66,7 @@ export function useDestinationExplore() {
             maxFlightTime,
             theme: formData.selectedTheme,
             departureDate: formData.departureDate,
+            nonStop: !!formData.directFlightsOnly,
           }),
         })
         const json = await res.json()

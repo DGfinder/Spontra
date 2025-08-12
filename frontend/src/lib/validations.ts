@@ -74,7 +74,13 @@ export const searchFormSchema = z.object({
     .number()
     .min(0.5, 'Minimum flight time is 0.5 hours')
     .max(12, 'Maximum flight time is 12 hours')
-    .optional()
+    .optional(),
+
+  // New: Only direct flights toggle
+  directFlightsOnly: z.boolean().optional()
+  ,
+  destinationAirport: airportCodeSchema.optional(),
+  cabinClass: z.enum(['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST']).optional()
 }).refine((data) => {
   // If return trip, return date is required and must be after departure
   if (data.tripType === 'return') {
@@ -89,6 +95,15 @@ export const searchFormSchema = z.object({
 }, {
   message: 'Return date must be after departure date',
   path: ['returnDate']
+}).refine((data) => {
+  // Origin and destination must differ when destination present
+  if (data.destinationAirport && data.destinationAirport === data.departureAirport) {
+    return false
+  }
+  return true
+}, {
+  message: 'Origin and destination cannot be the same',
+  path: ['destinationAirport']
 }).refine((data) => {
   // Validate consistency between range and individual values
   if (data.flightTimeRange && (data.minFlightTime !== undefined || data.maxFlightTimeRange !== undefined)) {

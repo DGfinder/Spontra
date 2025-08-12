@@ -277,6 +277,7 @@ class AmadeusService {
     maxFlightTime?: number
     theme: string
     departureDate?: string
+    nonStop?: boolean
   }): Promise<DestinationRecommendation[]> {
     try {
       // Build Amadeus search parameters
@@ -285,7 +286,8 @@ class AmadeusService {
         maxFlightTime: params.maxFlightTime,
         departureDate: params.departureDate || new Date().toISOString().split('T')[0],
         oneWay: true,
-        viewBy: 'DESTINATION'
+        viewBy: 'DESTINATION',
+        nonStop: params.nonStop,
       }
 
       // Search destinations using Amadeus

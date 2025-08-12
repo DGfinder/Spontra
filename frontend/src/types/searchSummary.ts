@@ -1,6 +1,7 @@
 export interface SearchSummaryData {
   selectedTheme: string
   departureAirport: string
+  destinationAirport?: string
   departureDate: string
   returnDate?: string
   passengers: number
@@ -10,6 +11,7 @@ export interface SearchSummaryData {
   maxFlightTimeRange?: number
   flightTimeRange?: [number, number]
   passengerClass?: string
+  directFlightsOnly?: boolean
 }
 
 export interface FormattedSearchSummary {

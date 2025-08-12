@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 interface FlightTimeSliderProps {
   value?: number // For backward compatibility
@@ -11,6 +11,8 @@ interface FlightTimeSliderProps {
   max?: number
   step?: number
   mode?: 'single' | 'range'
+  // Optional density overlay: array of { hour, value(0..1) }
+  density?: { hour: number; value: number }[]
 }
 
 export function FlightTimeSlider({ 
@@ -21,10 +23,12 @@ export function FlightTimeSlider({
   min = 0, 
   max = 12, 
   step = 0.5,
-  mode = 'range'
+  mode = 'range',
+  density
 }: FlightTimeSliderProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [activeThumb, setActiveThumb] = useState<'min' | 'max' | null>(null)
+  const [isFocused, setIsFocused] = useState<'min' | 'max' | null>(null)
   
   // Internal state for range mode
   const [internalRange, setInternalRange] = useState<[number, number]>([
@@ -86,6 +90,34 @@ export function FlightTimeSlider({
     handleRangeChange(currentRange[0], newMax)
   }
 
+  const keyboardStep = (e: React.KeyboardEvent) => {
+    const multiplier = e.ctrlKey || e.metaKey ? 4 : e.shiftKey ? 2 : 1
+    return step * multiplier
+  }
+
+  const onKeyDownMin = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const delta = keyboardStep(e)
+    if (['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault()
+      const sign = e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 1
+      const next = currentRange[0] + sign * delta
+      handleRangeChange(next, currentRange[1])
+    }
+  }
+
+  const onKeyDownMax = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const delta = keyboardStep(e)
+    if (['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp'].includes(e.key)) {
+      e.preventDefault()
+      const sign = e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 1
+      const next = currentRange[1] + sign * delta
+      handleRangeChange(currentRange[0], next)
+    }
+  }
+
+  const minPos = useMemo(() => getSliderPosition(currentRange[0]), [currentRange, min, max])
+  const maxPos = useMemo(() => getSliderPosition(currentRange[1]), [currentRange, min, max])
+
   // Generate tick marks for major hour intervals
   const generateTicks = () => {
     const ticks = []
@@ -118,12 +150,29 @@ export function FlightTimeSlider({
         </div>
       </div>
       
-      <div className="relative pb-6">
+      <div className="relative pb-8">
         {isRangeMode ? (
           /* Dual range slider */
           <div className="relative">
             {/* Track background */}
             <div className="w-full h-1 bg-white/20 rounded absolute top-0"></div>
+
+            {/* Density overlay */}
+            {density && density.length > 0 && (
+              <div className="absolute top-0 left-0 right-0 h-1 flex items-stretch pointer-events-none">
+                {density.map((d, idx) => {
+                  const left = getSliderPosition(Math.max(min, Math.min(d.hour, max)))
+                  const opacity = Math.max(0.08, Math.min(d.value, 1))
+                  return (
+                    <div
+                      key={idx}
+                      className="absolute h-1 bg-white rounded"
+                      style={{ left: `${left}%`, width: '2px', opacity }}
+                    />
+                  )
+                })}
+              </div>
+            )}
             
             {/* Active range track */}
             <div 
@@ -146,9 +195,17 @@ export function FlightTimeSlider({
               onMouseUp={() => { setIsDragging(false); setActiveThumb(null) }}
               onTouchStart={() => { setIsDragging(true); setActiveThumb('min') }}
               onTouchEnd={() => { setIsDragging(false); setActiveThumb(null) }}
+              onFocus={() => setIsFocused('min')}
+              onBlur={() => setIsFocused(null)}
+              onKeyDown={onKeyDownMin}
               className={`absolute w-full h-1 bg-transparent appearance-none cursor-pointer slider z-10 ${
                 isDragging && activeThumb === 'min' ? 'active' : ''
               }`}
+              aria-label="Minimum flight time"
+              aria-valuemin={min}
+              aria-valuemax={currentRange[1] - step}
+              aria-valuenow={currentRange[0]}
+              aria-valuetext={`Minimum ${formatTime(currentRange[0])}`}
             />
             
             {/* Maximum value slider */}
@@ -163,10 +220,36 @@ export function FlightTimeSlider({
               onMouseUp={() => { setIsDragging(false); setActiveThumb(null) }}
               onTouchStart={() => { setIsDragging(true); setActiveThumb('max') }}
               onTouchEnd={() => { setIsDragging(false); setActiveThumb(null) }}
+              onFocus={() => setIsFocused('max')}
+              onBlur={() => setIsFocused(null)}
+              onKeyDown={onKeyDownMax}
               className={`absolute w-full h-1 bg-transparent appearance-none cursor-pointer slider z-10 ${
                 isDragging && activeThumb === 'max' ? 'active' : ''
               }`}
+              aria-label="Maximum flight time"
+              aria-valuemin={currentRange[0] + step}
+              aria-valuemax={max}
+              aria-valuenow={currentRange[1]}
+              aria-valuetext={`Maximum ${formatTime(currentRange[1])}`}
             />
+
+            {/* Tooltips */}
+            {(isDragging || isFocused) && (
+              <>
+                <div
+                  className="absolute -top-6 transform -translate-x-1/2 text-[10px] text-white bg-black/60 px-1.5 py-0.5 rounded"
+                  style={{ left: `${minPos}%` }}
+                >
+                  {formatTime(currentRange[0])}
+                </div>
+                <div
+                  className="absolute -top-6 transform -translate-x-1/2 text-[10px] text-white bg-black/60 px-1.5 py-0.5 rounded"
+                  style={{ left: `${maxPos}%` }}
+                >
+                  {formatTime(currentRange[1])}
+                </div>
+              </>
+            )}
           </div>
         ) : (
           /* Single value slider (backward compatibility) */

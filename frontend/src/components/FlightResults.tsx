@@ -171,6 +171,8 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
   const [flights, setFlights] = useState<FlightOption[]>([])
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [nonStopOnly, setNonStopOnly] = useState<boolean>(false)
+  const [cabinClass, setCabinClass] = useState<'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'>('ECONOMY')
 
   // Fetch real flight options from our server route (Amadeus)
   const fetchFlightOptions = async (): Promise<FlightOption[]> => {
@@ -182,6 +184,8 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         destination: recommendation.destination.airport_code,
         departureDate: new Date().toISOString().slice(0,10),
         passengers: 1,
+        nonStop: nonStopOnly,
+        travelClass: cabinClass,
       }),
     })
     const json = await res.json()
@@ -206,7 +210,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         setIsLoading(false)
       })
     return () => { isActive = false }
-  }, [recommendation, selectedActivity])
+  }, [recommendation, selectedActivity, nonStopOnly, cabinClass])
 
   const handleFlightSelect = (flight: FlightOption) => {
     setSelectedFlight(flight)
@@ -261,11 +265,20 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
             </p>
           </div>
           
-          <div className="text-right">
-            <div className="text-white/80 text-sm">Flight Duration</div>
-            <div className="text-yellow-400 font-semibold">
-              ~{Math.round(recommendation.flight_route.total_duration_minutes / 60 * 10) / 10}h
-            </div>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-white/80 text-sm">
+              <input type="checkbox" checked={nonStopOnly} onChange={(e) => setNonStopOnly(e.target.checked)} />
+              Direct only
+            </label>
+            <select
+              className="bg-black/40 border border-white/20 text-white text-sm rounded px-2 py-1"
+              value={cabinClass}
+              onChange={(e) => setCabinClass(e.target.value as any)}
+            >
+              {['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST'].map(c => (
+                <option key={c} value={c}>{c.replace('_',' ')}</option>
+              ))}
+            </select>
           </div>
         </div>
       </header>

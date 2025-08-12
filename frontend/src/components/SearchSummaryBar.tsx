@@ -50,9 +50,9 @@ export function SearchSummaryBar({ searchData }: SearchSummaryBarProps) {
     return {
       themeDisplay: themeName,
       themeColor,
-      originInfo: `Origin: ${data.departureAirport} Ideal travel Time: ${flightTimeDisplay.replace(' flight time', 'h')}`,
+      originInfo: `Origin: ${data.departureAirport}${data.destinationAirport ? ` → ${data.destinationAirport}` : ''}  • Ideal travel time: ${flightTimeDisplay.replace(' flight time', 'h')}${data.directFlightsOnly ? ' • Direct only' : ''}`,
       dateRange,
-      passengerInfo: `${data.passengers} ${data.passengers === 1 ? 'Adult' : 'Adults'}, Economy`,
+      passengerInfo: `${data.passengers} ${data.passengers === 1 ? 'Adult' : 'Adults'}${data.passengerClass ? `, ${data.passengerClass.replace('_',' ')}` : ''}`,
       travelTimeInfo: flightTimeDisplay
     }
   }

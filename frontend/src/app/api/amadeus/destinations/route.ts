@@ -6,7 +6,7 @@ export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   try {
-    const { origin, maxFlightTime, theme, departureDate } = await req.json()
+    const { origin, maxFlightTime, theme, departureDate, nonStop } = await req.json()
 
     if (!origin) {
       return NextResponse.json({ ok: false, error: 'Missing required parameter: origin' }, { status: 400 })
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       maxFlightTime,
       theme,
       departureDate,
+      nonStop,
     })
 
     return NextResponse.json({ ok: true, data: recommendations })

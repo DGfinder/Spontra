@@ -55,6 +55,7 @@ export function useSearchForm() {
     const hasChanged = 
       formData.selectedTheme !== lastFormData.current.selectedTheme ||
       formData.departureAirport !== lastFormData.current.departureAirport ||
+      formData.destinationAirport !== (lastFormData.current as any).destinationAirport ||
       formData.departureDate !== lastFormData.current.departureDate ||
       formData.returnDate !== lastFormData.current.returnDate ||
       formData.passengers !== lastFormData.current.passengers ||

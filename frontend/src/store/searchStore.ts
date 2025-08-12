@@ -5,6 +5,7 @@ import { DestinationRecommendation } from '@/services/apiClient'
 export interface FormData {
   selectedTheme: string
   departureAirport: string
+  destinationAirport?: string
   departureDate: string
   returnDate?: string
   passengers: number
@@ -13,6 +14,10 @@ export interface FormData {
   flightTimeRange?: [number, number]
   minFlightTime?: number
   maxFlightTimeRange?: number
+  // New: filter to only show nonstop options in Explore flow
+  directFlightsOnly?: boolean
+  // Optional: cabin class for flight offers
+  cabinClass?: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'
 }
 
 export interface SearchHistory {
@@ -103,6 +108,7 @@ type SearchStore = SearchState & SearchActions
 const initialFormData: FormData = {
   selectedTheme: 'adventure',
   departureAirport: '',
+  destinationAirport: undefined,
   departureDate: '',
   returnDate: undefined,
   passengers: 1,
@@ -110,7 +116,9 @@ const initialFormData: FormData = {
   maxFlightTime: 8, // Keep for backward compatibility
   flightTimeRange: [1, 8], // Default range: 1-8 hours
   minFlightTime: 1,
-  maxFlightTimeRange: 8
+  maxFlightTimeRange: 8,
+  directFlightsOnly: false,
+  cabinClass: 'ECONOMY'
 }
 
 const initialPreferences = {
