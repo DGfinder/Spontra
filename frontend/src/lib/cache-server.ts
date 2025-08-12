@@ -37,7 +37,10 @@ class MemoryLRU<V> {
   set(k: string, v: V) {
     if (this.map.has(k)) this.map.delete(k)
     this.map.set(k, { v, at: Date.now() })
-    if (this.map.size > this.limit) this.map.delete(this.map.keys().next().value)
+    if (this.map.size > this.limit) {
+      const oldest = this.map.keys().next().value as string | undefined
+      if (oldest !== undefined) this.map.delete(oldest)
+    }
   }
 }
 
