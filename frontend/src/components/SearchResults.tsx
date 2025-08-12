@@ -36,11 +36,12 @@ export function SearchResults({
 }: SearchResultsProps) {
   // Get current search data for the summary bar
   const formData = useFormData()
-  const [viewMode, setViewMode] = useState<'destinations' | 'countries'>('destinations')
+  const [viewMode, setViewMode] = useState<'destinations' | 'countries'>('countries')
 
   // Aggregate results by country
   const countryAggregations = aggregateDestinationsByCountry(results)
   const countryStats = getCountryStats(countryAggregations)
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
 
   return (
     <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
@@ -64,15 +65,17 @@ export function SearchResults({
               }
             </p>
             <div className="flex items-center space-x-2 mt-2">
-              <span className="text-xs text-white/50">Sorted by price:</span>
-              <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">
-                Best deals first 💰
-              </span>
+               <span className="text-xs text-white/60">{viewMode === 'countries' ? 'Grouped by country' : 'Sorted by price'}:</span>
+               {viewMode === 'countries' ? (
+                 <span className="text-xs bg-blue-500/20 text-blue-200 px-2 py-1 rounded">Cheapest city per country</span>
+               ) : (
+                 <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">Best deals first 💰</span>
+               )}
               <CacheIndicator className="ml-2" />
               
               {/* View Mode Toggle */}
               <div className="flex items-center ml-4 bg-white/10 rounded-full p-1">
-                <button
+                 <button
                   onClick={() => setViewMode('destinations')}
                   className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
                     viewMode === 'destinations'
@@ -95,6 +98,16 @@ export function SearchResults({
                   <span>Countries</span>
                 </button>
               </div>
+
+              {/* Back to Countries chip (when viewing city list) */}
+              {viewMode === 'destinations' && (
+                <button
+                  onClick={() => { setSelectedCountry(null); setViewMode('countries') }}
+                  className="ml-2 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors"
+                >
+                  ← Back to countries
+                </button>
+              )}
             </div>
           </div>
           <button
@@ -146,10 +159,10 @@ export function SearchResults({
                   key={aggregation.country.code || `country-${index}`}
                   aggregation={aggregation}
                   selectedTheme={selectedTheme}
-                  onExploreCountry={(agg) => {
-                    console.log('Exploring country:', agg.country.name)
-                    // Switch to destinations view showing only this country's cities
+                   onExploreCountry={(agg) => {
+                    // Switch to destination view filtered to this country
                     setViewMode('destinations')
+                    setSelectedCountry(agg.country.code)
                   }}
                   onSelectDestination={onExploreDestination}
                 />
@@ -163,6 +176,7 @@ export function SearchResults({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
             {results
               .filter(result => result && result.destination && result.flight_route)
+              .filter(result => !selectedCountry || result.destination.country_code === selectedCountry)
               .sort((a, b) => {
                 // Sort by price (extracted from estimated_flight_price)
                 const priceA = parseFloat((a.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
