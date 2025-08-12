@@ -105,15 +105,15 @@ export function SearchForm({
   return (
     <div className="h-full flex flex-col font-muli">
       {/* Form Header */}
-      <div className="mb-4">
-        <h2 className="text-white font-bold mb-1" style={{ fontSize: '18px' }}>
+      <div className="mb-2">
+        <h2 className="text-white font-bold mb-1" style={{ fontSize: '16px' }}>
           WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-3" role="search" aria-label="Travel search form">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-2" role="search" aria-label="Travel search form">
         {/* Form Content */}
-        <div className="flex-1 flex flex-col gap-3">
+        <div className="flex-1 flex flex-col gap-2">
           {/* Theme Selection */}
           <VerticalThemeSelector
             themes={themes}
@@ -343,15 +343,15 @@ export function SearchForm({
         </div>
 
         {/* Search Button */}
-        <div className="mt-2">
+        <div className="mt-3">
           <button
             type="submit"
             disabled={!isValid || isLoading}
             className="w-full text-white font-bold rounded transition-all duration-200 shadow-lg flex items-center justify-center font-muli"
             style={{
               backgroundColor: formValues.selectedTheme ? getThemeColor(formValues.selectedTheme as any) : '#f97316',
-              height: '40px',
-              fontSize: '18.325px'
+              height: '44px',
+              fontSize: '18px'
             }}
             onMouseEnter={(e) => {
               if (formValues.selectedTheme && !isLoading && isValid) {

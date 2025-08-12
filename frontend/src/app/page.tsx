@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen w-full overflow-hidden" style={{ height: '100vh' }}>
+    <main className="min-h-screen w-full overflow-hidden">
       {/* Single Full-Screen Landing Page - No Scrolling */}
       <LandingPageForm />
     </main>

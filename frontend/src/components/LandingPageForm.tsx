@@ -375,20 +375,20 @@ export function LandingPageForm() {
 
       {/* Layout - show search panel only on the initial Search step */}
       {navigation.currentStep === 'search' && (
-      <div className="absolute inset-0 z-20 flex flex-col lg:flex-row pt-24 sm:pt-28 md:pt-32">
+      <div className="absolute inset-0 z-20 grid grid-cols-1 lg:grid-cols-[420px_1fr] items-center pt-24 sm:pt-28 md:pt-32">
         {/* Form Panel with Overlay - Responsive */}
         <div 
-          className="relative p-4 md:p-5 w-full lg:w-[370px] xl:w-[400px] h-full overflow-y-auto"
+          className="relative p-4 md:p-5 w-full h-[calc(100vh-8rem)] lg:h-[calc(100vh-10rem)] flex"
           style={{ 
-            maxHeight: 'calc(100vh - 6rem)' 
+            maxHeight: 'calc(100vh - 6rem)'
           }}
         >
           {/* Form Panel Overlay */}
           <div 
-            className="absolute inset-0 z-0"
+            className="absolute inset-0 z-0 rounded-lg"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
           />
-          <div className="relative z-10">
+          <div className="relative z-10 flex flex-col justify-center w-full no-scrollbar overflow-hidden">
             <SearchForm
               themes={THEMES}
               onSubmit={handleSubmit}
@@ -401,8 +401,8 @@ export function LandingPageForm() {
         <div 
           className="hidden lg:flex lg:flex-col bg-transparent"
           style={{ 
-            width: '369px',
-            padding: '20px'
+            width: '480px',
+            padding: '28px'
           }}
         >
           <div className="text-white font-muli">
