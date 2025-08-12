@@ -103,17 +103,17 @@ export function SearchForm({
   }, [formValues.flightTimeRange, formValues.maxFlightTime, formValues.directFlightsOnly, formValues.departureAirport, formValues.departureDate])
 
   return (
-    <div className="h-full flex flex-col font-muli">
+    <div className="h-full grid grid-rows-[auto_1fr] font-muli">
       {/* Form Header */}
-      <div className="mb-2">
+      <div className="mb-2 row-start-1 row-end-2">
         <h2 className="text-white font-bold mb-1" style={{ fontSize: '16px' }}>
           WHAT ARE YOU LOOKING FOR?
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col gap-2" role="search" aria-label="Travel search form">
-        {/* Form Content */}
-        <div className="flex-1 flex flex-col gap-2">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="row-start-2 row-end-3 grid grid-rows-[1fr_auto] h-full" role="search" aria-label="Travel search form">
+        {/* Form Content (scrolls if needed) */}
+        <div className="row-start-1 row-end-2 flex flex-col gap-2 overflow-y-auto no-scrollbar pr-1">
           {/* Theme Selection */}
           <VerticalThemeSelector
             themes={themes}
@@ -342,8 +342,8 @@ export function SearchForm({
           </div>
         </div>
 
-        {/* Search Button */}
-        <div className="mt-3">
+        {/* Search Button (always visible) */}
+        <div className="row-start-2 row-end-3 mt-3">
           <button
             type="submit"
             disabled={!isValid || isLoading}
