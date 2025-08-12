@@ -120,7 +120,7 @@ export function ValidatedAirportSearch({
   }
 
   // Handle suggestion selection
-  const handleSuggestionSelect = (airport: Airport) => {
+  const handleSuggestionSelect = async (airport: Airport) => {
     setQuery(`${airport.code} - ${airport.name}`)
     onChange(airport.code)
     setShowSuggestions(false)
@@ -131,6 +131,23 @@ export function ValidatedAirportSearch({
     const error = validateAirport(airport.code)
     setValidationError(error)
     onValidation?.(error === '', error || undefined)
+
+    // Fetch detailed airport info to display human-friendly origin in summary
+    try {
+      const res = await fetch('/api/amadeus/airport', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: airport.code })
+      })
+      const json = await res.json()
+      if (json.ok) {
+        const detailed = json.data?.detailedName || `${json.data?.address?.cityName || airport.city}${airport.name ? ' - ' + airport.name : ''}`
+        const { useSearchStore } = await import('@/store/searchStore')
+        useSearchStore.getState().updateFormData({ departureAirportDetailed: detailed })
+      }
+    } catch {
+      // ignore
+    }
   }
 
   // Handle keyboard navigation

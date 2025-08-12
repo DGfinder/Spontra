@@ -5,7 +5,9 @@ import { DestinationRecommendation } from '@/services/apiClient'
 export interface FormData {
   selectedTheme: string
   departureAirport: string
+  departureAirportDetailed?: string
   destinationAirport?: string
+  destinationAirportDetailed?: string
   departureDate: string
   returnDate?: string
   passengers: number
@@ -109,7 +111,9 @@ type SearchStore = SearchState & SearchActions
 const initialFormData: FormData = {
   selectedTheme: 'adventure',
   departureAirport: '',
+  departureAirportDetailed: '',
   destinationAirport: undefined,
+  destinationAirportDetailed: '',
   departureDate: '',
   returnDate: undefined,
   passengers: 1,

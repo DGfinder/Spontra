@@ -52,18 +52,16 @@ export function SearchResults({
 
   return (
     <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
-      {/* Search Summary Bar */}
-      <SearchSummaryBar searchData={formData} />
       {/* Results Header */}
       <div className="p-4 md:p-6 border-b border-white/20">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h2 className="text-lg md:text-2xl font-bold text-white">
-              {viewMode === 'countries' ? 'Countries' : 'Destinations'} within {
+              {viewMode === 'countries' ? 'Countries' : viewMode === 'constellation' ? 'Countries (Map)' : 'Cities'} within {
                 formData?.flightTimeRange 
-                  ? `${formData.flightTimeRange[0]}h - ${formData.flightTimeRange[1]}h` 
+                  ? `${formData.flightTimeRange[0]}h – ${formData.flightTimeRange[1]}h` 
                   : `${maxFlightTime || formData?.maxFlightTime || 8}h`
-              } from {departureAirport}
+              } from {formData?.departureAirportDetailed || formData?.departureAirport || departureAirport}
             </h2>
             <p className="text-white/70 mt-1 text-sm md:text-base">
               {viewMode === 'countries' 
@@ -71,17 +69,17 @@ export function SearchResults({
                 : `Found ${results.length} destinations for your ${selectedTheme} adventure`
               }
             </p>
-            <div className="flex items-center space-x-2 mt-2">
+            <div className="flex items-center flex-wrap gap-2 mt-2">
                <span className="text-xs text-white/60">{viewMode === 'countries' ? 'Grouped by country' : 'Sorted by price'}:</span>
                {viewMode === 'countries' ? (
                  <span className="text-xs bg-blue-500/20 text-blue-200 px-2 py-1 rounded">Cheapest city per country</span>
                ) : (
                  <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">Best deals first 💰</span>
                )}
-              <CacheIndicator className="ml-2" />
+              <CacheIndicator className="ml-1" />
               
               {/* View Mode Toggle */}
-              <div className="flex items-center ml-4 bg-white/10 rounded-full p-1">
+              <div className="flex items-center ml-2 bg-white/10 rounded-full p-1">
                  <button
                   onClick={() => setViewMode('destinations')}
                   className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${

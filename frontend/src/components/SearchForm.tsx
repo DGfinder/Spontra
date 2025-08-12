@@ -157,7 +157,21 @@ export function SearchForm({
             </label>
             <ValidatedAirportSearch
               value={formValues.destinationAirport || ''}
-              onChange={(code) => setValue('destinationAirport', code as any)}
+              onChange={async (code) => {
+                setValue('destinationAirport', code as any)
+                if (code) {
+                  try {
+                    const res = await fetch('/api/amadeus/airport', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) })
+                    const json = await res.json()
+                    if (json.ok) {
+                      const detailed = json.data?.detailedName || `${json.data?.address?.cityName || ''}${json.data?.name ? ' - ' + json.data?.name : ''}`
+                      setValue('destinationAirportDetailed', detailed as any)
+                    }
+                  } catch {}
+                } else {
+                  setValue('destinationAirportDetailed', '' as any)
+                }
+              }}
               placeholder="Anywhere"
               aria-label="Destination airport (optional)"
             />

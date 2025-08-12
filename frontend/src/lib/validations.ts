@@ -77,9 +77,11 @@ export const searchFormSchema = z.object({
     .optional(),
 
   // New: Only direct flights toggle
-  directFlightsOnly: z.boolean().optional()
-  ,
+  directFlightsOnly: z.boolean().optional(),
   destinationAirport: airportCodeSchema.optional(),
+  // Friendly labels for display
+  departureAirportDetailed: z.string().optional(),
+  destinationAirportDetailed: z.string().optional(),
   cabinClass: z.enum(['ECONOMY','PREMIUM_ECONOMY','BUSINESS','FIRST']).optional()
 }).refine((data) => {
   // If return trip, return date is required and must be after departure
