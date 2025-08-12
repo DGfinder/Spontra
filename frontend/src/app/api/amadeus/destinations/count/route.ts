@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { amadeusService } from '@/services/amadeusService'
-import { cacheGet, cacheSet } from '@/lib/cache'
+import { cacheGet, cacheSet } from '@/lib/cache-server'
 
 export const runtime = 'nodejs'
 

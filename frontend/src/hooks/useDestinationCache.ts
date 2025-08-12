@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { destinationCache } from '@/lib/cache'
+import { destinationCache } from '@/lib/cache-client'
 
 // Hook for managing destination cache operations
 export function useDestinationCache() {
