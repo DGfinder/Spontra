@@ -1,7 +1,10 @@
-<<<<<<< HEAD
 import Redis from 'ioredis'
 
-// Simple cross-instance cache wrapper with in-memory fallback
+// =============================================================================
+// SERVER-SIDE CACHE (Redis + Memory Fallback)
+// =============================================================================
+// Used by API routes for cross-instance caching with Redis as primary store
+
 export interface CacheOptions {
   ttlSeconds?: number
   keyPrefix?: string
@@ -66,9 +69,10 @@ export async function cacheSet(key: string, value: string, opts?: CacheOptions):
   mem.set(key, value)
 }
 
-=======
-// Client-side cache utility with TTL support
-// Perfect for caching destination search results that match Amadeus cache refresh cycle
+// =============================================================================
+// CLIENT-SIDE CACHE (localStorage + Memory)
+// =============================================================================
+// Used by frontend components for caching destination search results with TTL
 
 interface CacheEntry<T> {
   data: T
@@ -316,4 +320,3 @@ if (typeof window !== 'undefined') {
     destinationCache.cleanup()
   }, 10 * 60 * 1000)
 }
->>>>>>> 5abac67efe02e0a6e806cf7f0b300735190113e3
