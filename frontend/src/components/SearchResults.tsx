@@ -7,7 +7,7 @@ import { LoadingSkeleton } from './LoadingSkeleton'
 import { SearchSummaryBar } from './SearchSummaryBar'
 import { CacheIndicator } from './CacheIndicator'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
-import { useFormData } from '@/store/searchStore'
+import { useFormData, useSearchStore } from '@/store/searchStore'
 
 interface SearchResultsProps {
   results: DestinationRecommendation[]
@@ -39,9 +39,15 @@ export function SearchResults({
   const [viewMode, setViewMode] = useState<'destinations' | 'countries'>('countries')
 
   // Aggregate results by country
-  const countryAggregations = aggregateDestinationsByCountry(results)
+  const [visaFreeOnly, setVisaFreeOnly] = useState(false)
+  let countryAggregations = aggregateDestinationsByCountry(results)
+  if (visaFreeOnly) {
+    countryAggregations = countryAggregations.filter(agg => agg.country.visaFree)
+  }
   const countryStats = getCountryStats(countryAggregations)
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
+  const preferences = useSearchStore(s => s.preferences)
+  const hasPassport = Boolean(preferences.passportCountryCode)
 
   return (
     <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-40 flex flex-col">
@@ -107,6 +113,14 @@ export function SearchResults({
                 >
                   ← Back to countries
                 </button>
+              )}
+
+              {/* Visa-free only (if passport set) */}
+              {viewMode === 'countries' && hasPassport && (
+                <label className="ml-2 flex items-center gap-2 text-xs text-emerald-200 bg-emerald-600/20 px-2 py-1 rounded cursor-pointer">
+                  <input type="checkbox" checked={visaFreeOnly} onChange={(e) => setVisaFreeOnly(e.target.checked)} />
+                  Visa-free only
+                </label>
               )}
             </div>
           </div>

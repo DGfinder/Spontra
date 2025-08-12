@@ -66,6 +66,7 @@ interface SearchState {
     defaultPassengers: number
     preferredThemes: string[]
     recentAirports: string[]
+    passportCountryCode?: string
   }
 }
 
@@ -125,7 +126,8 @@ const initialPreferences = {
   defaultDepartureAirport: '',
   defaultPassengers: 1,
   preferredThemes: ['adventure'],
-  recentAirports: []
+  recentAirports: [],
+  passportCountryCode: ''
 }
 
 const initialNavigationState: NavigationState = {

@@ -52,7 +52,12 @@ export function CountryCard({
           <span className="text-4xl">{aggregation.country.flag}</span>
           <div>
             <h3 className="text-xl font-bold text-white">{aggregation.country.name}</h3>
-            <p className="text-white/60 text-sm">{aggregation.country.continent}</p>
+            <p className="text-white/60 text-sm flex items-center gap-2">
+              <span>{aggregation.country.continent}</span>
+              {aggregation.country.visaFree && (
+                <span className="text-emerald-300 text-xs bg-emerald-600/20 border border-emerald-400/30 rounded-full px-2 py-0.5">Visa-free</span>
+              )}
+            </p>
           </div>
         </div>
         

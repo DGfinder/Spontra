@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchStore } from '@/store/searchStore'
 import Link from 'next/link'
 
 interface HeaderProps {
@@ -11,6 +12,9 @@ interface HeaderProps {
 export function Header({ isExploreMode = false, onNavigateToSearch }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showComingSoon, setShowComingSoon] = useState(false)
+  const preferences = useSearchStore(s => s.preferences)
+  const updatePreferences = useSearchStore(s => s.updatePreferences)
+  const [passport, setPassport] = useState(preferences.passportCountryCode || '')
 
   const handleComingSoonClick = (feature: string) => {
     setShowComingSoon(true)
@@ -41,6 +45,21 @@ export function Header({ isExploreMode = false, onNavigateToSearch }: HeaderProp
 
             {/* Right side - simplified for explore mode */}
             <div className="flex items-center space-x-4">
+              {/* Passport selector (compact) */}
+              <select
+                value={passport}
+                onChange={(e) => { setPassport(e.target.value); updatePreferences({ passportCountryCode: e.target.value }) }}
+                className="bg-white/10 text-white text-xs rounded px-2 py-1 border border-white/20 focus:outline-none"
+                title="Passport nationality"
+              >
+                <option value="">Passport</option>
+                <option value="ES">Spain 🇪🇸</option>
+                <option value="GB">United Kingdom 🇬🇧</option>
+                <option value="DE">Germany 🇩🇪</option>
+                <option value="US">United States 🇺🇸</option>
+                <option value="CA">Canada 🇨🇦</option>
+                <option value="JP">Japan 🇯🇵</option>
+              </select>
               <button 
                 onClick={() => handleComingSoonClick('sign-in')}
                 className="text-white/80 hover:text-white transition-colors text-sm"

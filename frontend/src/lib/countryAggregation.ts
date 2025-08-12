@@ -2,6 +2,7 @@
 // Groups destinations by country and finds best deals per country
 
 import { DestinationRecommendation } from '@/services/apiClient'
+import { useSearchStore } from '@/store/searchStore'
 
 export interface CountryAggregation {
   country: {
@@ -9,6 +10,7 @@ export interface CountryAggregation {
     code: string
     flag: string // Flag emoji or URL
     continent: string
+    visaFree?: boolean
   }
   cheapestDestination: DestinationRecommendation
   allDestinations: DestinationRecommendation[]
@@ -47,6 +49,19 @@ const COUNTRY_CONTINENTS: Record<string, string> = {
   'AU': 'Oceania', 'NZ': 'Oceania',
   'BR': 'South America', 'AR': 'South America', 'CL': 'South America', 
   'PE': 'South America', 'CO': 'South America'
+}
+
+// Simplified visa-free map (placeholder for production data source)
+// Keyed by passport country code -> set of destination country codes
+const VISA_FREE: Record<string, Set<string>> = {
+  // Example: Spanish passport
+  'ES': new Set(['DE','NL','FR','IT','PT','GB','BE','AT','CH','GR','HR','CZ','HU','PL','DK','SE','NO','FI','IE','TR','MA','TN','US','CA','MX','JP','TH','SG','AU','NZ']),
+  // Add more as needed
+}
+
+function isVisaFree(passport: string, destination: string): boolean {
+  const set = VISA_FREE[passport?.toUpperCase?.() || '']
+  return set ? set.has(destination?.toUpperCase?.()) : false
 }
 
 /**
@@ -127,12 +142,16 @@ export function aggregateDestinationsByCountry(
       countryDestinations.flatMap(d => d.activity_matches || [])
     )).slice(0, 3)
 
+    const passport = typeof window !== 'undefined' ? useSearchStore.getState().preferences.passportCountryCode : ''
+    const visaFree = passport ? isVisaFree(passport, countryCode) : undefined
+
     const aggregation: CountryAggregation = {
       country: {
         name: countryName,
         code: countryCode,
         flag: COUNTRY_FLAGS[countryCode] || '🌍',
-        continent: COUNTRY_CONTINENTS[countryCode] || 'Unknown'
+        continent: COUNTRY_CONTINENTS[countryCode] || 'Unknown',
+        visaFree
       },
       cheapestDestination,
       allDestinations: countryDestinations.sort((a, b) => {
