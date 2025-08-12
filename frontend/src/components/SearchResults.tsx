@@ -8,6 +8,7 @@ import { SearchSummaryBar } from './SearchSummaryBar'
 import { CacheIndicator } from './CacheIndicator'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
 import { useFormData, useSearchStore } from '@/store/searchStore'
+import { CountryConstellation } from './CountryConstellation'
 
 interface SearchResultsProps {
   results: DestinationRecommendation[]
@@ -36,7 +37,7 @@ export function SearchResults({
 }: SearchResultsProps) {
   // Get current search data for the summary bar
   const formData = useFormData()
-  const [viewMode, setViewMode] = useState<'destinations' | 'countries'>('countries')
+  const [viewMode, setViewMode] = useState<'destinations' | 'countries' | 'constellation'>('countries')
 
   // Aggregate results by country
   const [visaFreeOnly, setVisaFreeOnly] = useState(false)
@@ -102,6 +103,17 @@ export function SearchResults({
                 >
                   <Globe size={12} />
                   <span>Countries</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('constellation')}
+                  className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
+                    viewMode === 'constellation'
+                      ? 'bg-blue-500 text-white'
+                      : 'text-white/60 hover:text-white/80'
+                  }`}
+                >
+                  <Map size={12} />
+                  <span>Map</span>
                 </button>
               </div>
 
@@ -182,6 +194,20 @@ export function SearchResults({
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Results - Constellation View */}
+        {!isLoading && !isError && Array.isArray(results) && results.length > 0 && viewMode === 'constellation' && (
+          <div className="max-w-6xl mx-auto">
+            <CountryConstellation
+              originAirport={departureAirport}
+              recommendations={results}
+              onCountryClick={(rec) => {
+                setSelectedCountry(rec.destination.country_code)
+                setViewMode('destinations')
+              }}
+            />
           </div>
         )}
 
