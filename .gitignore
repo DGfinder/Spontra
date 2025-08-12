@@ -71,6 +71,39 @@ coverage/
 # Temporary files
 tmp/
 temp/
+debug-*.js
+test-*.js
+*-test.js
+*.test.js
+*.tmp
 
 # Local development
 .dev/
+
+# Build artifacts
+dist/
+.output/
+.nuxt/
+.cache/
+.parcel-cache/
+
+# Test files (keep test directories but ignore standalone test files)
+test-api.js
+test-*.js
+debug-*.js
+
+# IDE and editor files
+*.swp
+*.swo
+.vimrc
+.nvimrc
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Cloud and deployment
+.vercel/
+.netlify/
+.firebase/
