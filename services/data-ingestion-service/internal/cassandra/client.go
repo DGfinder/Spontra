@@ -114,6 +114,11 @@ func NewClient(config config.CassandraConfig) (*Client, error) {
 		return nil, fmt.Errorf("failed to initialize destination schema: %w", err)
 	}
 
+	// Initialize theme-based destination schema
+	if err := client.initThemeDestinationSchema(); err != nil {
+		return nil, fmt.Errorf("failed to initialize theme destination schema: %w", err)
+	}
+
 	return client, nil
 }
 
@@ -473,6 +478,131 @@ func (c *Client) Close() error {
 	if c.session != nil {
 		c.session.Close()
 	}
+	return nil
+}
+
+// initThemeDestinationSchema initializes the theme-based destination schema
+func (c *Client) initThemeDestinationSchema() error {
+	// Create destinations table with theme scores
+	destinationsQuery := `
+		CREATE TABLE IF NOT EXISTS destinations (
+			id UUID,
+			iata_code TEXT,
+			city_name TEXT,
+			country_name TEXT,
+			country_code TEXT,
+			theme_scores MAP<TEXT, INT>,
+			highlights LIST<TEXT>,
+			description TEXT,
+			average_flight_time FLOAT,
+			price_range TEXT,
+			best_months SET<TEXT>,
+			image_url TEXT,
+			popularity_score FLOAT,
+			timezone TEXT,
+			language SET<TEXT>,
+			currency TEXT,
+			visa_required BOOLEAN,
+			created_at TIMESTAMP,
+			updated_at TIMESTAMP,
+			PRIMARY KEY (id)
+		);
+	`
+
+	if err := c.session.Query(destinationsQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create destinations table: %w", err)
+	}
+
+	// Create index on IATA code
+	iataIndexQuery := `CREATE INDEX IF NOT EXISTS dest_iata_idx ON destinations (iata_code);`
+	if err := c.session.Query(iataIndexQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create IATA index: %w", err)
+	}
+
+	// Create index on country code
+	countryIndexQuery := `CREATE INDEX IF NOT EXISTS dest_country_idx ON destinations (country_code);`
+	if err := c.session.Query(countryIndexQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create country index: %w", err)
+	}
+
+	// Create theme-optimized table
+	themeTableQuery := `
+		CREATE TABLE IF NOT EXISTS destinations_by_theme (
+			theme_name TEXT,
+			theme_score INT,
+			destination_id UUID,
+			iata_code TEXT,
+			city_name TEXT,
+			country_name TEXT,
+			country_code TEXT,
+			price_range TEXT,
+			average_flight_time FLOAT,
+			created_at TIMESTAMP,
+			PRIMARY KEY (theme_name, theme_score, destination_id)
+		) WITH CLUSTERING ORDER BY (theme_score DESC, destination_id ASC);
+	`
+
+	if err := c.session.Query(themeTableQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create destinations_by_theme table: %w", err)
+	}
+
+	// Create country aggregation table
+	countryTableQuery := `
+		CREATE TABLE IF NOT EXISTS destinations_by_country (
+			country_code TEXT,
+			country_name TEXT,
+			destination_id UUID,
+			iata_code TEXT,
+			city_name TEXT,
+			theme_scores MAP<TEXT, INT>,
+			price_range TEXT,
+			average_flight_time FLOAT,
+			popularity_score FLOAT,
+			created_at TIMESTAMP,
+			PRIMARY KEY (country_code, destination_id)
+		);
+	`
+
+	if err := c.session.Query(countryTableQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create destinations_by_country table: %w", err)
+	}
+
+	// Create theme definitions table
+	themeDefQuery := `
+		CREATE TABLE IF NOT EXISTS theme_definitions (
+			theme_key TEXT,
+			theme_name TEXT,
+			description TEXT,
+			keywords SET<TEXT>,
+			created_at TIMESTAMP,
+			PRIMARY KEY (theme_key)
+		);
+	`
+
+	if err := c.session.Query(themeDefQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create theme_definitions table: %w", err)
+	}
+
+	// Create recommendations cache table
+	cacheTableQuery := `
+		CREATE TABLE IF NOT EXISTS destination_recommendations_cache (
+			cache_key TEXT,
+			origin_airport TEXT,
+			theme_name TEXT,
+			max_flight_hours INT,
+			generation_date DATE,
+			recommendations_json TEXT,
+			expires_at TIMESTAMP,
+			created_at TIMESTAMP,
+			PRIMARY KEY (cache_key)
+		) WITH default_time_to_live = 86400;
+	`
+
+	if err := c.session.Query(cacheTableQuery).Exec(); err != nil {
+		return fmt.Errorf("failed to create recommendations cache table: %w", err)
+	}
+
+	log.Println("Theme destination schema initialized successfully")
 	return nil
 }
 

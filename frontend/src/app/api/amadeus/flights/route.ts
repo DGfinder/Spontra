@@ -1,26 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusService } from '@/services/amadeusService'
+import { amadeusClient } from '@/lib/amadeus-simple'
 
 export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
+  console.log('✈️ Real-time flights API called')
+  
   try {
-    const { origin, destination, departureDate, passengers = 1, travelClass = 'ECONOMY', nonStop } = await req.json()
+    const body = await req.json()
+    const { 
+      origin, 
+      destination, 
+      departureDate, 
+      returnDate,
+      passengers = 1, 
+      travelClass = 'ECONOMY',
+      nonStop = false
+    } = body
+    
+    console.log('📝 Flight search parameters:', { 
+      origin, 
+      destination, 
+      departureDate, 
+      returnDate,
+      passengers,
+      travelClass,
+      nonStop 
+    })
 
     if (!origin || !destination || !departureDate) {
-      return NextResponse.json({ ok: false, error: 'Missing required params: origin, destination, departureDate' }, { status: 400 })
+      console.log('❌ Missing required parameters')
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Missing required params: origin, destination, departureDate' 
+      }, { status: 400 })
     }
 
-    // Use existing server-side service to fetch offers
-    const offers = await amadeusService.searchFlights({
+    console.log('🔍 Checking amadeusClient availability...')
+    if (!amadeusClient) {
+      console.error('❌ AmadeusClient is null/undefined')
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Flight search service temporarily unavailable. Please try again later.',
+        fallback: true
+      }, { status: 503 })
+    }
+
+    console.log('🛫 Calling amadeusClient.searchFlights for real-time pricing...')
+    // Use simple Amadeus client to fetch offers
+    const offers = await amadeusClient.searchFlights({
       origin,
       destination,
       departureDate,
+      returnDate,
       adults: passengers,
       travelClass,
       nonStop,
       max: 20,
-    } as any)
+    })
 
     // Map to a lightweight shape for the UI
     const flights = (offers || []).slice(0, 12).map((offer: any, idx: number) => {
@@ -46,9 +83,57 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ ok: true, data: flights })
+    console.log('✅ Flight search successful, returning:', flights.length, 'processed offers')
+    
+    return NextResponse.json({ 
+      ok: true, 
+      data: flights,
+      meta: {
+        totalResults: flights.length,
+        searchTimestamp: new Date().toISOString(),
+        dataSource: 'amadeus-real-time'
+      }
+    })
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || 'Internal Server Error' }, { status: 500 })
+    console.error('💥 Real-time flights API error:', {
+      message: e?.message,
+      stack: e?.stack,
+      name: e?.name,
+      cause: e?.cause
+    })
+    
+    // Check for specific Amadeus API errors
+    if (e?.message?.includes('Flight search failed')) {
+      return NextResponse.json(
+        { 
+          ok: false, 
+          error: 'No flights found for the selected route and date. Please try different dates or airports.',
+          searchable: true
+        },
+        { status: 404 }
+      )
+    }
+    
+    // Check for authentication/credentials errors
+    if (e?.message?.includes('credentials') || e?.message?.includes('authentication')) {
+      return NextResponse.json(
+        { 
+          ok: false, 
+          error: 'Flight search service configuration error. Please contact support.',
+          fallback: true
+        },
+        { status: 503 }
+      )
+    }
+    
+    // Generic error
+    return NextResponse.json(
+      { 
+        ok: false, 
+        error: 'An unexpected error occurred while searching flights. Please try again.',
+        fallback: true
+      },
+      { status: 500 }
+    )
   }
 }
-

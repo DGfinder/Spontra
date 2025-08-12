@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { enableMockFallbacks, getErrorMessage } from '@/lib/environment'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
 import { CountryConstellation } from './CountryConstellation'
@@ -170,69 +171,77 @@ export function LandingPageForm() {
     } catch (error) {
       console.error('Destination exploration failed:', error)
       
-      // Fallback to mock data on API failure
-      console.log('Falling back to mock data...')
-      // Get max flight time from range or fallback
-      const maxFlightTime = data.flightTimeRange?.[1] ?? data.maxFlightTimeRange ?? data.maxFlightTime ?? 8
-      
-      const filteredCountries = MOCK_COUNTRIES.filter(
-        country => country.averageFlightTime <= maxFlightTime
-      )
-      
-      // Convert mock data to API format for consistency  
-      const mockResults: DestinationRecommendation[] = filteredCountries.map(country => ({
-        destination: {
-          id: country.code,
-          airport_code: country.code,
-          city_name: country.cities[0] || country.name,
-          country_name: country.name,
-          country_code: country.code,
-          description: country.description,
-          image_url: '',
-          activities: [],
-          popularity_score: 75,
-          climate_info: {
-            average_temperature: '15-25°C',
-            rainy_months: [],
-            sunny_months: [],
-            climate_type: 'Temperate'
+      if (enableMockFallbacks) {
+        // Fallback to mock data on API failure (development only)
+        console.log('Falling back to mock data...')
+        // Get max flight time from range or fallback
+        const maxFlightTime = data.flightTimeRange?.[1] ?? data.maxFlightTimeRange ?? data.maxFlightTime ?? 8
+        
+        const filteredCountries = MOCK_COUNTRIES.filter(
+          country => country.averageFlightTime <= maxFlightTime
+        )
+        
+        // Convert mock data to API format for consistency  
+        const mockResults: DestinationRecommendation[] = filteredCountries.map(country => ({
+          destination: {
+            id: country.code,
+            airport_code: country.code,
+            city_name: country.cities[0] || country.name,
+            country_name: country.name,
+            country_code: country.code,
+            description: country.description,
+            image_url: '',
+            activities: [],
+            popularity_score: 75,
+            climate_info: {
+              average_temperature: '15-25°C',
+              rainy_months: [],
+              sunny_months: [],
+              climate_type: 'Temperate'
+            },
+            best_time_to_visit: [],
+            budget: {
+              level: 'mid-range',
+              daily_budget_range: country.priceRange,
+              currency: 'EUR'
+            },
+            timezone: 'Europe/London',
+            language: ['English'],
+            currency: 'EUR',
+            visa_required: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           },
-          best_time_to_visit: [],
-          budget: {
-            level: 'mid-range',
-            daily_budget_range: country.priceRange,
-            currency: 'EUR'
+          flight_route: {
+            id: `${data.departureAirport}-${country.code}`,
+            origin_airport_code: data.departureAirport,
+            destination_airport_code: country.code,
+            estimated_duration_hours: Math.floor(country.averageFlightTime),
+            estimated_duration_minutes: Math.round((country.averageFlightTime % 1) * 60),
+            total_duration_minutes: country.averageFlightTime * 60,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           },
-          timezone: 'Europe/London',
-          language: ['English'],
-          currency: 'EUR',
-          visa_required: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        flight_route: {
-          id: `${data.departureAirport}-${country.code}`,
-          origin_airport_code: data.departureAirport,
-          destination_airport_code: country.code,
-          estimated_duration_hours: Math.floor(country.averageFlightTime),
-          estimated_duration_minutes: Math.round((country.averageFlightTime % 1) * 60),
-          total_duration_minutes: country.averageFlightTime * 60,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        match_score: 85,
-        activity_matches: [data.selectedTheme] as any,
-        reason_for_recommendation: `Perfect for ${data.selectedTheme} activities`,
-        estimated_flight_price: country.priceRange
-      }))
-      
-      // Update store with mock results to maintain consistent state
-      setResults(mockResults)
-      setShowResults(true)
-      console.log(`Mock fallback successful: ${mockResults.length} destinations loaded`)
-      
-      // Navigate to results step
-      navigateToStep('results')
+          match_score: 85,
+          activity_matches: [data.selectedTheme] as any,
+          reason_for_recommendation: `Perfect for ${data.selectedTheme} activities`,
+          estimated_flight_price: country.priceRange
+        }))
+        
+        // Update store with mock results to maintain consistent state
+        setResults(mockResults)
+        setShowResults(true)
+        console.log(`Mock fallback successful: ${mockResults.length} destinations loaded`)
+        
+        // Navigate to results step
+        navigateToStep('results')
+      } else {
+        // Production: Show honest error, no fake data
+        const errorInfo = getErrorMessage(error, 'Destination search')
+        console.error('Production error - no fallback:', errorInfo.userMessage)
+        // Re-throw to let the UI handle the error state
+        throw new Error(errorInfo.userMessage)
+      }
     }
   }
   

@@ -1,6 +1,7 @@
 import { useCallback } from 'react'
 import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
+import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cache'
 // Client will call our server route instead of hitting Amadeus directly
 
 // Theme to activity mapping
@@ -35,6 +36,47 @@ export function useDestinationExplore() {
     setError(null)
 
     try {
+      // Create cache key from search parameters
+      const cacheKey = createDestinationCacheKey({
+        origin: formData.departureAirport,
+        maxFlightTime: formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8,
+        theme: formData.selectedTheme,
+        departureDate: formData.departureDate,
+        viewBy: 'PRICE'
+      })
+
+      // Check cache first
+      const cachedSearch = destinationCache.get<CachedDestinationSearch>(cacheKey)
+      if (cachedSearch) {
+        console.log('🚀 Using cached destination results')
+        
+        // Create response from cached data
+        const cachedResponse: DestinationExploreResponse = {
+          id: `cached-${Date.now()}`,
+          explore_request_id: `cache-req-${Date.now()}`,
+          recommended_destinations: cachedSearch.results,
+          total_results: cachedSearch.results.length,
+          searched_at: cachedSearch.meta.searchTimestamp,
+          processing_time_ms: 0, // Instant from cache
+        }
+
+        // Update store with cached results
+        setResults(cachedResponse.recommended_destinations)
+        addToHistory({
+          formData,
+          resultCount: cachedResponse.recommended_destinations.length,
+          searchDuration: 0 // Instant from cache
+        })
+        
+        // Track preferences
+        addRecentAirport(formData.departureAirport)
+        addPreferredTheme(formData.selectedTheme)
+        
+        setLoading(false)
+        return cachedResponse
+      }
+
+      console.log('🔍 No cache hit, fetching fresh destination data')
       // Extract flight time range from form data
       const minFlightTime = formData.flightTimeRange?.[0] ?? formData.minFlightTime ?? 0.5
       const maxFlightTime = formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8
@@ -86,17 +128,50 @@ export function useDestinationExplore() {
         console.log(`✅ AMADEUS API SUCCESSFUL (server): Found ${amadeusResults.length} destinations`)
       } catch (amadeusError) {
         console.error('❌ AMADEUS API FAILED:', amadeusError)
-        console.warn('🔄 Falling back to backend API (localhost:8081)...')
-        try {
-          response = await apiClient.exploreDestinations(request)
-          console.log('✅ Backend API successful')
-        } catch (backendError) {
-          console.error('❌ Backend API also failed:', backendError)
-          throw backendError  // This will trigger the existing fallback in LandingPageForm
+        
+        // Only attempt backend fallback if the Amadeus error doesn't indicate a fallback should be used
+        const errorMessage = amadeusError instanceof Error ? amadeusError.message : String(amadeusError)
+        const shouldTryBackend = process.env.NODE_ENV === 'development' && 
+          process.env.NEXT_PUBLIC_API_BASE_URL && 
+          !errorMessage?.includes('fallback')
+        
+        if (shouldTryBackend) {
+          console.warn('🔄 Falling back to backend API (localhost:8081)...')
+          try {
+            response = await apiClient.exploreDestinations(request)
+            console.log('✅ Backend API successful')
+          } catch (backendError) {
+            console.error('❌ Backend API also failed:', backendError)
+            const backendErrorMessage = backendError instanceof Error ? backendError.message : String(backendError)
+            throw new Error('Destination exploration failed: ' + (backendErrorMessage || 'Network Error'))
+          }
+        } else {
+          console.log('🔄 No backend fallback available, throwing original error')
+          throw new Error('Destination exploration failed: ' + (errorMessage || 'Service unavailable'))
         }
       }
       
       const searchDuration = Date.now() - startTime
+
+      // Cache the successful response (24 hour TTL to match Amadeus cache refresh)
+      const cacheData: CachedDestinationSearch = {
+        results: response.recommended_destinations,
+        searchParams: {
+          origin: formData.departureAirport,
+          maxFlightTime,
+          theme: formData.selectedTheme,
+          departureDate: formData.departureDate,
+          viewBy: 'PRICE'
+        },
+        meta: {
+          searchTimestamp: response.searched_at,
+          totalResults: response.total_results,
+          dataSource: 'amadeus-api'
+        }
+      }
+      
+      destinationCache.set(cacheKey, cacheData, 24) // 24 hour TTL
+      console.log('💾 Cached destination search results for future requests')
 
       // Update store with results
       setResults(response.recommended_destinations)
@@ -112,6 +187,7 @@ export function useDestinationExplore() {
       addRecentAirport(formData.departureAirport)
       addPreferredTheme(formData.selectedTheme)
 
+      setLoading(false)
       return response
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to explore destinations'

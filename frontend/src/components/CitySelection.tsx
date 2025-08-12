@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, MapPin, Plane, Users, Star, Map } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { DestinationRecommendation } from '@/services/apiClient'
+import { themeDestinationService } from '@/services/themeDestinationService'
+import { EnhancedDestinationRecommendation } from '@/types/destinations'
 
 interface CityOption {
   id: string
@@ -11,15 +13,26 @@ interface CityOption {
   airport_code: string
   population: number
   flight_frequency: number // flights per week
-  primary_theme: 'adventure' | 'culture' | 'food' | 'nightlife' | 'nature' | 'shopping'
+  primary_theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
   secondary_themes: Array<{
-    theme: 'adventure' | 'culture' | 'food' | 'nightlife' | 'nature' | 'shopping'
-    strength: number // 0.1-0.8
+    theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+    strength: number // 0.1-1.0
   }>
   is_hidden_gem: boolean
   estimated_price: string
   flight_duration: number // in hours
   description: string
+  themeScores?: {
+    party: number
+    adventure: number
+    learn: number
+    shopping: number
+    beach: number
+  }
+  highlights?: string[]
+  bestMonths?: string[]
+  countryName: string
+  countryCode: string
 }
 
 interface CitySelectionProps {
@@ -46,24 +59,30 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
 
   const getThemeColor = (theme: string) => {
     switch (theme) {
-      case 'adventure': return 'text-orange-400'
-      case 'culture': return 'text-blue-400'
-      case 'food': return 'text-green-400'
+      case 'party':
       case 'nightlife': return 'text-purple-400'
-      case 'nature': return 'text-emerald-400'
+      case 'adventure': return 'text-orange-400'
+      case 'learn':
+      case 'culture': return 'text-blue-400'
       case 'shopping': return 'text-pink-400'
+      case 'beach': return 'text-cyan-400'
+      case 'food': return 'text-green-400'
+      case 'nature': return 'text-emerald-400'
       default: return 'text-yellow-400'
     }
   }
 
   const getThemeIcon = (theme: string) => {
     switch (theme) {
-      case 'adventure': return '🏔️'
-      case 'culture': return '🏛️'
-      case 'food': return '🍽️'
+      case 'party':
       case 'nightlife': return '🌃'
-      case 'nature': return '🌿'
+      case 'adventure': return '🏔️'
+      case 'learn':
+      case 'culture': return '🏛️'
       case 'shopping': return '🛍️'
+      case 'beach': return '🏖️'
+      case 'food': return '🍽️'
+      case 'nature': return '🌿'
       default: return '✈️'
     }
   }
@@ -288,21 +307,131 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
     let active = true
     setLoading(true)
     setError(null)
-    fetch('/api/amadeus/cities', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ countryName: country.name, origin: originAirport })
-    })
-      .then(res => res.json())
-      .then(json => {
-        if (!active) return
-        if (!json.ok) throw new Error(json.error || 'Failed to load cities')
-        setCities(json.data as CityOption[])
-      })
-      .catch((e) => { if (active) setError(e.message) })
-      .finally(() => { if (active) setLoading(false) })
+    
+    const loadCityData = async () => {
+      try {
+        console.log(`🏙️ Loading cities for ${country.name} with theme ${selectedTheme}`)
+        
+        // Try enhanced backend service first
+        const isBackendHealthy = await themeDestinationService.healthCheck()
+        
+        if (isBackendHealthy && selectedTheme) {
+          // Use backend theme destination service
+          const destinations = await themeDestinationService.getDestinationsByCountryAndTheme(
+            getCountryCode(country.name), 
+            selectedTheme, 
+            originAirport
+          )
+          
+          if (!active) return
+          
+          // Transform backend destinations to CityOption format
+          const transformedCities: CityOption[] = destinations.map((dest: EnhancedDestinationRecommendation) => ({
+            id: dest.destination.id,
+            name: dest.destination.city_name,
+            airport_code: dest.destination.airport_code,
+            population: 1000000, // Default population
+            flight_frequency: Math.round(dest.averageFlightTime ? 50 / dest.averageFlightTime : 7),
+            primary_theme: getPrimaryTheme(dest.themeScores || {}, selectedTheme),
+            secondary_themes: getSecondaryThemes(dest.themeScores || {}),
+            is_hidden_gem: (dest.destination.popularity_score || 0) < 70,
+            estimated_price: dest.estimated_flight_price || '€200-400',
+            flight_duration: dest.averageFlightTime || 2,
+            description: dest.destination.description,
+            themeScores: dest.themeScores,
+            highlights: dest.highlights,
+            bestMonths: dest.bestMonths,
+            countryName: dest.destination.country_name,
+            countryCode: dest.destination.country_code
+          }))
+          
+          setCities(transformedCities)
+        } else {
+          // Fallback to legacy API
+          const response = await fetch('/api/amadeus/cities', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ countryName: country.name, origin: originAirport })
+          })
+          
+          if (!active) return
+          
+          const json = await response.json()
+          if (!json.ok) throw new Error(json.error || 'Failed to load cities')
+          setCities(json.data as CityOption[])
+        }
+      } catch (e: any) {
+        if (active) {
+          console.error('City loading failed:', e)
+          setError(e.message)
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    
+    loadCityData()
     return () => { active = false }
-  }, [country?.name, originAirport])
+  }, [country?.name, originAirport, selectedTheme])
+  
+  // Helper function to get country code from name (basic mapping)
+  const getCountryCode = (countryName: string): string => {
+    const countryMap: Record<string, string> = {
+      'Spain': 'ES',
+      'France': 'FR', 
+      'Italy': 'IT',
+      'Germany': 'DE',
+      'United Kingdom': 'GB',
+      'Portugal': 'PT',
+      'Netherlands': 'NL',
+      'Greece': 'GR',
+      'Czech Republic': 'CZ',
+      'Austria': 'AT',
+      'Poland': 'PL',
+      'Hungary': 'HU',
+      'Croatia': 'HR',
+      'Switzerland': 'CH',
+      'Belgium': 'BE'
+    }
+    return countryMap[countryName] || countryName.slice(0, 2).toUpperCase()
+  }
+  
+  // Helper to determine primary theme from scores
+  const getPrimaryTheme = (scores: any, selectedTheme: string): 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature' => {
+    const validThemes: Array<'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'> = 
+      ['party', 'adventure', 'learn', 'shopping', 'beach', 'culture', 'food', 'nightlife', 'nature']
+    
+    if (scores && Object.keys(scores).length > 0) {
+      const maxScore = Math.max(...Object.values(scores) as number[])
+      const primary = Object.keys(scores).find(key => scores[key] === maxScore)
+      if (primary && validThemes.includes(primary as any)) {
+        return primary as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+      }
+    }
+    
+    const defaultTheme = selectedTheme && validThemes.includes(selectedTheme as any) 
+      ? selectedTheme as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+      : 'adventure'
+    
+    return defaultTheme
+  }
+  
+  // Helper to get secondary themes from scores
+  const getSecondaryThemes = (scores: any): Array<{theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature', strength: number}> => {
+    if (!scores) return []
+    
+    const validThemes: Array<'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'> = 
+      ['party', 'adventure', 'learn', 'shopping', 'beach', 'culture', 'food', 'nightlife', 'nature']
+    
+    return Object.entries(scores)
+      .map(([theme, score]) => ({ 
+        theme: theme as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature', 
+        strength: (score as number) / 100 
+      }))
+      .filter(({theme, strength}) => validThemes.includes(theme) && strength >= 0.3)
+      .sort((a, b) => b.strength - a.strength)
+      .slice(1, 4) // Skip primary, take next 3
+  }
 
   // Sort cities by importance: population + flight frequency, with hidden gems getting slight boost
   const sortedCities = [...cities].sort((a, b) => {
@@ -402,44 +531,75 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
       {/* Responsive City Grid */}
       <main className="relative z-10 flex-1 px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto">
-          {/* Major Cities Section */}
-          <div className="mb-8 sm:mb-12">
-            <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mb-4 sm:mb-6 text-center">
-              Premier Destinations
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
-              {sortedCities.slice(0, 3).map((city) => (
-                <CityCard
-                  key={city.id}
-                  city={city}
-                  selectedTheme={selectedTheme}
-                  onClick={() => onCitySelect(city)}
-                />
-              ))}
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="animate-spin w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <p className="text-white/80">Loading curated destinations...</p>
+                <p className="text-white/50 text-sm mt-2">Finding the perfect cities for {selectedTheme} activities</p>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Hidden Gems Section */}
-          {sortedCities.length > 3 && (
-            <div className="relative">
-              <div className="flex items-center mb-4 sm:mb-6">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent to-white/20"></div>
-                <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mx-4 sm:mx-6">
-                  Hidden Gems
-                </h2>
-                <div className="flex-1 h-px bg-gradient-to-l from-transparent to-white/20"></div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
-                {sortedCities.slice(3).map((city) => (
-                  <CityCard
-                    key={city.id}
-                    city={city}
-                    selectedTheme={selectedTheme}
-                    onClick={() => onCitySelect(city)}
-                  />
-                ))}
-              </div>
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-20">
+              <div className="text-red-400 mb-4">⚠️</div>
+              <h3 className="text-white font-semibold mb-2">Unable to load destinations</h3>
+              <p className="text-white/60 text-sm mb-6">{error}</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-6 py-2 bg-yellow-400 text-black rounded-lg hover:bg-yellow-300 transition-colors"
+              >
+                Try Again
+              </button>
             </div>
+          )}
+
+          {/* Cities Content */}
+          {!loading && !error && (
+            <>
+              {/* Major Cities Section */}
+              <div className="mb-8 sm:mb-12">
+                <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mb-4 sm:mb-6 text-center">
+                  Premier Destinations
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
+                  {sortedCities.slice(0, 3).map((city) => (
+                    <CityCard
+                      key={city.id}
+                      city={city}
+                      selectedTheme={selectedTheme}
+                      onClick={() => onCitySelect(city)}
+                    />
+                  ))}
+                </div>
+              </div>
+              
+              {/* Hidden Gems Section */}
+              {sortedCities.length > 3 && (
+                <div className="relative">
+                  <div className="flex items-center mb-4 sm:mb-6">
+                    <div className="flex-1 h-px bg-gradient-to-r from-transparent to-white/20"></div>
+                    <h2 className="text-white/60 text-xs sm:text-sm font-light tracking-widest uppercase mx-4 sm:mx-6">
+                      Hidden Gems
+                    </h2>
+                    <div className="flex-1 h-px bg-gradient-to-l from-transparent to-white/20"></div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 justify-items-center">
+                    {sortedCities.slice(3).map((city) => (
+                      <CityCard
+                        key={city.id}
+                        city={city}
+                        selectedTheme={selectedTheme}
+                        onClick={() => onCitySelect(city)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Luxury Discovery Footer */}

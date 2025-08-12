@@ -1,3 +1,5 @@
+import { enableMockFallbacks, getErrorMessage } from '@/lib/environment'
+
 interface YouTubeVideo {
   id: string
   title: string
@@ -38,8 +40,11 @@ class YouTubeService {
     maxResults = 5
   }: YouTubeSearchParams): Promise<YouTubeVideo[]> {
     if (!this.apiKey) {
-      console.warn('YouTube API key not configured, returning mock data')
-      return this.getMockVideos(destination, activity)
+      if (enableMockFallbacks) {
+        console.warn('YouTube API key not configured, returning mock data')
+        return this.getMockVideos(destination, activity)
+      }
+      throw new Error('Video search service is unavailable')
     }
 
     try {
@@ -63,8 +68,11 @@ class YouTubeService {
         .slice(0, maxResults)
     } catch (error) {
       console.error('Error fetching YouTube videos:', error)
-      // Fallback to mock data on error
-      return this.getMockVideos(destination, activity)
+      if (enableMockFallbacks) {
+        // Fallback to mock data on error
+        return this.getMockVideos(destination, activity)
+      }
+      throw getErrorMessage(error, 'Video search').message
     }
   }
 

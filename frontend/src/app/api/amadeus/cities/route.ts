@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusService } from '@/services/amadeusService'
+import { amadeusClient } from '@/lib/amadeus-simple'
 
 export const runtime = 'nodejs'
 
@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
 
     // Find cities in the country
     const keyword = countryName || countryCode
-    const locations = await amadeusService.searchLocations(keyword, 'CITY' as any)
+    const locations = await amadeusClient.searchLocations(keyword, 'CITY')
 
     const filtered = (locations || [])
       .filter((loc: any) => {
-        if (countryCode) return loc.address?.countryCode === countryCode
-        if (countryName) return (loc.address?.countryName || '').toLowerCase().includes(countryName.toLowerCase())
-        return true
+        // Note: amadeus-simple.ts AmadeusDestination doesn't have address property
+        // Filtering by keyword match should be sufficient for city search
+        return loc.name && loc.iataCode
       })
       .slice(0, 6)
 
@@ -42,13 +42,13 @@ export async function POST(req: NextRequest) {
       let flight_duration = undefined as number | undefined
       const destCode = city.iataCode
       try {
-        const offers = await amadeusService.searchFlights({
+        const offers = await amadeusClient.searchFlights({
           origin,
           destination: destCode,
           departureDate: departureDate || new Date().toISOString().slice(0, 10),
           adults: 1,
           max: 1,
-        } as any)
+        })
         const offer = (offers || [])[0]
         if (offer) {
           const total = offer?.price?.total
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
       results.push({
         id: city.id || city.iataCode,
-        name: city.name || city.address?.cityName,
+        name: city.name || city.address?.cityName || city.iataCode,
         airport_code: city.iataCode,
         population: 0,
         flight_frequency: 0,
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         is_hidden_gem: false,
         estimated_price: estimated_price || '',
         flight_duration: flight_duration || 0,
-        description: `Explore ${city.name || city.address?.cityName}`,
+        description: `Explore ${city.name || city.address?.cityName || city.iataCode}`,
       })
     }
 

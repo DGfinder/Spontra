@@ -239,7 +239,7 @@ export function ValidatedAirportSearch({
               {preferences.recentAirports
                 .slice(0, 5)
                 .map((airportCode) => AIRPORTS.find(a => a.code === airportCode))
-                .filter((airport) => airport !== undefined)
+                .filter((airport): airport is NonNullable<typeof airport> => airport !== undefined)
                 .map((airport) => {
                 
                 return (
