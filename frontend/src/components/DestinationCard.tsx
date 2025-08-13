@@ -1,4 +1,5 @@
 import { DestinationRecommendation } from '@/services/apiClient'
+import { CountryMapBadge } from './CountryMapBadge'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
 
 interface DestinationCardProps {
@@ -106,7 +107,8 @@ export function DestinationCard({
           <span className="text-3xl" role="img" aria-label={`${destination.country_name} flag`}>
             {flagEmoji}
           </span>
-          <div>
+          <div className="flex items-center gap-2">
+            <CountryMapBadge isoCode={destination.country_code} size={56} />
             <h3 className="text-xl font-bold text-white">{destination.country_name}</h3>
             <p className="text-white/60 text-sm">{destination.description}</p>
           </div>
