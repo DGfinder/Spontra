@@ -150,7 +150,8 @@ export function ValidatedAirportSearch({
       if (mapped) {
         const airport = AIRPORTS.find((a) => a.code === mapped.code)
         if (airport) {
-          setSuggestions([{ ...airport }])
+          const suggestion: Suggestion = { ...airport, type: 'AIRPORT' }
+          setSuggestions([suggestion])
           setShowSuggestions(true)
           return
         }
