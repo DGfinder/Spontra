@@ -113,7 +113,7 @@ export function SearchForm({
 
       <form onSubmit={handleSubmit(handleFormSubmit)} className="row-start-2 row-end-3 grid grid-rows-[1fr_auto] h-full" role="search" aria-label="Travel search form">
         {/* Form Content (scrolls if needed) */}
-        <div className="row-start-1 row-end-2 flex flex-col gap-2 overflow-y-auto no-scrollbar pr-1">
+        <div className="row-start-1 row-end-2 flex flex-col gap-2 overflow-y-auto no-scrollbar pr-1 pb-4">
           {/* Theme Selection */}
           <VerticalThemeSelector
             themes={themes}
@@ -364,7 +364,7 @@ export function SearchForm({
             className="w-full text-white font-bold rounded transition-all duration-200 shadow-lg flex items-center justify-center font-muli"
             style={{
               backgroundColor: formValues.selectedTheme ? getThemeColor(formValues.selectedTheme as any) : '#f97316',
-              height: '44px',
+              height: '48px',
               fontSize: '18px'
             }}
             onMouseEnter={(e) => {

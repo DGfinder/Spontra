@@ -13,6 +13,7 @@ import { BreadcrumbNavigation } from './BreadcrumbNavigation'
 import { useDestinationExplore } from '@/hooks/useDestinationExplore'
 import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
+import { getThemeColor, getThemeGradient, type ThemeKey } from '@/lib/theme'
 
 interface FormData {
   selectedTheme: string
@@ -69,6 +70,35 @@ const THEMES = [
     color: 'learn'
   }
 ]
+
+
+const BLURBS: Record<ThemeKey, { title: string; description: string }> = {
+  adventure: {
+    title: 'Thrilling Adventures Await',
+    description:
+      'From mountain treks to hidden canyons, uncover destinations packed with adrenaline and breathtaking views. Find trips that match your sense of adventure.'
+  },
+  nature: {
+    title: 'Reconnect With Nature',
+    description:
+      'Seek out serene forests, coastal escapes, and national parks. We’ll help you find peaceful places immersed in greenery and fresh air.'
+  },
+  shopping: {
+    title: 'Shop Iconic Districts',
+    description:
+      'Fashion capitals and local markets—discover destinations where browsing, bargains, and boutiques take center stage.'
+  },
+  party: {
+    title: 'Turn Up The Nightlife',
+    description:
+      'Find cities with buzzing bars, dance floors, and festivals. Plan a getaway where the nights are as unforgettable as the days.'
+  },
+  learn: {
+    title: 'Learn Through Travel',
+    description:
+      'Museums, history, and culture-rich neighborhoods. Explore places that inspire curiosity and expand your perspective.'
+  }
+}
 
 
 const MOCK_COUNTRIES: CountryResult[] = [
@@ -375,7 +405,7 @@ export function LandingPageForm() {
 
       {/* Layout - show search panel only on the initial Search step */}
       {navigation.currentStep === 'search' && (
-      <div className="absolute inset-0 z-20 grid grid-cols-1 lg:grid-cols-[420px_1fr] items-center pt-24 sm:pt-28 md:pt-32">
+      <div className="absolute inset-0 z-20 grid grid-cols-1 lg:grid-cols-[420px_1fr] items-start pt-20 sm:pt-24 md:pt-28">
         {/* Form Panel with Overlay - Responsive */}
         <div 
           className="relative p-4 md:p-5 w-full h-[calc(100vh-8rem)] lg:h-[calc(100vh-10rem)] flex"
@@ -388,7 +418,7 @@ export function LandingPageForm() {
             className="absolute inset-0 z-0 rounded-lg"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
           />
-          <div className="relative z-10 flex flex-col justify-center w-full no-scrollbar overflow-hidden">
+          <div className="relative z-10 flex flex-col justify-start w-full no-scrollbar overflow-hidden pt-1 pb-6 md:pb-8">
             <SearchForm
               themes={THEMES}
               onSubmit={handleSubmit}
@@ -403,17 +433,21 @@ export function LandingPageForm() {
           style={{ position: 'relative' }}
         >
           <div
-            className="absolute md:right-6 lg:right-10 xl:right-14 top-20 md:top-24 lg:top-32 w-[min(560px,44vw)] bg-black/55 backdrop-blur-sm border border-white/10 rounded-xl p-5 md:p-6 lg:p-7 shadow-2xl"
+            className="absolute md:right-6 lg:right-10 xl:right-14 top-16 md:top-20 lg:top-28 w-[min(560px,44vw)] bg-black/55 backdrop-blur-sm border border-white/10 rounded-xl p-5 md:p-6 lg:p-7 shadow-2xl"
           >
             <div className="text-white font-muli">
               <div className="flex items-center gap-3 mb-3">
-                <span className="inline-block h-1.5 w-8 rounded bg-orange-400" aria-hidden="true"></span>
+                <span
+                  className="inline-block h-1.5 w-8 rounded"
+                  aria-hidden="true"
+                  style={{ background: getThemeGradient(formData.selectedTheme as ThemeKey) }}
+                ></span>
                 <h3 className="font-extrabold tracking-tight text-xl md:text-2xl">
-                  Discover Amazing Destinations
+                  {BLURBS[formData.selectedTheme as ThemeKey]?.title || 'Discover Amazing Destinations'}
                 </h3>
               </div>
               <p className="opacity-90 text-sm md:text-base leading-relaxed">
-                Find your perfect getaway based on your interests and travel style. From adventure-packed destinations to cultural experiences, we’ll help you discover places that match your mood.
+                {BLURBS[formData.selectedTheme as ThemeKey]?.description || 'Find your perfect getaway based on your interests and travel style. From adventure-packed destinations to cultural experiences, we’ll help you discover places that match your mood.'}
               </p>
             </div>
           </div>

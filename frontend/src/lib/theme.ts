@@ -97,3 +97,25 @@ export const getThemeColor = (theme: ThemeKey): string => {
 export const getThemeHoverColor = (theme: ThemeKey): string => {
   return THEME_COLORS[theme]?.hover || THEME_COLORS.adventure.hover
 }
+
+export const getThemeGradient = (theme: ThemeKey): string => {
+  const primary = getThemeColor(theme)
+  const hover = getThemeHoverColor(theme)
+  return `linear-gradient(90deg, ${primary} 0%, ${hover} 100%)`
+}
+
+const toRgba = (rgb: string, alpha: number): string => {
+  try {
+    return rgb.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`)
+  } catch {
+    return rgb
+  }
+}
+
+export const getThemeColorAlpha = (theme: ThemeKey, alpha: number): string => {
+  return toRgba(getThemeColor(theme), alpha)
+}
+
+export const getThemeHoverColorAlpha = (theme: ThemeKey, alpha: number): string => {
+  return toRgba(getThemeHoverColor(theme), alpha)
+}

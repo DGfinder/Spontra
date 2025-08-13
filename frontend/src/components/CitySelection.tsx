@@ -6,6 +6,7 @@ import { ExplorationProgress } from './ExplorationProgress'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { themeDestinationService } from '@/services/themeDestinationService'
 import { EnhancedDestinationRecommendation } from '@/types/destinations'
+import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 
 interface CityOption {
   id: string
@@ -447,7 +448,6 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
       case 'shopping': return 'from-pink-900 via-rose-900 to-slate-900'
       case 'party': return 'from-purple-900 via-pink-900 to-slate-900'
       case 'learn': return 'from-blue-900 via-indigo-900 to-slate-900'
-      // Legacy theme mappings for backward compatibility
       case 'nightlife': return 'from-purple-900 via-pink-900 to-slate-900'
       case 'culture': return 'from-blue-900 via-indigo-900 to-slate-900'
       case 'food': return 'from-green-900 via-emerald-900 to-slate-900'
@@ -474,7 +474,8 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
         <div className="flex items-center justify-between max-w-8xl mx-auto">
           <button 
             onClick={onBack}
-            className="flex items-center space-x-2 sm:space-x-3 text-white/70 hover:text-white transition-all duration-300 group px-2 sm:px-4 py-2 rounded-xl hover:bg-white/10 min-h-[44px]"
+            className="flex items-center space-x-2 sm:space-x-3 text-white transition-all duration-300 group px-2 sm:px-4 py-2 rounded-xl min-h-[44px]"
+            style={{ backgroundColor: `${getThemeColor((selectedTheme || 'adventure') as ThemeKey)}1A` }}
           >
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform duration-300" />
             <span className="font-light tracking-wide text-sm sm:text-base">Back to Results</span>
@@ -503,7 +504,12 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
           <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Map button - hidden on small screens */}
             <button 
-              className="hidden lg:flex items-center space-x-2 text-white/60 hover:text-white/80 transition-all duration-300 px-4 py-2 rounded-xl hover:bg-white/10 border border-white/20 hover:border-white/30"
+              className="hidden lg:flex items-center space-x-2 transition-all duration-300 px-4 py-2 rounded-xl border"
+              style={{
+                borderColor: `${getThemeColor((selectedTheme || 'adventure') as ThemeKey)}33`,
+                backgroundColor: `${getThemeColor((selectedTheme || 'adventure') as ThemeKey)}14`,
+                color: 'white'
+              }}
               onClick={() => {
                 console.log('Map discovery mode coming soon...')
               }}

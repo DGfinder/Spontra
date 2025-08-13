@@ -2,6 +2,8 @@
 
 import { ChevronRight, Home, Search, Map, Building, Activity, Plane, CheckCircle } from 'lucide-react'
 import { useNavigationState, useNavigationActions } from '@/store/searchStore'
+import { useFormData } from '@/store/searchStore'
+import { getThemeColor, type ThemeKey } from '@/lib/theme'
 
 interface BreadcrumbItem {
   step: string
@@ -19,6 +21,7 @@ interface BreadcrumbNavigationProps {
 export function BreadcrumbNavigation({ className = '' }: BreadcrumbNavigationProps) {
   const navigation = useNavigationState()
   const { navigateToStep } = useNavigationActions()
+  const formData = useFormData()
 
   // Define the navigation steps in order
   const steps = [
@@ -80,11 +83,12 @@ export function BreadcrumbNavigation({ className = '' }: BreadcrumbNavigationPro
                 disabled={!item.onClick}
                 className={`flex items-center space-x-2 px-2 py-1 rounded-md transition-all duration-200 min-w-0 ${
                   item.isActive
-                    ? 'text-yellow-400 bg-yellow-400/10 border border-yellow-400/20'
+                    ? 'border'
                     : item.isCompleted
-                    ? 'text-white/80 hover:text-white hover:bg-white/10'
+                    ? ''
                     : 'text-white/40 cursor-not-allowed'
                 }`}
+                style={item.isActive ? { color: getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey), backgroundColor: `${getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey)}1A`, borderColor: `${getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey)}33` } : item.isCompleted ? { color: 'white' } : undefined}
                 aria-current={item.isActive ? 'page' : undefined}
               >
                 <div className={`flex-shrink-0 ${item.isCompleted ? 'text-green-400' : ''}`}>
@@ -98,11 +102,12 @@ export function BreadcrumbNavigation({ className = '' }: BreadcrumbNavigationPro
           ))}
 
           {/* Current Step Indicator for Mobile */}
-          <div className="sm:hidden ml-auto flex items-center space-x-2 bg-yellow-400/10 border border-yellow-400/20 rounded-md px-2 py-1">
-            <div className="text-yellow-400">
+          <div className="sm:hidden ml-auto flex items-center space-x-2 rounded-md px-2 py-1"
+            style={{ backgroundColor: `${getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey)}1A`, border: `1px solid ${getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey)}33` }}>
+            <div style={{ color: getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey) }}>
               {breadcrumbItems[currentStepIndex]?.icon}
             </div>
-            <span className="text-yellow-400 text-sm font-medium">
+            <span className="text-sm font-medium" style={{ color: getThemeColor((formData.selectedTheme || 'adventure') as ThemeKey) }}>
               {breadcrumbItems[currentStepIndex]?.label}
             </span>
           </div>

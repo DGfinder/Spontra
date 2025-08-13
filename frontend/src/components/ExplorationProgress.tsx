@@ -8,7 +8,12 @@ interface ExplorationProgressProps {
   }
 }
 
+import { useFormData } from '@/store/searchStore'
+import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
+
 export function ExplorationProgress({ currentStep, destination }: ExplorationProgressProps) {
+  const formData = useFormData()
+  const theme = (formData.selectedTheme || 'adventure') as ThemeKey
   const steps = [
     { id: 'search', label: 'Explore', icon: '🔍' },
     { id: 'countries', label: 'Countries', icon: '🌍' },
@@ -28,17 +33,24 @@ export function ExplorationProgress({ currentStep, destination }: ExplorationPro
             key={step.id}
             className={`flex items-center space-x-2 transition-all duration-300 ${
               index <= currentStepIndex 
-                ? 'text-yellow-400' 
+                ? '' 
                 : 'text-white/40'
             }`}
+            style={index <= currentStepIndex ? { color: getThemeColor(theme) } : undefined}
           >
             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all duration-300 ${
               index === currentStepIndex 
-                ? 'bg-yellow-400 text-black' 
+                ? 'text-black' 
                 : index < currentStepIndex
-                ? 'bg-yellow-400/30 text-yellow-400'
+                ? ''
                 : 'bg-white/10 text-white/40'
-            }`}>
+            }`}
+            style={index === currentStepIndex
+              ? { background: `linear-gradient(90deg, ${getThemeColor(theme)}, ${getThemeHoverColor(theme)})` }
+              : index < currentStepIndex
+              ? { backgroundColor: `${getThemeColor(theme)}33`, color: getThemeColor(theme) }
+              : undefined}
+            >
               {index < currentStepIndex ? '✓' : step.icon}
             </div>
             
@@ -48,8 +60,9 @@ export function ExplorationProgress({ currentStep, destination }: ExplorationPro
             
             {index < steps.length - 1 && (
               <div className={`w-8 h-px transition-all duration-300 ${
-                index < currentStepIndex ? 'bg-yellow-400' : 'bg-white/20'
-              }`} />
+                index < currentStepIndex ? '' : 'bg-white/20'
+              }`} 
+                style={index < currentStepIndex ? { backgroundColor: getThemeColor(theme) } : undefined} />
             )}
           </div>
         ))}
@@ -60,7 +73,7 @@ export function ExplorationProgress({ currentStep, destination }: ExplorationPro
               {currentStep === 'cities' ? 'Discovering' : 
                currentStep === 'activities' ? 'Exploring' : 'Flying to'}
             </div>
-            <div className="text-yellow-400 font-medium">
+            <div className="font-medium" style={{ color: getThemeColor(theme) }}>
               {currentStep === 'cities' ? destination.country_name : destination.city_name}
             </div>
           </div>

@@ -7,6 +7,7 @@ import { ErrorState } from './ErrorState'
 import { getErrorMessage } from '@/lib/environment'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { useFormData } from '@/store/searchStore'
+import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 
 interface FlightOption {
   id: string
@@ -270,14 +271,16 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <button 
             onClick={onBack}
-            className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors group"
+            className="flex items-center space-x-2 text-white group px-3 py-2 rounded-lg"
+            style={{ backgroundColor: `${getThemeColor((selectedActivity || 'adventure') as ThemeKey)}1A` }}
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             <span>Back to Activities</span>
           </button>
           
           <div className="text-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent"
+              style={{ backgroundImage: `linear-gradient(90deg, ${getThemeColor((selectedActivity || 'adventure') as ThemeKey)}, ${getThemeHoverColor((selectedActivity || 'adventure') as ThemeKey)})` }}>
               CHOOSE YOUR FLIGHT
             </h1>
             <p className="text-white/60 text-sm mt-2">
@@ -288,7 +291,7 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
           
           <div className="text-right">
             <div className="text-white/80 text-sm">Flight Duration</div>
-            <div className="text-yellow-400 font-semibold">
+            <div className="font-semibold" style={{ color: getThemeColor((selectedActivity || 'adventure') as ThemeKey) }}>
               ~{Math.round(recommendation.flight_route.total_duration_minutes / 60 * 10) / 10}h
             </div>
           </div>

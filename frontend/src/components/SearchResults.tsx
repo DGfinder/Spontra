@@ -9,6 +9,7 @@ import { CacheIndicator } from './CacheIndicator'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
 import { useFormData, useSearchStore } from '@/store/searchStore'
 import { CountryConstellation } from './CountryConstellation'
+import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 
 interface SearchResultsProps {
   results: DestinationRecommendation[]
@@ -72,21 +73,41 @@ export function SearchResults({
             <div className="flex items-center flex-wrap gap-2 mt-2">
                <span className="text-xs text-white/60">{viewMode === 'countries' ? 'Grouped by country' : 'Sorted by price'}:</span>
                {viewMode === 'countries' ? (
-                 <span className="text-xs bg-blue-500/20 text-blue-200 px-2 py-1 rounded">Cheapest city per country</span>
+                 <span
+                   className="text-xs px-2 py-1 rounded"
+                   style={{
+                     backgroundColor: `${getThemeColor(selectedTheme as ThemeKey)}33`,
+                     color: getThemeColor(selectedTheme as ThemeKey)
+                   }}
+                 >
+                   Cheapest city per country
+                 </span>
                ) : (
-                 <span className="text-xs bg-orange-500/20 text-orange-200 px-2 py-1 rounded">Best deals first 💰</span>
+                 <span
+                   className="text-xs px-2 py-1 rounded"
+                   style={{
+                     backgroundColor: `${getThemeHoverColor(selectedTheme as ThemeKey)}33`,
+                     color: getThemeHoverColor(selectedTheme as ThemeKey)
+                   }}
+                 >
+                   Best deals first 💰
+                 </span>
                )}
               <CacheIndicator className="ml-1" />
               
               {/* View Mode Toggle */}
-              <div className="flex items-center ml-2 bg-white/10 rounded-full p-1">
+               <div className="flex items-center ml-2 rounded-full p-1"
+                 style={{ backgroundColor: `${getThemeColor(selectedTheme as ThemeKey)}1A` }}>
                  <button
                   onClick={() => setViewMode('destinations')}
                   className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
                     viewMode === 'destinations'
-                      ? 'bg-blue-500 text-white'
-                      : 'text-white/60 hover:text-white/80'
+                      ? 'text-black'
+                      : 'text-white/70 hover:text-white'
                   }`}
+                  style={{
+                    background: viewMode === 'destinations' ? `linear-gradient(90deg, ${getThemeColor(selectedTheme as ThemeKey)}, ${getThemeHoverColor(selectedTheme as ThemeKey)})` : 'transparent'
+                  }}
                 >
                   <List size={12} />
                   <span>Cities</span>
@@ -95,9 +116,12 @@ export function SearchResults({
                   onClick={() => setViewMode('countries')}
                   className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
                     viewMode === 'countries'
-                      ? 'bg-blue-500 text-white'
-                      : 'text-white/60 hover:text-white/80'
+                      ? 'text-black'
+                      : 'text-white/70 hover:text-white'
                   }`}
+                  style={{
+                    background: viewMode === 'countries' ? `linear-gradient(90deg, ${getThemeColor(selectedTheme as ThemeKey)}, ${getThemeHoverColor(selectedTheme as ThemeKey)})` : 'transparent'
+                  }}
                 >
                   <Globe size={12} />
                   <span>Countries</span>
@@ -106,9 +130,12 @@ export function SearchResults({
                   onClick={() => setViewMode('constellation')}
                   className={`flex items-center space-x-1 px-3 py-1 rounded-full text-xs transition-all ${
                     viewMode === 'constellation'
-                      ? 'bg-blue-500 text-white'
-                      : 'text-white/60 hover:text-white/80'
+                      ? 'text-black'
+                      : 'text-white/70 hover:text-white'
                   }`}
+                  style={{
+                    background: viewMode === 'constellation' ? `linear-gradient(90deg, ${getThemeColor(selectedTheme as ThemeKey)}, ${getThemeHoverColor(selectedTheme as ThemeKey)})` : 'transparent'
+                  }}
                 >
                   <Map size={12} />
                   <span>Map</span>
@@ -127,7 +154,11 @@ export function SearchResults({
 
               {/* Visa-free only (if passport set) */}
               {viewMode === 'countries' && hasPassport && (
-                <label className="ml-2 flex items-center gap-2 text-xs text-emerald-200 bg-emerald-600/20 px-2 py-1 rounded cursor-pointer">
+                <label className="ml-2 flex items-center gap-2 text-xs px-2 py-1 rounded cursor-pointer"
+                  style={{
+                    backgroundColor: `${getThemeColor(selectedTheme as ThemeKey)}1A`,
+                    color: getThemeColor(selectedTheme as ThemeKey)
+                  }}>
                   <input type="checkbox" checked={visaFreeOnly} onChange={(e) => setVisaFreeOnly(e.target.checked)} />
                   Visa-free only
                 </label>
@@ -136,7 +167,8 @@ export function SearchResults({
           </div>
           <button
             onClick={onBackToSearch}
-            className="bg-white/20 hover:bg-white/30 text-white px-3 md:px-4 py-2 rounded-lg transition-colors duration-200 text-sm md:text-base"
+            className="text-white px-3 md:px-4 py-2 rounded-lg transition-colors duration-200 text-sm md:text-base"
+            style={{ backgroundColor: `${getThemeColor(selectedTheme as ThemeKey)}26` }}
             aria-label="Go back to search form"
           >
             ← Back to Search
@@ -154,22 +186,26 @@ export function SearchResults({
           <div className="max-w-6xl mx-auto">
             {/* Country Stats Summary */}
             {countryStats.totalCountries > 0 && (
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 border border-blue-500/30 rounded-lg">
+              <div className="mb-6 p-4 rounded-lg"
+                style={{
+                  background: `linear-gradient(90deg, ${getThemeColor(selectedTheme as ThemeKey)}22, ${getThemeHoverColor(selectedTheme as ThemeKey)}22)`,
+                  border: `1px solid ${getThemeColor(selectedTheme as ThemeKey)}4D`
+                }}>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div>
-                    <div className="text-2xl font-bold text-blue-400">{countryStats.totalCountries}</div>
+                    <div className="text-2xl font-bold" style={{ color: getThemeColor(selectedTheme as ThemeKey) }}>{countryStats.totalCountries}</div>
                     <div className="text-white/60 text-xs">Countries</div>
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-green-400">€{countryStats.averagePrice}</div>
+                    <div className="text-2xl font-bold" style={{ color: getThemeHoverColor(selectedTheme as ThemeKey) }}>€{countryStats.averagePrice}</div>
                     <div className="text-white/60 text-xs">Avg Price</div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-yellow-400">{countryStats.cheapestCountry}</div>
+                    <div className="text-xl font-bold" style={{ color: getThemeColor(selectedTheme as ThemeKey) }}>{countryStats.cheapestCountry}</div>
                     <div className="text-white/60 text-xs">Cheapest</div>
                   </div>
                   <div>
-                    <div className="text-xl font-bold text-purple-400">{countryStats.continents.length}</div>
+                    <div className="text-xl font-bold" style={{ color: getThemeHoverColor(selectedTheme as ThemeKey) }}>{countryStats.continents.length}</div>
                     <div className="text-white/60 text-xs">Continents</div>
                   </div>
                 </div>
