@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Clock, MapPin, Plane, Users, ChevronDown, ChevronUp, TrendingUp, TrendingDown, BarChart3 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import Image from 'next/image'
+import { Clock, MapPin, Plane, ChevronDown, ChevronUp } from 'lucide-react'
 import { CountryAggregation } from '@/lib/countryAggregation'
 import { getThemeColor } from '@/lib/theme'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
@@ -20,6 +21,7 @@ export function CountryCard({
   onSelectDestination 
 }: CountryCardProps) {
   const [showAllDestinations, setShowAllDestinations] = useState(false)
+  const [mapAvailable, setMapAvailable] = useState(true)
   const themeColor = getThemeColor(selectedTheme as any)
   
   // Generate analytics for the cheapest destination (country representative) with error handling
@@ -44,12 +46,62 @@ export function CountryCard({
     return `€${aggregation.priceRange.min} - €${aggregation.priceRange.max}`
   }
 
+  // Collect up to 8 images and show a small carousel
+  const mediaImages = useMemo(() => {
+    const urls = (aggregation.allDestinations || [])
+      .map(d => d?.destination?.image_url)
+      .filter((u): u is string => typeof u === 'string' && u.length > 0)
+      .slice(0, 8)
+    return urls
+  }, [aggregation.allDestinations])
+
+  const [currentImage, setCurrentImage] = useState(0)
+  const goPrev = () => setCurrentImage(i => (mediaImages.length ? (i - 1 + mediaImages.length) % mediaImages.length : 0))
+  const goNext = () => setCurrentImage(i => (mediaImages.length ? (i + 1) % mediaImages.length : 0))
+
+  // Value highlights based on simple heuristics
+  const highlights: Array<{ label: string; color: string }> = useMemo(() => {
+    const list: Array<{ label: string; color: string }> = []
+    if (aggregation.priceRange.min <= Math.max(150, Math.round(aggregation.averagePrice * 0.7))) {
+      list.push({ label: 'Great price', color: 'bg-emerald-500/20 text-emerald-300' })
+    }
+    if (aggregation.averageFlightTime <= 180) {
+      list.push({ label: 'Short flight', color: 'bg-blue-500/20 text-blue-300' })
+    }
+    if (aggregation.country?.visaFree) {
+      list.push({ label: 'Visa-free', color: 'bg-purple-500/20 text-purple-300' })
+    }
+    const rankText = rankingDisplay?.text?.toLowerCase?.() || ''
+    if (rankText.includes('excellent')) list.push({ label: 'Excellent deal', color: 'bg-emerald-600/20 text-emerald-300' })
+    if (countryAnalytics?.priceTrend?.direction === 'down' && (Math.abs(countryAnalytics?.priceTrend?.change || 0) >= 5)) {
+      list.push({ label: 'Prices dropping', color: 'bg-green-500/15 text-green-300' })
+    }
+    const seasonText = countryAnalytics?.seasonalInsight?.recommendation?.toLowerCase?.() || ''
+    if (seasonText.includes('shoulder')) list.push({ label: 'Shoulder season sweet spot', color: 'bg-sky-500/15 text-sky-300' })
+    return list.length ? list : [{ label: 'Well-matched to your filters', color: 'bg-white/10 text-white/70' }]
+  }, [aggregation])
+
   return (
     <div className="bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-black/50 transition-all duration-300 hover:border-white/30">
       {/* Country Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <span className="text-4xl">{aggregation.country.flag}</span>
+          {/* Flag or Map Vector */}
+          <div className="relative w-12 h-12 rounded-full overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center">
+            {mapAvailable ? (
+              // Optional country map vector; gracefully hides on error
+              <img
+                src={`/maps/${aggregation.country.code}.svg`}
+                alt={`${aggregation.country.name} map`}
+                className="w-10 h-10 opacity-80"
+                onError={() => setMapAvailable(false)}
+              />
+            ) : (
+              <span className="text-2xl" aria-hidden>
+                {aggregation.country.flag}
+              </span>
+            )}
+          </div>
           <div>
             <h3 className="text-xl font-bold text-white">{aggregation.country.name}</h3>
             <p className="text-white/60 text-sm flex items-center gap-2">
@@ -78,6 +130,27 @@ export function CountryCard({
           </div>
         </div>
       </div>
+
+      {/* Lightweight carousel to communicate feel */}
+      {mediaImages.length > 0 && (
+        <div className="mb-4">
+          <div className="relative h-32 rounded-lg overflow-hidden border border-white/10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={mediaImages[currentImage]} alt="Destination" loading="lazy" className="w-full h-full object-cover" />
+            {mediaImages.length > 1 && (
+              <>
+                <button aria-label="Previous image" onClick={goPrev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white/90 rounded-full w-7 h-7 flex items-center justify-center">‹</button>
+                <button aria-label="Next image" onClick={goNext} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white/90 rounded-full w-7 h-7 flex items-center justify-center">›</button>
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
+                  {mediaImages.map((_, i) => (
+                    <button key={i} aria-label={`Go to image ${i+1}`} onClick={() => setCurrentImage(i)} className={`w-2 h-2 rounded-full ${i === currentImage ? 'bg-white' : 'bg-white/40'}`} />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Key Stats */}
       <div className="grid grid-cols-3 gap-4 mb-4">
@@ -113,6 +186,15 @@ export function CountryCard({
           <div className="text-white/50 text-xs">Avg Price</div>
         </div>
       </div>
+
+      {/* Value highlights - concise reasons to pick this country */}
+      {highlights.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {highlights.map(h => (
+            <span key={h.label} className={`px-2 py-1 rounded-full text-xs ${h.color}`}>{h.label}</span>
+          ))}
+        </div>
+      )}
 
       {/* Best Deal Highlight with Analytics */}
       <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">

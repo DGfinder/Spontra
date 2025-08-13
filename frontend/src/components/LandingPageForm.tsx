@@ -405,7 +405,7 @@ export function LandingPageForm() {
 
       {/* Layout - show search panel only on the initial Search step */}
       {navigation.currentStep === 'search' && (
-      <div className="absolute inset-0 z-20 grid grid-cols-1 lg:grid-cols-[420px_1fr] items-start pt-20 sm:pt-24 md:pt-28">
+      <div className="absolute inset-0 left-[3vw] z-20 grid grid-cols-1 lg:grid-cols-[420px_1fr] items-start pt-20 sm:pt-24 md:pt-28">
         {/* Form Panel with Overlay - Responsive */}
         <div 
           className="relative p-4 md:p-5 w-full h-[calc(100vh-8rem)] lg:h-[calc(100vh-10rem)] flex"

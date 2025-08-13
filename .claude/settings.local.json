@@ -49,7 +49,9 @@
       "WebFetch(domain:developers.amadeus.com)",
       "Bash(npx next lint:*)",
       "Bash(git rev-parse:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(claude update)",
+      "Bash(sudo:*)"
     ],
     "deny": []
   }
