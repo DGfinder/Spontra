@@ -418,7 +418,8 @@ export function LandingPageForm() {
             className="absolute inset-0 z-0 rounded-lg"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
           />
-          <div className="relative z-10 flex flex-col justify-start w-full no-scrollbar overflow-hidden pt-1 pb-6 md:pb-8">
+          <div className="relative z-10 flex flex-col justify-start w-full no-scrollbar overflow-hidden pt-1 pb-6 md:pb-8"
+            style={{ marginLeft: '8px' }}>
             <SearchForm
               themes={THEMES}
               onSubmit={handleSubmit}
@@ -433,7 +434,8 @@ export function LandingPageForm() {
           style={{ position: 'relative' }}
         >
           <div
-            className="absolute md:right-6 lg:right-10 xl:right-14 top-16 md:top-20 lg:top-28 w-[min(560px,44vw)] bg-black/55 backdrop-blur-sm border border-white/10 rounded-xl p-5 md:p-6 lg:p-7 shadow-2xl"
+            className="absolute top-16 md:top-20 lg:top-28 w-[min(560px,44vw)] bg-black/55 backdrop-blur-sm border border-white/10 rounded-xl p-5 md:p-6 lg:p-7 shadow-2xl"
+            style={{ right: '5vw' }}
           >
             <div className="text-white font-muli">
               <div className="flex items-center gap-3 mb-3">

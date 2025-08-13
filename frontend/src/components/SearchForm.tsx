@@ -141,6 +141,7 @@ export function SearchForm({
               placeholder="Type city or airport name"
               error={getFieldError('departureAirport')}
               required
+              showInlineChips={false}
               aria-describedby={hasFieldError('departureAirport') ? 'departure-airport-error' : undefined}
             />
             {hasFieldError('departureAirport') && (
@@ -173,6 +174,7 @@ export function SearchForm({
                 }
               }}
               placeholder="Anywhere"
+              showInlineChips={false}
               aria-label="Destination airport (optional)"
             />
             {/* Inline validation hint when both airports are set to same code */}

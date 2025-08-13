@@ -17,6 +17,7 @@ interface ValidatedAirportSearchProps {
   error?: string
   required?: boolean
   onValidation?: (isValid: boolean, error?: string) => void
+  showInlineChips?: boolean
 }
 
   // Use richer list from data file (still static client-side, but more options)
@@ -63,7 +64,8 @@ export function ValidatedAirportSearch({
   placeholder = 'Type airport name or code',
   error,
   required = false,
-  onValidation
+  onValidation,
+  showInlineChips = true
 }: ValidatedAirportSearchProps) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
@@ -450,8 +452,8 @@ export function ValidatedAirportSearch({
         </ul>
       )}
 
-      {/* Inline recent chips */}
-      {preferences.recentAirports.length > 0 && (
+      {/* Inline recent chips (optional) */}
+      {showInlineChips && preferences.recentAirports.length > 0 && (
         <div className="mt-1 flex flex-wrap gap-1">
           {preferences.recentAirports.slice(0, 6).map((code) => (
             <button
