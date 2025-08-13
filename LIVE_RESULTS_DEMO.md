@@ -7,10 +7,12 @@ Your Spontra application is now fully configured to provide **live, real-time re
 ## 🔧 **What's Been Implemented**
 
 ### 1. **Amadeus API Integration** ✅
-- **Client ID**: `hmbheJWBT4gAKNEDxVEC53MTavleW7M0`
-- **Client Secret**: `yTGQ9nbTSbtByd5A` 
+- **Client ID**: `your_amadeus_client_id_here`
+- **Client Secret**: `your_amadeus_client_secret_here`
 - **Environment**: Test (ready for live data)
 - **OAuth2 Authentication**: Implemented and configured
+
+> ⚠️ **SECURITY WARNING**: Never commit real API credentials to version control. Use environment variables (.env.local) for sensitive data.
 
 ### 2. **Range-Based Search** ✅
 - **Frontend**: Dual-range slider (1h - 12h)

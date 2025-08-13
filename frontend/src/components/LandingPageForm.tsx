@@ -498,6 +498,7 @@ export function LandingPageForm() {
         <ActivityConstellation
           recommendation={navigation.selectedDestination}
           originAirport={formData.departureAirport}
+          themeKey={formData.selectedTheme as ThemeKey}
           onBack={handleBackToResults}
           onActivitySelect={handleActivitySelect}
           onBookFlight={() => navigateToStep('flights')}

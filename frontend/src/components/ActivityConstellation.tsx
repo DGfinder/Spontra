@@ -6,6 +6,7 @@ import { ExplorationProgress } from './ExplorationProgress'
 import { VideoModal } from './VideoModal'
 import { UGCUpload } from './UGCUpload'
 import { youtubeService, YouTubeVideo } from '../services/youtubeService'
+import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 import { DestinationRecommendation } from '@/services/apiClient'
 
 interface ActivityOption {
@@ -29,6 +30,7 @@ interface ActivityConstellationProps {
   onBack: () => void
   onActivitySelect?: (activity: ActivityOption) => void
   onBookFlight?: (recommendation: DestinationRecommendation) => void
+  themeKey?: ThemeKey
 }
 
 interface ActivityCircleProps {
@@ -239,7 +241,7 @@ function CentralDestinationCircle({ recommendation }: { recommendation: Destinat
   )
 }
 
-export function ActivityConstellation({ recommendation, originAirport, onBack, onActivitySelect, onBookFlight }: ActivityConstellationProps) {
+export function ActivityConstellation({ recommendation, originAirport, onBack, onActivitySelect, onBookFlight, themeKey = 'adventure' }: ActivityConstellationProps) {
   const [activities, setActivities] = useState<ActivityOption[]>([])
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
   const [selectedActivityForVideo, setSelectedActivityForVideo] = useState<ActivityOption | null>(null)
@@ -436,8 +438,8 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-yellow-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-orange-500 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl" style={{ background: getThemeColor(themeKey) }}></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 rounded-full blur-3xl" style={{ background: getThemeHoverColor(themeKey) }}></div>
       </div>
 
       {/* Progress Indicator */}
@@ -476,7 +478,8 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
             
             <button 
               onClick={() => onBookFlight?.(recommendation)}
-              className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-semibold px-4 sm:px-6 py-2 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 min-h-[44px]"
+              className="text-black font-semibold px-4 sm:px-6 py-2 rounded-lg transition-all duration-300 min-h-[44px]"
+              style={{ backgroundImage: `linear-gradient(90deg, ${getThemeColor(themeKey)}, ${getThemeHoverColor(themeKey)})` }}
             >
               <span className="hidden sm:inline">Book Flight</span>
               <span className="sm:hidden">Book</span>

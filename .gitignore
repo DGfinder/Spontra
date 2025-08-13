@@ -43,12 +43,67 @@ pids
 *.seed
 *.pid.lock
 
-# Environment variables
+# Environment variables and secrets
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.backup
+.env.save
+.environment
+*.env
+*/.env
+*/.env.local
+*/.env.*.local
+
+# API Keys and Credentials (NEVER COMMIT THESE)
+*key*.json
+*secret*.json
+*credential*.json
+*config*.json
+*auth*.json
+credentials/
+secrets/
+keys/
+cert/
+certs/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+**/credentials/**
+**/secrets/**
+**/keys/**
+
+# Service Account Keys
+service-account*.json
+gcp-*.json
+aws-*.json
+azure-*.json
+*-service-account.json
+
+# API Key Files
+api_keys*
+*api_key*
+*api-key*
+*apikey*
+*access_token*
+*access-token*
+*client_secret*
+*client-secret*
+*private_key*
+*private-key*
+
+# Authentication Files
+.htpasswd
+.htaccess
+auth.json
+auth.yaml
+auth.yml
+**/auth/**
 
 # Next.js
 .next/

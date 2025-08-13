@@ -30,8 +30,8 @@ class YouTubeService {
   private baseUrl = 'https://www.googleapis.com/youtube/v3'
 
   constructor() {
-    // In production, this should be stored as an environment variable
-    this.apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY || ''
+    // Use server-only API by default; client has no key. In dev fallback to mock.
+    this.apiKey = ''
   }
 
   async searchActivityVideos({
@@ -39,33 +39,29 @@ class YouTubeService {
     activity,
     maxResults = 5
   }: YouTubeSearchParams): Promise<YouTubeVideo[]> {
-    if (!this.apiKey) {
+    try {
+      // Prefer server-side proxy route so keys never reach the client
+      const res = await fetch(`/api/youtube/videos?destination=${encodeURIComponent(destination)}&activity=${encodeURIComponent(activity)}&maxResults=${maxResults}`)
+      const json = await res.json()
+      if (json.ok && Array.isArray(json.data)) {
+        // Map to expected shape with Shorts preference scoring
+        const scored = (json.data as any[]).map((v) => ({
+          id: v.id,
+          title: v.title,
+          description: v.description,
+          thumbnail: { url: v.thumbnail, width: 320, height: 180 },
+          channelTitle: v.channelTitle,
+          publishedAt: v.publishedAt,
+          isShort: /#shorts|short/gi.test(`${v.title} ${v.description}`),
+          source: 'youtube' as const,
+        }))
+        const ranked = await this.scoreVideos(scored, destination, activity)
+        return ranked.sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0)).slice(0, maxResults)
+      }
       if (enableMockFallbacks) {
-        console.warn('YouTube API key not configured, returning mock data')
         return this.getMockVideos(destination, activity)
       }
-      throw new Error('Video search service is unavailable')
-    }
-
-    try {
-      // Get multiple searches to find best quality content
-      const videos = await Promise.all([
-        this.searchWithOptions(destination, activity, 'short', 'relevance'),
-        this.searchWithOptions(destination, activity, 'short', 'viewCount'),
-        this.searchWithOptions(destination, activity, 'medium', 'relevance')
-      ])
-
-      // Flatten and deduplicate results
-      const allVideos = videos.flat()
-      const uniqueVideos = this.deduplicateVideos(allVideos)
-      
-      // Score and filter for quality travel content
-      const scoredVideos = await this.scoreVideos(uniqueVideos, destination, activity)
-      
-      // Sort by quality score and return top results
-      return scoredVideos
-        .sort((a, b) => (b.qualityScore || 0) - (a.qualityScore || 0))
-        .slice(0, maxResults)
+      throw new Error('Video proxy unavailable')
     } catch (error) {
       console.error('Error fetching YouTube videos:', error)
       if (enableMockFallbacks) {

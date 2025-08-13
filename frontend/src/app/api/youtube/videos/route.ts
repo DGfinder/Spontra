@@ -16,11 +16,11 @@ export async function GET(req: NextRequest) {
       }, { status: 400 })
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY
+    const apiKey = process.env.YOUTUBE_API_KEY
     if (!apiKey) {
       return NextResponse.json({
         ok: false,
-        error: 'YouTube API key not configured'
+        error: 'Video search service is not configured'
       }, { status: 500 })
     }
 
