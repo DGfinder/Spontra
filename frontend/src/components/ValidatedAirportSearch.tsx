@@ -44,13 +44,17 @@ const LEGACY_CODE_MAPPING: Record<string, { code: string; note?: string }> = {
 }
 
 function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
+  const lower = text.toLowerCase()
+  try {
+    return lower
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  } catch {
+    return lower.replace(/\s+/g, ' ').trim()
+  }
 }
 
 export function ValidatedAirportSearch({
