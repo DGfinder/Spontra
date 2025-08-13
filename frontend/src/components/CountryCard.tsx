@@ -83,13 +83,11 @@ export function CountryCard({
 
   return (
     <div className="bg-black/40 backdrop-blur-sm border border-white/20 rounded-xl p-6 hover:bg-black/50 transition-all duration-300 hover:border-white/30">
-      {/* Country Header */}
+      {/* City-first Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          {/* Flag or Map Vector */}
           <div className="relative w-12 h-12 rounded-full overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center">
             {mapAvailable ? (
-              // Optional country map vector; gracefully hides on error
               <img
                 src={`/maps/${aggregation.country.code}.svg`}
                 alt={`${aggregation.country.name} map`}
@@ -103,8 +101,12 @@ export function CountryCard({
             )}
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">{aggregation.country.name}</h3>
-            <p className="text-white/60 text-sm flex items-center gap-2">
+            <h3 className="text-2xl font-extrabold text-white leading-tight">
+              {aggregation.cheapestDestination.destination.city_name}
+            </h3>
+            <p className="text-white/70 text-sm flex items-center gap-2">
+              <span>{aggregation.country.name}</span>
+              <span className="text-white/30">•</span>
               <span>{aggregation.country.continent}</span>
               {aggregation.country.visaFree && (
                 <span className="text-emerald-300 text-xs bg-emerald-600/20 border border-emerald-400/30 rounded-full px-2 py-0.5">Visa-free</span>
@@ -196,16 +198,12 @@ export function CountryCard({
         </div>
       )}
 
-      {/* Best Deal Highlight with Analytics */}
+      {/* Best Deal Highlight with Analytics */
       <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <div className="text-white font-medium">
-              {aggregation.cheapestDestination.destination.city_name}
-            </div>
-            <div className="text-green-400 text-sm">
-              Best deal in {aggregation.country.name}
-            </div>
+            <div className="text-white font-medium">Best deal</div>
+            <div className="text-green-400 text-sm">{aggregation.cheapestDestination.destination.city_name} • {aggregation.country.name}</div>
           </div>
           <div className="text-green-400 font-bold">
             {aggregation.cheapestDestination.estimated_flight_price}
@@ -325,7 +323,7 @@ export function CountryCard({
         onClick={() => onExploreCountry?.(aggregation)}
         className={`w-full py-3 px-4 bg-gradient-to-r ${themeColor} text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 hover:scale-105`}
       >
-        Explore {aggregation.country.name}
+        Explore {aggregation.cheapestDestination.destination.city_name}
       </button>
     </div>
   )

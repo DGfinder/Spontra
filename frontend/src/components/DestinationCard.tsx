@@ -98,28 +98,27 @@ export function DestinationCard({
         transform: 'translateY(30px)'
       }}
       role="article"
-      aria-label={`Destination: ${destination.country_name}`}
+      aria-label={`City: ${destination.city_name}`}
     >
-      {/* Country Header */}
+      {/* City-first header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-3 min-w-0">
           <span className="text-3xl" role="img" aria-label={`${destination.country_name} flag`}>
             {flagEmoji}
           </span>
-          <div>
-            <h3 className="text-xl font-bold text-white">{destination.country_name}</h3>
-            <p className="text-white/60 text-sm">{destination.description}</p>
+          <div className="min-w-0">
+            <h3 className="text-2xl font-extrabold text-white leading-tight truncate">{destination.city_name}</h3>
+            <p className="text-white/70 text-sm flex items-center gap-2 min-w-0">
+              <span className="truncate">{destination.country_name}</span>
+              <span className="text-white/30">•</span>
+              <span className="truncate">{Math.round(result.match_score)}% match</span>
+            </p>
           </div>
         </div>
-        {/* Analytics Badges */}
-        <div className="flex flex-col gap-1">
-          <div className="bg-orange-500/20 text-orange-200 px-2 py-1 rounded text-xs">
-            {Math.round(result.match_score)}% match
-          </div>
-          <div className={`${rankingDisplay.bgColor} ${rankingDisplay.color} px-2 py-1 rounded text-xs flex items-center gap-1`}>
-            <span>{rankingDisplay.icon}</span>
-            <span>{rankingDisplay.text}</span>
-          </div>
+        {/* Rank badge */}
+        <div className={`${rankingDisplay.bgColor} ${rankingDisplay.color} px-2 py-1 rounded text-xs flex items-center gap-1`}>
+          <span>{rankingDisplay.icon}</span>
+          <span>{rankingDisplay.text}</span>
         </div>
       </div>
 
@@ -172,11 +171,7 @@ export function DestinationCard({
 
       {/* City and Activities */}
       <div className="mb-4">
-        <p className="text-white/70 text-sm mb-2">Destination</p>
         <div className="flex flex-wrap gap-2">
-          <span className="bg-orange-500/20 text-orange-200 px-2 py-1 rounded text-xs">
-            {destination.city_name}
-          </span>
           {result.activity_matches.slice(0, 2).map((activity) => (
             <span
               key={activity}
@@ -239,4 +234,5 @@ export function DestinationCard({
       </button>
     </div>
   )
+}
 }
