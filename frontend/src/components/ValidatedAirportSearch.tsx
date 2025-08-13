@@ -380,7 +380,7 @@ export function ValidatedAirportSearch({
                   <li
                     key={`recent-${airport.code}`}
                     className="px-4 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
-                    onClick={() => handleSuggestionSelect(airport)}
+                    onClick={() => handleSuggestionSelect({...airport, type: 'AIRPORT'})}
                     role="option"
                   >
                     <div className="font-medium text-sm">{airport.code} - {airport.name}</div>
