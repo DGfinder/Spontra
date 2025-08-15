@@ -1,13 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin, TrendingDown, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin, TrendingDown, TrendingUp, Wifi, Monitor, Utensils, Zap, Luggage } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { ErrorState } from './ErrorState'
 import { getErrorMessage } from '@/lib/environment'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { useFormData } from '@/store/searchStore'
 import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
+import { AirlineLogo, AllianceBadge, AirlineRating } from './AirlineLogo'
+import { getAirlineInfo, getFlightAmenities, getAirlineRating, getOnTimePerformance } from '@/data/airlines'
+import { PriceBreakdown, FareClassSelector } from './PriceBreakdown'
+import { AircraftInfo, AircraftBadge } from './AircraftInfo'
+import { BookingComparison } from './BookingComparison'
+import { LayoverDetails, generateLayoverInfo } from './LayoverDetails'
 
 interface FlightOption {
   id: string
@@ -23,6 +29,16 @@ interface FlightOption {
   arrivalContext: string
   bookingLink: string
   confidence: number
+  fareClasses?: Array<{
+    type: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'
+    price: number
+    availability: number
+  }>
+  priceBreakdown?: {
+    baseFare: number
+    taxes: number
+    fees: number
+  }
 }
 
 interface FlightResultsProps {
@@ -43,6 +59,13 @@ interface FlightCardProps {
 
 function FlightCard({ flight, recommendation, selectedActivity, isSelected, onClick }: FlightCardProps) {
   const [isHovered, setIsHovered] = useState(false)
+  const [showAmenities, setShowAmenities] = useState(false)
+  
+  const airlineInfo = getAirlineInfo(flight.airline)
+  const amenities = getFlightAmenities(flight.airline)
+  const rating = getAirlineRating(flight.airline)
+  const onTimePerf = getOnTimePerformance(flight.airline)
+  const layovers = generateLayoverInfo(flight.stops, 'Origin', recommendation.destination.city_name)
   
   const getBadgeColor = (badge?: string) => {
     switch (badge) {
@@ -88,13 +111,19 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
           </div>
         )}
 
-        {/* Price Circle */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold text-lg shadow-lg">
-            {flight.currency}{flight.price}
+        {/* Header with Airline Logo and Price */}
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-3">
+            <AirlineLogo iataCode={flight.airline} size="lg" showName={true} namePosition="right" />
+            {airlineInfo?.alliance && (
+              <AllianceBadge alliance={airlineInfo.alliance} size="sm" />
+            )}
           </div>
           
           <div className="text-right">
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold text-lg shadow-lg mb-2">
+              {flight.currency}{flight.price}
+            </div>
             <div className="text-white/80 text-sm">{getActivityIcon()} {selectedActivity}</div>
             <div className="text-white/60 text-xs mt-1">{flight.arrivalContext}</div>
           </div>
@@ -117,6 +146,11 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
               <div className="text-white/60 text-xs">
                 {flight.stops === 0 ? 'Direct' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
               </div>
+              {flight.stops > 0 && (
+                <div className="mt-1">
+                  <LayoverDetails layovers={layovers} compact={true} />
+                </div>
+              )}
             </div>
           </div>
           
@@ -127,16 +161,52 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
         </div>
 
         {/* Flight Details */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center space-x-2 text-white/80">
-            <Users size={14} />
-            <span>{flight.airline}</span>
+        <div className="space-y-3">
+          {/* Rating and Performance */}
+          <div className="flex items-center justify-between">
+            <AirlineRating rating={rating} onTimePerformance={onTimePerf} size="sm" />
+            <AircraftInfo aircraftCode={flight.aircraftType} size="sm" showSpecs={true} />
           </div>
           
-          <div className="flex items-center space-x-2 text-white/80">
-            <MapPin size={14} />
-            <span>{flight.aircraftType}</span>
-          </div>
+          {/* Amenities Preview */}
+          {amenities && (
+            <div className="flex items-center space-x-4 text-white/70 text-xs">
+              {amenities.wifi && <div className="flex items-center space-x-1"><Wifi size={12} /><span>WiFi</span></div>}
+              {amenities.entertainment && <div className="flex items-center space-x-1"><Monitor size={12} /><span>Entertainment</span></div>}
+              {amenities.meals !== 'none' && <div className="flex items-center space-x-1"><Utensils size={12} /><span>Meals</span></div>}
+              {amenities.power && <div className="flex items-center space-x-1"><Zap size={12} /><span>Power</span></div>}
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowAmenities(!showAmenities)
+                }}
+                className="text-yellow-400 hover:text-yellow-300 underline"
+              >
+                {showAmenities ? 'Less' : 'More'} info
+              </button>
+            </div>
+          )}
+          
+          {/* Expanded Amenities */}
+          {showAmenities && amenities && (
+            <div className="bg-black/30 rounded-lg p-3 space-y-2 text-xs">
+              <div className="grid grid-cols-2 gap-2 text-white/80">
+                <div className="flex items-center space-x-1">
+                  <Luggage size={12} />
+                  <span>Carry-on: {amenities.baggage.carryOn}</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Luggage size={12} />
+                  <span>Checked: {amenities.baggage.checked}</span>
+                </div>
+                {amenities.seatPitch && (
+                  <div className="col-span-2 text-white/60">
+                    Seat pitch: {amenities.seatPitch}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Hover Effects */}
@@ -147,8 +217,8 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
 
       {/* Expanded Details on Hover */}
       {isHovered && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="text-white text-sm space-y-2">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-w-md">
+          <div className="text-white text-sm space-y-3">
             <div className="flex justify-between">
               <span className="text-white/70">Confidence:</span>
               <span className="text-green-400 font-medium">{flight.confidence}% match</span>
@@ -158,6 +228,51 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
               <span className="text-white/70">Best for:</span>
               <span className="text-yellow-400">{flight.arrivalContext}</span>
             </div>
+
+            {/* Fare Classes Preview */}
+            {flight.fareClasses && flight.fareClasses.length > 1 && (
+              <div className="border-t border-white/20 pt-3">
+                <div className="text-white/70 text-xs mb-2">Available fare classes:</div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  {flight.fareClasses.map((fare, idx) => (
+                    <div key={idx} className="bg-white/10 rounded p-2">
+                      <div className="font-medium text-white">{fare.type.replace('_', ' ')}</div>
+                      <div className="text-yellow-400">{flight.currency}{fare.price}</div>
+                      <div className="text-white/60">{fare.availability} seats</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Price Breakdown */}
+            {flight.priceBreakdown && (
+              <div className="border-t border-white/20 pt-3">
+                <div className="text-white/70 text-xs mb-2">Price breakdown:</div>
+                <div className="space-y-1 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Base fare:</span>
+                    <span className="text-white">{flight.currency}{flight.priceBreakdown.baseFare}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Taxes:</span>
+                    <span className="text-white">{flight.currency}{flight.priceBreakdown.taxes}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-white/70">Fees:</span>
+                    <span className="text-white">{flight.currency}{flight.priceBreakdown.fees}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Layover Information */}
+            {flight.stops > 0 && layovers.length > 0 && (
+              <div className="border-t border-white/20 pt-3">
+                <div className="text-white/70 text-xs mb-2">Connection details:</div>
+                <LayoverDetails layovers={layovers} compact={false} className="text-xs" />
+              </div>
+            )}
             
             {selectedActivity && (
               <div className="pt-2 border-t border-white/20">
@@ -410,40 +525,45 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
 
           {/* Book Selected Flight */}
           {selectedFlight && (
-            <div className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-md border-t border-white/20 p-6 z-50">
-              <div className="max-w-6xl mx-auto flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold">
-                    €{selectedFlight.price}
-                  </div>
-                  <div>
-                    <div className="text-white font-semibold">
-                      {selectedFlight.departureTime} → {selectedFlight.arrivalTime}
+            <div className="mt-8">
+              <div className="max-w-6xl mx-auto">
+                {/* Flight Summary */}
+                <div className="bg-black/40 backdrop-blur-md border border-white/20 rounded-xl p-6 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-black font-bold">
+                        €{selectedFlight.price}
+                      </div>
+                      <div>
+                        <div className="text-white font-semibold text-lg">
+                          {selectedFlight.departureTime} → {selectedFlight.arrivalTime}
+                        </div>
+                        <div className="text-white/60">
+                          {selectedFlight.airline} • {selectedFlight.duration} • {selectedFlight.stops === 0 ? 'Direct' : `${selectedFlight.stops} stops`}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-white/60 text-sm">
-                      {selectedFlight.airline} • {selectedFlight.duration}
-                    </div>
+                    
+                    <button 
+                      className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-8 py-3 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105"
+                      onClick={() => onFlightSelect?.(selectedFlight)}
+                    >
+                      Continue to Activities
+                    </button>
                   </div>
                 </div>
-                
-                <button 
-                  className="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-8 py-3 rounded-lg hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105"
-                  onClick={() => {
-                    // Simulate realistic booking flow
-                    const bookingUrl = selectedFlight.bookingLink
-                    if (bookingUrl.includes('example.com')) {
-                      // For demo purposes, proceed to confirmation
-                      onFlightSelect?.(selectedFlight)
-                    } else {
-                      // Open real airline website in new tab
-                      window.open(bookingUrl, '_blank', 'noopener,noreferrer')
-                      // Still proceed to confirmation for demo
-                      setTimeout(() => onFlightSelect?.(selectedFlight), 1000)
-                    }
+
+                {/* Booking Comparison */}
+                <BookingComparison
+                  airlineCode={selectedFlight.airline}
+                  basePrice={selectedFlight.price}
+                  currency={selectedFlight.currency}
+                  flightId={selectedFlight.id}
+                  onBookingSelect={(option) => {
+                    // Open booking provider in new tab
+                    window.open(option.url, '_blank', 'noopener,noreferrer')
                   }}
-                >
-                  Book & Plan Activities
-                </button>
+                />
               </div>
             </div>
           )}
