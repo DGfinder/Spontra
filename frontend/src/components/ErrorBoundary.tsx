@@ -171,3 +171,102 @@ export function withErrorBoundary<P extends object>(
   
   return WithErrorBoundaryComponent
 }
+
+// Specialized error boundaries for different sections
+export function SearchFormErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary 
+      onError={(error, errorInfo) => {
+        console.error('Search form error:', error)
+        // Report search form specific errors
+      }}
+      fallback={(error, errorInfo, resetError) => (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <AlertTriangle className="w-8 h-8 mx-auto text-red-500 mb-2" />
+          <p className="text-red-700 mb-2">Search form is temporarily unavailable</p>
+          <button 
+            onClick={resetError}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+    >
+      {children}
+    </ErrorBoundary>
+  )
+}
+
+export function FlightResultsErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary 
+      onError={(error, errorInfo) => {
+        console.error('Flight results error:', error)
+        // Report flight results specific errors
+      }}
+      fallback={(error, errorInfo, resetError) => (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <AlertTriangle className="w-8 h-8 mx-auto text-yellow-500 mb-2" />
+          <h3 className="text-yellow-800 font-semibold mb-2">Unable to display flight results</h3>
+          <p className="text-yellow-700 mb-4">There was an issue loading flight information.</p>
+          <div className="space-x-2">
+            <button 
+              onClick={resetError}
+              className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+            >
+              Retry Search
+            </button>
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              Start Over
+            </button>
+          </div>
+        </div>
+      )}
+    >
+      {children}
+    </ErrorBoundary>
+  )
+}
+
+export function BookingFlowErrorBoundary({ children }: { children: ReactNode }) {
+  return (
+    <ErrorBoundary 
+      onError={(error, errorInfo) => {
+        console.error('Booking flow error:', error)
+        // Critical: report booking errors immediately
+      }}
+      fallback={(error, errorInfo, resetError) => (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-md mx-auto">
+          <AlertTriangle className="w-12 h-12 mx-auto text-red-500 mb-4" />
+          <h3 className="text-red-800 font-bold text-lg mb-2">Booking Error</h3>
+          <p className="text-red-700 mb-4">
+            There was an issue with the booking process. <strong>Your booking has not been completed.</strong>
+          </p>
+          <p className="text-sm text-red-600 mb-4">
+            Please try again or contact support if the problem persists.
+          </p>
+          <div className="space-y-2">
+            <button 
+              onClick={resetError}
+              className="w-full px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            >
+              Try Booking Again
+            </button>
+            <button 
+              onClick={() => window.history.back()}
+              className="w-full px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+            >
+              Go Back
+            </button>
+          </div>
+        </div>
+      )}
+    >
+      {children}
+    </ErrorBoundary>
+  )
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { Map, List, Globe } from 'lucide-react'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { DestinationCard } from './DestinationCard'
@@ -6,9 +6,11 @@ import { CountryCard } from './CountryCard'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { SearchSummaryBar } from './SearchSummaryBar'
 import { CacheIndicator } from './CacheIndicator'
+import { OptimizedSearchResults } from './optimized/OptimizedSearchResults'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
 import { useFormData, useSearchStore } from '@/store/searchStore'
 import { CountryConstellation } from './CountryConstellation'
+import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
 import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 
 interface SearchResultsProps {
@@ -24,7 +26,7 @@ interface SearchResultsProps {
   onExploreDestination?: (destination: DestinationRecommendation) => void
 }
 
-export function SearchResults({
+export const SearchResults = React.memo<SearchResultsProps>(({
   results,
   isLoading,
   isError,
@@ -35,19 +37,38 @@ export function SearchResults({
   onBackToSearch,
   onRetry,
   onExploreDestination
-}: SearchResultsProps) {
+}) => {
+  // Performance monitoring
+  usePerformanceMonitoring('SearchResults')
+  
   // Get current search data for the summary bar
   const formData = useFormData()
   const [viewMode, setViewMode] = useState<'destinations' | 'countries' | 'constellation'>('countries')
-
-  // Aggregate results by country
   const [visaFreeOnly, setVisaFreeOnly] = useState(false)
-  let countryAggregations = aggregateDestinationsByCountry(results)
-  if (visaFreeOnly) {
-    countryAggregations = countryAggregations.filter(agg => agg.country.visaFree)
-  }
-  const countryStats = getCountryStats(countryAggregations)
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null)
+
+  // Memoized country aggregations to avoid expensive recalculations
+  const countryAggregations = useMemo(() => {
+    let aggregations = aggregateDestinationsByCountry(results)
+    if (visaFreeOnly) {
+      aggregations = aggregations.filter(agg => agg.country.visaFree)
+    }
+    return aggregations
+  }, [results, visaFreeOnly])
+
+  // Memoized country statistics
+  const countryStats = useMemo(() => {
+    return getCountryStats(countryAggregations)
+  }, [countryAggregations])
+
+  // Optimized event handlers with useCallback
+  const handleVisaFreeToggle = useCallback(() => {
+    setVisaFreeOnly(prev => !prev)
+  }, [])
+
+  const handleExploreDestination = useCallback((destination: DestinationRecommendation) => {
+    onExploreDestination?.(destination)
+  }, [onExploreDestination])
   const preferences = useSearchStore(s => s.preferences)
   const hasPassport = Boolean(preferences.passportCountryCode)
 
@@ -305,4 +326,6 @@ export function SearchResults({
       </div>
     </div>
   )
-}
+})
+
+SearchResults.displayName = 'SearchResults'

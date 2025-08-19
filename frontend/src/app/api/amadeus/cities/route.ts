@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { amadeusClient } from '@/lib/amadeus-simple'
+import { AmadeusLocation } from '@/types/amadeus'
 
 export const runtime = 'nodejs'
 
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const locations = await amadeusClient.searchLocations(keyword, 'CITY')
 
     const filtered = (locations || [])
-      .filter((loc: any) => {
+      .filter((loc: AmadeusLocation) => {
         // Note: amadeus-simple.ts AmadeusDestination doesn't have address property
         // Filtering by keyword match should be sufficient for city search
         return loc.name && loc.iataCode
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
       .slice(0, 6)
 
     // For each city, attempt to fetch one representative flight to estimate price and duration
-    const results = [] as any[]
+    const results: any[] = []
     for (const city of filtered) {
       let estimated_price = undefined as string | undefined
       let flight_duration = undefined as number | undefined
@@ -77,8 +78,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ ok: true, data: results })
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || 'Internal Server Error' }, { status: 500 })
+  } catch (e: unknown) {
+    const error = e as Error
+    return NextResponse.json({ ok: false, error: error?.message || 'Internal Server Error' }, { status: 500 })
   }
 }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { themeDestinationService } from '@/services/themeDestinationService'
 import { amadeusService } from '@/services/amadeusService'
+import { validateApiRequest, destinationSearchApiSchema } from '@/lib/validations'
 
 // Ensure this runs in a Node.js runtime so server env vars are available
 export const runtime = 'nodejs'
@@ -10,14 +11,21 @@ export async function POST(req: NextRequest) {
   
   try {
     const body = await req.json()
-    const { origin, maxFlightTime, theme, departureDate, priceRange, countries, nonStop } = body
+    
+    // Validate and sanitize request body
+    const validation = validateApiRequest(destinationSearchApiSchema, body)
+    if (!validation.success) {
+      console.log('❌ Invalid destination search parameters:', validation.errors)
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Invalid destination search parameters',
+        details: validation.errors
+      }, { status: 400 })
+    }
+
+    const { origin, maxFlightTime, theme, departureDate, priceRange, countries, nonStop } = validation.data
     
     console.log('📝 Request parameters:', { origin, maxFlightTime, theme, departureDate, priceRange, countries, nonStop })
-
-    if (!origin) {
-      console.log('❌ Missing origin parameter')
-      return NextResponse.json({ ok: false, error: 'Missing required parameter: origin' }, { status: 400 })
-    }
 
     // Check if backend service is available
     const isBackendHealthy = await themeDestinationService.healthCheck()
@@ -67,16 +75,17 @@ export async function POST(req: NextRequest) {
       data: recommendations,
       source: 'legacy'
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as Error
     console.error('💥 Destinations API error:', {
-      message: e?.message,
-      stack: e?.stack,
-      name: e?.name,
-      cause: e?.cause
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+      cause: (error as any)?.cause
     })
     
     // Check for specific Amadeus API errors
-    if (e?.message?.includes('Amadeus API Error')) {
+    if (error?.message?.includes('Amadeus API Error')) {
       return NextResponse.json(
         { 
           ok: false, 

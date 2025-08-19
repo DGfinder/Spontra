@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react'
 import { airportCodeSchema } from '@/lib/validations'
 import { usePreferences, useSearchActions } from '@/store/searchStore'
+import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
 
 interface Airport {
   code: string
@@ -58,7 +59,7 @@ function normalize(text: string): string {
   }
 }
 
-export function ValidatedAirportSearch({
+export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
   value,
   onChange,
   placeholder = 'Type airport name or code',
@@ -66,7 +67,10 @@ export function ValidatedAirportSearch({
   required = false,
   onValidation,
   showInlineChips = true
-}: ValidatedAirportSearchProps) {
+}) => {
+  // Performance monitoring
+  usePerformanceMonitoring('ValidatedAirportSearch')
+  
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -130,7 +134,7 @@ export function ValidatedAirportSearch({
   )
 
   // Client + server-backed search with debounce and legacy mapping
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     setQuery(inputValue)
     setSelectedIndex(-1)
@@ -224,7 +228,7 @@ export function ValidatedAirportSearch({
       // Cleanup timer if user keeps typing
       return () => clearTimeout(timer)
     }
-  }
+  }, [onChange])
 
   // Handle suggestion selection
   const handleSuggestionSelect = async (item: Suggestion) => {
@@ -470,4 +474,6 @@ export function ValidatedAirportSearch({
       )}
     </div>
   )
-}
+})
+
+ValidatedAirportSearch.displayName = 'ValidatedAirportSearch'

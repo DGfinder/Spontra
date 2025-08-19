@@ -559,9 +559,27 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
                   basePrice={selectedFlight.price}
                   currency={selectedFlight.currency}
                   flightId={selectedFlight.id}
+                  flightDetails={{
+                    origin: originAirport,
+                    destination: recommendation.destination.airport_code,
+                    departureDate: formData.departureDate || new Date().toISOString().slice(0,10),
+                    passengers: formData.passengers || 1,
+                    cabinClass: formData.cabinClass || 'ECONOMY'
+                  }}
                   onBookingSelect={(option) => {
-                    // Open booking provider in new tab
-                    window.open(option.url, '_blank', 'noopener,noreferrer')
+                    // Open booking provider with affiliate URL if available
+                    const finalUrl = option.affiliateUrl || option.url
+                    window.open(finalUrl, '_blank', 'noopener,noreferrer')
+                    
+                    // Log successful redirect for conversion tracking
+                    if (option.clickId) {
+                      console.log('🔗 Affiliate click tracked:', {
+                        clickId: option.clickId,
+                        provider: option.provider.name,
+                        price: option.price,
+                        commission: option.estimatedCommission
+                      })
+                    }
                   }}
                 />
               </div>

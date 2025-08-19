@@ -1,5 +1,7 @@
 import { DestinationRecommendation } from '@/services/apiClient'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
+import { getThemeBgClass, getThemeClasses, validateTheme, type ThemeKey } from '@/lib/theme'
+import { Card, CardHeader, CardMedia, CardStats, CardInsight, CardAction, Badge, PriceBadge, VisaFreeBadge } from '@/components/ui'
 
 interface DestinationCardProps {
   result: DestinationRecommendation
@@ -32,24 +34,11 @@ const getCountryFlag = (countryCode: string): string => {
   return flagMap[countryCode.toUpperCase()] || '🌍'
 }
 
-// Helper function to get theme colors
-const getThemeColors = (theme: string) => {
-  switch (theme) {
-    case 'adventure':
-      return 'bg-orange-500 hover:bg-orange-600'
-    case 'party':
-      return 'bg-purple-500 hover:bg-purple-600'
-    case 'learn':
-      return 'bg-green-500 hover:bg-green-600'
-    case 'shopping':
-      return 'bg-pink-500 hover:bg-pink-600'
-    default:
-      return 'bg-blue-500 hover:bg-blue-600'
-  }
-}
-
+// Helper function to get theme hover colors (keeping only the unique hover opacity logic)
 const getThemeHoverColors = (theme: string) => {
-  switch (theme) {
+  const validTheme = validateTheme(theme)
+  const classes = getThemeClasses(validTheme)
+  switch (validTheme) {
     case 'adventure':
       return 'hover:bg-orange-500/10'
     case 'party':
@@ -226,7 +215,7 @@ export function DestinationCard({
 
       {/* Select Button with Theme Colors */}
       <button 
-        className={`w-full text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg ${getThemeColors(selectedTheme)}`}
+        className={`w-full text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg ${getThemeBgClass(validateTheme(selectedTheme), true)}`}
         onClick={handleExplore}
         aria-label={`Explore ${destination.city_name}`}
       >
@@ -234,5 +223,4 @@ export function DestinationCard({
       </button>
     </div>
   )
-}
 }

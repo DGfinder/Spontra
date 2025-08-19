@@ -53,7 +53,12 @@
       "Bash(claude update)",
       "Bash(sudo:*)",
       "Bash(git check-ignore:*)",
-      "Bash(./.githooks/pre-commit:*)"
+      "Bash(./.githooks/pre-commit:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npx eslint:*)",
+      "Bash(dos2unix:*)",
+      "Bash(sed:*)",
+      "Bash(npx next build:*)"
     ],
     "deny": []
   }

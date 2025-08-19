@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import { Clock, MapPin, Plane, ChevronDown, ChevronUp } from 'lucide-react'
 import { CountryAggregation } from '@/lib/countryAggregation'
-import { getThemeColor } from '@/lib/theme'
+import { getThemeClasses } from '@/lib/theme'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
 
 interface CountryCardProps {
@@ -22,7 +22,7 @@ export function CountryCard({
 }: CountryCardProps) {
   const [showAllDestinations, setShowAllDestinations] = useState(false)
   const [mapAvailable, setMapAvailable] = useState(true)
-  const themeColor = getThemeColor(selectedTheme as any)
+  const themeClasses = getThemeClasses(selectedTheme as any)
   
   // Generate analytics for the cheapest destination (country representative) with error handling
   const countryAnalytics = generateDestinationAnalytics(
@@ -122,7 +122,13 @@ export function CountryCard({
             </div>
             <div className={`${trendDisplay.bgColor} ${trendDisplay.color} px-1 py-0.5 rounded text-xs flex items-center gap-1`}>
               <span>{trendDisplay.icon}</span>
-              <span>{(countryAnalytics?.priceTrend?.change || 0) > 0 ? `+${countryAnalytics?.priceTrend?.change || 0}%` : (countryAnalytics?.priceTrend?.change || 0) === 0 ? 'Stable' : `${countryAnalytics?.priceTrend?.change || 0}%`}</span>
+              <span>
+                {(countryAnalytics?.priceTrend?.change || 0) > 0 
+                  ? `+${countryAnalytics?.priceTrend?.change || 0}%` 
+                  : (countryAnalytics?.priceTrend?.change || 0) === 0 
+                    ? 'Stable' 
+                    : `${countryAnalytics?.priceTrend?.change || 0}%`}
+              </span>
             </div>
           </div>
           <div className="text-white/50 text-xs mb-1">from</div>
@@ -198,8 +204,10 @@ export function CountryCard({
         </div>
       )}
 
-      {/* Best Deal Highlight with Analytics */
-      <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
+      {aggregation.cheapestDestination && (
+        <>
+          {/* Best Deal Highlight with Analytics */}
+          <div className="bg-gradient-to-r from-green-900/20 to-blue-900/20 border border-green-500/30 rounded-lg p-3 mb-4">
         <div className="flex items-center justify-between mb-2">
           <div>
             <div className="text-white font-medium">Best deal</div>
@@ -217,8 +225,10 @@ export function CountryCard({
           <span className="text-xs opacity-80">- {countryAnalytics?.bookingInsight?.reasoning || 'Booking recommendation unavailable'}</span>
         </div>
       </div>
+        </>
+      )}
 
-      {/* Price Range */}
+      {/* Price Range Section */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-white/70">Price range:</span>
@@ -228,7 +238,7 @@ export function CountryCard({
         {/* Price range visual bar */}
         <div className="mt-2 w-full bg-white/10 rounded-full h-2 relative">
           <div 
-            className={`absolute left-0 top-0 h-full rounded-full bg-gradient-to-r ${themeColor} opacity-70`}
+            className={`absolute left-0 top-0 h-full rounded-full bg-gradient-to-r ${themeClasses.bg} opacity-70`}
             style={{ width: '100%' }}
           />
           <div className="absolute left-2 top-0 w-1 h-full bg-green-400 rounded-full" />
@@ -321,7 +331,7 @@ export function CountryCard({
       {/* Action Button */}
       <button
         onClick={() => onExploreCountry?.(aggregation)}
-        className={`w-full py-3 px-4 bg-gradient-to-r ${themeColor} text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-300 hover:scale-105`}
+        className={`w-full py-3 px-4 ${themeClasses.bg} ${themeClasses.bgHover} text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105`}
       >
         Explore {aggregation.cheapestDestination.destination.city_name}
       </button>

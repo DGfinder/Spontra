@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { DestinationRecommendation } from '@/services/apiClient'
+import { NavigationState, SelectedCity, SelectedActivity, SelectedFlight, NavigationStep } from '@/types/navigation'
 
 export interface FormData {
   selectedTheme: string
@@ -31,19 +32,9 @@ export interface SearchHistory {
 }
 
 // Navigation flow types
-type NavigationStep = 'search' | 'results' | 'countries' | 'cities' | 'activities' | 'flights' | 'booking'
+// NavigationStep is now imported from types/navigation.ts
 
-interface NavigationState {
-  currentStep: NavigationStep
-  selectedDestination: DestinationRecommendation | null
-  selectedCity: any | null
-  selectedActivity: any | null
-  selectedFlight: any | null
-  canGoBack: boolean
-  navigationHistory: NavigationStep[]
-  isNavigating: boolean
-  navigationMessage: string | null
-}
+// NavigationState is now imported from types/navigation.ts
 
 interface SearchState {
   // Form data
@@ -88,9 +79,9 @@ interface SearchActions {
   navigateToStep: (step: NavigationStep) => void
   navigateBack: () => void
   setSelectedDestination: (destination: DestinationRecommendation | null) => void
-  setSelectedCity: (city: any | null) => void
-  setSelectedActivity: (activity: any | null) => void
-  setSelectedFlight: (flight: any | null) => void
+  setSelectedCity: (city: SelectedCity | null) => void
+  setSelectedActivity: (activity: SelectedActivity | null) => void
+  setSelectedFlight: (flight: SelectedFlight | null) => void
   resetNavigation: () => void
   setIsNavigating: (isNavigating: boolean, message?: string) => void
   

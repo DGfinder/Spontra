@@ -7,6 +7,8 @@ export interface BookingProvider {
   trustScore: number // 1-5
   bookingFee?: number
   features: string[]
+  hasAffiliateProgram?: boolean
+  affiliateCommissionRate?: number
 }
 
 export interface BookingOption {
@@ -16,6 +18,10 @@ export interface BookingOption {
   url: string
   availability: 'high' | 'low' | 'last-few'
   benefits?: string[]
+  affiliateUrl?: string
+  clickId?: string
+  estimatedCommission?: number
+  commissionRate?: number
 }
 
 // Major booking providers
@@ -29,7 +35,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/03/Lufthansa-Logo.png',
     trustScore: 5,
     bookingFee: 0,
-    features: ['Miles & More points', 'Free changes (same fare)', 'Direct customer service']
+    features: ['Miles & More points', 'Free changes (same fare)', 'Direct customer service'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 1.2
   },
   'airfrance': {
     id: 'airfrance',
@@ -39,7 +47,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://1000logos.net/wp-content/uploads/2020/04/Air-France-Logo.png',
     trustScore: 5,
     bookingFee: 0,
-    features: ['Flying Blue miles', 'Free seat selection', 'Direct booking benefits']
+    features: ['Flying Blue miles', 'Free seat selection', 'Direct booking benefits'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 1.5
   },
   'klm': {
     id: 'klm',
@@ -49,7 +59,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logoeps.com/wp-content/uploads/2013/03/klm-vector-logo.png',
     trustScore: 5,
     bookingFee: 0,
-    features: ['Flying Blue miles', 'Free changes', 'Priority customer service']
+    features: ['Flying Blue miles', 'Free changes', 'Priority customer service'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 1.5
   },
   'britishairways': {
     id: 'britishairways',
@@ -59,7 +71,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/03/British-Airways-Logo.png',
     trustScore: 5,
     bookingFee: 0,
-    features: ['Avios points', 'Executive Club benefits', 'Direct customer service']
+    features: ['Avios points', 'Executive Club benefits', 'Direct customer service'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 1.3
   },
 
   // Online Travel Agencies
@@ -71,7 +85,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/04/Expedia-Logo.png',
     trustScore: 4,
     bookingFee: 0,
-    features: ['Package deals', 'Rewards program', '24/7 customer service']
+    features: ['Package deals', 'Rewards program', '24/7 customer service'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 4.2
   },
   'booking': {
     id: 'booking',
@@ -81,7 +97,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/04/Booking-com-Logo.png',
     trustScore: 4,
     bookingFee: 0,
-    features: ['Genius program', 'Free cancellation options', 'Best price guarantee']
+    features: ['Genius program', 'Free cancellation options', 'Best price guarantee'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 3.8
   },
   'kayak': {
     id: 'kayak',
@@ -91,7 +109,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/04/Kayak-Logo.png',
     trustScore: 4,
     bookingFee: 0,
-    features: ['Price comparison', 'Price alerts', 'Trip planning tools']
+    features: ['Price comparison', 'Price alerts', 'Trip planning tools'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 2.1
   },
   'skyscanner': {
     id: 'skyscanner',
@@ -101,7 +121,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/04/Skyscanner-Logo.png',
     trustScore: 4,
     bookingFee: 0,
-    features: ['Price comparison', 'Flexible dates', 'Mobile app']
+    features: ['Price comparison', 'Flexible dates', 'Mobile app'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 1.8
   },
   'momondo': {
     id: 'momondo',
@@ -111,7 +133,9 @@ export const BOOKING_PROVIDERS: Record<string, BookingProvider> = {
     logoUrl: 'https://logos-world.net/wp-content/uploads/2020/04/Momondo-Logo.png',
     trustScore: 4,
     bookingFee: 0,
-    features: ['Price insights', 'Trip inspiration', 'Flexible search']
+    features: ['Price insights', 'Trip inspiration', 'Flexible search'],
+    hasAffiliateProgram: true,
+    affiliateCommissionRate: 2.3
   }
 }
 
@@ -120,7 +144,14 @@ export function generateBookingOptions(
   airlineCode: string,
   basePrice: number,
   currency: string,
-  flightId: string
+  flightId: string,
+  flightDetails?: {
+    origin: string
+    destination: string
+    departureDate: string
+    passengers: number
+    cabinClass: string
+  }
 ): BookingOption[] {
   const options: BookingOption[] = []
   
@@ -135,13 +166,18 @@ export function generateBookingOptions(
   const airlineProviderId = airlineProviders[airlineCode as keyof typeof airlineProviders]
   if (airlineProviderId) {
     const provider = BOOKING_PROVIDERS[airlineProviderId]
+    const estimatedCommission = provider.affiliateCommissionRate ? 
+      Math.round((basePrice * provider.affiliateCommissionRate / 100) * 100) / 100 : 0
+    
     options.push({
       provider,
       price: basePrice,
       currency,
       url: `${provider.website}/book/flight/${flightId}`,
       availability: 'high',
-      benefits: provider.features
+      benefits: provider.features,
+      estimatedCommission,
+      commissionRate: provider.affiliateCommissionRate
     })
   }
   
@@ -151,6 +187,8 @@ export function generateBookingOptions(
     const provider = BOOKING_PROVIDERS[providerId]
     const priceVariation = (Math.random() - 0.5) * 0.1 // ±5% variation
     const price = Math.round(basePrice * (1 + priceVariation))
+    const estimatedCommission = provider.affiliateCommissionRate ? 
+      Math.round((price * provider.affiliateCommissionRate / 100) * 100) / 100 : 0
     
     options.push({
       provider,
@@ -158,7 +196,9 @@ export function generateBookingOptions(
       currency,
       url: `${provider.website}/flights/book/${flightId}`,
       availability: index === 0 ? 'high' : 'high',
-      benefits: provider.features
+      benefits: provider.features,
+      estimatedCommission,
+      commissionRate: provider.affiliateCommissionRate
     })
   })
   

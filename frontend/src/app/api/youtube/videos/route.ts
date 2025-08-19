@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 
+// YouTube API response types
+interface YouTubeVideoItem {
+  id: {
+    videoId: string
+  }
+  snippet: {
+    title: string
+    description: string
+    thumbnails: {
+      medium: {
+        url: string
+      }
+    }
+    channelTitle: string
+    publishedAt: string
+  }
+}
+
+interface YouTubeSearchResponse {
+  items: YouTubeVideoItem[]
+}
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -41,9 +63,9 @@ export async function GET(req: NextRequest) {
       throw new Error(`YouTube API request failed: ${response.status}`)
     }
 
-    const data = await response.json()
+    const data = await response.json() as YouTubeSearchResponse
 
-    const videos = data.items?.map((item: any) => ({
+    const videos = data.items?.map((item: YouTubeVideoItem) => ({
       id: item.id?.videoId,
       title: item.snippet?.title,
       description: item.snippet?.description,

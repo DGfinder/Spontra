@@ -197,3 +197,141 @@ export const getValidationErrors = <T>(
     return { general: 'Validation failed' }
   }
 }
+
+// ============================================================================
+// API ROUTE VALIDATION SCHEMAS
+// ============================================================================
+
+// Currency code validation (ISO 4217)
+export const currencyCodeSchema = z
+  .string()
+  .length(3, 'Currency code must be exactly 3 letters')
+  .regex(/^[A-Z]{3}$/, 'Currency code must contain only uppercase letters')
+
+// Flight search API validation
+export const flightSearchApiSchema = z.object({
+  origin: airportCodeSchema,
+  destination: airportCodeSchema,
+  departureDate: z.string().min(1, 'Departure date is required'),
+  returnDate: z.string().optional(),
+  passengers: z.number().min(1, 'At least 1 passenger required').max(8, 'Maximum 8 passengers allowed'),
+  travelClass: z.enum(['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']).optional(),
+  nonStop: z.boolean().optional()
+})
+
+// Destination search API validation
+export const destinationSearchApiSchema = z.object({
+  origin: airportCodeSchema,
+  maxFlightTime: z.number().min(0.5).max(12).optional(),
+  minFlightTime: z.number().min(0.5).max(12).optional(),
+  theme: z.string().min(1, 'Theme is required'),
+  departureDate: z.string().optional(),
+  priceRange: z.string().optional(),
+  countries: z.array(z.string()).optional(),
+  nonStop: z.boolean().optional()
+}).refine((data) => {
+  if (data.minFlightTime && data.maxFlightTime) {
+    return data.minFlightTime <= data.maxFlightTime
+  }
+  return true
+}, {
+  message: 'Minimum flight time must be less than or equal to maximum',
+  path: ['maxFlightTime']
+})
+
+// Click tracking API validation
+export const clickEventApiSchema = z.object({
+  id: z.string().min(1, 'Click ID is required'),
+  partnerId: z.string().min(1, 'Partner ID is required'),
+  flightId: z.string().min(1, 'Flight ID is required'),
+  bookingValue: z.number().min(0, 'Booking value must be positive'),
+  deviceType: z.enum(['desktop', 'mobile', 'tablet']).optional(),
+  sessionId: z.string().optional(),
+  userAgent: z.string().max(500, 'User agent too long').optional(),
+  timestamp: z.string().optional()
+})
+
+// Webhook validation for conversion tracking
+export const webhookConversionSchema = z.object({
+  clickId: z.string().min(1, 'Click ID is required').max(100, 'Click ID too long'),
+  bookingReference: z.string().min(1, 'Booking reference is required').max(50, 'Booking reference too long'),
+  bookingValue: z.number().min(0, 'Booking value must be positive').max(1000000, 'Booking value too large'),
+  currency: currencyCodeSchema,
+  commissionValue: z.number().min(0, 'Commission value must be positive').optional(),
+  bookingDate: z.string().min(1, 'Booking date is required'),
+  passengerDetails: z.object({
+    adults: z.number().min(1).max(8).optional(),
+    children: z.number().min(0).max(8).optional(),
+    infants: z.number().min(0).max(8).optional()
+  }).optional(),
+  flightDetails: z.object({
+    origin: airportCodeSchema.optional(),
+    destination: airportCodeSchema.optional(),
+    departureDate: z.string().optional(),
+    returnDate: z.string().optional(),
+    airline: z.string().max(10).optional(),
+    cabinClass: z.enum(['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']).optional()
+  }).optional(),
+  status: z.enum(['pending', 'confirmed', 'cancelled']).optional()
+})
+
+// City search API validation
+export const citySearchApiSchema = z.object({
+  countryName: z.string().optional(),
+  countryCode: z.string().length(2, 'Country code must be 2 letters').regex(/^[A-Z]{2}$/).optional(),
+  origin: airportCodeSchema,
+  departureDate: z.string().optional()
+}).refine((data) => {
+  return data.countryName || data.countryCode
+}, {
+  message: 'Either country name or country code is required',
+  path: ['countryName']
+})
+
+// YouTube API validation
+export const youtubeApiSchema = z.object({
+  destination: z.string().min(1, 'Destination is required').max(100, 'Destination name too long'),
+  activity: z.string().max(100, 'Activity name too long').optional(),
+  maxResults: z.number().min(1).max(20).optional()
+})
+
+// String sanitization helper
+export const sanitizeString = (input: string): string => {
+  if (typeof input !== 'string') return ''
+  
+  return input
+    .trim()
+    .replace(/[<>\"']/g, '') // Remove potential XSS characters
+    .replace(/\0/g, '') // Remove null bytes
+    .substring(0, 1000) // Limit length
+}
+
+// Validate and sanitize API request
+export const validateApiRequest = <T>(
+  schema: z.ZodSchema<T>,
+  data: unknown,
+  sanitizeStrings = true
+): { success: true; data: T } | { success: false; errors: Record<string, string> } => {
+  try {
+    // Pre-sanitize string fields if requested
+    if (sanitizeStrings && typeof data === 'object' && data !== null) {
+      const sanitizedData = JSON.parse(JSON.stringify(data), (key, value) => {
+        return typeof value === 'string' ? sanitizeString(value) : value
+      })
+      data = sanitizedData
+    }
+    
+    const validatedData = schema.parse(data)
+    return { success: true, data: validatedData }
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors: Record<string, string> = {}
+      error.errors.forEach((err) => {
+        const path = err.path.join('.')
+        errors[path] = err.message
+      })
+      return { success: false, errors }
+    }
+    return { success: false, errors: { general: 'Validation failed' } }
+  }
+}

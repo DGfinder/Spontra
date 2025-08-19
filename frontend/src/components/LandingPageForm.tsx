@@ -10,6 +10,7 @@ import { ActivityConstellation } from './ActivityConstellation'
 import { FlightResults } from './FlightResults'
 import { BookingConfirmation } from './BookingConfirmation'
 import { BreadcrumbNavigation } from './BreadcrumbNavigation'
+import { SearchFormErrorBoundary, FlightResultsErrorBoundary, BookingFlowErrorBoundary } from './ErrorBoundary'
 import { useDestinationExplore } from '@/hooks/useDestinationExplore'
 import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
@@ -420,11 +421,13 @@ export function LandingPageForm() {
           />
           <div className="relative z-10 flex flex-col justify-start w-full no-scrollbar overflow-hidden pt-1 pb-6 md:pb-8"
             style={{ marginLeft: '8px' }}>
-            <SearchForm
-              themes={THEMES}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
+            <SearchFormErrorBoundary>
+              <SearchForm
+                themes={THEMES}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+              />
+            </SearchFormErrorBoundary>
           </div>
         </div>
 
@@ -506,40 +509,29 @@ export function LandingPageForm() {
       )}
 
       {navigation.currentStep === 'flights' && navigation.selectedDestination && (
-        <FlightResults
-          recommendation={navigation.selectedDestination}
-          originAirport={formData.departureAirport}
-          selectedActivity={navigation.selectedActivity?.category}
-          onBack={handleBackToResults}
-          onFlightSelect={handleFlightSelect}
-        />
+        <FlightResultsErrorBoundary>
+          <FlightResults
+            recommendation={navigation.selectedDestination}
+            originAirport={formData.departureAirport}
+            selectedActivity={navigation.selectedActivity?.category}
+            onBack={handleBackToResults}
+            onFlightSelect={handleFlightSelect}
+          />
+        </FlightResultsErrorBoundary>
       )}
 
       {navigation.currentStep === 'booking' && navigation.selectedDestination && navigation.selectedFlight && (
-        <BookingConfirmation
-          destination={navigation.selectedDestination}
-          flight={navigation.selectedFlight}
-          activity={navigation.selectedActivity}
-          originAirport={formData.departureAirport}
-          onStartNewSearch={handleStartNewSearch}
-        />
+        <BookingFlowErrorBoundary>
+          <BookingConfirmation
+            destination={navigation.selectedDestination}
+            flight={navigation.selectedFlight}
+            activity={navigation.selectedActivity}
+            originAirport={formData.departureAirport}
+            onStartNewSearch={handleStartNewSearch}
+          />
+        </BookingFlowErrorBoundary>
       )}
 
-      {/* Legacy Search Results Overlay - Show when not using navigation flow */}
-      {false && showResults && navigation.currentStep === 'search' && (
-        <SearchResults
-          results={results}
-          isLoading={isLoading}
-          isError={isError}
-          error={error}
-          maxFlightTime={formData.maxFlightTime}
-          departureAirport={formData.departureAirport}
-          selectedTheme={formData.selectedTheme}
-          onBackToSearch={handleBackToSearch}
-          onRetry={retry}
-          onExploreDestination={handleExploreDestination}
-        />
-      )}
       
       {/* CSS Animations */}
       <style jsx>{`

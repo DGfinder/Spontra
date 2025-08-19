@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { amadeusClient } from '@/lib/amadeus-simple'
+import { AmadeusFlightOffer } from '@/types/amadeus'
+import { validateApiRequest, flightSearchApiSchema } from '@/lib/validations'
 
 export const runtime = 'nodejs'
 
@@ -8,6 +10,18 @@ export async function POST(req: NextRequest) {
   
   try {
     const body = await req.json()
+    
+    // Validate and sanitize request body
+    const validation = validateApiRequest(flightSearchApiSchema, body)
+    if (!validation.success) {
+      console.log('❌ Invalid flight search parameters:', validation.errors)
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'Invalid flight search parameters',
+        details: validation.errors
+      }, { status: 400 })
+    }
+
     const { 
       origin, 
       destination, 
@@ -16,7 +30,7 @@ export async function POST(req: NextRequest) {
       passengers = 1, 
       travelClass = 'ECONOMY',
       nonStop = false
-    } = body
+    } = validation.data
     
     console.log('📝 Flight search parameters:', { 
       origin, 
@@ -27,14 +41,6 @@ export async function POST(req: NextRequest) {
       travelClass,
       nonStop 
     })
-
-    if (!origin || !destination || !departureDate) {
-      console.log('❌ Missing required parameters')
-      return NextResponse.json({ 
-        ok: false, 
-        error: 'Missing required params: origin, destination, departureDate' 
-      }, { status: 400 })
-    }
 
     console.log('🔍 Checking amadeusClient availability...')
     if (!amadeusClient) {
@@ -60,7 +66,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Map to a lightweight shape for the UI
-    const flights = (offers || []).slice(0, 12).map((offer: any, idx: number) => {
+    const flights = (offers || []).slice(0, 12).map((offer: AmadeusFlightOffer, idx: number) => {
       const firstItin = offer.itineraries?.[0]
       const firstSeg = firstItin?.segments?.[0]
       const lastSeg = firstItin?.segments?.[firstItin?.segments?.length - 1]
@@ -133,16 +139,17 @@ export async function POST(req: NextRequest) {
         dataSource: 'amadeus-real-time'
       }
     })
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as Error
     console.error('💥 Real-time flights API error:', {
-      message: e?.message,
-      stack: e?.stack,
-      name: e?.name,
-      cause: e?.cause
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name,
+      cause: (error as any)?.cause
     })
     
     // Check for specific Amadeus API errors
-    if (e?.message?.includes('Flight search failed')) {
+    if (error?.message?.includes('Flight search failed')) {
       return NextResponse.json(
         { 
           ok: false, 
@@ -154,7 +161,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Check for authentication/credentials errors
-    if (e?.message?.includes('credentials') || e?.message?.includes('authentication')) {
+    if (error?.message?.includes('credentials') || error?.message?.includes('authentication')) {
       return NextResponse.json(
         { 
           ok: false, 

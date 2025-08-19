@@ -11,8 +11,9 @@ export async function POST(req: NextRequest) {
     }
     const info = await amadeusService.getAirportInfo(code.toUpperCase())
     return NextResponse.json({ ok: true, data: info })
-  } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message || 'Internal Server Error' }, { status: 500 })
+  } catch (e: unknown) {
+    const error = e as Error
+    return NextResponse.json({ ok: false, error: error?.message || 'Internal Server Error' }, { status: 500 })
   }
 }
 

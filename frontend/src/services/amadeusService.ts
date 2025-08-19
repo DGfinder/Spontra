@@ -306,7 +306,6 @@ class AmadeusService {
     viewBy?: 'DATE' | 'DESTINATION' | 'DURATION' | 'WEEK' | 'COUNTRY' | 'PRICE'
     nonStop?: boolean // accepted for API parity; currently advisory in theme flow
   }): Promise<DestinationRecommendation[]> {
-    console.log(`🎯 Theme-based destination exploration: ${params.theme}`)
     
     // Step 1: Check if theme is supported
     if (!isThemeSupported(params.theme)) {
