@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
-import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cache-client'
+import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cacheClient'
 // Client will call our server route instead of hitting Amadeus directly
 
 // Theme to activity mapping

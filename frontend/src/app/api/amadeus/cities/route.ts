@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusClient } from '@/lib/amadeus-simple'
+import { amadeusClient } from '@/lib/amadeusSimple'
 import { AmadeusLocation } from '@/types/amadeus'
 
 export const runtime = 'nodejs'

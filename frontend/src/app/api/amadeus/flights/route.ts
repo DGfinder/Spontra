@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { amadeusClient } from '@/lib/amadeus-simple'
+import { amadeusClient } from '@/lib/amadeusSimple'
 import { AmadeusFlightOffer } from '@/types/amadeus'
 import { validateApiRequest, flightSearchApiSchema } from '@/lib/validations'
 

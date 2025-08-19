@@ -331,7 +331,7 @@ class AmadeusService {
     }
 
     // Step 4: Get cached pricing for each theme-appropriate city
-    const { amadeusClient } = await import('@/lib/amadeus-simple')
+    const { amadeusClient } = await import('@/lib/amadeusSimple')
     const recommendations: DestinationRecommendation[] = []
     
     try {
@@ -500,7 +500,7 @@ class AmadeusService {
     originAirport: string,
     theme: string
   ): Promise<DestinationRecommendation[]> {
-    const { amadeusClient } = await import('@/lib/amadeus-simple')
+    const { amadeusClient } = await import('@/lib/amadeusSimple')
 
     const recommendations: DestinationRecommendation[] = []
     
