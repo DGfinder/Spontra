@@ -226,7 +226,7 @@ export const destinationSearchApiSchema = z.object({
   minFlightTime: z.number().min(0.5).max(12).optional(),
   theme: z.string().min(1, 'Theme is required'),
   departureDate: z.string().optional(),
-  priceRange: z.string().optional(),
+  priceRange: z.enum(['budget', 'mid-range', 'luxury', 'any']).optional(),
   countries: z.array(z.string()).optional(),
   nonStop: z.boolean().optional()
 }).refine((data) => {
