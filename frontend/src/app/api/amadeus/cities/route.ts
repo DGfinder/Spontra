@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { amadeusClient } from '@/lib/amadeusSimple'
-import { AmadeusLocation } from '@/types/amadeus'
 
 export const runtime = 'nodejs'
 
@@ -29,8 +28,8 @@ export async function POST(req: NextRequest) {
     const locations = await amadeusClient.searchLocations(keyword, 'CITY')
 
     const filtered = (locations || [])
-      .filter((loc: AmadeusLocation) => {
-        // Note: amadeus-simple.ts AmadeusDestination doesn't have address property
+      .filter((loc) => {
+        // Note: searchLocations returns AmadeusDestination from amadeusSimple.ts
         // Filtering by keyword match should be sufficient for city search
         return loc.name && loc.iataCode
       })
