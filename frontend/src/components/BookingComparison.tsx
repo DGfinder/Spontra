@@ -160,12 +160,12 @@ export function BookingComparison({
       </div>
 
       {/* Show More/Less Button */}
-      {optimizedOptions.length > 3 && (
+      {bookingOptions.length > 3 && (
         <button
           onClick={() => setShowAllOptions(!showAllOptions)}
           className="w-full mt-4 text-white/70 hover:text-white text-sm border border-white/20 rounded-lg py-2 transition-colors"
         >
-          {showAllOptions ? 'Show Less' : `Show ${optimizedOptions.length - 3} More Options`}
+          {showAllOptions ? 'Show Less' : `Show ${bookingOptions.length - 3} More Options`}
         </button>
       )}
 

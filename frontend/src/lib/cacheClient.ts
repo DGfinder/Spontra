@@ -101,7 +101,7 @@ class ClientCache {
 
     const remainingHours = Math.round((entry.ttl - age) / 1000 / 60 / 60 * 10) / 10
     console.log(`✅ Cache hit for ${key} (expires in ${remainingHours}h)`)
-    return entry.data
+    return entry.data as T
   }
 
   /**

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType } from '@/services/apiClient'
+import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType, DestinationRecommendation } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
 import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cacheClient'
 // Client will call our server route instead of hitting Amadeus directly
@@ -54,7 +54,7 @@ export function useDestinationExplore() {
         const cachedResponse: DestinationExploreResponse = {
           id: `cached-${Date.now()}`,
           explore_request_id: `cache-req-${Date.now()}`,
-          recommended_destinations: cachedSearch.results,
+          recommended_destinations: cachedSearch.results as DestinationRecommendation[],
           total_results: cachedSearch.results.length,
           searched_at: cachedSearch.meta.searchTimestamp,
           processing_time_ms: 0, // Instant from cache

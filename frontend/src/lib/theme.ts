@@ -329,5 +329,4 @@ export const createThemeComponentConfig = (theme: ThemeKey) => ({
   iconName: getThemeIconName(theme)
 })
 
-// Re-export commonly used types for convenience
-export type { ThemeIconProps, ThemeScores }
+// Types already exported above for convenience

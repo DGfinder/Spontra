@@ -233,7 +233,7 @@ class AffiliateService {
         sessionId = uuidv4()
         sessionStorage.setItem('spontra_session_id', sessionId)
       }
-      return sessionId
+      return sessionId || uuidv4()
     }
     return uuidv4()
   }
@@ -467,5 +467,4 @@ class AffiliateService {
 // Export singleton instance
 export const affiliateService = new AffiliateService()
 
-// Export types
-export type { AffiliatePartner, ClickEvent, ConversionEvent }
+// Types already exported above

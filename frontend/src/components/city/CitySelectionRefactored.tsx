@@ -183,7 +183,6 @@ export function CitySelectionRefactored({
             
             <ExplorationProgress 
               currentStep="cities"
-              completedSteps={['countries']}
             />
           </div>
         </div>

@@ -34,7 +34,9 @@ export interface TextAreaFieldProps extends React.TextareaHTMLAttributes<HTMLTex
 }
 
 // Base input styles
-const getInputStyles = (variant: string, hasError: boolean) => {
+type InputVariant = 'default' | 'minimal' | 'glass'
+
+const getInputStyles = (variant: InputVariant, hasError: boolean) => {
   const baseStyles = [
     'w-full',
     'font-muli',
@@ -167,7 +169,7 @@ const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
             id={fieldId}
             type={type}
             className={cn(
-              getInputStyles(variant, hasError),
+              getInputStyles(variant as InputVariant, hasError),
               icon && 'pl-10',
               suffix && 'pr-10',
               className
@@ -221,7 +223,7 @@ const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
             ref={ref}
             id={fieldId}
             className={cn(
-              getInputStyles(variant, hasError),
+              getInputStyles(variant as InputVariant, hasError),
               'appearance-none',
               'pr-10',
               className
@@ -291,7 +293,7 @@ const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(
           id={fieldId}
           rows={rows}
           className={cn(
-            getInputStyles(variant, hasError),
+            getInputStyles(variant as InputVariant, hasError),
             !resize && 'resize-none',
             className
           )}

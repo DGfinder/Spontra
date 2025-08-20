@@ -559,13 +559,6 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
                   basePrice={selectedFlight.price}
                   currency={selectedFlight.currency}
                   flightId={selectedFlight.id}
-                  flightDetails={{
-                    origin: originAirport,
-                    destination: recommendation.destination.airport_code,
-                    departureDate: formData.departureDate || new Date().toISOString().slice(0,10),
-                    passengers: formData.passengers || 1,
-                    cabinClass: formData.cabinClass || 'ECONOMY'
-                  }}
                   onBookingSelect={(option) => {
                     // Open booking provider with affiliate URL if available
                     const finalUrl = option.affiliateUrl || option.url

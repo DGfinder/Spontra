@@ -341,8 +341,8 @@ function parseSkyscannerConversion(data: SkyscannerWebhookData): ConversionEvent
 
 function parseGenericConversion(data: GenericWebhookData): ConversionEvent {
   return {
-    clickId: data.clickId || data.click_id,
-    bookingReference: data.bookingRef || data.booking_reference,
+    clickId: data.clickId || data.click_id || '',
+    bookingReference: data.bookingRef || data.booking_reference || '',
     bookingValue: parseFloat(data.value || data.amount || '0'),
     currency: data.currency || 'EUR',
     commissionValue: parseFloat(data.commission || '0'),

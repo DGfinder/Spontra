@@ -23,10 +23,7 @@ const MemoizedCountryCard = React.memo(CountryCard, (prevProps, nextProps) => {
   return (
     prevProps.aggregation.country.code === nextProps.aggregation.country.code &&
     prevProps.selectedTheme === nextProps.selectedTheme &&
-    prevProps.maxFlightTime === nextProps.maxFlightTime &&
-    prevProps.departureAirport === nextProps.departureAirport &&
-    prevProps.index === nextProps.index &&
-    prevProps.aggregation.destinations.length === nextProps.aggregation.destinations.length
+    prevProps.aggregation.allDestinations.length === nextProps.aggregation.allDestinations.length
   )
 })
 
@@ -188,10 +185,7 @@ export const OptimizedSearchResults = React.memo<OptimizedSearchResultsProps>(({
                 key={`${aggregation.country.code}-${visaFreeOnly}`}
                 aggregation={aggregation}
                 selectedTheme={selectedTheme}
-                maxFlightTime={maxFlightTime}
-                departureAirport={departureAirport}
-                index={index}
-                onExplore={handleExploreDestination}
+                onSelectDestination={handleExploreDestination}
               />
             ))}
           </div>
