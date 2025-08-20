@@ -245,9 +245,24 @@ export const clickEventApiSchema = z.object({
   partnerId: z.string().min(1, 'Partner ID is required'),
   flightId: z.string().min(1, 'Flight ID is required'),
   bookingValue: z.number().min(0, 'Booking value must be positive'),
-  deviceType: z.enum(['desktop', 'mobile', 'tablet']).optional(),
-  sessionId: z.string().optional(),
-  userAgent: z.string().max(500, 'User agent too long').optional(),
+  currency: z.string().min(3, 'Currency is required'),
+  origin: z.string().min(3, 'Origin is required'),
+  destination: z.string().min(3, 'Destination is required'),
+  departureDate: z.string().min(1, 'Departure date is required'),
+  passengers: z.number().min(1, 'Passengers is required'),
+  cabinClass: z.string().min(1, 'Cabin class is required'),
+  deviceType: z.enum(['desktop', 'mobile', 'tablet']),
+  sessionId: z.string().min(1, 'Session ID is required'),
+  userAgent: z.string().max(500, 'User agent too long'),
+  referrer: z.string(),
+  utm: z.object({
+    source: z.string().optional(),
+    medium: z.string().optional(),
+    campaign: z.string().optional(),
+    term: z.string().optional(),
+    content: z.string().optional()
+  }),
+  userId: z.string().optional(),
   timestamp: z.string().optional()
 })
 

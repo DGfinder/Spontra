@@ -36,11 +36,14 @@ export async function POST(req: NextRequest) {
       timestamp: clickEvent.timestamp
     })
 
-    // Store the click event (in real implementation, save to database)
-    clickEvents.push({
+    // Ensure timestamp is always present and create the complete event
+    const completeClickEvent: ClickEvent = {
       ...clickEvent,
-      timestamp: new Date().toISOString() // Ensure server timestamp
-    })
+      timestamp: clickEvent.timestamp || new Date().toISOString() // Ensure server timestamp
+    }
+
+    // Store the click event (in real implementation, save to database)
+    clickEvents.push(completeClickEvent)
 
     // In a real implementation, you would:
     // 1. Save to database (PostgreSQL, MongoDB, etc.)
@@ -49,13 +52,13 @@ export async function POST(req: NextRequest) {
     // 4. Trigger attribution workflows
 
     // Simulate database save
-    await simulateDatabaseSave(clickEvent)
+    await simulateDatabaseSave(completeClickEvent)
 
     // Send to analytics service
-    await sendToAnalytics(clickEvent)
+    await sendToAnalytics(completeClickEvent)
 
     // Update real-time metrics
-    await updateMetrics(clickEvent)
+    await updateMetrics(completeClickEvent)
 
     return NextResponse.json({
       success: true,
