@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
     // Generate summary statistics
     const totalReports = filteredReports.length
     const severityBreakdown = filteredReports.reduce((acc, report) => {
-      const severity = report.severity || 'unknown'
+      const severity = report.severity ?? 'unknown'
       acc[severity] = (acc[severity] || 0) + 1
       return acc
     }, {} as Record<string, number>)
