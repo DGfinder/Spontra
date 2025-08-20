@@ -60,21 +60,27 @@ export async function POST(req: NextRequest) {
 
     // Fallback to legacy Amadeus service with theme city logic
     console.log('🔄 Using legacy amadeusService with theme-based filtering')
-    const recommendations = await amadeusService.exploreDestinations({
-      origin,
-      maxFlightTime,
-      theme,
-      departureDate,
-      nonStop,
-      viewBy: 'PRICE' // Use PRICE view for cached pricing sorted by cost
-    })
+    
+    try {
+      const recommendations = await amadeusService.exploreDestinations({
+        origin,
+        maxFlightTime,
+        theme,
+        departureDate,
+        nonStop,
+        viewBy: 'PRICE' // Use PRICE view for cached pricing sorted by cost
+      })
 
-    console.log('✅ Legacy API call successful, recommendations count:', recommendations?.length || 0)
-    return NextResponse.json({ 
-      ok: true, 
-      data: recommendations,
-      source: 'legacy'
-    })
+      console.log('✅ Legacy API call successful, recommendations count:', recommendations?.length || 0)
+      return NextResponse.json({ 
+        ok: true, 
+        data: recommendations,
+        source: 'legacy'
+      })
+    } catch (legacyError) {
+      console.error('❌ Legacy Amadeus service failed:', legacyError)
+      throw legacyError // Re-throw to be handled by outer catch block
+    }
   } catch (e: unknown) {
     const error = e as Error
     console.error('💥 Destinations API error:', {

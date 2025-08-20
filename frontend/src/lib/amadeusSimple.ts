@@ -33,6 +33,7 @@ class SimpleAmadeusClient {
   private clientSecret: string;
   private baseUrl: string;
   private accessToken: string | null = null;
+  private tokenExpiresAt: number = 0;
 
   constructor() {
     this.clientId = process.env.AMADEUS_CLIENT_ID || '';
@@ -40,10 +41,25 @@ class SimpleAmadeusClient {
     this.baseUrl = process.env.AMADEUS_ENVIRONMENT === 'production' 
       ? 'https://api.amadeus.com' 
       : 'https://test.api.amadeus.com';
+    
+    // Validate credentials on initialization
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🔧 Amadeus Client Configuration:')
+      console.log('📡 Base URL:', this.baseUrl)
+      console.log('🆔 Client ID configured:', !!this.clientId)
+      console.log('🔑 Client Secret configured:', !!this.clientSecret)
+      console.log('🌍 Environment:', process.env.AMADEUS_ENVIRONMENT || 'test')
+      
+      if (!this.clientId || !this.clientSecret) {
+        console.warn('⚠️ Amadeus credentials not fully configured!')
+        console.warn('   Make sure AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET are set in .env.local')
+      }
+    }
   }
 
   private async getAccessToken(): Promise<string> {
-    if (this.accessToken) {
+    // Check if we have a valid token that hasn't expired
+    if (this.accessToken && Date.now() < this.tokenExpiresAt) {
       return this.accessToken;
     }
 
@@ -77,14 +93,31 @@ class SimpleAmadeusClient {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('❌ Token request failed:', errorText)
-      throw new Error(`Token request failed: ${response.status} - ${errorText}`);
+      console.error('❌ Amadeus Token Authentication Failed:')
+      console.error('   Status:', response.status)
+      console.error('   Response:', errorText)
+      console.error('   URL:', `${this.baseUrl}/v1/security/oauth2/token`)
+      
+      // Parse specific error details if available
+      try {
+        const errorData = JSON.parse(errorText)
+        if (errorData.error) {
+          console.error('   Error Code:', errorData.error)
+          console.error('   Error Description:', errorData.error_description)
+        }
+      } catch (parseError) {
+        // Error response not in JSON format
+      }
+      
+      throw new Error(`Amadeus authentication failed: ${response.status} - ${errorText}`);
     }
 
     const data: AmadeusTokenResponse = await response.json();
     this.accessToken = data.access_token;
+    // Set expiry time (subtract 60 seconds for safety margin)
+    this.tokenExpiresAt = Date.now() + (data.expires_in - 60) * 1000;
     if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Access token acquired successfully')
+      console.log('✅ Access token acquired successfully, expires in:', data.expires_in, 'seconds')
     }
     return this.accessToken;
   }
@@ -228,17 +261,23 @@ class SimpleAmadeusClient {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('❌ Amadeus API error response:', errorText)
+      console.error('❌ Amadeus Destination API Failed:')
+      console.error('   Status:', response.status)
+      console.error('   URL:', url)
+      console.error('   Response:', errorText)
       
-      // Parse error details
+      // Parse detailed error information
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.errors && errorData.errors.length > 0) {
           const error = errorData.errors[0];
+          console.error('   Error Code:', error.code)
+          console.error('   Error Title:', error.title)
+          console.error('   Error Detail:', error.detail)
           throw new Error(`Amadeus API Error ${error.code}: ${error.title} - ${error.detail}`);
         }
       } catch (parseError) {
-        // Fall back to original error format
+        console.error('   Could not parse error details')
       }
       
       throw new Error(`Destination exploration failed: ${response.status} - ${errorText}`);

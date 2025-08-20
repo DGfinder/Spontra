@@ -9,10 +9,12 @@ export async function POST(req: NextRequest) {
     if (!code || typeof code !== 'string' || code.length !== 3) {
       return NextResponse.json({ ok: false, error: 'Invalid airport code' }, { status: 400 })
     }
+    
     const info = await amadeusService.getAirportInfo(code.toUpperCase())
     return NextResponse.json({ ok: true, data: info })
   } catch (e: unknown) {
     const error = e as Error
+    console.error('💥 Airport API error:', error)
     return NextResponse.json({ ok: false, error: error?.message || 'Internal Server Error' }, { status: 500 })
   }
 }

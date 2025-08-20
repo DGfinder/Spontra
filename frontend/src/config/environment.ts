@@ -108,7 +108,7 @@ class EnvironmentService {
     }
 
     // Validate themes
-    const validThemes = ['party', 'adventure', 'learn', 'shopping', 'beach']
+    const validThemes = ['party', 'adventure', 'learn', 'shopping', 'nature']
     const invalidThemes = this.config.supportedThemes.filter(theme => !validThemes.includes(theme))
     if (invalidThemes.length > 0) {
       errors.push(`Invalid themes found: ${invalidThemes.join(', ')}`)
@@ -219,7 +219,7 @@ export const {
 } = environmentService.getConfig()
 
 // Type guards
-export function isValidTheme(theme: string): theme is 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' {
+export function isValidTheme(theme: string): theme is 'party' | 'adventure' | 'learn' | 'shopping' | 'nature' {
   return supportedThemes.includes(theme)
 }
 

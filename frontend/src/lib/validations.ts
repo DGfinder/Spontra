@@ -224,7 +224,7 @@ export const destinationSearchApiSchema = z.object({
   origin: airportCodeSchema,
   maxFlightTime: z.number().min(0.5).max(12).optional(),
   minFlightTime: z.number().min(0.5).max(12).optional(),
-  theme: z.string().min(1, 'Theme is required'),
+  theme: z.string().min(1).optional(),
   departureDate: z.string().optional(),
   priceRange: z.enum(['budget', 'mid-range', 'luxury', 'any']).optional(),
   countries: z.array(z.string()).optional(),
