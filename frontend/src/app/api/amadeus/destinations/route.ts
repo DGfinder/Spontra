@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
     
     // Check for authentication/credentials errors
-    if (e?.message?.includes('credentials') || e?.message?.includes('authentication')) {
+    if (error?.message?.includes('credentials') || error?.message?.includes('authentication')) {
       return NextResponse.json(
         { 
           ok: false, 
