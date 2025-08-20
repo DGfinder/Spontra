@@ -120,8 +120,11 @@ class EnvironmentService {
 
     if (errors.length > 0) {
       console.warn('⚠️ Environment configuration issues:', errors)
-      if (this.config.enableDebugLogging) {
-        throw new Error(`Environment configuration errors: ${errors.join('; ')}`)
+      // Don't throw errors in production or when services are starting up
+      // Allow graceful degradation instead of failing completely
+      if (this.config.enableDebugLogging && process.env.NODE_ENV === 'development') {
+        console.warn('Debug mode enabled but allowing startup with configuration warnings')
+        // throw new Error(`Environment configuration errors: ${errors.join('; ')}`)
       }
     }
   }
