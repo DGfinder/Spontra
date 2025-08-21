@@ -49,7 +49,8 @@ export async function POST(req: NextRequest) {
         isBackendHealthy = await themeDestinationService.healthCheck()
         console.log(`💚 [${requestId}] Backend health check result:`, isBackendHealthy)
       } catch (healthError) {
-        console.log(`❌ [${requestId}] Backend health check failed:`, healthError.message)
+        const errorMessage = healthError instanceof Error ? healthError.message : String(healthError)
+        console.log(`❌ [${requestId}] Backend health check failed:`, errorMessage)
         isBackendHealthy = false
       }
     } else {
@@ -80,7 +81,8 @@ export async function POST(req: NextRequest) {
           requestId
         })
       } catch (backendError) {
-        console.warn(`⚠️ [${requestId}] Backend service failed, falling back to legacy service:`, backendError.message)
+        const errorMessage = backendError instanceof Error ? backendError.message : String(backendError)
+        console.warn(`⚠️ [${requestId}] Backend service failed, falling back to legacy service:`, errorMessage)
         // Continue to fallback below
       }
     } else {
@@ -117,12 +119,13 @@ export async function POST(req: NextRequest) {
         requestId
       })
     } catch (legacyError) {
+      const error = legacyError instanceof Error ? legacyError : new Error(String(legacyError))
       console.error(`💥 [${requestId}] Legacy Amadeus service failed:`, {
-        message: legacyError?.message,
-        stack: legacyError?.stack,
-        name: legacyError?.name
+        message: error.message,
+        stack: error.stack,
+        name: error.name
       })
-      throw legacyError // Re-throw to be handled by outer catch block
+      throw error // Re-throw to be handled by outer catch block
     }
   } catch (e: unknown) {
     const error = e as Error
