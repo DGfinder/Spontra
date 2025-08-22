@@ -19,7 +19,8 @@ import {
   ChevronDown,
   ExternalLink,
   MessageSquare,
-  Clock
+  Clock,
+  Zap
 } from 'lucide-react'
 import { ModerationQueue, ModerationAction } from '@/types/admin'
 
