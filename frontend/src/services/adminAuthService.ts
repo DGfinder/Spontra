@@ -36,8 +36,26 @@ class AdminAuthService {
   private clearSession(): void {
     this.currentSession = null
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('admin-session')
-      document.cookie = 'admin-token=; path=/admin; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+      try {
+        // Clear localStorage
+        localStorage.removeItem('admin-session')
+        localStorage.removeItem('admin-user')
+        localStorage.removeItem('admin-token')
+        
+        // Clear sessionStorage
+        sessionStorage.clear()
+        
+        // Clear all admin cookies
+        const adminCookies = ['admin-token', 'admin-session', 'admin-user']
+        adminCookies.forEach(cookieName => {
+          document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`
+          document.cookie = `${cookieName}=; path=/admin; expires=Thu, 01 Jan 1970 00:00:01 GMT`
+        })
+        
+        console.log('🧹 Admin session cleared completely')
+      } catch (error) {
+        console.warn('Session cleanup had issues:', error)
+      }
     }
   }
 
@@ -45,7 +63,43 @@ class AdminAuthService {
    * Public method to clear stale sessions (for login page)
    */
   clearStaleSession(): void {
+    console.log('🔄 Clearing stale admin session...')
     this.clearSession()
+  }
+
+  /**
+   * Force complete browser cleanup (for troubled sessions)
+   */
+  forceCompleteCleanup(): void {
+    if (typeof window !== 'undefined') {
+      try {
+        // Clear all localStorage
+        const localStorageKeys = Object.keys(localStorage)
+        localStorageKeys.forEach(key => {
+          if (key.includes('admin') || key.includes('session') || key.includes('auth')) {
+            localStorage.removeItem(key)
+          }
+        })
+        
+        // Clear all cookies
+        const cookies = document.cookie.split(';')
+        cookies.forEach(cookie => {
+          const eqPos = cookie.indexOf('=')
+          const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim()
+          if (name.includes('admin') || name.includes('auth') || name.includes('session')) {
+            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT`
+            document.cookie = `${name}=; path=/admin; expires=Thu, 01 Jan 1970 00:00:01 GMT`
+          }
+        })
+        
+        console.log('🚨 Force cleanup completed')
+        return true
+      } catch (error) {
+        console.error('Force cleanup failed:', error)
+        return false
+      }
+    }
+    return false
   }
 
   /**
@@ -73,11 +127,19 @@ class AdminAuthService {
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
+      console.log('🔐 Starting admin login process...', { email: credentials.email })
+      
       // Clear any existing stale session first
       this.clearSession()
 
       // DEMO MODE: Check for demo credentials first
       if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
+        console.log('✨ Demo credentials detected - activating demo mode')
+        
+        // Force complete cleanup before demo login
+        this.forceCompleteCleanup()
+        
+        await new Promise(resolve => setTimeout(resolve, 100)) // Brief delay for cleanup
         const demoUser: AdminUser = {
           id: 'demo-admin',
           email: 'demo@spontra.com',
@@ -115,10 +177,16 @@ class AdminAuthService {
 
         // Store in localStorage for persistence
         if (typeof window !== 'undefined') {
-          localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
-          document.cookie = `admin-token=${demoToken}; path=/admin; max-age=86400; samesite=strict`
+          try {
+            localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+            document.cookie = `admin-token=${demoToken}; path=/admin; max-age=86400; samesite=strict`
+            console.log('✅ Demo session stored successfully')
+          } catch (error) {
+            console.error('❌ Failed to store demo session:', error)
+          }
         }
 
+        console.log('🎉 Demo login successful!')
         return {
           success: true,
           user: demoUser,
@@ -171,10 +239,76 @@ class AdminAuthService {
 
       return result
     } catch (error) {
-      console.error('Admin login failed:', error)
+      console.error('❌ Admin login failed:', error)
+      
+      // If it's demo credentials and something failed, try fallback demo mode
+      if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
+        console.log('🔄 Demo login failed, attempting fallback...')
+        return this.fallbackDemoLogin()
+      }
+      
       return {
         success: false,
         error: 'Login failed. Please try again.'
+      }
+    }
+  }
+
+  /**
+   * Fallback demo login method
+   */
+  private fallbackDemoLogin(): LoginResponse {
+    try {
+      console.log('🚑 Activating fallback demo mode...')
+      
+      // Force cleanup and set minimal demo session
+      this.forceCompleteCleanup()
+      
+      const demoUser: AdminUser = {
+        id: 'demo-admin-fallback',
+        email: 'demo@spontra.com',
+        username: 'demo_admin',
+        fullName: 'Demo Administrator',
+        role: 'super_admin',
+        permissions: [
+          'content.view', 'content.moderate', 'content.delete', 'content.featured',
+          'creators.view', 'creators.manage', 'creators.payouts', 'creators.suspend',
+          'analytics.view', 'analytics.export', 'analytics.configure',
+          'destinations.view', 'destinations.edit', 'destinations.create',
+          'system.monitor', 'system.configure', 'system.users', 'system.logs',
+          'finance.view', 'finance.manage', 'finance.payouts',
+          'support.view', 'support.manage', 'support.escalate'
+        ],
+        profilePicture: undefined,
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        isActive: true,
+        mfaEnabled: false
+      }
+
+      const demoToken = 'demo-fallback-token-' + Date.now()
+      
+      // Set session without storage dependencies
+      this.currentSession = {
+        user: demoUser,
+        token: demoToken,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        lastActivity: new Date().toISOString(),
+        ipAddress: '127.0.0.1',
+        userAgent: 'Demo Fallback'
+      }
+
+      console.log('✅ Fallback demo login successful!')
+      return {
+        success: true,
+        user: demoUser,
+        token: demoToken
+      }
+    } catch (error) {
+      console.error('❌ Fallback demo login also failed:', error)
+      return {
+        success: false,
+        error: 'Demo mode is experiencing issues. Please refresh the page and try again.'
       }
     }
   }

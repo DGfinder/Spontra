@@ -52,30 +52,46 @@ export default function AdminLoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
+    
+    console.log('🚀 Login form submitted', { email: formData.email })
 
     try {
+      // Add small delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 300))
+      
       const result = await adminAuthService.login({
         email: formData.email,
         password: formData.password,
         mfaCode: formData.mfaCode || undefined
       })
 
+      console.log('📝 Login result:', { success: result.success, hasUser: !!result.user })
+
       if (result.success) {
-        // Successful login
+        console.log('✅ Login successful, redirecting to:', redirect)
+        // Small delay to ensure state is updated
+        await new Promise(resolve => setTimeout(resolve, 500))
         router.push(redirect)
       } else if (result.requiresMFA) {
-        // MFA required
+        console.log('🔐 MFA required')
         setRequiresMFA(true)
         setError(null)
       } else {
-        // Login failed
+        console.log('❌ Login failed:', result.error)
         setError(result.error || 'Invalid credentials')
       }
     } catch (err) {
+      console.error('💥 Login exception:', err)
       setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleForceCleanup = () => {
+    console.log('🧹 Force cleanup requested by user')
+    adminAuthService.forceCompleteCleanup()
+    setError('Browser data cleared. Please try logging in again.')
   }
 
   const handleForgotPassword = () => {
@@ -192,10 +208,25 @@ export default function AdminLoginPage() {
             {/* Error Message */}
             {error && (
               <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3">
-                <div className="flex items-center space-x-2">
-                  <AlertTriangle size={16} className="text-red-400" />
-                  <p className="text-red-300 text-sm">{error}</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <AlertTriangle size={16} className="text-red-400" />
+                    <p className="text-red-300 text-sm">{error}</p>
+                  </div>
+                  {error.includes('Browser extensions') && (
+                    <button
+                      onClick={handleForceCleanup}
+                      className="text-red-300 hover:text-red-200 text-xs underline ml-2"
+                    >
+                      Clear Data
+                    </button>
+                  )}
                 </div>
+                {error.includes('unexpected error') && (
+                  <div className="mt-2 text-xs text-red-200">
+                    💡 Try refreshing the page, disabling browser extensions, or using incognito mode
+                  </div>
+                )}
               </div>
             )}
 
@@ -264,6 +295,14 @@ export default function AdminLoginPage() {
                 ✨ Demo mode works offline with full admin features
               </p>
             )}
+            
+            <button
+              type="button"
+              onClick={handleForceCleanup}
+              className="mt-2 text-blue-300/60 hover:text-blue-200/80 text-xs transition-colors"
+            >
+              Having login issues? Click here to clear browser data
+            </button>
           </div>
         </div>
 
