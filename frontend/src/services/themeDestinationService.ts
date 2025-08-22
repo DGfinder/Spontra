@@ -40,11 +40,11 @@ export interface CountrySummary {
 }
 
 export interface ThemeScoreBreakdown {
-  party: number      // Social & Entertainment
+  vibe: number       // Social & Entertainment
   adventure: number  // Active & Outdoor
-  learn: number      // Cultural & Creative
-  shopping: number   // Luxury & Indulgent
-  beach: number      // Relaxation & Family
+  discover: number   // Cultural & Creative
+  indulge: number    // Luxury & Indulgent
+  nature: number     // Nature & Relaxation
 }
 
 // Use the EnhancedDestinationRecommendation from types/destinations.ts
@@ -146,18 +146,18 @@ class ThemeDestinationService {
   /**
    * Map frontend theme to backend activity types
    */
-  private mapThemeToActivities(theme: string): ('activities' | 'shopping' | 'restaurants' | 'nature' | 'culture' | 'nightlife' | 'beaches' | 'sightseeing' | 'adventure' | 'relaxation')[] {
+  private mapThemeToActivities(theme: string): ('activities' | 'luxury_shopping' | 'spa_treatments' | 'restaurants' | 'nature' | 'culture' | 'nightlife' | 'sightseeing' | 'adventure' | 'relaxation' | 'cooking_classes' | 'food_tours')[] {
     switch (theme.toLowerCase()) {
-      case 'party':
+      case 'vibe':
         return ['nightlife', 'restaurants', 'activities']
       case 'adventure':
         return ['adventure', 'nature', 'activities'] 
-      case 'learn':
-        return ['culture', 'sightseeing', 'activities']
-      case 'shopping':
-        return ['shopping', 'activities']
-      case 'beach':
-        return ['beaches', 'relaxation', 'nature']
+      case 'discover':
+        return ['culture', 'sightseeing', 'activities', 'cooking_classes', 'food_tours']
+      case 'indulge':
+        return ['luxury_shopping', 'spa_treatments', 'activities']
+      case 'nature':
+        return ['nature', 'relaxation', 'adventure']
       default:
         return ['activities']
     }
@@ -181,28 +181,30 @@ class ThemeDestinationService {
    * Extract theme scores from backend activity data
    */
   private extractThemeScores(activities: any[]): ThemeScoreBreakdown {
-    const scores = { party: 0, adventure: 0, learn: 0, shopping: 0, beach: 0 }
+    const scores = { vibe: 0, adventure: 0, discover: 0, indulge: 0, nature: 0 }
     
     activities?.forEach(activity => {
       switch (activity.type) {
         case 'nightlife':
         case 'restaurants':
-          scores.party = Math.max(scores.party, activity.score || 0)
+          scores.vibe = Math.max(scores.vibe, activity.score || 0)
           break
         case 'adventure':
-        case 'nature':
           scores.adventure = Math.max(scores.adventure, activity.score || 0)
           break
         case 'culture':
         case 'sightseeing':
-          scores.learn = Math.max(scores.learn, activity.score || 0)
+        case 'cooking_classes':
+        case 'food_tours':
+          scores.discover = Math.max(scores.discover, activity.score || 0)
           break
-        case 'shopping':
-          scores.shopping = Math.max(scores.shopping, activity.score || 0)
+        case 'luxury_shopping':
+        case 'spa_treatments':
+          scores.indulge = Math.max(scores.indulge, activity.score || 0)
           break
-        case 'beaches':
+        case 'nature':
         case 'relaxation':
-          scores.beach = Math.max(scores.beach, activity.score || 0)
+          scores.nature = Math.max(scores.nature, activity.score || 0)
           break
       }
     })

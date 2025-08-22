@@ -1,11 +1,11 @@
 // Enhanced destination types for backend integration
 
 export interface ThemeScores {
-  party: number      // Social & Entertainment: 0-100
+  vibe: number       // Social & Entertainment: 0-100
   adventure: number  // Active & Outdoor: 0-100
-  learn: number      // Cultural & Creative: 0-100
-  shopping: number   // Luxury & Indulgent: 0-100
-  beach: number      // Relaxation & Family: 0-100
+  discover: number   // Cultural & Creative: 0-100
+  indulge: number    // Luxury & Indulgent: 0-100
+  nature: number     // Nature & Relaxation: 0-100
 }
 
 export interface EnhancedDestination {
@@ -188,12 +188,12 @@ export interface SearchRecommendations {
 }
 
 // Core types
-export type ThemeType = 'party' | 'adventure' | 'learn' | 'shopping' | 'beach'
+export type ThemeType = 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature'
 
 export type ActivityType = 
   | 'nightlife' | 'restaurants' | 'activities'
-  | 'adventure' | 'nature' | 'shopping' 
-  | 'culture' | 'sightseeing' | 'beaches' | 'relaxation'
+  | 'adventure' | 'nature' | 'luxury_shopping' | 'spa_treatments'
+  | 'culture' | 'sightseeing' | 'relaxation' | 'cooking_classes' | 'food_tours'
 
 export type PriceRange = 'budget' | 'mid-range' | 'luxury' | 'any'
 

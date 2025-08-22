@@ -8,11 +8,11 @@ export interface ThemeCity {
   countryName: string
   countryCode: string
   themeScores: {
-    party: number      // Social & Entertainment: nightlife, bars, food scenes, social dining (0-100)
+    vibe: number       // Social & Entertainment: nightlife, bars, food scenes, social dining (0-100)
     adventure: number  // Active & Outdoor: hiking, sports, nature, budget backpacking (0-100) 
-    learn: number      // Cultural & Creative: museums, history, arts, digital nomad hubs (0-100)
-    shopping: number   // Luxury & Indulgent: fashion, luxury, spas, wellness, romance (0-100)
-    beach: number      // Relaxation & Family: coastal, family activities, leisure, beach wellness (0-100)
+    discover: number   // Cultural & Creative: museums, history, arts, digital nomad hubs (0-100)
+    indulge: number    // Luxury & Indulgent: fashion, luxury, spas, wellness, romance (0-100)
+    nature: number     // Nature & Relaxation: natural landscapes, wildlife, outdoor wellness, peaceful retreats (0-100)
   }
   highlights: string[] // What makes this city special across all themes
   averageFlightTime: number // Rough estimate for European origins (hours)
@@ -21,9 +21,9 @@ export interface ThemeCity {
   description: string // Rich description of the city's character
 }
 
-// Theme definitions with expanded scope
+// Theme definitions with updated scope
 export const THEME_DEFINITIONS = {
-  party: {
+  vibe: {
     name: 'Social & Entertainment',
     description: 'Nightlife, bars, clubs, music festivals, food scenes, social dining experiences',
     keywords: ['nightlife', 'bars', 'clubs', 'restaurants', 'music', 'festivals', 'social']
@@ -33,20 +33,20 @@ export const THEME_DEFINITIONS = {
     description: 'Hiking, extreme sports, nature activities, budget backpacking, outdoor wellness',
     keywords: ['hiking', 'sports', 'nature', 'outdoor', 'backpacking', 'adventure', 'mountains']
   },
-  learn: {
+  discover: {
     name: 'Cultural & Creative',
-    description: 'Museums, history, arts districts, creative scenes, digital nomad hubs, education',
-    keywords: ['museums', 'history', 'culture', 'arts', 'creative', 'learning', 'architecture']
+    description: 'Museums, history, arts districts, creative scenes, culinary experiences, authentic local culture',
+    keywords: ['museums', 'history', 'culture', 'arts', 'creative', 'learning', 'architecture', 'culinary', 'food']
   },
-  shopping: {
+  indulge: {
     name: 'Luxury & Indulgent',
     description: 'Fashion, luxury shopping, spas, wellness experiences, romantic getaways, premium services',
     keywords: ['shopping', 'luxury', 'fashion', 'spas', 'wellness', 'romance', 'premium']
   },
-  beach: {
-    name: 'Relaxation & Family',
-    description: 'Coastal destinations, family activities, leisure travel, beach wellness, water sports',
-    keywords: ['beach', 'coast', 'family', 'relaxation', 'water', 'leisure', 'islands']
+  nature: {
+    name: 'Nature & Relaxation',
+    description: 'Natural landscapes, wildlife, outdoor wellness, peaceful retreats, national parks, scenic destinations',
+    keywords: ['nature', 'wildlife', 'landscapes', 'relaxation', 'parks', 'natural', 'peaceful', 'beaches', 'coast']
   }
 } as const
 
@@ -58,11 +58,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 85,     // Excellent nightlife, beach clubs, social dining
+      vibe: 85,     // Excellent nightlife, beach clubs, social dining
       adventure: 45, // Some outdoor activities, but not primary focus
-      learn: 75,     // Rich culture, museums, architecture
-      shopping: 65,  // Good shopping, but not luxury focused
-      beach: 90      // World-class city beaches and coastal culture
+      discover: 75,     // Rich culture, museums, architecture
+      indulge: 65,  // Good shopping, but not luxury focused
+      nature: 90      // World-class city beaches and coastal culture
     },
     highlights: ['City beaches', 'Gothic Quarter nightlife', 'Gaudí architecture', 'Tapas culture', 'Beach clubs'],
     averageFlightTime: 2.5,
@@ -76,11 +76,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain', 
     countryCode: 'ES',
     themeScores: {
-      party: 98,     // World capital of electronic music
+      vibe: 98,     // World capital of electronic music
       adventure: 30, // Limited outdoor activities
-      learn: 25,     // Minimal cultural offerings
-      shopping: 40,  // Basic shopping scene
-      beach: 95      // Stunning beaches and beach clubs
+      discover: 25,     // Minimal cultural offerings
+      indulge: 40,  // Basic shopping scene
+      nature: 95      // Stunning beaches and beach clubs
     },
     highlights: ['Electronic music capital', 'Sunset parties', 'Superstar DJs', 'Crystal clear waters', 'Beach parties'],
     averageFlightTime: 2.5,
@@ -94,11 +94,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Netherlands',
     countryCode: 'NL',
     themeScores: {
-      party: 88,     // Famous nightlife and social scene
+      vibe: 88,     // Famous nightlife and social scene
       adventure: 35, // Limited outdoor activities
-      learn: 80,     // Excellent museums and culture
-      shopping: 70,  // Good shopping districts
-      beach: 15      // No beaches
+      discover: 80,     // Excellent museums and culture
+      indulge: 70,  // Good shopping districts
+      nature: 15      // No beaches
     },
     highlights: ['Red light district', 'Coffee shop culture', 'Canal tours', 'World-class museums', 'Liberal atmosphere'],
     averageFlightTime: 1.5,
@@ -112,11 +112,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 92,     // Underground techno and alternative scene
+      vibe: 92,     // Underground techno and alternative scene
       adventure: 25, // Limited outdoor activities
-      learn: 85,     // Rich history and cultural sites
-      shopping: 60,  // Good alternative shopping
-      beach: 10      // No beaches
+      discover: 85,     // Rich history and cultural sites
+      indulge: 60,  // Good alternative shopping
+      nature: 10      // No beaches
     },
     highlights: ['Underground techno', 'Berghain club', 'Historical sites', 'Alternative culture', 'Street art'],
     averageFlightTime: 1.5,
@@ -131,11 +131,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Hungary',
     countryCode: 'HU',
     themeScores: {
-      party: 85,     // Famous ruin pubs and thermal bath parties
+      vibe: 85,     // Famous ruin pubs and thermal bath parties
       adventure: 35, // Some outdoor activities on Danube
-      learn: 75,     // Rich history and beautiful architecture
-      shopping: 45,  // Basic shopping scene
-      beach: 10      // No beaches
+      discover: 75,     // Rich history and beautiful architecture
+      indulge: 45,  // Basic shopping scene
+      nature: 10      // No beaches
     },
     highlights: ['Ruin pubs', 'Thermal bath parties', 'Danube cruises', 'Parliament building', 'Affordable nightlife'],
     averageFlightTime: 2,
@@ -149,11 +149,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Czech Republic',
     countryCode: 'CZ',
     themeScores: {
-      party: 80,     // Great beer culture and pub scene
+      vibe: 80,     // Great beer culture and pub scene
       adventure: 25, // Limited outdoor activities
-      learn: 90,     // Stunning medieval architecture and history
-      shopping: 50,  // Decent shopping in Old Town
-      beach: 5       // No beaches
+      discover: 90,     // Stunning medieval architecture and history
+      indulge: 50,  // Decent shopping in Old Town
+      nature: 5       // No beaches
     },
     highlights: ['Medieval architecture', 'Beer halls', 'Charles Bridge', 'Prague Castle', 'Cheap beer'],
     averageFlightTime: 1.5,
@@ -169,11 +169,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Switzerland',
     countryCode: 'CH',
     themeScores: {
-      party: 40,     // Limited nightlife scene
+      vibe: 40,     // Limited nightlife scene
       adventure: 85, // Swiss Alps access, hiking, winter sports
-      learn: 60,     // Some museums and culture
-      shopping: 80,  // Luxury shopping hub
-      beach: 35      // Lake activities but no beaches
+      discover: 60,     // Some museums and culture
+      indulge: 80,  // Luxury shopping hub
+      nature: 35      // Lake activities but no beaches
     },
     highlights: ['Swiss Alps access', 'Lake Zurich', 'Luxury shopping', 'Hiking trails', 'Winter sports'],
     averageFlightTime: 2,
@@ -187,11 +187,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Austria',
     countryCode: 'AT',
     themeScores: {
-      party: 35,     // Limited nightlife
+      vibe: 35,     // Limited nightlife
       adventure: 95, // World-class skiing and mountain activities
-      learn: 50,     // Some cultural sites
-      shopping: 45,  // Basic shopping
-      beach: 15      // No beaches, but mountain lakes
+      discover: 50,     // Some cultural sites
+      indulge: 45,  // Basic shopping
+      nature: 15      // No beaches, but mountain lakes
     },
     highlights: ['Skiing paradise', 'Mountain climbing', 'Alpine adventures', 'Winter Olympics heritage', 'Tyrolean Alps'],
     averageFlightTime: 2,
@@ -205,11 +205,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Iceland',
     countryCode: 'IS',
     themeScores: {
-      party: 60,     // Surprisingly good nightlife scene
+      vibe: 60,     // Surprisingly good nightlife scene
       adventure: 95, // Northern lights, glaciers, volcanoes, unique nature
-      learn: 70,     // Viking heritage and modern culture
-      shopping: 40,  // Limited but unique local goods
-      beach: 20      // Cold water, not traditional beaches
+      discover: 70,     // Viking heritage and modern culture
+      indulge: 40,  // Limited but unique local goods
+      nature: 20      // Cold water, not traditional beaches
     },
     highlights: ['Northern lights', 'Glacier tours', 'Volcano hiking', 'Blue Lagoon', 'Viking heritage'],
     averageFlightTime: 3,
@@ -225,11 +225,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 65,     // Good nightlife and dining scene
+      vibe: 65,     // Good nightlife and dining scene
       adventure: 25, // Limited outdoor activities
-      learn: 98,     // Ultimate historical and cultural destination
-      shopping: 75,  // Great fashion shopping
-      beach: 10      // No beaches
+      discover: 98,     // Ultimate historical and cultural destination
+      indulge: 75,  // Great fashion shopping
+      nature: 10      // No beaches
     },
     highlights: ['Ancient Rome', 'Vatican Museums', 'Colosseum', 'Italian cuisine', 'Art masterpieces'],
     averageFlightTime: 2.5,
@@ -243,11 +243,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 75,     // Great dining and nightlife scene
+      vibe: 75,     // Great dining and nightlife scene
       adventure: 20, // Limited outdoor activities
-      learn: 95,     // World-class museums and culture
-      shopping: 95,  // Fashion capital of the world
-      beach: 5       // No beaches
+      discover: 95,     // World-class museums and culture
+      indulge: 95,  // Fashion capital of the world
+      nature: 5       // No beaches
     },
     highlights: ['Louvre Museum', 'Eiffel Tower', 'Fashion shopping', 'Fine dining', 'Art galleries'],
     averageFlightTime: 1.5,
@@ -261,11 +261,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 40,     // Limited nightlife
+      vibe: 40,     // Limited nightlife
       adventure: 25, // Some outdoor activities in Tuscany
-      learn: 95,     // Renaissance art capital
-      shopping: 80,  // Luxury Italian fashion and crafts
-      beach: 5       // No beaches
+      discover: 95,     // Renaissance art capital
+      indulge: 80,  // Luxury Italian fashion and crafts
+      nature: 5       // No beaches
     },
     highlights: ['Renaissance art', 'Uffizi Gallery', 'Michelangelo\'s David', 'Tuscan cuisine', 'Leather goods'],
     averageFlightTime: 2.5,
@@ -281,11 +281,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 70,     // Good nightlife and aperitivo culture
+      vibe: 70,     // Good nightlife and aperitivo culture
       adventure: 15, // Limited outdoor activities
-      learn: 65,     // Some cultural sites
-      shopping: 98,  // Global fashion capital
-      beach: 5       // No beaches
+      discover: 65,     // Some cultural sites
+      indulge: 98,  // Global fashion capital
+      nature: 5       // No beaches
     },
     highlights: ['Fashion capital', 'Luxury brands', 'Quadrilatero della Moda', 'La Scala opera', 'Design district'],
     averageFlightTime: 2,
@@ -299,11 +299,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Austria',
     countryCode: 'AT',
     themeScores: {
-      party: 50,     // Traditional coffeehouses and some nightlife
+      vibe: 50,     // Traditional coffeehouses and some nightlife
       adventure: 30, // Limited outdoor activities
-      learn: 90,     // Rich imperial history and classical music
-      shopping: 75,  // Good luxury shopping and traditional crafts
-      beach: 5       // No beaches
+      discover: 90,     // Rich imperial history and classical music
+      indulge: 75,  // Good luxury shopping and traditional crafts
+      nature: 5       // No beaches
     },
     highlights: ['Imperial palaces', 'Classical music', 'Coffee house culture', 'Art museums', 'Luxury shopping'],
     averageFlightTime: 2,
@@ -319,11 +319,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 60,     // Good nightlife and dining
+      vibe: 60,     // Good nightlife and dining
       adventure: 40, // Some outdoor activities in mountains nearby
-      learn: 55,     // Some cultural attractions
-      shopping: 70,  // Good luxury shopping
-      beach: 90      // French Riviera beaches
+      discover: 55,     // Some cultural attractions
+      indulge: 70,  // Good luxury shopping
+      nature: 90      // French Riviera beaches
     },
     highlights: ['French Riviera', 'Promenade des Anglais', 'Mediterranean beaches', 'Luxury resorts', 'Côte d\'Azur'],
     averageFlightTime: 2,
@@ -337,11 +337,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Greece',
     countryCode: 'GR',
     themeScores: {
-      party: 70,     // Good nightlife and taverna culture
+      vibe: 70,     // Good nightlife and taverna culture
       adventure: 45, // Island hopping and some outdoor activities
-      learn: 95,     // Ancient Greece and classical history
-      shopping: 40,  // Basic shopping scene
-      beach: 60      // Island access and some nearby beaches
+      discover: 95,     // Ancient Greece and classical history
+      indulge: 40,  // Basic shopping scene
+      nature: 60      // Island access and some nearby beaches
     },
     highlights: ['Ancient Greece', 'Acropolis', 'Island hopping', 'Greek cuisine', 'Mediterranean culture'],
     averageFlightTime: 3,
@@ -357,11 +357,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 75,     // Great nightlife and tapas culture
+      vibe: 75,     // Great nightlife and tapas culture
       adventure: 30, // Some outdoor activities nearby
-      learn: 85,     // World-class museums (Prado, Reina Sofia)
-      shopping: 70,  // Good shopping districts
-      beach: 5       // No beaches
+      discover: 85,     // World-class museums (Prado, Reina Sofia)
+      indulge: 70,  // Good shopping districts
+      nature: 5       // No beaches
     },
     highlights: ['Prado Museum', 'Royal Palace', 'Retiro Park', 'Tapas culture', 'Flamenco shows'],
     averageFlightTime: 2,
@@ -375,11 +375,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Portugal',
     countryCode: 'PT',
     themeScores: {
-      party: 70,     // Great nightlife in Bairro Alto
+      vibe: 70,     // Great nightlife in Bairro Alto
       adventure: 50, // Surfing and coastal activities
-      learn: 75,     // Historic neighborhoods and cultural sites
-      shopping: 55,  // Good local shopping and crafts
-      beach: 70      // Great beaches nearby (Cascais)
+      discover: 75,     // Historic neighborhoods and cultural sites
+      indulge: 55,  // Good local shopping and crafts
+      nature: 70      // Great beaches nearby (Cascais)
     },
     highlights: ['Tram 28', 'Fado music', 'Pastéis de nata', 'Coastal beaches', 'Historic neighborhoods'],
     averageFlightTime: 2.5,
@@ -393,11 +393,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Ireland',
     countryCode: 'IE',
     themeScores: {
-      party: 85,     // Famous pub culture and nightlife
+      vibe: 85,     // Famous pub culture and nightlife
       adventure: 40, // Some outdoor activities and coastal walks
-      learn: 70,     // Rich literary and historical heritage
-      shopping: 60,  // Good shopping areas
-      beach: 25      // Some coastal areas
+      discover: 70,     // Rich literary and historical heritage
+      indulge: 60,  // Good shopping areas
+      nature: 25      // Some coastal areas
     },
     highlights: ['Temple Bar', 'Guinness Storehouse', 'Trinity College', 'Literary heritage', 'Irish pubs'],
     averageFlightTime: 1.5,
@@ -411,11 +411,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Kingdom',
     countryCode: 'GB',
     themeScores: {
-      party: 70,     // Good pub scene and festival nightlife
+      vibe: 70,     // Good pub scene and festival nightlife
       adventure: 45, // Hiking in nearby Highlands
-      learn: 90,     // Rich Scottish history and culture
-      shopping: 65,  // Good shopping on Royal Mile
-      beach: 15      // Limited coastal access
+      discover: 90,     // Rich Scottish history and culture
+      indulge: 65,  // Good shopping on Royal Mile
+      nature: 15      // Limited coastal access
     },
     highlights: ['Edinburgh Castle', 'Royal Mile', 'Scottish Highland access', 'Whisky culture', 'Festivals'],
     averageFlightTime: 2,
@@ -429,11 +429,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Kingdom',
     countryCode: 'GB',
     themeScores: {
-      party: 80,     // Diverse nightlife and pub culture
+      vibe: 80,     // Diverse nightlife and pub culture
       adventure: 25, // Limited outdoor activities
-      learn: 95,     // World-class museums and historical sites
-      shopping: 90,  // Oxford Street, Harrods, boutique shopping
-      beach: 10      // No beaches
+      discover: 95,     // World-class museums and historical sites
+      indulge: 90,  // Oxford Street, Harrods, boutique shopping
+      nature: 10      // No beaches
     },
     highlights: ['British Museum', 'Buckingham Palace', 'West End shows', 'Oxford Street', 'Pub culture'],
     averageFlightTime: 1.5,
@@ -447,11 +447,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Denmark',
     countryCode: 'DK',
     themeScores: {
-      party: 65,     // Hygge culture and good nightlife
+      vibe: 65,     // Hygge culture and good nightlife
       adventure: 35, // Cycling and some outdoor activities
-      learn: 75,     // Design museums and cultural sites
-      shopping: 80,  // Scandinavian design and fashion
-      beach: 30      // Some coastal areas
+      discover: 75,     // Design museums and cultural sites
+      indulge: 80,  // Scandinavian design and fashion
+      nature: 30      // Some coastal areas
     },
     highlights: ['Nyhavn harbor', 'Design museums', 'Cycling culture', 'Hygge lifestyle', 'Scandinavian cuisine'],
     averageFlightTime: 2,
@@ -465,11 +465,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Sweden',
     countryCode: 'SE',
     themeScores: {
-      party: 60,     // Good nightlife scene
+      vibe: 60,     // Good nightlife scene
       adventure: 45, // Archipelago activities and outdoor pursuits
-      learn: 80,     // Museums and Nobel Prize heritage
-      shopping: 75,  // Scandinavian fashion and design
-      beach: 40      // Archipelago islands
+      discover: 80,     // Museums and Nobel Prize heritage
+      indulge: 75,  // Scandinavian fashion and design
+      nature: 40      // Archipelago islands
     },
     highlights: ['Gamla Stan', 'ABBA Museum', 'Archipelago islands', 'Nobel Prize sites', 'Design districts'],
     averageFlightTime: 2.5,
@@ -483,11 +483,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Norway',
     countryCode: 'NO',
     themeScores: {
-      party: 55,     // Limited but quality nightlife
+      vibe: 55,     // Limited but quality nightlife
       adventure: 85, // Fjords, skiing, hiking, northern lights
-      learn: 75,     // Viking heritage and modern museums
-      shopping: 60,  // Some design shopping
-      beach: 25      // Limited coastal activities
+      discover: 75,     // Viking heritage and modern museums
+      indulge: 60,  // Some design shopping
+      nature: 25      // Limited coastal activities
     },
     highlights: ['Fjord access', 'Viking Ship Museum', 'Northern lights', 'Cross-country skiing', 'Modern architecture'],
     averageFlightTime: 2.5,
@@ -501,11 +501,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Finland',
     countryCode: 'FI',
     themeScores: {
-      party: 60,     // Good nightlife and sauna culture
+      vibe: 60,     // Good nightlife and sauna culture
       adventure: 70, // Northern lights, national parks, winter activities
-      learn: 70,     // Design museums and cultural sites
-      shopping: 65,  // Finnish design and crafts
-      beach: 30      // Baltic Sea activities
+      discover: 70,     // Design museums and cultural sites
+      indulge: 65,  // Finnish design and crafts
+      nature: 30      // Baltic Sea activities
     },
     highlights: ['Sauna culture', 'Design District', 'Suomenlinna fortress', 'Northern lights access', 'Finnish design'],
     averageFlightTime: 3,
@@ -519,11 +519,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 45,     // Limited nightlife due to tourism focus
+      vibe: 45,     // Limited nightlife due to tourism focus
       adventure: 20, // Limited outdoor activities
-      learn: 95,     // Unique architecture and art heritage
-      shopping: 70,  // Murano glass and luxury goods
-      beach: 30      // Nearby Lido beaches
+      discover: 95,     // Unique architecture and art heritage
+      indulge: 70,  // Murano glass and luxury goods
+      nature: 30      // Nearby Lido beaches
     },
     highlights: ['St. Mark\'s Square', 'Grand Canal', 'Murano glass', 'Gondola rides', 'Renaissance art'],
     averageFlightTime: 2.5,
@@ -537,11 +537,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 70,     // Great local nightlife and street food scene
+      vibe: 70,     // Great local nightlife and street food scene
       adventure: 55, // Vesuvius hiking, Amalfi Coast access
-      learn: 80,     // Pompeii, archaeological sites, art
-      shopping: 45,  // Basic shopping
-      beach: 75      // Amalfi Coast and Capri access
+      discover: 80,     // Pompeii, archaeological sites, art
+      indulge: 45,  // Basic shopping
+      nature: 75      // Amalfi Coast and Capri access
     },
     highlights: ['Authentic pizza', 'Pompeii day trips', 'Mount Vesuvius', 'Amalfi Coast access', 'Street art'],
     averageFlightTime: 2.5,
@@ -557,11 +557,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 75,     // Good nightlife scene
+      vibe: 75,     // Good nightlife scene
       adventure: 50, // Water sports and cycling
-      learn: 40,     // Some cultural sites
-      shopping: 60,  // Good shopping areas
-      beach: 95      // Beautiful Mallorca beaches
+      discover: 40,     // Some cultural sites
+      indulge: 60,  // Good shopping areas
+      nature: 95      // Beautiful Mallorca beaches
     },
     highlights: ['Mallorca beaches', 'Water sports', 'Cycling routes', 'Cathedral', 'Old town'],
     averageFlightTime: 2,
@@ -575,11 +575,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 80,     // Great flamenco and tapas scene
+      vibe: 80,     // Great flamenco and tapas scene
       adventure: 25, // Limited outdoor activities
-      learn: 90,     // Rich Moorish and Spanish heritage
-      shopping: 50,  // Decent shopping
-      beach: 10      // No beaches
+      discover: 90,     // Rich Moorish and Spanish heritage
+      indulge: 50,  // Decent shopping
+      nature: 10      // No beaches
     },
     highlights: ['Alcázar palace', 'Cathedral', 'Flamenco shows', 'Tapas culture', 'Moorish architecture'],
     averageFlightTime: 2.5,
@@ -593,11 +593,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 75,     // Great student nightlife and food scene
+      vibe: 75,     // Great student nightlife and food scene
       adventure: 20, // Limited outdoor activities
-      learn: 80,     // University city with rich history
-      shopping: 50,  // Good local shopping
-      beach: 5       // No beaches
+      discover: 80,     // University city with rich history
+      indulge: 50,  // Good local shopping
+      nature: 5       // No beaches
     },
     highlights: ['Food capital', 'Medieval towers', 'University culture', 'Porticoes', 'Authentic cuisine'],
     averageFlightTime: 2,
@@ -611,11 +611,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 60,     // Good aperitivo culture
+      vibe: 60,     // Good aperitivo culture
       adventure: 70, // Alps access, skiing nearby
-      learn: 75,     // Royal history and museums
-      shopping: 65,  // Good shopping areas
-      beach: 5       // No beaches
+      discover: 75,     // Royal history and museums
+      indulge: 65,  // Good shopping areas
+      nature: 5       // No beaches
     },
     highlights: ['Royal palaces', 'Alps access', 'Egyptian Museum', 'Chocolate culture', 'Winter Olympics legacy'],
     averageFlightTime: 2,
@@ -629,11 +629,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Belgium',
     countryCode: 'BE',
     themeScores: {
-      party: 70,     // Good beer culture and nightlife
+      vibe: 70,     // Good beer culture and nightlife
       adventure: 25, // Limited outdoor activities
-      learn: 75,     // EU institutions and art nouveau
-      shopping: 80,  // Chocolate and luxury goods
-      beach: 10      // No beaches
+      discover: 75,     // EU institutions and art nouveau
+      indulge: 80,  // Chocolate and luxury goods
+      nature: 10      // No beaches
     },
     highlights: ['Grand Place', 'Belgian chocolate', 'Beer culture', 'EU institutions', 'Art Nouveau'],
     averageFlightTime: 1.5,
@@ -647,11 +647,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 70,     // Great food and wine scene
+      vibe: 70,     // Great food and wine scene
       adventure: 40, // Some outdoor activities nearby
-      learn: 80,     // UNESCO heritage and history
-      shopping: 65,  // Good shopping districts
-      beach: 10      // No beaches
+      discover: 80,     // UNESCO heritage and history
+      indulge: 65,  // Good shopping districts
+      nature: 10      // No beaches
     },
     highlights: ['Gastronomy capital', 'UNESCO Old Town', 'Traboules', 'Wine culture', 'Silk heritage'],
     averageFlightTime: 1.5,
@@ -665,11 +665,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 75,     // Vibrant multicultural nightlife
+      vibe: 75,     // Vibrant multicultural nightlife
       adventure: 60, // Calanques hiking, water sports
-      learn: 65,     // Cultural diversity and history
-      shopping: 45,  // Basic shopping
-      beach: 80      // Beautiful Calanques and beaches
+      discover: 65,     // Cultural diversity and history
+      indulge: 45,  // Basic shopping
+      nature: 80      // Beautiful Calanques and beaches
     },
     highlights: ['Calanques National Park', 'Old Port', 'Bouillabaisse', 'Multicultural atmosphere', 'Coastal hiking'],
     averageFlightTime: 2,
@@ -683,11 +683,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 85,     // Famous Reeperbahn nightlife
+      vibe: 85,     // Famous Reeperbahn nightlife
       adventure: 35, // Some water activities
-      learn: 70,     // Maritime heritage and museums
-      shopping: 60,  // Good shopping areas
-      beach: 25      // Port city but no traditional beaches
+      discover: 70,     // Maritime heritage and museums
+      indulge: 60,  // Good shopping areas
+      nature: 25      // Port city but no traditional beaches
     },
     highlights: ['Reeperbahn nightlife', 'Port culture', 'Maritime museums', 'Fish market', 'Music scene'],
     averageFlightTime: 1.5,
@@ -701,11 +701,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 60,     // Decent nightlife scene
+      vibe: 60,     // Decent nightlife scene
       adventure: 20, // Limited outdoor activities
-      learn: 65,     // Museums and cultural sites
-      shopping: 85,  // Excellent shopping and business district
-      beach: 5       // No beaches
+      discover: 65,     // Museums and cultural sites
+      indulge: 85,  // Excellent shopping and business district
+      nature: 5       // No beaches
     },
     highlights: ['Financial district', 'Museums district', 'Apple wine culture', 'Modern architecture', 'Business hub'],
     averageFlightTime: 1.5,
@@ -719,11 +719,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 65,     // Good nightlife and beer culture
+      vibe: 65,     // Good nightlife and beer culture
       adventure: 30, // Rhine cycling, limited outdoor activities
-      learn: 60,     // Some cultural attractions
-      shopping: 90,  // Fashion and luxury shopping capital
-      beach: 15      // Rhine river activities
+      discover: 60,     // Some cultural attractions
+      indulge: 90,  // Fashion and luxury shopping capital
+      nature: 15      // Rhine river activities
     },
     highlights: ['Königsallee shopping', 'Japanese quarter', 'Art galleries', 'Rhine promenade', 'Fashion capital'],
     averageFlightTime: 1.5,
@@ -737,11 +737,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 80,     // Great beer culture and nightlife
+      vibe: 80,     // Great beer culture and nightlife
       adventure: 25, // Limited outdoor activities
-      learn: 85,     // Rich history and Gothic cathedral
-      shopping: 70,  // Good shopping areas
-      beach: 10      // No beaches
+      discover: 85,     // Rich history and Gothic cathedral
+      indulge: 70,  // Good shopping areas
+      nature: 10      // No beaches
     },
     highlights: ['Cologne Cathedral', 'Beer halls (Brauhäuser)', 'Roman heritage', 'Christmas markets', 'Art museums'],
     averageFlightTime: 1.5,
@@ -755,11 +755,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Croatia',
     countryCode: 'HR',
     themeScores: {
-      party: 75,     // Great cafe and nightlife culture
+      vibe: 75,     // Great cafe and nightlife culture
       adventure: 45, // Some outdoor activities nearby
-      learn: 80,     // Rich Austro-Hungarian heritage
-      shopping: 55,  // Good local shopping
-      beach: 20      // No beaches, but lakes nearby
+      discover: 80,     // Rich Austro-Hungarian heritage
+      indulge: 55,  // Good local shopping
+      nature: 20      // No beaches, but lakes nearby
     },
     highlights: ['Upper Town', 'Café culture', 'Museums', 'Christmas markets', 'Austro-Hungarian architecture'],
     averageFlightTime: 2,
@@ -773,11 +773,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Slovenia',
     countryCode: 'SI',
     themeScores: {
-      party: 70,     // Great student nightlife scene
+      vibe: 70,     // Great student nightlife scene
       adventure: 80, // Lake Bled, Julian Alps, outdoor paradise
-      learn: 75,     // Beautiful architecture and culture
-      shopping: 50,  // Basic shopping
-      beach: 30      // Lakes but no ocean beaches
+      discover: 75,     // Beautiful architecture and culture
+      indulge: 50,  // Basic shopping
+      nature: 30      // Lakes but no ocean beaches
     },
     highlights: ['Lake Bled access', 'Julian Alps', 'Dragon Bridge', 'Castle', 'Green capital'],
     averageFlightTime: 2,
@@ -793,11 +793,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Latvia',
     countryCode: 'LV',
     themeScores: {
-      party: 80,     // Great nightlife and affordable drinks
+      vibe: 80,     // Great nightlife and affordable drinks
       adventure: 30, // Some outdoor activities in nearby forests
-      learn: 80,     // Beautiful Art Nouveau and medieval architecture
-      shopping: 45,  // Basic shopping scene
-      beach: 25      // Baltic Sea access
+      discover: 80,     // Beautiful Art Nouveau and medieval architecture
+      indulge: 45,  // Basic shopping scene
+      nature: 25      // Baltic Sea access
     },
     highlights: ['Art Nouveau district', 'Medieval Old Town', 'Affordable nightlife', 'Russian culture', 'Baltic beaches'],
     averageFlightTime: 2.5,
@@ -811,11 +811,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Estonia',
     countryCode: 'EE',
     themeScores: {
-      party: 75,     // Good nightlife and tech scene
+      vibe: 75,     // Good nightlife and tech scene
       adventure: 35, // Some outdoor activities and islands
-      learn: 85,     // UNESCO medieval old town
-      shopping: 50,  // Decent shopping areas
-      beach: 30      // Baltic Sea and islands
+      discover: 85,     // UNESCO medieval old town
+      indulge: 50,  // Decent shopping areas
+      nature: 30      // Baltic Sea and islands
     },
     highlights: ['Medieval Old Town', 'Digital nomad hub', 'Tech culture', 'Baltic islands', 'Affordable prices'],
     averageFlightTime: 2.5,
@@ -829,11 +829,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Lithuania',
     countryCode: 'LT',
     themeScores: {
-      party: 70,     // Growing nightlife scene
+      vibe: 70,     // Growing nightlife scene
       adventure: 40, // Some outdoor activities in nearby nature
-      learn: 85,     // Beautiful baroque architecture
-      shopping: 45,  // Basic shopping
-      beach: 20      // Limited coastal access
+      discover: 85,     // Beautiful baroque architecture
+      indulge: 45,  // Basic shopping
+      nature: 20      // Limited coastal access
     },
     highlights: ['Baroque Old Town', 'Vilnius University', 'Trakai Castle access', 'Affordable culture', 'Hidden gem'],
     averageFlightTime: 2.5,
@@ -847,11 +847,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Poland',
     countryCode: 'PL',
     themeScores: {
-      party: 85,     // Famous student nightlife and cheap drinks
+      vibe: 85,     // Famous student nightlife and cheap drinks
       adventure: 35, // Tatra Mountains access
-      learn: 95,     // Incredible medieval architecture and history
-      shopping: 50,  // Good local shopping
-      beach: 10      // No beaches
+      discover: 95,     // Incredible medieval architecture and history
+      indulge: 50,  // Good local shopping
+      nature: 10      // No beaches
     },
     highlights: ['Wawel Castle', 'Main Market Square', 'Jewish Quarter (Kazimierz)', 'Salt mines', 'Student nightlife'],
     averageFlightTime: 2,
@@ -865,11 +865,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Poland',
     countryCode: 'PL',
     themeScores: {
-      party: 70,     // Good nightlife scene
+      vibe: 70,     // Good nightlife scene
       adventure: 40, // Baltic Sea activities
-      learn: 90,     // Rich maritime and WWII history
-      shopping: 45,  // Basic shopping
-      beach: 50      // Baltic Sea beaches
+      discover: 90,     // Rich maritime and WWII history
+      indulge: 45,  // Basic shopping
+      nature: 50      // Baltic Sea beaches
     },
     highlights: ['Old Town', 'Maritime heritage', 'WWII history', 'Baltic beaches', 'Amber shopping'],
     averageFlightTime: 2,
@@ -883,11 +883,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Slovakia',
     countryCode: 'SK',
     themeScores: {
-      party: 75,     // Great nightlife and affordable drinks
+      vibe: 75,     // Great nightlife and affordable drinks
       adventure: 45, // Danube activities and nearby mountains
-      learn: 80,     // Beautiful castle and historic center
-      shopping: 50,  // Decent shopping
-      beach: 15      // Danube river activities
+      discover: 80,     // Beautiful castle and historic center
+      indulge: 50,  // Decent shopping
+      nature: 15      // Danube river activities
     },
     highlights: ['Bratislava Castle', 'Danube River', 'Old Town', 'Wine culture', 'Affordable destination'],
     averageFlightTime: 2,
@@ -901,11 +901,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Serbia',
     countryCode: 'RS',
     themeScores: {
-      party: 90,     // Famous for incredible nightlife scene
+      vibe: 90,     // Famous for incredible nightlife scene
       adventure: 40, // Danube and Sava river activities
-      learn: 75,     // Rich history and cultural sites
-      shopping: 40,  // Basic shopping
-      beach: 20      // River beaches and activities
+      discover: 75,     // Rich history and cultural sites
+      indulge: 40,  // Basic shopping
+      nature: 20      // River beaches and activities
     },
     highlights: ['Epic nightlife', 'Floating river bars', 'Kalemegdan Fortress', 'Bohemian Quarter', 'Balkan culture'],
     averageFlightTime: 2.5,
@@ -919,11 +919,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Bulgaria',
     countryCode: 'BG',
     themeScores: {
-      party: 75,     // Growing nightlife and cheap drinks
+      vibe: 75,     // Growing nightlife and cheap drinks
       adventure: 65, // Vitosha Mountain access, skiing
-      learn: 80,     // Orthodox churches and Roman ruins
-      shopping: 40,  // Basic shopping
-      beach: 15      // No beaches but mountain activities
+      discover: 80,     // Orthodox churches and Roman ruins
+      indulge: 40,  // Basic shopping
+      nature: 15      // No beaches but mountain activities
     },
     highlights: ['Alexander Nevsky Cathedral', 'Vitosha Mountain', 'Roman ruins', 'Orthodox culture', 'Affordable prices'],
     averageFlightTime: 2.5,
@@ -937,11 +937,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Romania',
     countryCode: 'RO',
     themeScores: {
-      party: 80,     // Great nightlife and club scene
+      vibe: 80,     // Great nightlife and club scene
       adventure: 40, // Some outdoor activities in nearby Carpathians
-      learn: 75,     // Interesting mix of architecture and history
-      shopping: 55,  // Decent shopping areas
-      beach: 10      // No beaches
+      discover: 75,     // Interesting mix of architecture and history
+      indulge: 55,  // Decent shopping areas
+      nature: 10      // No beaches
     },
     highlights: ['Old Town nightlife', 'Palace of Parliament', 'Carpathian Mountains access', 'Romanian culture', 'Affordable luxury'],
     averageFlightTime: 2.5,
@@ -957,11 +957,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 80,     // Great nightlife and festival scene
+      vibe: 80,     // Great nightlife and festival scene
       adventure: 45, // Cycling, water sports
-      learn: 70,     // Architecture and cultural sites
-      shopping: 60,  // Good shopping areas
-      beach: 85      // Excellent city beaches
+      discover: 70,     // Architecture and cultural sites
+      indulge: 60,  // Good shopping areas
+      nature: 85      // Excellent city beaches
     },
     highlights: ['City of Arts and Sciences', 'Las Fallas festival', 'Paella origin', 'City beaches', 'Bike-friendly'],
     averageFlightTime: 2,
@@ -975,11 +975,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 75,     // Great pintxos and nightlife culture
+      vibe: 75,     // Great pintxos and nightlife culture
       adventure: 60, // Basque mountains and coast access
-      learn: 85,     // Guggenheim Museum and Basque culture
-      shopping: 65,  // Good shopping areas
-      beach: 50      // Coastal access
+      discover: 85,     // Guggenheim Museum and Basque culture
+      indulge: 65,  // Good shopping areas
+      nature: 50      // Coastal access
     },
     highlights: ['Guggenheim Museum', 'Pintxos culture', 'Basque heritage', 'Modern architecture', 'Mountain access'],
     averageFlightTime: 2,
@@ -993,11 +993,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Portugal',
     countryCode: 'PT',
     themeScores: {
-      party: 75,     // Great wine and nightlife scene
+      vibe: 75,     // Great wine and nightlife scene
       adventure: 45, // Douro Valley and coastal activities
-      learn: 85,     // UNESCO historic center and cultural heritage
-      shopping: 55,  // Good local shopping and crafts
-      beach: 60      // Atlantic beaches nearby
+      discover: 85,     // UNESCO historic center and cultural heritage
+      indulge: 55,  // Good local shopping and crafts
+      nature: 60      // Atlantic beaches nearby
     },
     highlights: ['Port wine cellars', 'Ribeira district', 'Azulejo tiles', 'Douro Valley', 'Historic trams'],
     averageFlightTime: 2.5,
@@ -1011,11 +1011,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Portugal',
     countryCode: 'PT',
     themeScores: {
-      party: 70,     // Good beach party scene
+      vibe: 70,     // Good beach party scene
       adventure: 55, // Water sports and coastal activities
-      learn: 50,     // Some historical sites
-      shopping: 45,  // Basic shopping
-      beach: 95      // Algarve beaches - some of Europe's best
+      discover: 50,     // Some historical sites
+      indulge: 45,  // Basic shopping
+      nature: 95      // Algarve beaches - some of Europe's best
     },
     highlights: ['Algarve beaches', 'Ria Formosa Natural Park', 'Coastal cliffs', 'Water sports', 'Beach resorts'],
     averageFlightTime: 2.5,
@@ -1029,11 +1029,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Malta',
     countryCode: 'MT',
     themeScores: {
-      party: 85,     // Famous party destination, especially Paceville
+      vibe: 85,     // Famous party destination, especially Paceville
       adventure: 65, // Diving, water sports, rock climbing
-      learn: 80,     // Rich history from Knights of Malta
-      shopping: 50,  // Basic shopping
-      beach: 90      // Crystal clear Mediterranean waters
+      discover: 80,     // Rich history from Knights of Malta
+      indulge: 50,  // Basic shopping
+      nature: 90      // Crystal clear Mediterranean waters
     },
     highlights: ['Paceville nightlife', 'Blue Lagoon', 'Valletta UNESCO site', 'Diving spots', 'Mediterranean culture'],
     averageFlightTime: 3,
@@ -1047,11 +1047,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Cyprus',
     countryCode: 'CY',
     themeScores: {
-      party: 70,     // Good beach party and nightlife scene
+      vibe: 70,     // Good beach party and nightlife scene
       adventure: 60, // Water sports, diving, hiking
-      learn: 65,     // Ancient history and archaeological sites
-      shopping: 45,  // Basic shopping
-      beach: 90      // Beautiful Mediterranean beaches
+      discover: 65,     // Ancient history and archaeological sites
+      indulge: 45,  // Basic shopping
+      nature: 90      // Beautiful Mediterranean beaches
     },
     highlights: ['Finikoudes Beach', 'Ancient Kition', 'Salt Lake', 'Diving sites', 'Mediterranean cuisine'],
     averageFlightTime: 4,
@@ -1067,11 +1067,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Iceland',
     countryCode: 'IS',
     themeScores: {
-      party: 60,     // Surprising nightlife scene
+      vibe: 60,     // Surprising nightlife scene
       adventure: 95, // Ultimate adventure destination
-      learn: 75,     // Viking heritage and unique culture
-      shopping: 40,  // Limited but unique
-      beach: 20      // Geothermal beaches, not traditional
+      discover: 75,     // Viking heritage and unique culture
+      indulge: 40,  // Limited but unique
+      nature: 20      // Geothermal beaches, not traditional
     },
     highlights: ['Northern Lights', 'Blue Lagoon', 'Glacier tours', 'Volcano hiking', 'Midnight sun'],
     averageFlightTime: 3,
@@ -1085,11 +1085,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Faroe Islands',
     countryCode: 'FO',
     themeScores: {
-      party: 35,     // Limited nightlife
+      vibe: 35,     // Limited nightlife
       adventure: 90, // Incredible hiking and nature
-      learn: 60,     // Nordic culture and traditions
-      shopping: 25,  // Very limited
-      beach: 40      // Dramatic coastlines, not traditional beaches
+      discover: 60,     // Nordic culture and traditions
+      indulge: 25,  // Very limited
+      nature: 40      // Dramatic coastlines, not traditional beaches
     },
     highlights: ['Dramatic landscapes', 'Hiking trails', 'Nordic culture', 'Grass-roof houses', 'Unspoiled nature'],
     averageFlightTime: 2.5,
@@ -1105,11 +1105,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United States',
     countryCode: 'US',
     themeScores: {
-      party: 98,     // Ultimate party destination
+      vibe: 98,     // Ultimate party destination
       adventure: 45, // Desert activities, Grand Canyon access
-      learn: 35,     // Limited cultural offerings
-      shopping: 85,  // Excellent shopping
-      beach: 5       // No beaches
+      discover: 35,     // Limited cultural offerings
+      indulge: 85,  // Excellent shopping
+      nature: 5       // No beaches
     },
     highlights: ['World-class nightlife', 'Casino culture', 'Shows and entertainment', 'Desert adventures', 'Luxury shopping'],
     averageFlightTime: 11,
@@ -1123,11 +1123,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United States',
     countryCode: 'US',
     themeScores: {
-      party: 90,     // South Beach party scene
+      vibe: 90,     // South Beach party scene
       adventure: 50, // Water sports and Everglades
-      learn: 45,     // Art Deco and cultural diversity
-      shopping: 80,  // Great shopping districts
-      beach: 95      // World-famous beaches
+      discover: 45,     // Art Deco and cultural diversity
+      indulge: 80,  // Great shopping districts
+      nature: 95      // World-famous beaches
     },
     highlights: ['South Beach', 'Art Deco architecture', 'Latin nightlife', 'Water sports', 'Fashion scene'],
     averageFlightTime: 9,
@@ -1141,11 +1141,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United States',
     countryCode: 'US',
     themeScores: {
-      party: 85,     // Diverse nightlife scene
+      vibe: 85,     // Diverse nightlife scene
       adventure: 25, // Limited outdoor activities
-      learn: 98,     // World-class museums and culture
-      shopping: 95,  // Shopping capital
-      beach: 10      // No beaches
+      discover: 98,     // World-class museums and culture
+      indulge: 95,  // Shopping capital
+      nature: 10      // No beaches
     },
     highlights: ['Broadway shows', 'Museums', 'Times Square', 'Central Park', 'Shopping districts'],
     averageFlightTime: 8,
@@ -1159,11 +1159,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Japan',
     countryCode: 'JP',
     themeScores: {
-      party: 80,     // Unique nightlife districts
+      vibe: 80,     // Unique nightlife districts
       adventure: 40, // Some outdoor activities
-      learn: 90,     // Rich culture and technology
-      shopping: 95,  // Shopping paradise
-      beach: 15      // Limited coastal access
+      discover: 90,     // Rich culture and technology
+      indulge: 95,  // Shopping paradise
+      nature: 15      // Limited coastal access
     },
     highlights: ['Shibuya crossing', 'Tech culture', 'Traditional temples', 'Anime culture', 'Unique shopping'],
     averageFlightTime: 11,
@@ -1177,11 +1177,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Arab Emirates',
     countryCode: 'AE',
     themeScores: {
-      party: 70,     // Luxury nightlife scene
+      vibe: 70,     // Luxury nightlife scene
       adventure: 60, // Desert activities, water sports
-      learn: 50,     // Modern architecture and culture
-      shopping: 98,  // Ultimate shopping destination
-      beach: 85      // Luxury beach resorts
+      discover: 50,     // Modern architecture and culture
+      indulge: 98,  // Ultimate shopping destination
+      nature: 85      // Luxury beach resorts
     },
     highlights: ['Burj Khalifa', 'Luxury malls', 'Desert safaris', 'Beach resorts', 'Tax-free shopping'],
     averageFlightTime: 6,
@@ -1195,11 +1195,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Thailand',
     countryCode: 'TH',
     themeScores: {
-      party: 85,     // Famous nightlife and street life
+      vibe: 85,     // Famous nightlife and street life
       adventure: 65, // Jungle tours, water activities
-      learn: 80,     // Rich Buddhist culture and temples
-      shopping: 80,  // Excellent shopping and markets
-      beach: 30      // River activities, beach access nearby
+      discover: 80,     // Rich Buddhist culture and temples
+      indulge: 80,  // Excellent shopping and markets
+      nature: 30      // River activities, beach access nearby
     },
     highlights: ['Street food', 'Buddhist temples', 'Floating markets', 'Rooftop bars', 'Thai massage'],
     averageFlightTime: 11,
@@ -1213,11 +1213,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Singapore',
     countryCode: 'SG',
     themeScores: {
-      party: 70,     // Good nightlife and rooftop bars
+      vibe: 70,     // Good nightlife and rooftop bars
       adventure: 35, // Limited outdoor activities
-      learn: 75,     // Cultural diversity and modern architecture
-      shopping: 90,  // Shopping paradise
-      beach: 40      // Resort islands nearby
+      discover: 75,     // Cultural diversity and modern architecture
+      indulge: 90,  // Shopping paradise
+      nature: 40      // Resort islands nearby
     },
     highlights: ['Marina Bay Sands', 'Gardens by the Bay', 'Hawker centers', 'Shopping districts', 'Clean and safe'],
     averageFlightTime: 12,
@@ -1231,11 +1231,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Mexico',
     countryCode: 'MX',
     themeScores: {
-      party: 85,     // Vibrant nightlife and fiesta culture
+      vibe: 85,     // Vibrant nightlife and fiesta culture
       adventure: 55, // Volcano hiking, day trips to pyramids
-      learn: 90,     // Rich Aztec and colonial history
-      shopping: 60,  // Good local shopping and crafts
-      beach: 15      // No beaches
+      discover: 90,     // Rich Aztec and colonial history
+      indulge: 60,  // Good local shopping and crafts
+      nature: 15      // No beaches
     },
     highlights: ['Aztec history', 'Day of the Dead culture', 'Street art', 'Mezcal bars', 'Colonial architecture'],
     averageFlightTime: 12,
@@ -1249,11 +1249,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Brazil',
     countryCode: 'BR',
     themeScores: {
-      party: 95,     // Carnival and beach party capital
+      vibe: 95,     // Carnival and beach party capital
       adventure: 70, // Christ the Redeemer, hiking, water sports
-      learn: 60,     // Brazilian culture and history
-      shopping: 50,  // Basic shopping
-      beach: 98      // World-famous beaches
+      discover: 60,     // Brazilian culture and history
+      indulge: 50,  // Basic shopping
+      nature: 98      // World-famous beaches
     },
     highlights: ['Carnival', 'Copacabana beach', 'Christ the Redeemer', 'Samba culture', 'Sugarloaf Mountain'],
     averageFlightTime: 11,
@@ -1267,11 +1267,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Egypt',
     countryCode: 'EG',
     themeScores: {
-      party: 40,     // Limited nightlife
+      vibe: 40,     // Limited nightlife
       adventure: 60, // Desert tours, Nile activities
-      learn: 98,     // Ultimate historical destination
-      shopping: 60,  // Good markets and bazaars
-      beach: 20      // Red Sea access
+      discover: 98,     // Ultimate historical destination
+      indulge: 60,  // Good markets and bazaars
+      nature: 20      // Red Sea access
     },
     highlights: ['Pyramids of Giza', 'Egyptian Museum', 'Nile River', 'Islamic architecture', 'Ancient history'],
     averageFlightTime: 4.5,
@@ -1289,11 +1289,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 45,     // Moderate nightlife, wine bars
+      vibe: 45,     // Moderate nightlife, wine bars
       adventure: 35, // Limited outdoor activities
-      learn: 98,     // World-class art, Renaissance history
-      shopping: 80,  // Artisan goods, luxury leather
-      beach: 20      // Not coastal
+      discover: 98,     // World-class art, Renaissance history
+      indulge: 80,  // Artisan goods, luxury leather
+      nature: 20      // Not coastal
     },
     highlights: ['Uffizi Gallery', 'Renaissance architecture', 'Artisan workshops', 'Wine culture', 'Historic center'],
     averageFlightTime: 2.5,
@@ -1309,11 +1309,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 40,     // Limited nightlife due to tourism focus
+      vibe: 40,     // Limited nightlife due to tourism focus
       adventure: 30, // Minimal outdoor activities
-      learn: 92,     // Rich history, unique architecture
-      shopping: 75,  // Venetian glass, luxury goods
-      beach: 45      // Nearby Lido beaches
+      discover: 92,     // Rich history, unique architecture
+      indulge: 75,  // Venetian glass, luxury goods
+      nature: 45      // Nearby Lido beaches
     },
     highlights: ['Gondola rides', "St. Mark's Square", 'Venetian glass', 'Historic palaces', 'Romantic atmosphere'],
     averageFlightTime: 2.5,
@@ -1329,11 +1329,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Italy',
     countryCode: 'IT',
     themeScores: {
-      party: 70,     // Vibrant local nightlife, music scene
+      vibe: 70,     // Vibrant local nightlife, music scene
       adventure: 55, // Vesuvius, coastal access
-      learn: 80,     // Ancient history, archaeology
-      shopping: 60,  // Local markets, crafts
-      beach: 70      // Amalfi Coast nearby
+      discover: 80,     // Ancient history, archaeology
+      indulge: 60,  // Local markets, crafts
+      nature: 70      // Amalfi Coast nearby
     },
     highlights: ['Pizza birthplace', 'Mount Vesuvius', 'Pompeii access', 'Amalfi Coast', 'Authentic culture'],
     averageFlightTime: 3,
@@ -1349,11 +1349,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 65,     // Good nightlife, wine culture
+      vibe: 65,     // Good nightlife, wine culture
       adventure: 45, // Some outdoor activities nearby
-      learn: 75,     // History, architecture, museums
-      shopping: 70,  // Fashion, French goods
-      beach: 20      // Inland city
+      discover: 75,     // History, architecture, museums
+      indulge: 70,  // Fashion, French goods
+      nature: 20      // Inland city
     },
     highlights: ['Michelin restaurants', 'Wine regions', 'Old Town UNESCO site', 'Silk heritage', 'French cuisine'],
     averageFlightTime: 2,
@@ -1369,11 +1369,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 75,     // Riviera nightlife, casinos nearby
+      vibe: 75,     // Riviera nightlife, casinos nearby
       adventure: 50, // Hiking, water sports
-      learn: 60,     // Art museums, culture
-      shopping: 80,  // Luxury boutiques, French fashion
-      beach: 95      // Premium Mediterranean beaches
+      discover: 60,     // Art museums, culture
+      indulge: 80,  // Luxury boutiques, French fashion
+      nature: 95      // Premium Mediterranean beaches
     },
     highlights: ['Promenade des Anglais', 'French Riviera', 'Beach clubs', 'Art museums', 'Monte Carlo access'],
     averageFlightTime: 2.5,
@@ -1389,11 +1389,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'France',
     countryCode: 'FR',
     themeScores: {
-      party: 70,     // Wine culture, sophisticated nightlife
+      vibe: 70,     // Wine culture, sophisticated nightlife
       adventure: 40, // Limited outdoor activities
-      learn: 75,     // Wine education, history
-      shopping: 65,  // Wine, French goods
-      beach: 30      // Atlantic coast access but not primary
+      discover: 75,     // Wine education, history
+      indulge: 65,  // Wine, French goods
+      nature: 30      // Atlantic coast access but not primary
     },
     highlights: ['World wine capital', 'UNESCO historic center', 'Wine tours', 'French architecture', 'Gourmet dining'],
     averageFlightTime: 2,
@@ -1409,11 +1409,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 88,     // Famous nightlife district, Reeperbahn
+      vibe: 88,     // Famous nightlife district, Reeperbahn
       adventure: 45, // Harbor activities, cycling
-      learn: 70,     // Maritime history, museums
-      shopping: 60,  // Good shopping areas
-      beach: 40      // Harbor/river, not traditional beach
+      discover: 70,     // Maritime history, museums
+      indulge: 60,  // Good shopping areas
+      nature: 40      // Harbor/river, not traditional beach
     },
     highlights: ['Reeperbahn nightlife', 'Harbor district', 'Maritime culture', 'Red light district', 'Music venues'],
     averageFlightTime: 1.5,
@@ -1429,11 +1429,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 75,     // Good nightlife, beer culture
+      vibe: 75,     // Good nightlife, beer culture
       adventure: 40, // Limited outdoor activities
-      learn: 85,     // Gothic cathedral, museums, history
-      shopping: 70,  // Shopping streets, markets
-      beach: 25      // River city, not coastal
+      discover: 85,     // Gothic cathedral, museums, history
+      indulge: 70,  // Shopping streets, markets
+      nature: 25      // River city, not coastal
     },
     highlights: ['Gothic Cathedral', 'Art museums', 'Brewery tours', 'Rhine River', 'German culture'],
     averageFlightTime: 1.5,
@@ -1449,11 +1449,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Germany',
     countryCode: 'DE',
     themeScores: {
-      party: 55,     // Moderate nightlife scene
+      vibe: 55,     // Moderate nightlife scene
       adventure: 50, // Elbe cycling, nearby nature
-      learn: 90,     // Baroque architecture, art collections
-      shopping: 60,  // Historic markets, crafts
-      beach: 25      // River city
+      discover: 90,     // Baroque architecture, art collections
+      indulge: 60,  // Historic markets, crafts
+      nature: 25      // River city
     },
     highlights: ['Baroque architecture', 'Frauenkirche', 'Art collections', 'Historic rebuilding', 'Elbe Valley'],
     averageFlightTime: 2,
@@ -1469,11 +1469,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Kingdom',
     countryCode: 'GB',
     themeScores: {
-      party: 80,     // Pub culture, festival nightlife
+      vibe: 80,     // Pub culture, festival nightlife
       adventure: 70, // Highland access, hiking, castles
-      learn: 92,     // Rich history, festivals, culture
-      shopping: 65,  // Royal Mile, Scottish goods
-      beach: 30      // Not coastal focus
+      discover: 92,     // Rich history, festivals, culture
+      indulge: 65,  // Royal Mile, Scottish goods
+      nature: 30      // Not coastal focus
     },
     highlights: ['Edinburgh Castle', 'Royal Mile', 'Festival scene', 'Highland access', 'Whisky culture'],
     averageFlightTime: 2,
@@ -1489,11 +1489,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Kingdom',
     countryCode: 'GB',
     themeScores: {
-      party: 85,     // Famous music scene, nightlife
+      vibe: 85,     // Famous music scene, nightlife
       adventure: 50, // Peak District access
-      learn: 70,     // Industrial heritage, music history
-      shopping: 75,  // Northern Quarter, shopping centers
-      beach: 25      // Inland city
+      discover: 70,     // Industrial heritage, music history
+      indulge: 75,  // Northern Quarter, shopping centers
+      nature: 25      // Inland city
     },
     highlights: ['Music scene legacy', 'Football culture', 'Industrial heritage', 'Northern Quarter', 'Peak District access'],
     averageFlightTime: 1.5,
@@ -1509,11 +1509,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'United Kingdom',
     countryCode: 'GB',
     themeScores: {
-      party: 82,     // Vibrant nightlife, music venues
+      vibe: 82,     // Vibrant nightlife, music venues
       adventure: 65, // Scottish Highlands access
-      learn: 80,     // Victorian architecture, museums
-      shopping: 68,  // Style Mile, Scottish products
-      beach: 35      // West coast access
+      discover: 80,     // Victorian architecture, museums
+      indulge: 68,  // Style Mile, Scottish products
+      nature: 35      // West coast access
     },
     highlights: ['Music venues', 'Victorian architecture', 'Arts scene', 'Highland gateway', 'Friendly culture'],
     averageFlightTime: 1.5,
@@ -1529,11 +1529,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Netherlands',
     countryCode: 'NL',
     themeScores: {
-      party: 75,     // Good nightlife, harbor culture
+      vibe: 75,     // Good nightlife, harbor culture
       adventure: 60, // Cycling, water activities
-      learn: 70,     // Modern architecture, design
-      shopping: 65,  // Modern shopping areas
-      beach: 50      // North Sea coast nearby
+      discover: 70,     // Modern architecture, design
+      indulge: 65,  // Modern shopping areas
+      nature: 50      // North Sea coast nearby
     },
     highlights: ['Modern architecture', 'Harbor culture', 'Cycling city', 'Design museums', 'Multicultural dining'],
     averageFlightTime: 1.5,
@@ -1549,11 +1549,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Belgium',
     countryCode: 'BE',
     themeScores: {
-      party: 70,     // University town nightlife, beer culture
+      vibe: 70,     // University town nightlife, beer culture
       adventure: 45, // Cycling, canal tours
-      learn: 85,     // Medieval architecture, art
-      shopping: 60,  // Belgian goods, local crafts
-      beach: 35      // Not coastal
+      discover: 85,     // Medieval architecture, art
+      indulge: 60,  // Belgian goods, local crafts
+      nature: 35      // Not coastal
     },
     highlights: ['Medieval architecture', 'Canal tours', 'Belgian beer', 'University atmosphere', 'Gothic cathedral'],
     averageFlightTime: 1.5,
@@ -1569,11 +1569,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Switzerland',
     countryCode: 'CH',
     themeScores: {
-      party: 60,     // Moderate nightlife, cultural events
+      vibe: 60,     // Moderate nightlife, cultural events
       adventure: 65, // Rhine activities, Black Forest access
-      learn: 88,     // World-class art museums
-      shopping: 75,  // Swiss goods, luxury items
-      beach: 30      // River activities only
+      discover: 88,     // World-class art museums
+      indulge: 75,  // Swiss goods, luxury items
+      nature: 30      // River activities only
     },
     highlights: ['Art museums', 'Rhine River', 'Swiss culture', 'Architecture', 'Cultural festivals'],
     averageFlightTime: 1.5,
@@ -1589,11 +1589,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Austria',
     countryCode: 'AT',
     themeScores: {
-      party: 55,     // Classical music events, moderate nightlife
+      vibe: 55,     // Classical music events, moderate nightlife
       adventure: 75, // Alpine access, hiking, skiing
-      learn: 92,     // Mozart heritage, baroque architecture
-      shopping: 65,  // Austrian goods, traditional crafts
-      beach: 25      // Alpine lakes nearby
+      discover: 92,     // Mozart heritage, baroque architecture
+      indulge: 65,  // Austrian goods, traditional crafts
+      nature: 25      // Alpine lakes nearby
     },
     highlights: ['Mozart birthplace', 'Baroque old town', 'Alpine setting', 'Classical music', 'Sound of Music'],
     averageFlightTime: 2,
@@ -1609,11 +1609,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Austria',
     countryCode: 'AT',
     themeScores: {
-      party: 65,     // Apres-ski, mountain culture
+      vibe: 65,     // Apres-ski, mountain culture
       adventure: 95, // World-class skiing, mountaineering
-      learn: 70,     // Olympic history, Austrian culture
-      shopping: 60,  // Outdoor gear, Austrian products
-      beach: 30      // Mountain lakes
+      discover: 70,     // Olympic history, Austrian culture
+      indulge: 60,  // Outdoor gear, Austrian products
+      nature: 30      // Mountain lakes
     },
     highlights: ['Alpine skiing', 'Olympic heritage', 'Mountain adventures', 'Cable cars', 'Austrian Alps'],
     averageFlightTime: 2,
@@ -1629,11 +1629,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Denmark',
     countryCode: 'DK',
     themeScores: {
-      party: 75,     // University nightlife, cultural scene
+      vibe: 75,     // University nightlife, cultural scene
       adventure: 55, // Cycling, coastal activities
-      learn: 80,     // Design museums, Viking history
-      shopping: 70,  // Danish design, local goods
-      beach: 60      // Danish coast
+      discover: 80,     // Design museums, Viking history
+      indulge: 70,  // Danish design, local goods
+      nature: 60      // Danish coast
     },
     highlights: ['Danish design', 'ARoS art museum', 'University culture', 'Viking heritage', 'Coastal charm'],
     averageFlightTime: 2,
@@ -1649,11 +1649,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Sweden',
     countryCode: 'SE',
     themeScores: {
-      party: 70,     // Music scene, craft beer culture
+      vibe: 70,     // Music scene, craft beer culture
       adventure: 65, // Archipelago, outdoor activities
-      learn: 75,     // Maritime history, design
-      shopping: 65,  // Scandinavian design
-      beach: 55      // West coast archipelago
+      discover: 75,     // Maritime history, design
+      indulge: 65,  // Scandinavian design
+      nature: 55      // West coast archipelago
     },
     highlights: ['Archipelago islands', 'Music festivals', 'Maritime culture', 'Scandinavian design', 'Craft beer scene'],
     averageFlightTime: 2.5,
@@ -1669,11 +1669,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Norway',
     countryCode: 'NO',
     themeScores: {
-      party: 60,     // Cozy pub culture, limited nightlife
+      vibe: 60,     // Cozy pub culture, limited nightlife
       adventure: 92, // Fjord access, hiking, dramatic nature
-      learn: 75,     // Hanseatic history, maritime culture
-      shopping: 55,  // Norwegian goods, outdoor gear
-      beach: 40      // Fjord coastline, not beach focused
+      discover: 75,     // Hanseatic history, maritime culture
+      indulge: 55,  // Norwegian goods, outdoor gear
+      nature: 40      // Fjord coastline, not beach focused
     },
     highlights: ['Fjord gateway', 'Bryggen wharf', 'Dramatic landscapes', 'Hiking trails', 'Norse heritage'],
     averageFlightTime: 2.5,
@@ -1689,11 +1689,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Finland',
     countryCode: 'FI',
     themeScores: {
-      party: 65,     // University town, moderate nightlife
+      vibe: 65,     // University town, moderate nightlife
       adventure: 70, // Finnish nature, archipelago
-      learn: 80,     // Finnish history, medieval castle
-      shopping: 55,  // Finnish design, local goods
-      beach: 50      // Baltic archipelago
+      discover: 80,     // Finnish history, medieval castle
+      indulge: 55,  // Finnish design, local goods
+      nature: 50      // Baltic archipelago
     },
     highlights: ['Medieval castle', 'Finnish archipelago', 'University culture', 'Nordic history', 'River culture'],
     averageFlightTime: 3,
@@ -1709,11 +1709,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Portugal',
     countryCode: 'PT',
     themeScores: {
-      party: 78,     // Famous student nightlife, Fado music
+      vibe: 78,     // Famous student nightlife, Fado music
       adventure: 55, // River activities, nearby nature
-      learn: 88,     // Historic university, libraries
-      shopping: 60,  // Portuguese crafts, books
-      beach: 45      // Atlantic coast accessible
+      discover: 88,     // Historic university, libraries
+      indulge: 60,  // Portuguese crafts, books
+      nature: 45      // Atlantic coast accessible
     },
     highlights: ['Historic university', 'Student nightlife', 'Fado music', 'Joanina Library', 'Academic tradition'],
     averageFlightTime: 2.5,
@@ -1729,11 +1729,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 72,     // Pintxos bars, Basque nightlife
+      vibe: 72,     // Pintxos bars, Basque nightlife
       adventure: 60, // Coastal activities, hiking nearby
-      learn: 82,     // Guggenheim, Basque culture
-      shopping: 65,  // Basque crafts, modern shopping
-      beach: 55      // Basque coast nearby
+      discover: 82,     // Guggenheim, Basque culture
+      indulge: 65,  // Basque crafts, modern shopping
+      nature: 55      // Basque coast nearby
     },
     highlights: ['Guggenheim Museum', 'Pintxos culture', 'Basque heritage', 'Industrial renewal', 'Modern architecture'],
     averageFlightTime: 2,
@@ -1749,11 +1749,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 75,     // Flamenco, tapas culture, student life
+      vibe: 75,     // Flamenco, tapas culture, student life
       adventure: 65, // Sierra Nevada skiing, hiking
-      learn: 95,     // Alhambra, Moorish history
-      shopping: 60,  // Moorish crafts, souvenirs
-      beach: 40      // Coast accessible but not primary
+      discover: 95,     // Alhambra, Moorish history
+      indulge: 60,  // Moorish crafts, souvenirs
+      nature: 40      // Coast accessible but not primary
     },
     highlights: ['Alhambra palace', 'Moorish architecture', 'Flamenco culture', 'Free tapas tradition', 'Sierra Nevada'],
     averageFlightTime: 2.5,
@@ -1769,11 +1769,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Spain',
     countryCode: 'ES',
     themeScores: {
-      party: 78,     // Pintxos bars, beach nightlife
+      vibe: 78,     // Pintxos bars, beach nightlife
       adventure: 55, // Surfing, coastal walks
-      learn: 70,     // Basque culture, culinary arts
-      shopping: 65,  // Basque specialties
-      beach: 88      // Beautiful city beach
+      discover: 70,     // Basque culture, culinary arts
+      indulge: 65,  // Basque specialties
+      nature: 88      // Beautiful city beach
     },
     highlights: ['Michelin restaurants', 'Pintxos bars', 'La Concha beach', 'Basque cuisine', 'Film festival'],
     averageFlightTime: 2,
@@ -1789,11 +1789,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Greece',
     countryCode: 'GR',
     themeScores: {
-      party: 82,     // University nightlife, vibrant scene
+      vibe: 82,     // University nightlife, vibrant scene
       adventure: 50, // Some outdoor activities nearby
-      learn: 85,     // Byzantine history, archaeology
-      shopping: 60,  // Greek goods, local markets
-      beach: 60      // Aegean coast access
+      discover: 85,     // Byzantine history, archaeology
+      indulge: 60,  // Greek goods, local markets
+      nature: 60      // Aegean coast access
     },
     highlights: ['Byzantine monuments', 'University culture', 'Greek nightlife', 'Archaeological sites', 'Waterfront'],
     averageFlightTime: 3,
@@ -1809,11 +1809,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Hungary',
     countryCode: 'HU',
     themeScores: {
-      party: 70,     // Student nightlife, thermal baths
+      vibe: 70,     // Student nightlife, thermal baths
       adventure: 55, // Great Plain, nature activities
-      learn: 75,     // Protestant heritage, university
-      shopping: 50,  // Local markets, Hungarian goods
-      beach: 40      // Thermal baths, not coastal
+      discover: 75,     // Protestant heritage, university
+      indulge: 50,  // Local markets, Hungarian goods
+      nature: 40      // Thermal baths, not coastal
     },
     highlights: ['Reformed College', 'Thermal baths', 'Student culture', 'Great Plain access', 'Hungarian tradition'],
     averageFlightTime: 2.5,
@@ -1829,11 +1829,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Romania',
     countryCode: 'RO',
     themeScores: {
-      party: 75,     // University nightlife, cultural events
+      vibe: 75,     // University nightlife, cultural events
       adventure: 65, // Carpathian Mountains, hiking
-      learn: 80,     // Transylvanian history, architecture
-      shopping: 55,  // Local crafts, Romanian goods
-      beach: 25      // Landlocked
+      discover: 80,     // Transylvanian history, architecture
+      indulge: 55,  // Local crafts, Romanian goods
+      nature: 25      // Landlocked
     },
     highlights: ['Transylvanian culture', 'Gothic architecture', 'Student nightlife', 'Mountain access', 'Romanian heritage'],
     averageFlightTime: 3,
@@ -1849,11 +1849,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Croatia',
     countryCode: 'HR',
     themeScores: {
-      party: 80,     // Beach clubs, summer nightlife
+      vibe: 80,     // Beach clubs, summer nightlife
       adventure: 70, // Island hopping, water sports
-      learn: 80,     // Roman heritage, Diocletian's Palace
-      shopping: 55,  // Local crafts, souvenirs
-      beach: 90      // Stunning Adriatic beaches
+      discover: 80,     // Roman heritage, Diocletian's Palace
+      indulge: 55,  // Local crafts, souvenirs
+      nature: 90      // Stunning Adriatic beaches
     },
     highlights: ["Diocletian's Palace", 'Island hopping', 'Crystal clear waters', 'Roman history', 'Beach culture'],
     averageFlightTime: 2.5,
@@ -1869,11 +1869,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Slovenia',
     countryCode: 'SI',
     themeScores: {
-      party: 68,     // Cozy bars, student culture
+      vibe: 68,     // Cozy bars, student culture
       adventure: 80, // Alps access, outdoor paradise
-      learn: 75,     // Architectural heritage, culture
-      shopping: 60,  // Local crafts, sustainable goods
-      beach: 35      // Not coastal, but Lake Bled nearby
+      discover: 75,     // Architectural heritage, culture
+      indulge: 60,  // Local crafts, sustainable goods
+      nature: 35      // Not coastal, but Lake Bled nearby
     },
     highlights: ['Dragon Bridge', 'Castle hill', 'Green city', 'Alps access', 'Sustainable tourism'],
     averageFlightTime: 2,
@@ -1889,11 +1889,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Slovakia',
     countryCode: 'SK',
     themeScores: {
-      party: 72,     // Pub culture, affordable nightlife
+      vibe: 72,     // Pub culture, affordable nightlife
       adventure: 60, // Danube activities, nearby nature
-      learn: 75,     // Historic old town, castles
-      shopping: 55,  // Local goods, affordable shopping
-      beach: 30      // River activities
+      discover: 75,     // Historic old town, castles
+      indulge: 55,  // Local goods, affordable shopping
+      nature: 30      // River activities
     },
     highlights: ['Historic castle', 'Danube riverfront', 'Medieval old town', 'Affordable culture', 'Central European charm'],
     averageFlightTime: 2,
@@ -1909,11 +1909,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Lithuania',
     countryCode: 'LT',
     themeScores: {
-      party: 70,     // Growing nightlife scene, bar culture
+      vibe: 70,     // Growing nightlife scene, bar culture
       adventure: 55, // Baltic nature, forests
-      learn: 88,     // Baroque architecture, history
-      shopping: 60,  // Baltic amber, local crafts
-      beach: 40      // Baltic coast accessible
+      discover: 88,     // Baroque architecture, history
+      indulge: 60,  // Baltic amber, local crafts
+      nature: 40      // Baltic coast accessible
     },
     highlights: ['Baroque old town', 'Baltic amber', 'Historic architecture', 'Affordable culture', 'Forest landscapes'],
     averageFlightTime: 2.5,
@@ -1929,11 +1929,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Latvia',
     countryCode: 'LV',
     themeScores: {
-      party: 78,     // Famous nightlife, party destination
+      vibe: 78,     // Famous nightlife, party destination
       adventure: 55, // Baltic nature, beaches
-      learn: 82,     // Art Nouveau architecture, history
-      shopping: 62,  // Baltic goods, local markets
-      beach: 50      // Baltic seaside nearby
+      discover: 82,     // Art Nouveau architecture, history
+      indulge: 62,  // Baltic goods, local markets
+      nature: 50      // Baltic seaside nearby
     },
     highlights: ['Art Nouveau district', 'Medieval old town', 'Baltic nightlife', 'Affordable luxury', 'Cultural heritage'],
     averageFlightTime: 2.5,
@@ -1949,11 +1949,11 @@ export const ALL_CITIES: ThemeCity[] = [
     countryName: 'Estonia',
     countryCode: 'EE',
     themeScores: {
-      party: 75,     // Digital nomad scene, unique bars
+      vibe: 75,     // Digital nomad scene, unique bars
       adventure: 50, // Baltic islands, nature
-      learn: 85,     // Medieval architecture, digital innovation
-      shopping: 65,  // Digital services, local crafts
-      beach: 45      // Baltic coast
+      discover: 85,     // Medieval architecture, digital innovation
+      indulge: 65,  // Digital services, local crafts
+      nature: 45      // Baltic coast
     },
     highlights: ['Medieval old town', 'Digital innovation', 'Startup culture', 'Baltic heritage', 'Tech scene'],
     averageFlightTime: 2.5,

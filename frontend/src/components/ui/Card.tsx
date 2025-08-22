@@ -344,8 +344,18 @@ const CardAction = forwardRef<HTMLDivElement, CardActionProps>(
   }, ref) => {
     const validTheme = validateTheme(theme)
     
+    const themeColors = {
+      adventure: 'yellow',
+      vibe: 'purple',
+      nature: 'green',
+      indulge: 'amber',
+      discover: 'blue'
+    }
+    
+    const colorName = themeColors[validTheme] || 'blue'
+    
     const variantStyles = {
-      primary: `bg-${validTheme === 'adventure' ? 'orange' : validTheme === 'party' ? 'purple' : validTheme === 'nature' ? 'green' : validTheme === 'shopping' ? 'pink' : 'blue'}-500 hover:bg-${validTheme === 'adventure' ? 'orange' : validTheme === 'party' ? 'purple' : validTheme === 'nature' ? 'green' : validTheme === 'shopping' ? 'pink' : 'blue'}-600 text-white`,
+      primary: `bg-${colorName}-500 hover:bg-${colorName}-600 text-white`,
       outline: `border border-white/30 hover:border-white/50 text-white hover:bg-white/10`,
       ghost: `text-white hover:bg-white/10`
     }

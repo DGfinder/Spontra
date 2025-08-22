@@ -1,19 +1,9 @@
 import { useCallback } from 'react'
-import { apiClient, DestinationExploreRequest, DestinationExploreResponse, ActivityType, DestinationRecommendation } from '@/services/apiClient'
+import { DestinationExploreResponse, DestinationRecommendation } from '@/services/apiClient'
 import { useSearchStore, useSearchActions, FormData } from '@/store/searchStore'
 import { destinationCache, createDestinationCacheKey, CachedDestinationSearch } from '@/lib/cacheClient'
 // Client will call our server route instead of hitting Amadeus directly
 
-// Theme to activity mapping
-const THEME_TO_ACTIVITY: Record<string, ActivityType> = {
-  adventure: 'adventure',
-  nature: 'nature',
-  shopping: 'shopping',
-  party: 'nightlife',
-  learn: 'culture',
-  // Legacy mappings for compatibility
-  activities: 'activities'
-}
 
 export function useDestinationExplore() {
   const { isLoading, isError, error, results } = useSearchStore()
@@ -36,13 +26,16 @@ export function useDestinationExplore() {
     setError(null)
 
     try {
+      // Extract flight time range for cache key
+      const minFlightTime = formData.flightTimeRange?.[0] ?? formData.minFlightTime ?? 0.5
+      const maxFlightTime = formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8
+
       // Create cache key from search parameters
       const cacheKey = createDestinationCacheKey({
         origin: formData.departureAirport,
-        maxFlightTime: formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8,
+        maxFlightTime,
         theme: formData.selectedTheme,
-        departureDate: formData.departureDate,
-        viewBy: 'PRICE'
+        departureDate: formData.departureDate
       })
 
       // Check cache first
@@ -77,22 +70,15 @@ export function useDestinationExplore() {
       }
 
       console.log('🔍 No cache hit, fetching fresh destination data')
-      // Extract flight time range from form data
-      const minFlightTime = formData.flightTimeRange?.[0] ?? formData.minFlightTime ?? 0.5
-      const maxFlightTime = formData.flightTimeRange?.[1] ?? formData.maxFlightTimeRange ?? formData.maxFlightTime ?? 8
-
-      // Map form data to API request
-      const request: DestinationExploreRequest = {
-        origin_airport_code: formData.departureAirport,
-        min_flight_duration_hours: minFlightTime,
-        max_flight_duration_hours: maxFlightTime,
-        preferred_activities: [THEME_TO_ACTIVITY[formData.selectedTheme] || 'adventure'],
-        budget_level: 'any',
-        max_results: 20,
-        include_visa_required: false
-      }
-
-      console.log('Exploring destinations with parameters:', request)
+      
+      console.log('Exploring destinations with parameters:', {
+        origin: formData.departureAirport,
+        minFlightTime,
+        maxFlightTime,
+        theme: formData.selectedTheme,
+        departureDate: formData.departureDate,
+        nonStop: !!formData.directFlightsOnly,
+      })
 
       // Try Amadeus service first (direct API access with your credentials)
       const startTime = Date.now()
@@ -105,6 +91,7 @@ export function useDestinationExplore() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             origin: formData.departureAirport,
+            minFlightTime,
             maxFlightTime,
             theme: formData.selectedTheme,
             departureDate: formData.departureDate,
@@ -128,27 +115,8 @@ export function useDestinationExplore() {
         console.log(`✅ AMADEUS API SUCCESSFUL (server): Found ${amadeusResults.length} destinations`)
       } catch (amadeusError) {
         console.error('❌ AMADEUS API FAILED:', amadeusError)
-        
-        // Only attempt backend fallback if the Amadeus error doesn't indicate a fallback should be used
         const errorMessage = amadeusError instanceof Error ? amadeusError.message : String(amadeusError)
-        const shouldTryBackend = process.env.NODE_ENV === 'development' && 
-          process.env.NEXT_PUBLIC_API_BASE_URL && 
-          !errorMessage?.includes('fallback')
-        
-        if (shouldTryBackend) {
-          console.warn('🔄 Falling back to backend API (localhost:8081)...')
-          try {
-            response = await apiClient.exploreDestinations(request)
-            console.log('✅ Backend API successful')
-          } catch (backendError) {
-            console.error('❌ Backend API also failed:', backendError)
-            const backendErrorMessage = backendError instanceof Error ? backendError.message : String(backendError)
-            throw new Error('Destination exploration failed: ' + (backendErrorMessage || 'Network Error'))
-          }
-        } else {
-          console.log('🔄 No backend fallback available, throwing original error')
-          throw new Error('Destination exploration failed: ' + (errorMessage || 'Service unavailable'))
-        }
+        throw new Error('Destination exploration failed: ' + (errorMessage || 'Service unavailable'))
       }
       
       const searchDuration = Date.now() - startTime
@@ -160,8 +128,7 @@ export function useDestinationExplore() {
           origin: formData.departureAirport,
           maxFlightTime,
           theme: formData.selectedTheme,
-          departureDate: formData.departureDate,
-          viewBy: 'PRICE'
+          departureDate: formData.departureDate
         },
         meta: {
           searchTimestamp: response.searched_at,

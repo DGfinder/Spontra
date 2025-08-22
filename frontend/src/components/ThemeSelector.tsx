@@ -1,4 +1,4 @@
-import { Mountain, Trees, ShoppingBag, Music, BookOpen } from 'lucide-react'
+import { Mountain, Trees, Sparkles, Music, BookOpen } from 'lucide-react'
 
 interface Theme {
   id: string
@@ -24,9 +24,9 @@ export function ThemeSelector({ themes, selectedTheme, onThemeSelect }: ThemeSel
     switch (themeId) {
       case 'adventure': return <Mountain {...iconProps} />
       case 'nature': return <Trees {...iconProps} />
-      case 'shopping': return <ShoppingBag {...iconProps} />
-      case 'party': return <Music {...iconProps} />
-      case 'learn': return <BookOpen {...iconProps} />
+      case 'indulge': return <Sparkles {...iconProps} />
+      case 'vibe': return <Music {...iconProps} />
+      case 'discover': return <BookOpen {...iconProps} />
       default: return <></>  // Return empty fragment instead of null
     }
   }

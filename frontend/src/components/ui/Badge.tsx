@@ -87,11 +87,11 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
 
     // Theme-based variants (when using theme prop)
     const themeStyles = {
-      adventure: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
-      party: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+      adventure: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+      vibe: 'bg-purple-600/20 text-purple-300 border border-purple-600/30',
       nature: 'bg-green-500/20 text-green-300 border border-green-500/30',
-      shopping: 'bg-pink-500/20 text-pink-300 border border-pink-500/30',
-      learn: 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+      indulge: 'bg-amber-600/20 text-amber-300 border border-amber-600/30',
+      discover: 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
     }
 
     // Use theme styles if theme is provided and variant is default
@@ -202,10 +202,10 @@ export const ThemeBadge = forwardRef<HTMLSpanElement, Omit<BadgeProps, 'variant'
 }>(({ themeType, ...props }, ref) => {
   const themeLabels = {
     adventure: 'Adventure',
-    party: 'Nightlife',
+    vibe: 'Social Energy',
     nature: 'Nature',
-    shopping: 'Shopping',
-    learn: 'Culture'
+    indulge: 'Luxury & Wellness',
+    discover: 'Culture & Cuisine'
   }
 
   return (

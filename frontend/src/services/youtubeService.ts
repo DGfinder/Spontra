@@ -171,7 +171,7 @@ class YouTubeService {
       'nature-park': 'nature park wildlife conservation',
       'shopping': 'shopping market boutique local crafts',
       'adventure': 'adventure outdoor sports activities',
-      'beaches': 'beach coast water activities',
+      'nature': 'nature coast water activities wildlife parks',
       'sightseeing': 'sightseeing landmarks attractions tours'
     }
 

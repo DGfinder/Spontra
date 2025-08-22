@@ -1,29 +1,29 @@
-// Theme configuration matching the original design
+// Theme configuration with updated theme structure
 export const THEME_COLORS = {
   adventure: {
     primary: 'rgb(255, 189, 10)', // Gold/Yellow
     hover: 'rgb(255, 199, 40)',
     name: 'Adventure'
   },
-  party: {
-    primary: 'rgb(235, 91, 37)', // Orange/Red
-    hover: 'rgb(245, 101, 47)',
-    name: 'Party'
+  vibe: {
+    primary: 'rgb(147, 51, 234)', // Purple (social energy)
+    hover: 'rgb(168, 85, 247)',
+    name: 'Vibe'
   },
   nature: {
     primary: 'rgb(2, 192, 109)', // Green
     hover: 'rgb(12, 202, 119)',
     name: 'Nature'
   },
-  shopping: {
-    primary: 'rgb(229, 43, 0)', // Red
-    hover: 'rgb(239, 53, 10)',
-    name: 'Shopping'
+  indulge: {
+    primary: 'rgb(217, 119, 6)', // Amber (luxury/wellness)
+    hover: 'rgb(245, 158, 11)',
+    name: 'Indulge'
   },
-  learn: {
-    primary: 'rgb(127, 106, 228)', // Purple
-    hover: 'rgb(137, 116, 238)',
-    name: 'Learn'
+  discover: {
+    primary: 'rgb(59, 130, 246)', // Blue (cultural/culinary)
+    hover: 'rgb(99, 102, 241)',
+    name: 'Discover'
   }
 } as const
 
@@ -127,20 +127,20 @@ export const getThemeHoverColorAlpha = (theme: ThemeKey, alpha: number): string 
 // Tailwind CSS class mappings for themes
 export const THEME_TAILWIND_CLASSES = {
   adventure: {
-    bg: 'bg-orange-500',
-    bgHover: 'bg-orange-600',
-    text: 'text-orange-500',
-    textHover: 'text-orange-600',
-    border: 'border-orange-500',
-    ring: 'ring-orange-500'
+    bg: 'bg-yellow-500',
+    bgHover: 'bg-yellow-600',
+    text: 'text-yellow-500',
+    textHover: 'text-yellow-600',
+    border: 'border-yellow-500',
+    ring: 'ring-yellow-500'
   },
-  party: {
-    bg: 'bg-purple-500',
-    bgHover: 'bg-purple-600',
-    text: 'text-purple-500',
-    textHover: 'text-purple-600',
-    border: 'border-purple-500',
-    ring: 'ring-purple-500'
+  vibe: {
+    bg: 'bg-purple-600',
+    bgHover: 'bg-purple-700',
+    text: 'text-purple-600',
+    textHover: 'text-purple-700',
+    border: 'border-purple-600',
+    ring: 'ring-purple-600'
   },
   nature: {
     bg: 'bg-green-500',
@@ -150,15 +150,15 @@ export const THEME_TAILWIND_CLASSES = {
     border: 'border-green-500',
     ring: 'ring-green-500'
   },
-  shopping: {
-    bg: 'bg-pink-500',
-    bgHover: 'bg-pink-600',
-    text: 'text-pink-500',
-    textHover: 'text-pink-600',
-    border: 'border-pink-500',
-    ring: 'ring-pink-500'
+  indulge: {
+    bg: 'bg-amber-600',
+    bgHover: 'bg-amber-700',
+    text: 'text-amber-600',
+    textHover: 'text-amber-700',
+    border: 'border-amber-600',
+    ring: 'ring-amber-600'
   },
-  learn: {
+  discover: {
     bg: 'bg-blue-500',
     bgHover: 'bg-blue-600',
     text: 'text-blue-500',
@@ -183,13 +183,13 @@ export const getThemeTextClass = (theme: ThemeKey, hover = false): string => {
   return hover ? `${classes.text} ${classes.textHover}` : classes.text
 }
 
-// Theme-to-activity mappings (consolidated from themeDestinationService.ts)
+// Theme-to-activity mappings with updated categorizations
 export const THEME_ACTIVITY_MAPPINGS = {
-  adventure: ['hiking', 'climbing', 'skiing', 'diving', 'bungee', 'rafting', 'safari', 'trekking'],
-  nature: ['hiking', 'camping', 'wildlife', 'gardens', 'parks', 'beaches', 'forests', 'mountains'],
-  shopping: ['markets', 'malls', 'boutiques', 'outlets', 'fashion', 'crafts', 'souvenirs', 'local_goods'],
-  party: ['nightlife', 'bars', 'clubs', 'festivals', 'concerts', 'events', 'music', 'dancing'],
-  learn: ['museums', 'galleries', 'tours', 'history', 'culture', 'architecture', 'workshops', 'classes']
+  adventure: ['hiking', 'climbing', 'skiing', 'diving', 'bungee', 'rafting', 'safari', 'trekking', 'paragliding', 'rock_climbing'],
+  nature: ['hiking', 'camping', 'wildlife', 'gardens', 'parks', 'beaches', 'forests', 'mountains', 'bird_watching', 'nature_photography'],
+  indulge: ['luxury_shopping', 'spa_treatments', 'wellness_resorts', 'massage_therapy', 'yoga_retreats', 'thermal_baths', 'fashion_districts', 'artisan_boutiques', 'meditation', 'detox_programs'],
+  vibe: ['nightlife', 'bars', 'clubs', 'festivals', 'concerts', 'events', 'music', 'dancing', 'beach_clubs', 'rooftop_bars', 'live_music', 'social_dining', 'night_markets', 'street_festivals'],
+  discover: ['museums', 'galleries', 'tours', 'history', 'culture', 'architecture', 'workshops', 'classes', 'cooking_classes', 'food_tours', 'local_markets', 'wine_tasting', 'cultural_tours', 'art_galleries', 'historical_sites', 'language_immersion']
 } as const
 
 export const getThemeActivities = (theme: ThemeKey): readonly string[] => {
@@ -215,15 +215,15 @@ export const THEME_CONFIG = {
     description: 'Thrilling adventures and adrenaline-packed experiences',
     keywords: ['thrilling', 'adrenaline', 'outdoor', 'extreme', 'active']
   },
-  party: {
-    id: 'party',
-    label: 'Party',
-    color: THEME_COLORS.party,
-    classes: THEME_TAILWIND_CLASSES.party,
-    activities: THEME_ACTIVITY_MAPPINGS.party,
-    background: '/party-background.jpg',
-    description: 'Vibrant nightlife and entertainment experiences',
-    keywords: ['nightlife', 'entertainment', 'music', 'dancing', 'social']
+  vibe: {
+    id: 'vibe',
+    label: 'Vibe',
+    color: THEME_COLORS.vibe,
+    classes: THEME_TAILWIND_CLASSES.vibe,
+    activities: THEME_ACTIVITY_MAPPINGS.vibe,
+    background: '/vibe-background.jpg',
+    description: 'Social energy, nightlife, festivals, and music scenes',
+    keywords: ['nightlife', 'entertainment', 'music', 'dancing', 'social', 'festivals', 'energy']
   },
   nature: {
     id: 'nature',
@@ -235,25 +235,25 @@ export const THEME_CONFIG = {
     description: 'Peaceful natural settings and outdoor beauty',
     keywords: ['peaceful', 'natural', 'outdoors', 'scenic', 'relaxing']
   },
-  shopping: {
-    id: 'shopping',
-    label: 'Shopping',
-    color: THEME_COLORS.shopping,
-    classes: THEME_TAILWIND_CLASSES.shopping,
-    activities: THEME_ACTIVITY_MAPPINGS.shopping,
-    background: '/shopping-background.jpg',
-    description: 'Fashion districts and unique shopping experiences',
-    keywords: ['fashion', 'retail', 'markets', 'boutiques', 'local']
+  indulge: {
+    id: 'indulge',
+    label: 'Indulge',
+    color: THEME_COLORS.indulge,
+    classes: THEME_TAILWIND_CLASSES.indulge,
+    activities: THEME_ACTIVITY_MAPPINGS.indulge,
+    background: '/indulge-background.jpg',
+    description: 'Wellness, luxury shopping, spas, and premium experiences',
+    keywords: ['wellness', 'luxury', 'spa', 'shopping', 'premium', 'relaxation', 'self-care']
   },
-  learn: {
-    id: 'learn',
-    label: 'Learn',
-    color: THEME_COLORS.learn,
-    classes: THEME_TAILWIND_CLASSES.learn,
-    activities: THEME_ACTIVITY_MAPPINGS.learn,
-    background: '/learn-background.jpg',
-    description: 'Cultural enrichment and educational experiences',
-    keywords: ['cultural', 'educational', 'history', 'museums', 'art']
+  discover: {
+    id: 'discover',
+    label: 'Discover',
+    color: THEME_COLORS.discover,
+    classes: THEME_TAILWIND_CLASSES.discover,
+    activities: THEME_ACTIVITY_MAPPINGS.discover,
+    background: '/discover-background.jpg',
+    description: 'Culture, history, local cuisine, and authentic experiences',
+    keywords: ['cultural', 'educational', 'history', 'museums', 'art', 'culinary', 'authentic', 'local']
   }
 } as const
 
@@ -313,9 +313,9 @@ export const getThemeIconName = (theme: ThemeKey): string => {
   const iconMap: Record<ThemeKey, string> = {
     adventure: 'Mountain',
     nature: 'Trees', 
-    shopping: 'ShoppingBag',
-    party: 'Music',
-    learn: 'BookOpen'
+    indulge: 'Sparkles',
+    vibe: 'Music',
+    discover: 'BookOpen'
   }
   return iconMap[theme] || iconMap.adventure
 }

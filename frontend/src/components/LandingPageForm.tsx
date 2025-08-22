@@ -53,22 +53,22 @@ const THEMES = [
     color: 'nature'
   },
   { 
-    id: 'shopping', 
-    label: 'Shopping', 
-    background: '/shopping-background.jpg',
-    color: 'shopping'
+    id: 'indulge', 
+    label: 'Indulge', 
+    background: '/indulge-background.jpg',
+    color: 'indulge'
   },
   { 
-    id: 'party', 
-    label: 'Party', 
-    background: '/party-background.jpg',
-    color: 'party'
+    id: 'vibe', 
+    label: 'Vibe', 
+    background: '/vibe-background.jpg',
+    color: 'vibe'
   },
   { 
-    id: 'learn', 
-    label: 'Learn', 
-    background: '/learn-background.jpg',
-    color: 'learn'
+    id: 'discover', 
+    label: 'Discover', 
+    background: '/discover-background.jpg',
+    color: 'discover'
   }
 ]
 
@@ -82,22 +82,22 @@ const BLURBS: Record<ThemeKey, { title: string; description: string }> = {
   nature: {
     title: 'Reconnect With Nature',
     description:
-      'Seek out serene forests, coastal escapes, and national parks. We’ll help you find peaceful places immersed in greenery and fresh air.'
+      'Seek out serene forests, coastal escapes, and national parks. We\'ll help you find peaceful places immersed in greenery and fresh air.'
   },
-  shopping: {
-    title: 'Shop Iconic Districts',
+  indulge: {
+    title: 'Indulge in Luxury & Wellness',
     description:
-      'Fashion capitals and local markets—discover destinations where browsing, bargains, and boutiques take center stage.'
+      'Luxury shopping, spa retreats, and premium experiences. Discover destinations where you can pamper yourself and enjoy the finer things.'
   },
-  party: {
-    title: 'Turn Up The Nightlife',
+  vibe: {
+    title: 'Feel The Social Energy',
     description:
-      'Find cities with buzzing bars, dance floors, and festivals. Plan a getaway where the nights are as unforgettable as the days.'
+      'Find cities with buzzing bars, festivals, and vibrant social scenes. Plan a getaway where the energy and connections are unforgettable.'
   },
-  learn: {
-    title: 'Learn Through Travel',
+  discover: {
+    title: 'Discover Culture & Cuisine',
     description:
-      'Museums, history, and culture-rich neighborhoods. Explore places that inspire curiosity and expand your perspective.'
+      'Museums, local markets, and authentic culinary experiences. Explore places that inspire curiosity and expand your cultural horizons.'
   }
 }
 

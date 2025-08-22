@@ -12,9 +12,9 @@ export interface CityOption {
   airport_code: string
   population: number
   flight_frequency: number
-  primary_theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+  primary_theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'nature' | 'culture' | 'food' | 'nightlife' | 'nature'
   secondary_themes: Array<{
-    theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+    theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'nature' | 'culture' | 'food' | 'nightlife' | 'nature'
     strength: number
   }>
   is_hidden_gem: boolean

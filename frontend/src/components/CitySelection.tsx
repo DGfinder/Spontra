@@ -14,9 +14,9 @@ interface CityOption {
   airport_code: string
   population: number
   flight_frequency: number // flights per week
-  primary_theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+  primary_theme: 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
   secondary_themes: Array<{
-    theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+    theme: 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
     strength: number // 0.1-1.0
   }>
   is_hidden_gem: boolean
@@ -24,11 +24,11 @@ interface CityOption {
   flight_duration: number // in hours
   description: string
   themeScores?: {
-    party: number
+    vibe: number
     adventure: number
-    learn: number
-    shopping: number
-    beach: number
+    discover: number
+    indulge: number
+    nature: number
   }
   highlights?: string[]
   bestMonths?: string[]
@@ -60,27 +60,26 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
 
   const getThemeColor = (theme: string) => {
     switch (theme) {
-      case 'party':
+      case 'vibe':
       case 'nightlife': return 'text-purple-400'
       case 'adventure': return 'text-orange-400'
-      case 'learn':
+      case 'discover':
       case 'culture': return 'text-blue-400'
-      case 'shopping': return 'text-pink-400'
-      case 'beach': return 'text-cyan-400'
-      case 'food': return 'text-green-400'
+      case 'indulge': return 'text-amber-400'
       case 'nature': return 'text-emerald-400'
+      case 'food': return 'text-green-400'
       default: return 'text-yellow-400'
     }
   }
 
   const getThemeIcon = (theme: string) => {
     switch (theme) {
-      case 'party':
+      case 'vibe':
       case 'nightlife': return '🌃'
       case 'adventure': return '🏔️'
-      case 'learn':
+      case 'discover':
       case 'culture': return '🏛️'
-      case 'shopping': return '🛍️'
+      case 'indulge': return '✨'
       case 'beach': return '🏖️'
       case 'food': return '🍽️'
       case 'nature': return '🌿'
@@ -398,35 +397,35 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
   }
   
   // Helper to determine primary theme from scores
-  const getPrimaryTheme = (scores: any, selectedTheme: string): 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature' => {
-    const validThemes: Array<'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'> = 
-      ['party', 'adventure', 'learn', 'shopping', 'beach', 'culture', 'food', 'nightlife', 'nature']
+  const getPrimaryTheme = (scores: any, selectedTheme: string): 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife' => {
+    const validThemes: Array<'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'> = 
+      ['vibe', 'adventure', 'discover', 'indulge', 'nature', 'culture', 'food', 'nightlife']
     
     if (scores && Object.keys(scores).length > 0) {
       const maxScore = Math.max(...Object.values(scores) as number[])
       const primary = Object.keys(scores).find(key => scores[key] === maxScore)
       if (primary && validThemes.includes(primary as any)) {
-        return primary as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+        return primary as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
       }
     }
     
     const defaultTheme = selectedTheme && validThemes.includes(selectedTheme as any) 
-      ? selectedTheme as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'
+      ? selectedTheme as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
       : 'adventure'
     
     return defaultTheme
   }
   
   // Helper to get secondary themes from scores
-  const getSecondaryThemes = (scores: any): Array<{theme: 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature', strength: number}> => {
+  const getSecondaryThemes = (scores: any): Array<{theme: 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife', strength: number}> => {
     if (!scores) return []
     
-    const validThemes: Array<'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature'> = 
-      ['party', 'adventure', 'learn', 'shopping', 'beach', 'culture', 'food', 'nightlife', 'nature']
+    const validThemes: Array<'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'> = 
+      ['vibe', 'adventure', 'discover', 'indulge', 'nature', 'culture', 'food', 'nightlife']
     
     return Object.entries(scores)
       .map(([theme, score]) => ({ 
-        theme: theme as 'party' | 'adventure' | 'learn' | 'shopping' | 'beach' | 'culture' | 'food' | 'nightlife' | 'nature', 
+        theme: theme as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife', 
         strength: (score as number) / 100 
       }))
       .filter(({theme, strength}) => validThemes.includes(theme) && strength >= 0.3)
@@ -445,9 +444,9 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
     switch (selectedTheme) {
       case 'adventure': return 'from-orange-900 via-amber-900 to-slate-900'
       case 'nature': return 'from-green-900 via-teal-900 to-slate-900'
-      case 'shopping': return 'from-pink-900 via-rose-900 to-slate-900'
-      case 'party': return 'from-purple-900 via-pink-900 to-slate-900'
-      case 'learn': return 'from-blue-900 via-indigo-900 to-slate-900'
+      case 'indulge': return 'from-amber-900 via-orange-900 to-slate-900'
+      case 'vibe': return 'from-purple-900 via-pink-900 to-slate-900'
+      case 'discover': return 'from-blue-900 via-indigo-900 to-slate-900'
       case 'nightlife': return 'from-purple-900 via-pink-900 to-slate-900'
       case 'culture': return 'from-blue-900 via-indigo-900 to-slate-900'
       case 'food': return 'from-green-900 via-emerald-900 to-slate-900'

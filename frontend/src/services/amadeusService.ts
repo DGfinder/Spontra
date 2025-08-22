@@ -318,7 +318,7 @@ class AmadeusService {
         return ['culture', 'activities']
       case 'shopping':
         return ['shopping', 'activities']
-      case 'beach':
+      case 'nature':
         return ['nature', 'activities']
       default:
         return ['activities']

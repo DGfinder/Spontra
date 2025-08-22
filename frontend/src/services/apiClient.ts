@@ -99,15 +99,17 @@ export interface BudgetInfo {
 
 export type ActivityType = 
   | 'activities'
-  | 'shopping'
+  | 'luxury_shopping'
+  | 'spa_treatments'
   | 'restaurants'
   | 'nature'
   | 'culture'
   | 'nightlife'
-  | 'beaches'
   | 'sightseeing'
   | 'adventure'
   | 'relaxation'
+  | 'cooking_classes'
+  | 'food_tours'
 
 export interface AirportSuggestion {
   code: string

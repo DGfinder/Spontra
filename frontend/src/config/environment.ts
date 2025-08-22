@@ -59,7 +59,7 @@ class EnvironmentService {
       rateLimit: parseInt(this.getEnvVar('NEXT_PUBLIC_RATE_LIMIT', '100')), // requests per minute
       
       // Theme configuration
-      supportedThemes: this.getEnvVar('NEXT_PUBLIC_SUPPORTED_THEMES', 'party,adventure,learn,shopping,beach').split(','),
+      supportedThemes: this.getEnvVar('NEXT_PUBLIC_SUPPORTED_THEMES', 'vibe,adventure,discover,indulge,nature').split(','),
       defaultTheme: this.getEnvVar('NEXT_PUBLIC_DEFAULT_THEME', 'adventure'),
       
       // Error handling
@@ -108,7 +108,7 @@ class EnvironmentService {
     }
 
     // Validate themes
-    const validThemes = ['party', 'adventure', 'learn', 'shopping', 'nature']
+    const validThemes = ['vibe', 'adventure', 'discover', 'indulge', 'nature']
     const invalidThemes = this.config.supportedThemes.filter(theme => !validThemes.includes(theme))
     if (invalidThemes.length > 0) {
       errors.push(`Invalid themes found: ${invalidThemes.join(', ')}`)
@@ -222,7 +222,7 @@ export const {
 } = environmentService.getConfig()
 
 // Type guards
-export function isValidTheme(theme: string): theme is 'party' | 'adventure' | 'learn' | 'shopping' | 'nature' {
+export function isValidTheme(theme: string): theme is 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' {
   return supportedThemes.includes(theme)
 }
 

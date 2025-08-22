@@ -40,13 +40,15 @@ const getThemeHoverColors = (theme: string) => {
   const classes = getThemeClasses(validTheme)
   switch (validTheme) {
     case 'adventure':
-      return 'hover:bg-orange-500/10'
-    case 'party':
-      return 'hover:bg-purple-500/10'
-    case 'learn':
+      return 'hover:bg-yellow-500/10'
+    case 'vibe':
+      return 'hover:bg-purple-600/10'
+    case 'discover':
+      return 'hover:bg-blue-500/10'
+    case 'indulge':
+      return 'hover:bg-amber-600/10'
+    case 'nature':
       return 'hover:bg-green-500/10'
-    case 'shopping':
-      return 'hover:bg-pink-500/10'
     default:
       return 'hover:bg-blue-500/10'
   }

@@ -17,16 +17,18 @@ interface ExploreFormData {
   includeVisaRequired: boolean
 }
 
-type ActivityType = 'activities' | 'shopping' | 'restaurants' | 'nature' | 'culture' | 'nightlife' | 'beaches' | 'sightseeing' | 'adventure' | 'relaxation'
+type ActivityType = 'activities' | 'luxury_shopping' | 'spa_treatments' | 'restaurants' | 'nature' | 'culture' | 'nightlife' | 'beaches' | 'sightseeing' | 'adventure' | 'relaxation' | 'cooking_classes' | 'food_tours'
 
 const ACTIVITY_OPTIONS: { value: ActivityType; label: string; icon: string; hasBackground?: boolean }[] = [
   { value: 'activities', label: 'Activities', icon: '🎯' },
-  { value: 'shopping', label: 'Shopping', icon: '🛍️', hasBackground: true },
+  { value: 'luxury_shopping', label: 'Luxury Shopping', icon: '🛍️', hasBackground: true },
+  { value: 'spa_treatments', label: 'Spa & Wellness', icon: '✨', hasBackground: true },
   { value: 'restaurants', label: 'Restaurants', icon: '🍽️' },
   { value: 'nature', label: 'Nature', icon: '🌲' },
   { value: 'culture', label: 'Culture', icon: '🎭', hasBackground: true },
   { value: 'nightlife', label: 'Nightlife', icon: '🌃', hasBackground: true },
-  { value: 'beaches', label: 'Beaches', icon: '🏖️' },
+  { value: 'cooking_classes', label: 'Cooking Classes', icon: '👨‍🍳', hasBackground: true },
+  { value: 'food_tours', label: 'Food Tours', icon: '🚶‍♀️', hasBackground: true },
   { value: 'sightseeing', label: 'Sightseeing', icon: '🏛️', hasBackground: true },
   { value: 'adventure', label: 'Adventure', icon: '🏔️', hasBackground: true },
   { value: 'relaxation', label: 'Relaxation', icon: '🧘' },
@@ -57,15 +59,15 @@ export function ExploreForm() {
       return '/nature-background.jpg' // Default to the nature image
     }
     
-    // Priority order for background selection - matches LandingPageForm themes
-    if (formData.preferredActivities.includes('shopping')) {
-      return '/shopping-background.jpg'
+    // Priority order for background selection - matches new theme structure
+    if (formData.preferredActivities.includes('luxury_shopping') || formData.preferredActivities.includes('spa_treatments')) {
+      return '/indulge-background.jpg'
     }
-    if (formData.preferredActivities.includes('culture') || formData.preferredActivities.includes('sightseeing')) {
-      return '/learn-background.jpg'
+    if (formData.preferredActivities.includes('culture') || formData.preferredActivities.includes('sightseeing') || formData.preferredActivities.includes('cooking_classes') || formData.preferredActivities.includes('food_tours')) {
+      return '/discover-background.jpg'
     }
     if (formData.preferredActivities.includes('nightlife')) {
-      return '/party-background.jpg'
+      return '/vibe-background.jpg'
     }
     if (formData.preferredActivities.includes('adventure')) {
       return '/adventure-background.jpg'
@@ -469,9 +471,9 @@ export function ExploreForm() {
             <div className="flex items-end justify-end p-8 h-full">
               <div className="text-white/60 text-xs bg-black/30 px-3 py-1 rounded">
                 {formData.preferredActivities.length === 0 ? 'Nature & Relaxation' : 
-                 formData.preferredActivities.includes('shopping') ? 'Shopping Districts' :
-                 formData.preferredActivities.includes('culture') || formData.preferredActivities.includes('sightseeing') ? 'Cultural Experiences' :
-                 formData.preferredActivities.includes('nightlife') ? 'Nightlife Scene' :
+                 formData.preferredActivities.includes('luxury_shopping') || formData.preferredActivities.includes('spa_treatments') ? 'Luxury & Indulgence' :
+                 formData.preferredActivities.includes('culture') || formData.preferredActivities.includes('sightseeing') || formData.preferredActivities.includes('cooking_classes') || formData.preferredActivities.includes('food_tours') ? 'Cultural Discovery' :
+                 formData.preferredActivities.includes('nightlife') ? 'Social Vibes' :
                  formData.preferredActivities.includes('adventure') ? 'Adventure Awaits' :
                  formData.preferredActivities.includes('nature') || formData.preferredActivities.includes('beaches') || formData.preferredActivities.includes('relaxation') ? 'Nature & Serenity' :
                  'Explore More'}
