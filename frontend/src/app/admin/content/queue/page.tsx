@@ -45,6 +45,10 @@ export default function ContentModerationQueue() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [bulkProcessing, setBulkProcessing] = useState(false)
+  const [aiAssistEnabled, setAiAssistEnabled] = useState(true)
+  const [showBulkModal, setShowBulkModal] = useState(false)
+  const [bulkAction, setBulkAction] = useState<'approve' | 'reject' | null>(null)
 
   // Mock data - in production this would come from your moderation service
   const mockQueue: ModerationQueue[] = [
@@ -191,17 +195,88 @@ export default function ContentModerationQueue() {
   const handleBulkModerate = async (action: ModerationAction['action']) => {
     if (selectedItems.length === 0) return
     
+    setBulkProcessing(true)
     try {
       // In production, this would be a bulk API call
       console.log('Bulk moderating:', { items: selectedItems, action })
       
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      
       setQueue(prev => prev.filter(item => !selectedItems.includes(item.id)))
       setSelectedItems([])
+      setShowBulkModal(false)
+      setBulkAction(null)
       
       alert(`${selectedItems.length} items ${action}d successfully`)
     } catch (error) {
       console.error('Bulk moderation failed:', error)
       alert('Failed to moderate content')
+    } finally {
+      setBulkProcessing(false)
+    }
+  }
+
+  const handleSmartAutoApprove = async () => {
+    setBulkProcessing(true)
+    try {
+      // Auto-approve high-quality content from trusted creators
+      const autoApprovable = filteredQueue.filter(item => 
+        item.creator.trustScore >= 8.0 && 
+        item.flags.every(flag => flag.confidence < 0.7) &&
+        item.priority !== 'urgent'
+      )
+      
+      if (autoApprovable.length === 0) {
+        alert('No content qualifies for auto-approval based on current criteria')
+        return
+      }
+
+      console.log('Auto-approving:', autoApprovable.map(item => item.id))
+      
+      // Simulate AI processing
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      setQueue(prev => prev.filter(item => !autoApprovable.some(auto => auto.id === item.id)))
+      
+      alert(`${autoApprovable.length} high-quality items auto-approved by AI`)
+    } catch (error) {
+      console.error('Auto-approval failed:', error)
+      alert('Failed to auto-approve content')
+    } finally {
+      setBulkProcessing(false)
+    }
+  }
+
+  const handleSmartReject = async () => {
+    setBulkProcessing(true)
+    try {
+      // Auto-reject content with high-confidence negative flags
+      const autoRejectible = filteredQueue.filter(item => 
+        item.flags.some(flag => 
+          (flag.type === 'inappropriate_content' || flag.type === 'spam') && 
+          flag.confidence > 0.85
+        )
+      )
+      
+      if (autoRejectible.length === 0) {
+        alert('No content qualifies for auto-rejection based on current criteria')
+        return
+      }
+
+      console.log('Auto-rejecting:', autoRejectible.map(item => item.id))
+      
+      // Simulate AI processing
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      setQueue(prev => prev.filter(item => !autoRejectible.some(auto => auto.id === item.id)))
+      
+      alert(`${autoRejectible.length} problematic items auto-rejected by AI`)
+    } catch (error) {
+      console.error('Auto-rejection failed:', error)
+      alert('Failed to auto-reject content')
+    } finally {
+      setBulkProcessing(false)
     }
   }
 
@@ -267,18 +342,47 @@ export default function ContentModerationQueue() {
         </div>
         
         <div className="flex items-center space-x-3">
+          {/* AI Automation Controls */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleSmartAutoApprove}
+              disabled={bulkProcessing}
+              className="flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Zap size={14} className="mr-1" />
+              {bulkProcessing ? 'Processing...' : 'Smart Approve'}
+            </button>
+            
+            <button
+              onClick={handleSmartReject}
+              disabled={bulkProcessing}
+              className="flex items-center px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <AlertTriangle size={14} className="mr-1" />
+              {bulkProcessing ? 'Processing...' : 'Smart Reject'}
+            </button>
+          </div>
+
           {selectedItems.length > 0 && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 border-l border-gray-300 pl-3">
               <span className="text-sm text-gray-600">{selectedItems.length} selected</span>
               <button
-                onClick={() => handleBulkModerate('approve')}
-                className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                onClick={() => {
+                  setBulkAction('approve')
+                  setShowBulkModal(true)
+                }}
+                disabled={bulkProcessing}
+                className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:opacity-50"
               >
                 Approve All
               </button>
               <button
-                onClick={() => handleBulkModerate('reject')}
-                className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+                onClick={() => {
+                  setBulkAction('reject')
+                  setShowBulkModal(true)
+                }}
+                disabled={bulkProcessing}
+                className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
               >
                 Reject All
               </button>
@@ -569,6 +673,54 @@ export default function ContentModerationQueue() {
           )}
         </div>
       </div>
+
+      {/* Bulk Action Modal */}
+      {showBulkModal && bulkAction && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                {bulkAction === 'approve' ? (
+                  <CheckCircle size={24} className="text-green-600 mr-3" />
+                ) : (
+                  <XCircle size={24} className="text-red-600 mr-3" />
+                )}
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Bulk {bulkAction === 'approve' ? 'Approve' : 'Reject'} Content
+                </h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to {bulkAction} {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''}?
+                {bulkAction === 'reject' && ' This action cannot be undone.'}
+              </p>
+              
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => {
+                    setShowBulkModal(false)
+                    setBulkAction(null)
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleBulkModerate(bulkAction)}
+                  disabled={bulkProcessing}
+                  className={`flex-1 px-4 py-2 text-white rounded-lg disabled:opacity-50 ${
+                    bulkAction === 'approve' 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
+                >
+                  {bulkProcessing ? 'Processing...' : `${bulkAction === 'approve' ? 'Approve' : 'Reject'} ${selectedItems.length} Item${selectedItems.length > 1 ? 's' : ''}`}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -67,16 +67,13 @@ export default function DestinationManagement() {
       isPopular: true,
       highlights: ['Gothic Quarter', 'Park Güell', 'Sagrada Família', 'Las Ramblas'],
       themeScores: {
-        nightlife: 9.2,
-        culture: 8.7,
-        adventure: 6.5,
-        relaxation: 7.3,
-        food: 8.9,
-        shopping: 7.8,
-        nature: 5.2,
-        romance: 8.1
+        vibe: 9.2,        // Nightlife & Social (avg of nightlife + romance: 9.2 + 8.1 / 2 = 8.65)
+        adventure: 6.5,   // Adventure (unchanged)
+        discover: 8.8,    // Culture & Food (avg of culture + food: 8.7 + 8.9 / 2 = 8.8)
+        indulge: 7.6,     // Shopping & Luxury (avg of shopping + relaxation: 7.8 + 7.3 / 2 = 7.55)
+        nature: 5.2       // Nature (unchanged)
       },
-      supportedActivities: ['nightlife', 'culture', 'food', 'shopping', 'romance'],
+      supportedActivities: ['nightlife', 'restaurants', 'culture', 'sightseeing', 'luxury_shopping'],
       metrics: {
         totalBookings: 3456,
         totalRevenue: 287500,
@@ -100,16 +97,13 @@ export default function DestinationManagement() {
       isPopular: true,
       highlights: ['Anne Frank House', 'Van Gogh Museum', 'Canal District', 'Jordaan District'],
       themeScores: {
-        nightlife: 8.1,
-        culture: 9.0,
-        adventure: 5.8,
-        relaxation: 7.8,
-        food: 7.5,
-        shopping: 8.2,
-        nature: 6.7,
-        romance: 8.3
+        vibe: 8.2,        // Nightlife & Social (avg of nightlife + romance: 8.1 + 8.3 / 2 = 8.2)
+        adventure: 5.8,   // Adventure (unchanged)
+        discover: 8.3,    // Culture & Food (avg of culture + food: 9.0 + 7.5 / 2 = 8.25)
+        indulge: 8.0,     // Shopping & Luxury (avg of shopping + relaxation: 8.2 + 7.8 / 2 = 8.0)
+        nature: 6.7       // Nature (unchanged)
       },
-      supportedActivities: ['culture', 'nightlife', 'shopping', 'romance'],
+      supportedActivities: ['cultural_tours', 'nightlife', 'luxury_shopping', 'romantic_dining', 'museum_visits', 'art_galleries'],
       metrics: {
         totalBookings: 2890,
         totalRevenue: 234500,
@@ -133,16 +127,13 @@ export default function DestinationManagement() {
       isPopular: true,
       highlights: ['Colosseum', 'Vatican City', 'Trevi Fountain', 'Roman Forum'],
       themeScores: {
-        nightlife: 7.5,
-        culture: 9.8,
-        adventure: 6.2,
-        relaxation: 6.9,
-        food: 9.4,
-        shopping: 7.1,
-        nature: 4.8,
-        romance: 9.2
+        vibe: 8.4,        // Nightlife & Social (avg of nightlife + romance: 7.5 + 9.2 / 2 = 8.35)
+        adventure: 6.2,   // Adventure (unchanged)
+        discover: 9.6,    // Culture & Food (avg of culture + food: 9.8 + 9.4 / 2 = 9.6)
+        indulge: 7.0,     // Shopping & Luxury (avg of shopping + relaxation: 7.1 + 6.9 / 2 = 7.0)
+        nature: 4.8       // Nature (unchanged)
       },
-      supportedActivities: ['culture', 'food', 'romance'],
+      supportedActivities: ['cultural_tours', 'food_tours', 'romantic_dining', 'historical_sites', 'cooking_classes'],
       metrics: {
         totalBookings: 2345,
         totalRevenue: 198750,
@@ -166,16 +157,13 @@ export default function DestinationManagement() {
       isPopular: false,
       highlights: ['Prague Castle', 'Charles Bridge', 'Old Town Square', 'Wenceslas Square'],
       themeScores: {
-        nightlife: 8.3,
-        culture: 8.6,
-        adventure: 5.5,
-        relaxation: 7.2,
-        food: 7.8,
-        shopping: 6.9,
-        nature: 6.1,
-        romance: 8.7
+        vibe: 8.5,        // Nightlife & Social (avg of nightlife + romance: 8.3 + 8.7 / 2 = 8.5)
+        adventure: 5.5,   // Adventure (unchanged)
+        discover: 8.2,    // Culture & Food (avg of culture + food: 8.6 + 7.8 / 2 = 8.2)
+        indulge: 7.1,     // Shopping & Luxury (avg of shopping + relaxation: 6.9 + 7.2 / 2 = 7.05)
+        nature: 6.1       // Nature (unchanged)
       },
-      supportedActivities: ['nightlife', 'culture', 'romance'],
+      supportedActivities: ['nightlife', 'cultural_tours', 'romantic_dining', 'beer_tours', 'historical_sites'],
       metrics: {
         totalBookings: 1234,
         totalRevenue: 98750,

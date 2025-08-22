@@ -234,14 +234,11 @@ export interface AdminDestination {
   isPopular: boolean
   highlights: string[]
   themeScores: {
-    nightlife: number
-    culture: number
-    adventure: number
-    relaxation: number
-    food: number
-    shopping: number
-    nature: number
-    romance: number
+    vibe: number         // Social & Entertainment (was: nightlife + romance)
+    adventure: number    // Active & Outdoor (unchanged)
+    discover: number     // Cultural & Creative (was: culture + food)
+    indulge: number      // Luxury & Indulgent (was: shopping + relaxation)
+    nature: number       // Nature & Relaxation (unchanged)
   }
   supportedActivities: string[]
   metrics: {
