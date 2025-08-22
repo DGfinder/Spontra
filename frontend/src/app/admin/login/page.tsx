@@ -69,9 +69,15 @@ export default function AdminLoginPage() {
 
       if (result.success) {
         console.log('✅ Login successful, redirecting to:', redirect)
-        // Small delay to ensure state is updated
-        await new Promise(resolve => setTimeout(resolve, 500))
-        router.push(redirect)
+        // Enhanced delay to ensure session is fully stored and state is updated
+        await new Promise(resolve => setTimeout(resolve, 800))
+        
+        // Force a page reload to ensure fresh authentication state
+        if (redirect === '/admin') {
+          window.location.href = '/admin'
+        } else {
+          router.push(redirect)
+        }
       } else if (result.requiresMFA) {
         console.log('🔐 MFA required')
         setRequiresMFA(true)
