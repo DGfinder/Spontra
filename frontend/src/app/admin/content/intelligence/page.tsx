@@ -597,7 +597,9 @@ export default function ContentIntelligenceDashboard() {
                         {analysis.status}
                       </span>
                       {analysis.automatedAction && (
-                        <Zap size={14} className="text-blue-500" title="Automated decision" />
+                        <span title="Automated decision">
+                          <Zap size={14} className="text-blue-500" />
+                        </span>
                       )}
                     </div>
                   </div>

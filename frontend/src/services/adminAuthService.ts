@@ -31,10 +31,51 @@ class AdminAuthService {
   }
 
   /**
+   * Clear any existing session data
+   */
+  private clearSession(): void {
+    this.currentSession = null
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('admin-session')
+      document.cookie = 'admin-token=; path=/admin; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+    }
+  }
+
+  /**
+   * Public method to clear stale sessions (for login page)
+   */
+  clearStaleSession(): void {
+    this.clearSession()
+  }
+
+  /**
+   * Check if backend is available
+   */
+  private async isBackendAvailable(): Promise<boolean> {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
+      
+      const response = await fetch(`${this.baseUrl}/health`, {
+        method: 'GET',
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      return response.ok
+    } catch (error) {
+      return false
+    }
+  }
+
+  /**
    * Authenticate admin user
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
+      // Clear any existing stale session first
+      this.clearSession()
+
       // DEMO MODE: Check for demo credentials first
       if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
         const demoUser: AdminUser = {
@@ -85,7 +126,17 @@ class AdminAuthService {
         }
       }
 
-      // Production mode: Try API authentication
+      // Production mode: Check backend availability first
+      const backendAvailable = await this.isBackendAvailable()
+      
+      if (!backendAvailable) {
+        return {
+          success: false,
+          error: 'Admin backend is not available. Please use demo credentials (demo@spontra.com / demo123) or contact your administrator.'
+        }
+      }
+
+      // Try API authentication
       const response = await fetch(`${this.baseUrl}/auth/login`, {
         method: 'POST',
         headers: {
@@ -288,6 +339,18 @@ class AdminAuthService {
       const token = this.getToken()
       if (!token) return false
 
+      // Skip refresh for demo tokens
+      if (token.startsWith('demo-jwt-token-')) {
+        return true // Demo tokens don't need refresh
+      }
+
+      // Check if backend is available before attempting refresh
+      const backendAvailable = await this.isBackendAvailable()
+      if (!backendAvailable) {
+        console.warn('Backend unavailable for token refresh')
+        return false
+      }
+
       const response = await fetch(`${this.baseUrl}/auth/refresh`, {
         method: 'POST',
         headers: {
@@ -402,11 +465,15 @@ class AdminAuthService {
 // Singleton instance
 export const adminAuthService = new AdminAuthService()
 
-// Auto-refresh token every 30 minutes
+// Auto-refresh token every 30 minutes (but skip for demo mode)
 if (typeof window !== 'undefined') {
   setInterval(() => {
     if (adminAuthService.isAuthenticated()) {
-      adminAuthService.refreshToken()
+      const token = adminAuthService.getToken()
+      // Skip auto-refresh for demo tokens
+      if (token && !token.startsWith('demo-jwt-token-')) {
+        adminAuthService.refreshToken()
+      }
       adminAuthService.updateActivity()
     }
   }, 30 * 60 * 1000)

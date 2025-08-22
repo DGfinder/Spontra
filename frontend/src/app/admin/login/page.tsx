@@ -22,15 +22,22 @@ export default function AdminLoginPage() {
   const sessionError = searchParams.get('error')
 
   useEffect(() => {
+    // Always clear any stale session data on login page load to prevent conflicts
+    adminAuthService.clearStaleSession()
+    
     // Display session error if present
     if (sessionError === 'session_expired') {
       setError('Your session has expired. Please log in again.')
+    } else if (sessionError) {
+      setError('Authentication error. Please try logging in again.')
     }
     
-    // Check if already authenticated
-    if (adminAuthService.isAuthenticated()) {
-      router.push(redirect)
-    }
+    // Check if already authenticated (after cleanup)
+    setTimeout(() => {
+      if (adminAuthService.isAuthenticated()) {
+        router.push(redirect)
+      }
+    }, 100) // Small delay to ensure cleanup is complete
   }, [sessionError, redirect, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -228,7 +235,11 @@ export default function AdminLoginPage() {
         <div className="bg-blue-500/20 border border-blue-500/30 rounded-2xl p-4 mt-6">
           <div className="text-center">
             <h3 className="text-white font-medium mb-2">Demo Access</h3>
-            <p className="text-blue-200 text-sm mb-3">Try the admin dashboard with demo credentials:</p>
+            <p className="text-blue-200 text-sm mb-3">
+              {error && error.includes('backend is not available') 
+                ? 'Backend unavailable - Use demo mode:' 
+                : 'Try the admin dashboard with demo credentials:'}
+            </p>
             <div className="bg-white/10 rounded-lg p-3 text-left">
               <p className="text-white text-sm font-mono">Email: demo@spontra.com</p>
               <p className="text-white text-sm font-mono">Password: demo123</p>
@@ -241,11 +252,18 @@ export default function AdminLoginPage() {
                   password: 'demo123',
                   mfaCode: ''
                 })
+                setError(null) // Clear any backend errors
               }}
               className="mt-3 text-blue-300 hover:text-blue-200 text-sm transition-colors"
             >
               Fill Demo Credentials
             </button>
+            
+            {error && error.includes('backend is not available') && (
+              <p className="text-yellow-300 text-xs mt-2">
+                ✨ Demo mode works offline with full admin features
+              </p>
+            )}
           </div>
         </div>
 
