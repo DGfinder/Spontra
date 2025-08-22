@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ReactNode } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 import { 
   BarChart3, 
   Shield, 
@@ -250,7 +251,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <nav className="flex-1 px-4 py-4 space-y-2">
           {filteredNavigation.map((item) => (
             <div key={item.id}>
-              <a
+              <Link
                 href={item.href}
                 className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
                   isActive(item.href)
@@ -269,13 +270,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     )}
                   </>
                 )}
-              </a>
+              </Link>
               
               {/* Sub-navigation */}
               {sidebarOpen && item.children && isActive(item.href) && (
                 <div className="ml-6 mt-2 space-y-1">
                   {item.children.map((child) => (
-                    <a
+                    <Link
                       key={child.id}
                       href={child.href}
                       className={`flex items-center px-3 py-1 rounded text-sm transition-colors ${
@@ -286,7 +287,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     >
                       <child.icon size={16} className="mr-2" />
                       {child.label}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}

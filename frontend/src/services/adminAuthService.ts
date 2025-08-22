@@ -27,7 +27,8 @@ class AdminAuthService {
   private currentSession: AdminSession | null = null
 
   constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:8082'
+    // Use the current domain for admin API routes since we have them locally
+    this.baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
   }
 
   /**
@@ -103,21 +104,24 @@ class AdminAuthService {
   }
 
   /**
-   * Check if backend is available
+   * Check if admin API is available
    */
-  private async isBackendAvailable(): Promise<boolean> {
+  private async isAPIAvailable(): Promise<boolean> {
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
       
-      const response = await fetch(`${this.baseUrl}/health`, {
-        method: 'GET',
+      // Test the admin login route which we know exists
+      const response = await fetch(`${this.baseUrl}/api/admin/auth/login`, {
+        method: 'HEAD', // Just check if endpoint exists
         signal: controller.signal
       })
       
       clearTimeout(timeoutId)
-      return response.ok
+      // Accept both 200 and 405 (Method Not Allowed) as API is available
+      return response.status === 200 || response.status === 405
     } catch (error) {
+      console.warn('Admin API availability check failed:', error)
       return false
     }
   }
@@ -132,186 +136,86 @@ class AdminAuthService {
       // Clear any existing stale session first
       this.clearSession()
 
-      // DEMO MODE: Check for demo credentials first
-      if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
-        console.log('✨ Demo credentials detected - activating demo mode')
-        
-        // Force complete cleanup before demo login
-        this.forceCompleteCleanup()
-        
-        await new Promise(resolve => setTimeout(resolve, 100)) // Brief delay for cleanup
-        const demoUser: AdminUser = {
-          id: 'demo-admin',
-          email: 'demo@spontra.com',
-          username: 'demo_admin',
-          fullName: 'Demo Administrator',
-          role: 'super_admin',
-          permissions: [
-            'content.view', 'content.moderate', 'content.delete', 'content.featured',
-            'creators.view', 'creators.manage', 'creators.payouts', 'creators.suspend',
-            'analytics.view', 'analytics.export', 'analytics.configure',
-            'destinations.view', 'destinations.edit', 'destinations.create',
-            'system.monitor', 'system.configure', 'system.users', 'system.logs',
-            'finance.view', 'finance.manage', 'finance.payouts',
-            'support.view', 'support.manage', 'support.escalate'
-          ],
-          profilePicture: undefined,
-          createdAt: new Date().toISOString(),
-          lastLoginAt: new Date().toISOString(),
-          isActive: true,
-          mfaEnabled: false
+      // Check if admin API is available
+      const apiAvailable = await this.isAPIAvailable()
+      
+      if (!apiAvailable) {
+        return {
+          success: false,
+          error: 'Admin authentication service is not available. Please check your connection and try again.'
         }
+      }
 
-        const demoToken = 'demo-jwt-token-' + Date.now()
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+      // Make API request to our local admin auth endpoint
+      const response = await fetch(`${this.baseUrl}/api/admin/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+          mfaCode: credentials.mfaCode
+        }),
+      })
 
-        // Store demo session
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        return {
+          success: false,
+          error: errorData.error || 'Authentication failed',
+          requiresMFA: errorData.requiresMFA || false
+        }
+      }
+
+      const result = await response.json()
+
+      if (result.success && result.token && result.user) {
+        // The secure cookie is already set by the API route
+        // Just store the session data locally
         this.currentSession = {
-          user: demoUser,
-          token: demoToken,
-          expiresAt,
+          user: result.user,
+          token: result.token,
+          expiresAt: result.expiresAt,
           lastActivity: new Date().toISOString(),
-          ipAddress: '127.0.0.1',
-          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Demo Client'
+          ipAddress: '', // Will be handled by server
+          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'
         }
 
         // Store in localStorage for persistence
         if (typeof window !== 'undefined') {
           try {
             localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
-            document.cookie = `admin-token=${demoToken}; path=/admin; max-age=86400; samesite=strict`
-            console.log('✅ Demo session stored successfully')
+            console.log('✅ Login successful, session stored')
           } catch (error) {
-            console.error('❌ Failed to store demo session:', error)
+            console.warn('⚠️ Could not store session in localStorage:', error)
+            // Continue anyway, cookie-based auth will work
           }
         }
 
-        console.log('🎉 Demo login successful!')
         return {
           success: true,
-          user: demoUser,
-          token: demoToken
-        }
-      }
-
-      // Production mode: Check backend availability first
-      const backendAvailable = await this.isBackendAvailable()
-      
-      if (!backendAvailable) {
-        return {
-          success: false,
-          error: 'Admin backend is not available. Please use demo credentials (demo@spontra.com / demo123) or contact your administrator.'
-        }
-      }
-
-      // Try API authentication
-      const response = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      })
-
-      const result = await response.json()
-
-      if (result.success && result.token) {
-        // Store token in cookie
-        if (typeof window !== 'undefined') {
-          document.cookie = `admin-token=${result.token}; path=/admin; max-age=86400; samesite=strict`
-        }
-        
-        // Store session data
-        this.currentSession = {
           user: result.user,
           token: result.token,
-          expiresAt: result.expiresAt,
-          lastActivity: new Date().toISOString(),
-          ipAddress: '', // Will be set by server
-          userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown'
-        }
-
-        // Store in localStorage for persistence
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+          requiresMFA: result.requiresMFA
         }
       }
 
-      return result
+      return {
+        success: false,
+        error: result.error || 'Login failed',
+        requiresMFA: result.requiresMFA || false
+      }
+
     } catch (error) {
       console.error('❌ Admin login failed:', error)
-      
-      // If it's demo credentials and something failed, try fallback demo mode
-      if (credentials.email === 'demo@spontra.com' && credentials.password === 'demo123') {
-        console.log('🔄 Demo login failed, attempting fallback...')
-        return this.fallbackDemoLogin()
-      }
-      
       return {
         success: false,
-        error: 'Login failed. Please try again.'
+        error: 'Network error occurred during login. Please check your connection and try again.'
       }
     }
   }
 
-  /**
-   * Fallback demo login method
-   */
-  private fallbackDemoLogin(): LoginResponse {
-    try {
-      console.log('🚑 Activating fallback demo mode...')
-      
-      // Force cleanup and set minimal demo session
-      this.forceCompleteCleanup()
-      
-      const demoUser: AdminUser = {
-        id: 'demo-admin-fallback',
-        email: 'demo@spontra.com',
-        username: 'demo_admin',
-        fullName: 'Demo Administrator',
-        role: 'super_admin',
-        permissions: [
-          'content.view', 'content.moderate', 'content.delete', 'content.featured',
-          'creators.view', 'creators.manage', 'creators.payouts', 'creators.suspend',
-          'analytics.view', 'analytics.export', 'analytics.configure',
-          'destinations.view', 'destinations.edit', 'destinations.create',
-          'system.monitor', 'system.configure', 'system.users', 'system.logs',
-          'finance.view', 'finance.manage', 'finance.payouts',
-          'support.view', 'support.manage', 'support.escalate'
-        ],
-        profilePicture: undefined,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
-        isActive: true,
-        mfaEnabled: false
-      }
-
-      const demoToken = 'demo-fallback-token-' + Date.now()
-      
-      // Set session without storage dependencies
-      this.currentSession = {
-        user: demoUser,
-        token: demoToken,
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        lastActivity: new Date().toISOString(),
-        ipAddress: '127.0.0.1',
-        userAgent: 'Demo Fallback'
-      }
-
-      console.log('✅ Fallback demo login successful!')
-      return {
-        success: true,
-        user: demoUser,
-        token: demoToken
-      }
-    } catch (error) {
-      console.error('❌ Fallback demo login also failed:', error)
-      return {
-        success: false,
-        error: 'Demo mode is experiencing issues. Please refresh the page and try again.'
-      }
-    }
-  }
 
   /**
    * Register new admin user (super admin only)
@@ -344,25 +248,28 @@ class AdminAuthService {
     try {
       const token = this.getToken()
       if (token) {
-        await fetch(`${this.baseUrl}/auth/logout`, {
+        // Attempt to notify server of logout
+        await fetch(`${this.baseUrl}/api/admin/auth/logout`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
           }
+        }).catch(error => {
+          // Don't fail logout if server call fails
+          console.warn('Logout API call failed:', error)
         })
       }
     } catch (error) {
-      console.error('Logout API call failed:', error)
+      console.error('Logout process error:', error)
     } finally {
-      // Clear local data
-      this.currentSession = null
-      localStorage.removeItem('admin-session')
-      
-      // Clear cookie
-      document.cookie = 'admin-token=; path=/admin; expires=Thu, 01 Jan 1970 00:00:01 GMT'
+      // Always clear local data regardless of server response
+      this.clearSession()
       
       // Redirect to login
-      window.location.href = '/admin/login'
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin/login'
+      }
     }
   }
 
@@ -471,43 +378,51 @@ class AdminAuthService {
   async refreshToken(): Promise<boolean> {
     try {
       const token = this.getToken()
-      if (!token) return false
-
-      // Skip refresh for demo tokens
-      if (token.startsWith('demo-jwt-token-')) {
-        return true // Demo tokens don't need refresh
-      }
-
-      // Check if backend is available before attempting refresh
-      const backendAvailable = await this.isBackendAvailable()
-      if (!backendAvailable) {
-        console.warn('Backend unavailable for token refresh')
+      if (!token) {
+        console.log('No token available for refresh')
         return false
       }
 
-      const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+      // Check if admin API is available before attempting refresh
+      const apiAvailable = await this.isAPIAvailable()
+      if (!apiAvailable) {
+        console.warn('Admin API unavailable for token refresh')
+        return false
+      }
+
+      const response = await fetch(`${this.baseUrl}/api/admin/auth/refresh`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       })
+
+      if (!response.ok) {
+        console.error('Token refresh failed with status:', response.status)
+        return false
+      }
 
       const result = await response.json()
 
       if (result.success && result.token) {
-        // Update token in cookie
-        document.cookie = `admin-token=${result.token}; path=/admin; max-age=86400; samesite=strict`
-        
-        // Update session
+        // Update session with new token
         if (this.currentSession) {
           this.currentSession.token = result.token
           this.currentSession.expiresAt = result.expiresAt
-          localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+          this.currentSession.lastActivity = new Date().toISOString()
+          
+          // Update localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('admin-session', JSON.stringify(this.currentSession))
+          }
         }
 
+        console.log('✅ Token refreshed successfully')
         return true
       }
 
+      console.warn('Token refresh response missing required data')
       return false
     } catch (error) {
       console.error('Token refresh failed:', error)
@@ -599,18 +514,40 @@ class AdminAuthService {
 // Singleton instance
 export const adminAuthService = new AdminAuthService()
 
-// Auto-refresh token every 30 minutes (but skip for demo mode)
+// Auto-refresh token every 30 minutes and update activity
 if (typeof window !== 'undefined') {
+  // Set up periodic token refresh and activity updates
   setInterval(() => {
     if (adminAuthService.isAuthenticated()) {
-      const token = adminAuthService.getToken()
-      // Skip auto-refresh for demo tokens
-      if (token && !token.startsWith('demo-jwt-token-')) {
-        adminAuthService.refreshToken()
-      }
+      // Update activity tracking
       adminAuthService.updateActivity()
+      
+      // Check if token needs refresh (refresh 5 minutes before expiry)
+      const token = adminAuthService.getToken()
+      if (token) {
+        const currentSession = adminAuthService.getCurrentUser()
+        if (currentSession) {
+          try {
+            // Parse the session to check expiry
+            const session = JSON.parse(localStorage.getItem('admin-session') || '{}')
+            const expiresAt = new Date(session.expiresAt)
+            const now = new Date()
+            const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000)
+            
+            // Refresh token if it expires within 5 minutes
+            if (expiresAt < fiveMinutesFromNow) {
+              console.log('🔄 Token expiring soon, attempting refresh...')
+              adminAuthService.refreshToken().catch(error => {
+                console.warn('Auto token refresh failed:', error)
+              })
+            }
+          } catch (error) {
+            console.warn('Error checking token expiry:', error)
+          }
+        }
+      }
     }
-  }, 30 * 60 * 1000)
+  }, 5 * 60 * 1000) // Check every 5 minutes instead of 30 for better responsiveness
 }
 
 export default adminAuthService

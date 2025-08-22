@@ -17,6 +17,12 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requiresMFA, setRequiresMFA] = useState(false)
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string
+    password?: string
+    mfaCode?: string
+  }>({})
+  const [isOnline, setIsOnline] = useState(true)
   
   const redirect = searchParams.get('redirect') || '/admin'
   const sessionError = searchParams.get('error')
@@ -25,9 +31,15 @@ export default function AdminLoginPage() {
     // Always clear any stale session data on login page load to prevent conflicts
     adminAuthService.clearStaleSession()
     
-    // Display session error if present
+    // Display session error if present with more specific messaging
     if (sessionError === 'session_expired') {
       setError('Your session has expired. Please log in again.')
+    } else if (sessionError === 'token_refresh_required') {
+      setError('Your session needs to be renewed. Please log in again.')
+    } else if (sessionError === 'invalid_token') {
+      setError('Invalid session detected. Please log in again.')
+    } else if (sessionError === 'no_token') {
+      setError('Authentication required. Please log in to access the admin panel.')
     } else if (sessionError) {
       setError('Authentication error. Please try logging in again.')
     }
@@ -40,29 +52,85 @@ export default function AdminLoginPage() {
     }, 100) // Small delay to ensure cleanup is complete
   }, [sessionError, redirect, router])
 
+  // Validation functions
+  const validateEmail = (email: string): string | undefined => {
+    if (!email) return 'Email is required'
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) return 'Please enter a valid email address'
+    return undefined
+  }
+
+  const validatePassword = (password: string): string | undefined => {
+    if (!password) return 'Password is required'
+    if (password.length < 6) return 'Password must be at least 6 characters long'
+    return undefined
+  }
+
+  const validateMFACode = (code: string): string | undefined => {
+    if (requiresMFA && !code) return 'MFA code is required'
+    if (requiresMFA && !/^\d{6}$/.test(code)) return 'MFA code must be 6 digits'
+    return undefined
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
     
-    // Clear error when user starts typing
+    // Clear errors when user starts typing
     if (error) setError(null)
+    
+    // Clear field-specific validation errors
+    setValidationErrors(prev => ({ ...prev, [name]: undefined }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-    
+    setValidationErrors({})
+
     console.log('🚀 Login form submitted', { email: formData.email })
 
     try {
+      // Validate form fields
+      const emailError = validateEmail(formData.email)
+      const passwordError = validatePassword(formData.password)
+      const mfaError = validateMFACode(formData.mfaCode)
+
+      const newValidationErrors = {
+        email: emailError,
+        password: passwordError,
+        mfaCode: mfaError
+      }
+
+      // Remove undefined errors
+      Object.keys(newValidationErrors).forEach(key => {
+        if (!newValidationErrors[key as keyof typeof newValidationErrors]) {
+          delete newValidationErrors[key as keyof typeof newValidationErrors]
+        }
+      })
+
+      // If there are validation errors, show them and stop
+      if (Object.keys(newValidationErrors).length > 0) {
+        setValidationErrors(newValidationErrors)
+        setIsLoading(false)
+        return
+      }
+
+      // Check network connectivity
+      if (!navigator.onLine) {
+        setError('No internet connection. Please check your network and try again.')
+        setIsLoading(false)
+        return
+      }
+
       // Add small delay to show loading state
       await new Promise(resolve => setTimeout(resolve, 300))
       
       const result = await adminAuthService.login({
-        email: formData.email,
+        email: formData.email.trim(),
         password: formData.password,
-        mfaCode: formData.mfaCode || undefined
+        mfaCode: formData.mfaCode?.trim() || undefined
       })
 
       console.log('📝 Login result:', { success: result.success, hasUser: !!result.user })
@@ -70,11 +138,11 @@ export default function AdminLoginPage() {
       if (result.success) {
         console.log('✅ Login successful, redirecting to:', redirect)
         // Enhanced delay to ensure session is fully stored and state is updated
-        await new Promise(resolve => setTimeout(resolve, 800))
+        await new Promise(resolve => setTimeout(resolve, 500))
         
-        // Force a page reload to ensure fresh authentication state
+        // Use router push for better navigation
         if (redirect === '/admin') {
-          window.location.href = '/admin'
+          router.push('/admin')
         } else {
           router.push(redirect)
         }
@@ -84,11 +152,30 @@ export default function AdminLoginPage() {
         setError(null)
       } else {
         console.log('❌ Login failed:', result.error)
-        setError(result.error || 'Invalid credentials')
+        const errorMessage = result.error || 'Login failed'
+        
+        // Provide more specific error messages
+        if (errorMessage.includes('Too many')) {
+          setError(errorMessage)
+        } else if (errorMessage.includes('locked')) {
+          setError(errorMessage)
+        } else if (errorMessage.includes('Invalid credentials')) {
+          setError('Invalid email or password. Please check your credentials and try again.')
+        } else {
+          setError(errorMessage)
+        }
       }
     } catch (err) {
       console.error('💥 Login exception:', err)
-      setError('An unexpected error occurred. Please try again.')
+      
+      // More specific error handling
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Unable to connect to the authentication service. Please check your connection and try again.')
+      } else if (err instanceof Error) {
+        setError(`Login error: ${err.message}`)
+      } else {
+        setError('An unexpected error occurred. Please try again.')
+      }
     } finally {
       setIsLoading(false)
     }
@@ -141,12 +228,24 @@ export default function AdminLoginPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-3 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                  className={`w-full pl-10 pr-3 py-3 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:ring-2 focus:border-transparent transition-all ${
+                    validationErrors.email
+                      ? 'border-red-400 focus:ring-red-400'
+                      : 'border-white/20 focus:ring-blue-400'
+                  }`}
                   placeholder="admin@spontra.com"
                   required
                   disabled={isLoading}
+                  autoComplete="email"
+                  aria-describedby={validationErrors.email ? "email-error" : undefined}
                 />
               </div>
+              {validationErrors.email && (
+                <p id="email-error" className="text-red-300 text-sm mt-1 flex items-center">
+                  <AlertTriangle size={14} className="mr-1" />
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -164,20 +263,33 @@ export default function AdminLoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                  className={`w-full pl-10 pr-12 py-3 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:ring-2 focus:border-transparent transition-all ${
+                    validationErrors.password
+                      ? 'border-red-400 focus:ring-red-400'
+                      : 'border-white/20 focus:ring-blue-400'
+                  }`}
                   placeholder="Enter your password"
                   required
                   disabled={isLoading}
+                  autoComplete="current-password"
+                  aria-describedby={validationErrors.password ? "password-error" : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center text-white/50 hover:text-white/70 transition-colors"
                   disabled={isLoading}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+              {validationErrors.password && (
+                <p id="password-error" className="text-red-300 text-sm mt-1 flex items-center">
+                  <AlertTriangle size={14} className="mr-1" />
+                  {validationErrors.password}
+                </p>
+              )}
             </div>
 
             {/* MFA Code Field - Show only when MFA is required */}
@@ -196,16 +308,28 @@ export default function AdminLoginPage() {
                     type="text"
                     value={formData.mfaCode}
                     onChange={handleInputChange}
-                    className="w-full pl-10 pr-3 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all text-center tracking-widest"
+                    className={`w-full pl-10 pr-3 py-3 bg-white/10 border rounded-lg text-white placeholder-white/50 focus:ring-2 focus:border-transparent transition-all text-center tracking-widest ${
+                      validationErrors.mfaCode
+                        ? 'border-red-400 focus:ring-red-400'
+                        : 'border-white/20 focus:ring-blue-400'
+                    }`}
                     placeholder="000000"
                     maxLength={6}
                     pattern="[0-9]{6}"
                     required
                     disabled={isLoading}
                     autoFocus
+                    autoComplete="one-time-code"
+                    aria-describedby={validationErrors.mfaCode ? "mfa-error" : "mfa-help"}
                   />
                 </div>
-                <p className="text-xs text-white/60 mt-1">
+                {validationErrors.mfaCode && (
+                  <p id="mfa-error" className="text-red-300 text-sm mt-1 flex items-center">
+                    <AlertTriangle size={14} className="mr-1" />
+                    {validationErrors.mfaCode}
+                  </p>
+                )}
+                <p id="mfa-help" className="text-xs text-white/60 mt-1">
                   Enter the 6-digit code from your authenticator app
                 </p>
               </div>
@@ -268,46 +392,39 @@ export default function AdminLoginPage() {
           </form>
         </div>
 
-        {/* Demo Credentials */}
-        <div className="bg-blue-500/20 border border-blue-500/30 rounded-2xl p-4 mt-6">
+        {/* System Information */}
+        <div className="bg-slate-800/20 border border-slate-600/30 rounded-2xl p-4 mt-6">
           <div className="text-center">
-            <h3 className="text-white font-medium mb-2">Demo Access</h3>
-            <p className="text-blue-200 text-sm mb-3">
-              {error && error.includes('backend is not available') 
-                ? 'Backend unavailable - Use demo mode:' 
-                : 'Try the admin dashboard with demo credentials:'}
+            <h3 className="text-white font-medium mb-2">Admin Access</h3>
+            <p className="text-slate-300 text-sm mb-3">
+              Use your administrator credentials to access the admin panel
             </p>
             <div className="bg-white/10 rounded-lg p-3 text-left">
-              <p className="text-white text-sm font-mono">Email: demo@spontra.com</p>
-              <p className="text-white text-sm font-mono">Password: demo123</p>
+              <p className="text-slate-300 text-sm">📧 Email: admin@spontra.com</p>
+              <p className="text-slate-300 text-sm">🔑 Password: admin123</p>
+              <p className="text-slate-300 text-xs mt-2 opacity-75">Default credentials for initial setup</p>
             </div>
             <button
               type="button"
               onClick={() => {
                 setFormData({
-                  email: 'demo@spontra.com',
-                  password: 'demo123',
+                  email: 'admin@spontra.com',
+                  password: 'admin123',
                   mfaCode: ''
                 })
-                setError(null) // Clear any backend errors
+                setError(null)
               }}
-              className="mt-3 text-blue-300 hover:text-blue-200 text-sm transition-colors"
+              className="mt-3 text-slate-300 hover:text-slate-200 text-sm transition-colors"
             >
-              Fill Demo Credentials
+              Fill Admin Credentials
             </button>
-            
-            {error && error.includes('backend is not available') && (
-              <p className="text-yellow-300 text-xs mt-2">
-                ✨ Demo mode works offline with full admin features
-              </p>
-            )}
             
             <button
               type="button"
               onClick={handleForceCleanup}
-              className="mt-2 text-blue-300/60 hover:text-blue-200/80 text-xs transition-colors"
+              className="mt-2 text-slate-400 hover:text-slate-300 text-xs transition-colors block w-full"
             >
-              Having login issues? Click here to clear browser data
+              Having login issues? Clear browser data
             </button>
           </div>
         </div>

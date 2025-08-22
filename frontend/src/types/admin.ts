@@ -12,6 +12,10 @@ export interface AdminUser {
   lastLoginAt: string
   isActive: boolean
   mfaEnabled: boolean
+  // Security fields (for internal use only, not exposed in API responses)
+  failedLoginAttempts?: number
+  lastFailedLogin?: string | null
+  accountLockedUntil?: string | null
 }
 
 export type AdminRole = 'super_admin' | 'content_moderator' | 'analytics_manager' | 'customer_service' | 'business_manager'
