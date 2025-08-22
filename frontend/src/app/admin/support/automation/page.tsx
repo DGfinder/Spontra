@@ -732,7 +732,9 @@ export default function SupportAutomationHub() {
                         {ticket.status}
                       </span>
                       {ticket.automatedResponse.sent && (
-                        <Bot size={16} className="text-blue-500" title="AI Response Sent" />
+                        <span title="AI Response Sent">
+                          <Bot size={16} className="text-blue-500" />
+                        </span>
                       )}
                     </div>
                   </div>
