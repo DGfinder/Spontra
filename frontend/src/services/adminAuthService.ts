@@ -70,7 +70,7 @@ class AdminAuthService {
   /**
    * Force complete browser cleanup (for troubled sessions)
    */
-  forceCompleteCleanup(): void {
+  forceCompleteCleanup(): boolean {
     if (typeof window !== 'undefined') {
       try {
         // Clear all localStorage
