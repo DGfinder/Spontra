@@ -23,7 +23,26 @@ import {
   Database,
   Zap,
   Brain,
-  DollarSign
+  DollarSign,
+  Calendar,
+  FileText,
+  Camera,
+  Star,
+  Target,
+  Globe,
+  Mail,
+  Share2,
+  PieChart,
+  UserCheck,
+  BookOpen,
+  AlertTriangle,
+  CreditCard,
+  Receipt,
+  FileBarChart,
+  Shield as Security,
+  ChevronDown,
+  ChevronRight,
+  Plus
 } from 'lucide-react'
 import { adminAuthService } from '@/services/adminAuthService'
 import { AdminUser } from '@/types/admin'
@@ -40,83 +59,129 @@ interface NavigationItem {
   badge?: number
   permissions?: string[]
   children?: NavigationItem[]
+  isSection?: boolean
+  isExpanded?: boolean
+  section?: 'primary' | 'secondary' | 'administrative'
 }
 
 const navigation: NavigationItem[] = [
+  // PRIMARY SECTION
   {
     id: 'dashboard',
     label: 'Dashboard',
     icon: BarChart3,
-    href: '/admin'
-  },
-  {
-    id: 'finance',
-    label: 'Finance Automation',
-    icon: DollarSign,
-    href: '/admin/finance',
-    permissions: ['finance.view'],
-    children: [
-      { id: 'finance-automation', label: 'Automation Hub', icon: Zap, href: '/admin/finance/automation' },
-      { id: 'finance-reports', label: 'Financial Reports', icon: BarChart3, href: '/admin/finance/reports' }
-    ]
-  },
-  {
-    id: 'content',
-    label: 'Content Intelligence',
-    icon: Video,
-    href: '/admin/content',
-    badge: 0,
-    permissions: ['content.view', 'content.moderate'],
-    children: [
-      { id: 'content-queue', label: 'Moderation Queue', icon: Video, href: '/admin/content/queue' },
-      { id: 'content-intelligence', label: 'AI Intelligence', icon: Brain, href: '/admin/content/intelligence' }
-    ]
-  },
-  {
-    id: 'revenue',
-    label: 'Revenue Optimization',
-    icon: TrendingUp,
-    href: '/admin/revenue',
-    permissions: ['finance.view']
-  },
-  {
-    id: 'creators',
-    label: 'Creator Lifecycle',
-    icon: Users,
-    href: '/admin/creators',
-    permissions: ['creators.view'],
-    children: [
-      { id: 'creators-dashboard', label: 'Creator Dashboard', icon: Users, href: '/admin/creators/dashboard' },
-      { id: 'creators-lifecycle', label: 'Lifecycle Management', icon: Activity, href: '/admin/creators/lifecycle' },
-      { id: 'creators-payouts', label: 'Payouts', icon: DollarSign, href: '/admin/creators/payouts', permissions: ['creators.payouts'] }
-    ]
-  },
-  {
-    id: 'support',
-    label: 'Support Automation',
-    icon: MessageSquare,
-    href: '/admin/support',
-    permissions: ['support.view'],
-    children: [
-      { id: 'support-automation', label: 'Automation Hub', icon: Zap, href: '/admin/support/automation' },
-      { id: 'support-tickets', label: 'Tickets', icon: MessageSquare, href: '/admin/support/tickets' }
-    ]
-  },
-  {
-    id: 'intelligence',
-    label: 'Business Intelligence',
-    icon: Brain,
-    href: '/admin/intelligence',
-    permissions: ['analytics.view']
+    href: '/admin',
+    section: 'primary'
   },
   {
     id: 'destinations',
     label: 'Destinations',
     icon: MapPin,
     href: '/admin/destinations',
+    section: 'primary',
+    isExpanded: true,
     permissions: ['destinations.view'],
     children: [
-      { id: 'destinations-manage', label: 'Manage Cities', icon: MapPin, href: '/admin/destinations/manage' }
+      { id: 'destinations-browse', label: 'Browse Destinations', icon: MapPin, href: '/admin/destinations/manage' },
+      { id: 'destinations-add', label: 'Add New Destination', icon: Plus, href: '/admin/destinations/add' },
+      { id: 'destinations-themes', label: 'Themes & Categories', icon: Star, href: '/admin/destinations/themes' },
+      { id: 'destinations-featured', label: 'Featured Cities', icon: Target, href: '/admin/destinations/featured' },
+      { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' }
+    ]
+  },
+  {
+    id: 'content',
+    label: 'Content Management',
+    icon: FileText,
+    href: '/admin/content',
+    section: 'primary',
+    badge: 0,
+    permissions: ['content.view'],
+    children: [
+      { id: 'content-library', label: 'Video Library', icon: Video, href: '/admin/content/library' },
+      { id: 'content-moderation', label: 'Content Moderation', icon: Shield, href: '/admin/content/queue' },
+      { id: 'content-ugc', label: 'User Generated Content', icon: Camera, href: '/admin/content/ugc' },
+      { id: 'content-calendar', label: 'Editorial Calendar', icon: Calendar, href: '/admin/content/calendar' },
+      { id: 'content-performance', label: 'Content Performance', icon: TrendingUp, href: '/admin/content/performance' }
+    ]
+  },
+  {
+    id: 'creator-tools',
+    label: 'Creator Tools',
+    icon: Users,
+    href: '/admin/creators',
+    section: 'primary',
+    permissions: ['creators.view'],
+    children: [
+      { id: 'creator-profiles', label: 'Creator Profiles', icon: User, href: '/admin/creators/dashboard' },
+      { id: 'creator-analytics', label: 'Creator Analytics', icon: PieChart, href: '/admin/creators/analytics' },
+      { id: 'creator-partnerships', label: 'Partnership Programs', icon: Share2, href: '/admin/creators/partnerships' },
+      { id: 'creator-guidelines', label: 'Content Guidelines', icon: BookOpen, href: '/admin/creators/guidelines' }
+    ]
+  },
+  
+  // SECONDARY SECTION
+  {
+    id: 'marketing',
+    label: 'Marketing',
+    icon: Target,
+    href: '/admin/marketing',
+    section: 'secondary',
+    permissions: ['marketing.view'],
+    children: [
+      { id: 'marketing-campaigns', label: 'Campaigns', icon: Zap, href: '/admin/marketing/campaigns' },
+      { id: 'marketing-seo', label: 'SEO & Discovery', icon: Search, href: '/admin/marketing/seo' },
+      { id: 'marketing-email', label: 'Email Marketing', icon: Mail, href: '/admin/marketing/email' },
+      { id: 'marketing-social', label: 'Social Media', icon: Share2, href: '/admin/marketing/social' },
+      { id: 'marketing-analytics', label: 'Analytics & Reports', icon: BarChart3, href: '/admin/marketing/analytics' }
+    ]
+  },
+  {
+    id: 'community',
+    label: 'Users & Community',
+    icon: UserCheck,
+    href: '/admin/community',
+    section: 'secondary',
+    permissions: ['users.view'],
+    children: [
+      { id: 'community-users', label: 'User Management', icon: Users, href: '/admin/community/users' },
+      { id: 'community-segments', label: 'User Segments', icon: PieChart, href: '/admin/community/segments' },
+      { id: 'community-reviews', label: 'Reviews & Ratings', icon: Star, href: '/admin/community/reviews' },
+      { id: 'community-guidelines', label: 'Community Guidelines', icon: BookOpen, href: '/admin/community/guidelines' },
+      { id: 'community-support', label: 'Support Tickets', icon: MessageSquare, href: '/admin/support/automation' }
+    ]
+  },
+
+  // ADMINISTRATIVE SECTION
+  {
+    id: 'finance',
+    label: 'Finance',
+    icon: DollarSign,
+    href: '/admin/finance',
+    section: 'administrative',
+    permissions: ['finance.view'],
+    children: [
+      { id: 'finance-dashboard', label: 'Revenue Dashboard', icon: BarChart3, href: '/admin/revenue' },
+      { id: 'finance-processing', label: 'Payment Processing', icon: CreditCard, href: '/admin/finance/payments' },
+      { id: 'finance-invoicing', label: 'Invoicing', icon: Receipt, href: '/admin/finance/invoicing' },
+      { id: 'finance-tax', label: 'Tax Management', icon: FileBarChart, href: '/admin/finance/tax' },
+      { id: 'finance-reports', label: 'Financial Reports', icon: FileText, href: '/admin/finance/automation' },
+      { id: 'finance-budgets', label: 'Budgets & Forecasting', icon: TrendingUp, href: '/admin/finance/budgets' }
+    ]
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
+    href: '/admin/settings',
+    section: 'administrative',
+    permissions: ['system.configure'],
+    children: [
+      { id: 'settings-general', label: 'General Settings', icon: Settings, href: '/admin/settings/general' },
+      { id: 'settings-team', label: 'Team & Permissions', icon: Users, href: '/admin/settings/team' },
+      { id: 'settings-api', label: 'API & Integrations', icon: Zap, href: '/admin/settings/api' },
+      { id: 'settings-security', label: 'Security', icon: Security, href: '/admin/settings/security' },
+      { id: 'settings-audit', label: 'Audit Logs', icon: FileText, href: '/admin/settings/audit' }
     ]
   },
   {
@@ -124,14 +189,14 @@ const navigation: NavigationItem[] = [
     label: 'System Monitor',
     icon: Activity,
     href: '/admin/system',
-    permissions: ['system.monitor']
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    href: '/admin/settings',
-    permissions: ['system.configure']
+    section: 'administrative',
+    permissions: ['system.monitor'],
+    children: [
+      { id: 'system-performance', label: 'Performance Metrics', icon: TrendingUp, href: '/admin/system/performance' },
+      { id: 'system-errors', label: 'Error Tracking', icon: AlertTriangle, href: '/admin/system/errors' },
+      { id: 'system-uptime', label: 'Uptime Status', icon: Activity, href: '/admin/system/uptime' },
+      { id: 'system-database', label: 'Database Health', icon: Database, href: '/admin/system' }
+    ]
   }
 ]
 
@@ -144,6 +209,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notifications, setNotifications] = useState(3)
   const [searchQuery, setSearchQuery] = useState('')
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    destinations: true, // Destinations expanded by default per requirements
+    content: false,
+    'creator-tools': false,
+    marketing: false,
+    community: false,
+    finance: false,
+    settings: false,
+    system: false
+  })
 
   useEffect(() => {
     // Skip authentication check for login page
@@ -192,12 +267,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     return adminAuthService.hasAnyPermission(item.permissions as any[])
   }) : []
 
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }))
+  }
+
   const isActive = (href: string) => {
     if (href === '/admin') {
       return pathname === '/admin'
     }
     return pathname.startsWith(href)
   }
+
+  // Group navigation items by section
+  const primaryItems = navigation.filter(item => item.section === 'primary')
+  const secondaryItems = navigation.filter(item => item.section === 'secondary')
+  const administrativeItems = navigation.filter(item => item.section === 'administrative')
 
   // For login page, render children without layout
   if (pathname === '/admin/login') {
@@ -248,51 +335,234 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-4 space-y-2">
-          {filteredNavigation.map((item) => (
-            <div key={item.id}>
-              <Link
-                href={item.href}
-                className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <item.icon size={20} />
-                {sidebarOpen && (
-                  <>
-                    <span className="ml-3 font-medium">{item.label}</span>
-                    {item.badge && item.badge > 0 && (
-                      <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
-                        {item.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </Link>
-              
-              {/* Sub-navigation */}
-              {sidebarOpen && item.children && isActive(item.href) && (
-                <div className="ml-6 mt-2 space-y-1">
-                  {item.children.map((child) => (
+        <nav className="flex-1 px-4 py-4 overflow-y-auto">
+          {/* PRIMARY SECTION */}
+          <div className="mb-6">
+            {sidebarOpen && (
+              <div className="px-3 mb-3">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Content & Destinations
+                </h3>
+              </div>
+            )}
+            <div className="space-y-1">
+              {primaryItems.filter(item => {
+                if (!item.permissions) return true
+                return adminAuthService.hasAnyPermission(item.permissions as any[])
+              }).map((item) => (
+                <div key={item.id}>
+                  <div className="flex items-center">
                     <Link
-                      key={child.id}
-                      href={child.href}
-                      className={`flex items-center px-3 py-1 rounded text-sm transition-colors ${
-                        pathname === child.href
-                          ? 'text-blue-400'
-                          : 'text-slate-400 hover:text-slate-300'
+                      href={item.href}
+                      className={`flex-1 flex items-center px-3 py-2 rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                       }`}
                     >
-                      <child.icon size={16} className="mr-2" />
-                      {child.label}
+                      <item.icon size={20} />
+                      {sidebarOpen && (
+                        <>
+                          <span className="ml-3 font-medium">{item.label}</span>
+                          {item.badge && item.badge > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                              {item.badge}
+                            </span>
+                          )}
+                        </>
+                      )}
                     </Link>
-                  ))}
+                    
+                    {/* Expand/Collapse Button */}
+                    {sidebarOpen && item.children && (
+                      <button
+                        onClick={() => toggleSection(item.id)}
+                        className="ml-1 p-1 text-slate-400 hover:text-slate-300 transition-colors"
+                      >
+                        {expandedSections[item.id] ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Sub-navigation */}
+                  {sidebarOpen && item.children && expandedSections[item.id] && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={child.href}
+                          className={`flex items-center px-3 py-2 rounded text-sm transition-colors ${
+                            pathname === child.href
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <child.icon size={16} className="mr-2" />
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* SECONDARY SECTION */}
+          <div className="mb-6">
+            {sidebarOpen && (
+              <div className="px-3 mb-3">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Marketing & Community
+                </h3>
+              </div>
+            )}
+            <div className="space-y-1">
+              {secondaryItems.filter(item => {
+                if (!item.permissions) return true
+                return adminAuthService.hasAnyPermission(item.permissions as any[])
+              }).map((item) => (
+                <div key={item.id}>
+                  <div className="flex items-center">
+                    <Link
+                      href={item.href}
+                      className={`flex-1 flex items-center px-3 py-2 rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <item.icon size={20} />
+                      {sidebarOpen && (
+                        <>
+                          <span className="ml-3 font-medium">{item.label}</span>
+                          {item.badge && item.badge > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                              {item.badge}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Link>
+                    
+                    {/* Expand/Collapse Button */}
+                    {sidebarOpen && item.children && (
+                      <button
+                        onClick={() => toggleSection(item.id)}
+                        className="ml-1 p-1 text-slate-400 hover:text-slate-300 transition-colors"
+                      >
+                        {expandedSections[item.id] ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Sub-navigation */}
+                  {sidebarOpen && item.children && expandedSections[item.id] && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={child.href}
+                          className={`flex items-center px-3 py-2 rounded text-sm transition-colors ${
+                            pathname === child.href
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <child.icon size={16} className="mr-2" />
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ADMINISTRATIVE SECTION */}
+          <div className="border-t border-slate-800 pt-4">
+            {sidebarOpen && (
+              <div className="px-3 mb-3">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Administration
+                </h3>
+              </div>
+            )}
+            <div className="space-y-1">
+              {administrativeItems.filter(item => {
+                if (!item.permissions) return true
+                return adminAuthService.hasAnyPermission(item.permissions as any[])
+              }).map((item) => (
+                <div key={item.id}>
+                  <div className="flex items-center">
+                    <Link
+                      href={item.href}
+                      className={`flex-1 flex items-center px-3 py-2 rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                      }`}
+                    >
+                      <item.icon size={20} />
+                      {sidebarOpen && (
+                        <>
+                          <span className="ml-3 font-medium">{item.label}</span>
+                          {item.badge && item.badge > 0 && (
+                            <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                              {item.badge}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Link>
+                    
+                    {/* Expand/Collapse Button */}
+                    {sidebarOpen && item.children && (
+                      <button
+                        onClick={() => toggleSection(item.id)}
+                        className="ml-1 p-1 text-slate-400 hover:text-slate-300 transition-colors"
+                      >
+                        {expandedSections[item.id] ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Sub-navigation */}
+                  {sidebarOpen && item.children && expandedSections[item.id] && (
+                    <div className="ml-6 mt-2 space-y-1">
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.id}
+                          href={child.href}
+                          className={`flex items-center px-3 py-2 rounded text-sm transition-colors ${
+                            pathname === child.href
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'text-slate-400 hover:text-slate-300 hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <child.icon size={16} className="mr-2" />
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         </nav>
 
         {/* User Profile */}
