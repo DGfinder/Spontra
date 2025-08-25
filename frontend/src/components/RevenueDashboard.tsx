@@ -92,20 +92,18 @@ export function RevenueDashboard({ className = '' }: RevenueDashboardProps) {
       }
     })
 
-    // Add conversion data (simplified for demo)
-    // In production, you'd match by partner ID properly
-    Object.keys(combined).forEach(partnerId => {
-      const conversions = Math.floor(combined[partnerId].clicks * 0.12) // 12% conversion rate estimate
-      const revenue = conversions * 350 // €350 average booking
-      const commissions = revenue * 0.035 // 3.5% average commission
-      
-      combined[partnerId] = {
-        ...combined[partnerId],
-        conversions,
-        revenue: Math.round(revenue * 100) / 100,
-        commissions: Math.round(commissions * 100) / 100,
-        conversionRate: combined[partnerId].clicks > 0 ? 
-          Math.round((conversions / combined[partnerId].clicks) * 10000) / 100 : 0
+    // Add conversion data from real API response
+    Object.keys(conversionStats || {}).forEach(partnerId => {
+      if (combined[partnerId]) {
+        const partnerConversions = conversionStats[partnerId] || {}
+        combined[partnerId] = {
+          ...combined[partnerId],
+          conversions: partnerConversions.conversions || 0,
+          revenue: partnerConversions.revenue || 0,
+          commissions: partnerConversions.commissions || 0,
+          conversionRate: combined[partnerId].clicks > 0 ? 
+            Math.round(((partnerConversions.conversions || 0) / combined[partnerId].clicks) * 10000) / 100 : 0
+        }
       }
     })
 
@@ -133,7 +131,15 @@ export function RevenueDashboard({ className = '' }: RevenueDashboardProps) {
     return (
       <div className={`bg-black/20 backdrop-blur-sm rounded-xl border border-white/20 p-6 ${className}`}>
         <div className="text-center text-white/60">
-          Failed to load revenue metrics
+          <DollarSign size={48} className="mx-auto mb-4 text-white/40" />
+          <h3 className="text-lg font-medium text-white mb-2">Revenue Data Unavailable</h3>
+          <p className="text-white/60 mb-4">Unable to connect to analytics services</p>
+          <button 
+            onClick={fetchMetrics}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white text-sm transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     )
@@ -257,10 +263,10 @@ export function RevenueDashboard({ className = '' }: RevenueDashboardProps) {
           <div>
             <h4 className="text-blue-200 font-medium mb-2">Performance Insights</h4>
             <ul className="text-blue-200/80 text-sm space-y-1">
-              <li>• Average booking value: €{metrics.averageBookingValue.toFixed(0)}</li>
-              <li>• Top converting partner: {topPartners[0]?.[0] || 'None'}</li>
-              <li>• Commission rate range: 1.2% - 4.2% depending on partner</li>
-              <li>• {metrics.totalConversions} successful bookings tracked in {timeframe}</li>
+              <li>• Average booking value: {metrics.averageBookingValue > 0 ? `€${metrics.averageBookingValue.toFixed(0)}` : 'No data'}</li>
+              <li>• Top converting partner: {topPartners[0]?.[0] || 'No data'}</li>
+              <li>• Total partner integrations: {Object.keys(metrics.partnerStats).length || 0}</li>
+              <li>• {metrics.totalConversions || 0} successful bookings tracked in {timeframe}</li>
             </ul>
           </div>
         </div>

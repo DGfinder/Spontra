@@ -19,22 +19,69 @@ import {
   Zap,
   Users,
   Shield,
-  Wifi
+  Wifi,
+  WifiOff
 } from 'lucide-react'
-import { SystemHealth } from '@/types/admin'
+
+interface SystemHealth {
+  overall: 'healthy' | 'warning' | 'critical' | 'unknown'
+  services: Array<{
+    name: string
+    status: 'up' | 'degraded' | 'down' | 'unknown'
+    responseTime: number | null
+    uptime: number | null
+    version: string | null
+    endpoints: Array<{
+      path: string
+      method: string
+      status: number | null
+      responseTime: number | null
+      lastChecked: string | null
+    }>
+  }>
+  performance: {
+    cpu: number | null
+    memory: number | null
+    disk: number | null
+    database: {
+      connections: number | null
+      queryTime: number | null
+      errorRate: number | null
+    }
+    cache: {
+      hitRate: number | null
+      memoryUsage: number | null
+    }
+    api: {
+      requestsPerSecond: number | null
+      averageResponseTime: number | null
+      errorRate: number | null
+    }
+  }
+  alerts: Array<{
+    id: string
+    level: 'info' | 'warning' | 'error' | 'critical'
+    message: string
+    service: string
+    timestamp: string
+    acknowledged: boolean
+  }>
+  lastUpdated: string
+  monitoringEnabled: boolean
+}
 
 interface SystemMetrics {
   realTimeStats: {
-    requestsPerSecond: number
-    activeUsers: number
-    responseTime: number
-    errorRate: number
+    requestsPerSecond: number | null
+    activeUsers: number | null
+    responseTime: number | null
+    errorRate: number | null
   }
   resourceUsage: {
-    cpu: number
-    memory: number
-    disk: number
-    network: number
+    cpu: number | null
+    memory: number | null
+    disk: number | null
+    network: number | null
   }
   recentAlerts: Array<{
     id: string
@@ -49,157 +96,108 @@ export default function SystemMonitor() {
   const [systemHealth, setSystemHealth] = useState<SystemHealth | null>(null)
   const [systemMetrics, setSystemMetrics] = useState<SystemMetrics | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
   const [autoRefresh, setAutoRefresh] = useState(true)
+  const [monitoringEnabled, setMonitoringEnabled] = useState(false)
 
-  // Mock data
-  const mockSystemHealth: SystemHealth = {
-    overall: 'healthy',
-    services: [
-      {
-        name: 'Frontend (Next.js)',
-        status: 'up',
-        responseTime: 89,
-        uptime: 99.9,
-        version: '1.2.3',
-        endpoints: [
-          { path: '/', method: 'GET', status: 200, responseTime: 89, lastChecked: new Date().toISOString() },
-          { path: '/api/health', method: 'GET', status: 200, responseTime: 45, lastChecked: new Date().toISOString() }
-        ]
-      },
-      {
-        name: 'Backend API (Go)',
-        status: 'up',
-        responseTime: 156,
-        uptime: 99.8,
-        version: '2.1.0',
-        endpoints: [
-          { path: '/health', method: 'GET', status: 200, responseTime: 156, lastChecked: new Date().toISOString() },
-          { path: '/api/v1/cities', method: 'GET', status: 200, responseTime: 234, lastChecked: new Date().toISOString() },
-          { path: '/api/v1/flights', method: 'GET', status: 200, responseTime: 189, lastChecked: new Date().toISOString() }
-        ]
-      },
-      {
-        name: 'Admin API',
-        status: 'up',
-        responseTime: 134,
-        uptime: 99.5,
-        version: '1.0.5',
-        endpoints: [
-          { path: '/admin/health', method: 'GET', status: 200, responseTime: 134, lastChecked: new Date().toISOString() },
-          { path: '/admin/metrics', method: 'GET', status: 200, responseTime: 167, lastChecked: new Date().toISOString() }
-        ]
-      },
-      {
-        name: 'PostgreSQL Database',
-        status: 'up',
-        responseTime: 45,
-        uptime: 99.9,
-        version: '14.2',
-        endpoints: [
-          { path: 'connection_pool', method: 'CHECK', status: 200, responseTime: 45, lastChecked: new Date().toISOString() }
-        ]
-      },
-      {
-        name: 'Redis Cache',
-        status: 'up',
-        responseTime: 12,
-        uptime: 100,
-        version: '7.0',
-        endpoints: [
-          { path: 'ping', method: 'PING', status: 200, responseTime: 12, lastChecked: new Date().toISOString() }
-        ]
-      },
-      {
-        name: 'Amadeus API',
-        status: 'degraded',
-        responseTime: 1890,
-        uptime: 98.2,
-        version: 'v2',
-        endpoints: [
-          { path: '/v2/shopping/flight-offers', method: 'GET', status: 200, responseTime: 1890, lastChecked: new Date().toISOString() },
-          { path: '/v1/reference-data/locations/cities', method: 'GET', status: 429, responseTime: 2100, lastChecked: new Date().toISOString() }
-        ]
-      }
-    ],
-    performance: {
-      cpu: 45,
-      memory: 67,
-      disk: 23,
-      database: {
-        connections: 15,
-        queryTime: 25,
-        errorRate: 0.1
-      },
-      cache: {
-        hitRate: 89,
-        memoryUsage: 45
-      },
-      api: {
-        requestsPerSecond: 120,
-        averageResponseTime: 89,
-        errorRate: 0.2
-      }
-    },
-    alerts: [
-      {
-        id: 'alert_001',
-        level: 'warning',
-        message: 'Amadeus API response time above threshold (1.8s)',
-        service: 'Amadeus API',
-        timestamp: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
-        acknowledged: false
-      },
-      {
-        id: 'alert_002',
-        level: 'info',
-        message: 'Scheduled backup completed successfully',
-        service: 'Database',
-        timestamp: new Date(Date.now() - 1800000).toISOString(), // 30 minutes ago
-        acknowledged: true
-      }
-    ],
-    lastUpdated: new Date().toISOString()
-  }
-
-  const mockSystemMetrics: SystemMetrics = {
-    realTimeStats: {
-      requestsPerSecond: 120,
-      activeUsers: 2340,
-      responseTime: 156,
-      errorRate: 0.12
-    },
-    resourceUsage: {
-      cpu: 45,
-      memory: 67,
-      disk: 23,
-      network: 34
-    },
-    recentAlerts: mockSystemHealth.alerts
-  }
 
   useEffect(() => {
-    const loadData = () => {
-      setTimeout(() => {
-        setSystemHealth(mockSystemHealth)
-        setSystemMetrics(mockSystemMetrics)
-        setLastUpdated(new Date())
-        setIsLoading(false)
-      }, 1000)
-    }
-
-    loadData()
+    loadSystemData()
 
     // Auto-refresh every 30 seconds
     let interval: NodeJS.Timeout
-    if (autoRefresh) {
-      interval = setInterval(loadData, 30000)
+    if (autoRefresh && monitoringEnabled) {
+      interval = setInterval(loadSystemData, 30000)
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [autoRefresh])
+  }, [autoRefresh, monitoringEnabled])
+
+  const loadSystemData = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      // Check if monitoring is enabled first
+      const monitoringResponse = await fetch('/api/admin/system/status')
+      const monitoringData = await monitoringResponse.json()
+      
+      setMonitoringEnabled(monitoringData.enabled || false)
+
+      if (!monitoringData.enabled) {
+        // Set empty/zero values when monitoring is disabled
+        setSystemHealth({
+          overall: 'unknown',
+          services: [],
+          performance: {
+            cpu: null,
+            memory: null,
+            disk: null,
+            database: {
+              connections: null,
+              queryTime: null,
+              errorRate: null
+            },
+            cache: {
+              hitRate: null,
+              memoryUsage: null
+            },
+            api: {
+              requestsPerSecond: null,
+              averageResponseTime: null,
+              errorRate: null
+            }
+          },
+          alerts: [],
+          lastUpdated: new Date().toISOString(),
+          monitoringEnabled: false
+        })
+        
+        setSystemMetrics({
+          realTimeStats: {
+            requestsPerSecond: null,
+            activeUsers: null,
+            responseTime: null,
+            errorRate: null
+          },
+          resourceUsage: {
+            cpu: null,
+            memory: null,
+            disk: null,
+            network: null
+          },
+          recentAlerts: []
+        })
+      } else {
+        // Load real system data when monitoring is enabled
+        const [healthResponse, metricsResponse] = await Promise.all([
+          fetch('/api/admin/system/health'),
+          fetch('/api/admin/system/metrics')
+        ])
+
+        if (healthResponse.ok && metricsResponse.ok) {
+          const healthData = await healthResponse.json()
+          const metricsData = await metricsResponse.json()
+          
+          setSystemHealth(healthData)
+          setSystemMetrics(metricsData)
+        } else {
+          throw new Error('Failed to load system data')
+        }
+      }
+      
+      setLastUpdated(new Date())
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load system monitoring data'
+      setError(errorMessage)
+      console.error('System monitoring error:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const getServiceStatusColor = (status: string) => {
     switch (status) {
@@ -238,13 +236,7 @@ export default function SystemMonitor() {
   }
 
   const handleRefresh = () => {
-    setIsLoading(true)
-    setTimeout(() => {
-      setSystemHealth(mockSystemHealth)
-      setSystemMetrics(mockSystemMetrics)
-      setLastUpdated(new Date())
-      setIsLoading(false)
-    }, 1000)
+    loadSystemData()
   }
 
   if (isLoading) {
@@ -273,6 +265,7 @@ export default function SystemMonitor() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">System Monitor</h1>
           <p className="text-gray-600">Real-time system health and performance monitoring</p>
+          <MonitoringStatusIndicator enabled={monitoringEnabled} />
         </div>
         
         <div className="flex items-center space-x-3">
@@ -301,8 +294,12 @@ export default function SystemMonitor() {
         </div>
       </div>
 
-      {/* System Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {!monitoringEnabled ? (
+        <EmptyMonitoringState />
+      ) : (
+        <>
+          {/* System Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-4">
             <div className="p-2 bg-blue-100 rounded-lg">
@@ -312,15 +309,15 @@ export default function SystemMonitor() {
               systemHealth!.overall === 'healthy' ? 'text-green-600' : 
               systemHealth!.overall === 'warning' ? 'text-yellow-600' : 'text-red-600'
             }`}>
-              {systemHealth!.overall === 'healthy' ? <CheckCircle size={14} className="mr-1" /> : 
-               systemHealth!.overall === 'warning' ? <AlertTriangle size={14} className="mr-1" /> : 
+              {systemHealth?.overall === 'healthy' ? <CheckCircle size={14} className="mr-1" /> : 
+               systemHealth?.overall === 'warning' ? <AlertTriangle size={14} className="mr-1" /> : 
                <XCircle size={14} className="mr-1" />}
-              {systemHealth!.overall}
+              {systemHealth?.overall ?? 'unknown'}
             </div>
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {systemHealth!.services.filter(s => s.status === 'up').length}/{systemHealth!.services.length}
+              {systemHealth ? `${systemHealth.services.filter(s => s.status === 'up').length}/${systemHealth.services.length}` : '0/0'}
             </div>
             <p className="text-sm text-gray-600">Services Online</p>
             <p className="text-xs text-gray-500 mt-1">system health</p>
@@ -339,7 +336,7 @@ export default function SystemMonitor() {
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {systemMetrics!.realTimeStats.requestsPerSecond}
+              {systemMetrics?.realTimeStats.requestsPerSecond ?? '0'}
             </div>
             <p className="text-sm text-gray-600">Requests/sec</p>
             <p className="text-xs text-gray-500 mt-1">current load</p>
@@ -358,7 +355,7 @@ export default function SystemMonitor() {
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {systemMetrics!.realTimeStats.activeUsers.toLocaleString()}
+              {systemMetrics?.realTimeStats.activeUsers?.toLocaleString() ?? '0'}
             </div>
             <p className="text-sm text-gray-600">Active Users</p>
             <p className="text-xs text-gray-500 mt-1">online now</p>
@@ -377,7 +374,7 @@ export default function SystemMonitor() {
           </div>
           <div>
             <div className="text-2xl font-bold text-gray-900 mb-1">
-              {systemMetrics!.realTimeStats.responseTime}ms
+              {systemMetrics?.realTimeStats.responseTime ?? '0'}ms
             </div>
             <p className="text-sm text-gray-600">Response Time</p>
             <p className="text-xs text-gray-500 mt-1">average response</p>
@@ -397,7 +394,7 @@ export default function SystemMonitor() {
             
             <div className="p-6">
               <div className="space-y-4">
-                {systemHealth!.services.map((service, index) => (
+                {systemHealth?.services.map((service, index) => (
                   <div key={index} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center space-x-3">
@@ -470,12 +467,12 @@ export default function SystemMonitor() {
                     <Cpu size={16} className="text-blue-600" />
                     <span className="text-sm font-medium text-gray-900">CPU</span>
                   </div>
-                  <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.cpu}%</span>
+                  <span className="text-sm text-gray-600">{systemMetrics?.resourceUsage.cpu ?? 0}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${getResourceColor(systemMetrics!.resourceUsage.cpu)}`}
-                    style={{ width: `${systemMetrics!.resourceUsage.cpu}%` }}
+                    className={`h-2 rounded-full ${getResourceColor(systemMetrics?.resourceUsage.cpu ?? 0)}`}
+                    style={{ width: `${systemMetrics?.resourceUsage.cpu ?? 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -486,12 +483,12 @@ export default function SystemMonitor() {
                     <Memory size={16} className="text-green-600" />
                     <span className="text-sm font-medium text-gray-900">Memory</span>
                   </div>
-                  <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.memory}%</span>
+                  <span className="text-sm text-gray-600">{systemMetrics?.resourceUsage.memory ?? 0}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${getResourceColor(systemMetrics!.resourceUsage.memory)}`}
-                    style={{ width: `${systemMetrics!.resourceUsage.memory}%` }}
+                    className={`h-2 rounded-full ${getResourceColor(systemMetrics?.resourceUsage.memory ?? 0)}`}
+                    style={{ width: `${systemMetrics?.resourceUsage.memory ?? 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -502,12 +499,12 @@ export default function SystemMonitor() {
                     <HardDisk size={16} className="text-purple-600" />
                     <span className="text-sm font-medium text-gray-900">Disk</span>
                   </div>
-                  <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.disk}%</span>
+                  <span className="text-sm text-gray-600">{systemMetrics?.resourceUsage.disk ?? 0}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${getResourceColor(systemMetrics!.resourceUsage.disk)}`}
-                    style={{ width: `${systemMetrics!.resourceUsage.disk}%` }}
+                    className={`h-2 rounded-full ${getResourceColor(systemMetrics?.resourceUsage.disk ?? 0)}`}
+                    style={{ width: `${systemMetrics?.resourceUsage.disk ?? 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -518,12 +515,12 @@ export default function SystemMonitor() {
                     <Wifi size={16} className="text-orange-600" />
                     <span className="text-sm font-medium text-gray-900">Network</span>
                   </div>
-                  <span className="text-sm text-gray-600">{systemMetrics!.resourceUsage.network}%</span>
+                  <span className="text-sm text-gray-600">{systemMetrics?.resourceUsage.network ?? 0}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className={`h-2 rounded-full ${getResourceColor(systemMetrics!.resourceUsage.network)}`}
-                    style={{ width: `${systemMetrics!.resourceUsage.network}%` }}
+                    className={`h-2 rounded-full ${getResourceColor(systemMetrics?.resourceUsage.network ?? 0)}`}
+                    style={{ width: `${systemMetrics?.resourceUsage.network ?? 0}%` }}
                   ></div>
                 </div>
               </div>
@@ -537,9 +534,9 @@ export default function SystemMonitor() {
             </div>
             
             <div className="p-6">
-              {systemHealth!.alerts.length > 0 ? (
+              {systemHealth?.alerts && systemHealth.alerts.length > 0 ? (
                 <div className="space-y-3">
-                  {systemHealth!.alerts.map((alert) => (
+                  {systemHealth.alerts.map((alert) => (
                     <div key={alert.id} className={`p-3 rounded-lg border ${getAlertColor(alert.level)}`}>
                       <div className="flex items-start space-x-3">
                         {getAlertIcon(alert.level)}
@@ -564,6 +561,94 @@ export default function SystemMonitor() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function MonitoringStatusIndicator({ enabled }: { enabled: boolean }) {
+  const StatusIcon = enabled ? Wifi : WifiOff
+  const color = enabled ? 'text-green-600' : 'text-red-600'
+  const text = enabled ? 'Monitoring Active' : 'Monitoring Disabled'
+
+  return (
+    <div className="flex items-center space-x-2 mt-1">
+      <StatusIcon size={14} className={color} />
+      <span className={`text-sm ${color}`}>{text}</span>
+      {!enabled && (
+        <span className="text-xs text-gray-500">• Configure system monitoring</span>
+      )}
+    </div>
+  )
+}
+
+function EmptyMonitoringState() {
+  return (
+    <div className="bg-white rounded-xl p-12 shadow-sm border border-gray-100 text-center">
+      <div className="w-16 h-16 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+        <Activity size={32} className="text-gray-400" />
+      </div>
+      
+      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        System Monitoring Not Configured
+      </h3>
+      
+      <p className="text-gray-600 mb-6 max-w-md mx-auto">
+        To monitor system health and performance, configure monitoring tools and health checks.
+      </p>
+      
+      <div className="bg-gray-50 rounded-lg p-6 max-w-2xl mx-auto text-left">
+        <h4 className="font-semibold text-gray-900 mb-4">Setup Requirements:</h4>
+        
+        <div className="space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Server size={12} className="text-blue-600" />
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">Health Check Endpoints</div>
+              <div className="text-sm text-gray-600">Configure /health endpoints for all services</div>
+            </div>
+          </div>
+          
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Activity size={12} className="text-green-600" />
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">Performance Monitoring</div>
+              <div className="text-sm text-gray-600">Set up Prometheus, New Relic, or DataDog</div>
+            </div>
+          </div>
+          
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Database size={12} className="text-purple-600" />
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">Database Monitoring</div>
+              <div className="text-sm text-gray-600">Configure database connection and query monitoring</div>
+            </div>
+          </div>
+          
+          <div className="flex items-start space-x-3">
+            <div className="w-6 h-6 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <AlertTriangle size={12} className="text-orange-600" />
+            </div>
+            <div>
+              <div className="font-medium text-gray-900">Alerting System</div>
+              <div className="text-sm text-gray-600">Configure alerts for system issues and thresholds</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          <div className="text-sm text-gray-600">
+            <strong>Note:</strong> Contact your system administrator to configure monitoring tools and health checks.
           </div>
         </div>
       </div>

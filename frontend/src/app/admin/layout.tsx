@@ -161,7 +161,7 @@ const navigation: NavigationItem[] = [
     section: 'administrative',
     permissions: ['finance.view'],
     children: [
-      { id: 'finance-dashboard', label: 'Revenue Dashboard', icon: BarChart3, href: '/admin/revenue' },
+      { id: 'finance-dashboard', label: 'Revenue Dashboard', icon: BarChart3, href: '/admin/financial' },
       { id: 'finance-processing', label: 'Payment Processing', icon: CreditCard, href: '/admin/finance/payments' },
       { id: 'finance-invoicing', label: 'Invoicing', icon: Receipt, href: '/admin/finance/invoicing' },
       { id: 'finance-tax', label: 'Tax Management', icon: FileBarChart, href: '/admin/finance/tax' },
