@@ -8,7 +8,15 @@ export const runtime = 'nodejs'
 // Secure JWT secret validation
 const getJWTSecret = () => {
   const secret = process.env.ADMIN_JWT_SECRET
+  console.log('🔐 JWT Secret check:', { 
+    secretExists: !!secret,
+    secretLength: secret?.length || 0,
+    isDefault: secret === 'your-super-secret-admin-key-change-in-production',
+    firstChars: secret?.substring(0, 10) || 'N/A'
+  })
+  
   if (!secret || secret === 'your-super-secret-admin-key-change-in-production') {
+    console.error('❌ ADMIN_JWT_SECRET not properly configured')
     throw new Error('ADMIN_JWT_SECRET environment variable must be set with a secure secret key')
   }
   return new TextEncoder().encode(secret)
@@ -36,7 +44,7 @@ const adminUsers: AdminUserWithSecurity[] = [
       'finance.view', 'finance.manage', 'finance.payouts',
       'support.view', 'support.manage', 'support.escalate'
     ] as AdminPermission[],
-    passwordHash: '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/lewF5K8.E6jjQ.XaO', // admin123 hashed
+    passwordHash: '$2b$12$IOhK7af13TM2phH1izJ/fOqSJx1PjY4izQQuh2VDemx4KCSxkzxSa', // admin123 hashed
     profilePicture: undefined,
     createdAt: '2024-01-01T00:00:00Z',
     lastLoginAt: '2024-01-15T10:00:00Z',
@@ -58,7 +66,7 @@ const adminUsers: AdminUserWithSecurity[] = [
       'analytics.view',
       'support.view'
     ] as AdminPermission[],
-    passwordHash: '$2a$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // mod123 hashed
+    passwordHash: '$2b$12$fa9eBCcEAYOPPZ8D3p2Sm.czHB9Eor.n7fX89r7aYjEH9ntzaVQV6', // mod123 hashed
     profilePicture: undefined,
     createdAt: '2024-01-01T00:00:00Z',
     lastLoginAt: '2024-01-15T09:30:00Z',
@@ -81,8 +89,22 @@ const RATE_LIMIT_MAX_ATTEMPTS = 10
 
 export async function POST(req: NextRequest) {
   try {
+    // Debug environment variables (temporary for production debugging)
+    console.log('🔧 Environment check:', {
+      hasJWTSecret: !!process.env.ADMIN_JWT_SECRET,
+      nodeEnv: process.env.NODE_ENV,
+      secretLength: process.env.ADMIN_JWT_SECRET?.length || 0
+    })
+
     const clientIP = req.ip || req.headers.get('x-forwarded-for') || 'unknown'
     const { email, password, mfaCode } = await req.json()
+
+    console.log('🔐 Login attempt:', { 
+      email, 
+      passwordLength: password?.length || 0,
+      clientIP,
+      hasMfaCode: !!mfaCode 
+    })
 
     // Rate limiting check
     const rateLimitKey = `login_${clientIP}`
@@ -113,7 +135,15 @@ export async function POST(req: NextRequest) {
     // Find user by email
     const user = adminUsers.find(u => u.email.toLowerCase() === email.toLowerCase())
     
+    console.log('👤 User lookup:', { 
+      email, 
+      userFound: !!user, 
+      userEmail: user?.email,
+      isActive: user?.isActive 
+    })
+    
     if (!user) {
+      console.log('❌ User not found for email:', email)
       rateLimit.attempts++
       rateLimitMap.set(rateLimitKey, rateLimit)
       // Don't reveal whether user exists or not
@@ -140,8 +170,21 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify password using bcrypt
+    console.log('🔑 Password verification:', { 
+      passwordProvided: password,
+      storedHash: user.passwordHash,
+      hashType: user.passwordHash.substring(0, 4)
+    })
+    
     const validPassword = await bcrypt.compare(password, user.passwordHash)
+    
+    console.log('✅ Password check result:', { 
+      validPassword,
+      email: user.email 
+    })
+    
     if (!validPassword) {
+      console.log('❌ Password verification failed for:', user.email)
       // Increment failed login attempts
       user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1
       user.lastFailedLogin = new Date().toISOString()
