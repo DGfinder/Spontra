@@ -365,6 +365,21 @@ class AdminService {
     return !!json.success
   }
 
+  // ============================================================================
+  // THEME ANALYTICS / DESTINATIONS (READ-ONLY)
+  // ============================================================================
+
+  async getThemeDestinations(params: { origin: string; theme: string; maxFlightTime?: number; minScore?: number; limit?: number }): Promise<any> {
+    const res = await fetch(`${this.config.baseUrl}/themes/destinations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    })
+    const json = await res.json()
+    if (!json.success) throw new Error(json.error || 'Failed to load theme destinations')
+    return json.data
+  }
+
   /**
    * Update destination
    */

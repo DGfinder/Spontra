@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import adminService from '@/services/adminService'
+import { poiService } from '@/services/poiService'
 import {
   Star,
   Plus,
@@ -76,13 +77,35 @@ export default function ThemeManagementPage() {
     icon: 'Star'
   })
 
-  const mockDestinationScores: DestinationThemeScore[] = [
-    { iataCode: 'ROM', cityName: 'Rome', countryName: 'Italy', score: 9.2, rank: 1, trending: 'up' },
-    { iataCode: 'ATH', cityName: 'Athens', countryName: 'Greece', score: 8.9, rank: 2, trending: 'stable' },
-    { iataCode: 'BCN', cityName: 'Barcelona', countryName: 'Spain', score: 8.7, rank: 3, trending: 'up' },
-    { iataCode: 'PAR', cityName: 'Paris', countryName: 'France', score: 8.5, rank: 4, trending: 'down' },
-    { iataCode: 'VIE', cityName: 'Vienna', countryName: 'Austria', score: 8.3, rank: 5, trending: 'stable' }
-  ]
+  const [topDestinations, setTopDestinations] = useState<any[]>([])
+  const [topPOIs, setTopPOIs] = useState<any[]>([])
+
+  const loadThemeAnalytics = async (themeKey: string) => {
+    try {
+      // Use a sensible default origin for analytics
+      const data = await adminService.getThemeDestinations({ origin: 'LHR', theme: themeKey, minScore: 60, limit: 20 })
+      const items = (data?.destinations || data?.Destinations || [])
+      setTopDestinations(items.slice(0, 10))
+
+      // Fetch top POIs for the best destination (if available)
+      const best = items[0]
+      const code = best?.IataCode || best?.destination?.airport_code
+      if (code) {
+        try {
+          const res = await poiService.listPOIs(code, { theme: themeKey as any, sortBy: 'popularity', sortOrder: 'desc', limit: 5 } as any)
+          setTopPOIs(res.pois || [])
+        } catch {
+          setTopPOIs([])
+        }
+      } else {
+        setTopPOIs([])
+      }
+    } catch (e) {
+      console.warn('Theme analytics failed', e)
+      setTopDestinations([])
+      setTopPOIs([])
+    }
+  }
 
   const loadThemes = async () => {
     setIsLoading(true)
@@ -119,6 +142,12 @@ export default function ThemeManagementPage() {
   }
 
   useEffect(() => { loadThemes() }, [])
+
+  useEffect(() => {
+    if (selectedTheme && activeTab !== 'overview') {
+      loadThemeAnalytics(selectedTheme.key)
+    }
+  }, [selectedTheme, activeTab])
 
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -197,13 +226,7 @@ export default function ThemeManagementPage() {
           <p className="text-gray-600">Manage destination themes and scoring system</p>
         </div>
         
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <Plus size={16} className="mr-2" />
-          Create Theme
-        </button>
+        {/* Read-only: create disabled */}
       </div>
 
       {/* Stats Cards */}
@@ -345,37 +368,7 @@ export default function ThemeManagementPage() {
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => duplicateTheme(selectedTheme)}
-                      className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                      title="Duplicate theme"
-                    >
-                      <Copy size={16} />
-                    </button>
-                    <button
-                      onClick={() => setIsEditing(!isEditing)}
-                      className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => toggleThemeStatus(selectedTheme.id)}
-                      className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                        selectedTheme.isActive
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
-                    >
-                      {selectedTheme.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
-                    <button
-                      onClick={() => deleteTheme(selectedTheme.id)}
-                      className="p-2 text-red-600 hover:text-red-700 transition-colors"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+                  {/* Read-only: actions disabled */}
                 </div>
 
                 {/* Tabs */}
@@ -485,29 +478,48 @@ export default function ThemeManagementPage() {
                     <h4 className="text-lg font-semibold text-gray-900 mb-4">
                       Top Destinations for {selectedTheme.name}
                     </h4>
-                    
-                    <div className="space-y-3">
-                      {mockDestinationScores.map((destination) => (
-                        <div key={destination.iataCode} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-xs">{destination.iataCode}</span>
+                    <div className="space-y-3 mb-6">
+                      {topDestinations.length === 0 && (
+                        <div className="text-sm text-gray-500">No destinations found for this theme yet.</div>
+                      )}
+                      {topDestinations.map((d, idx) => {
+                        const code = d.IataCode || d.destination?.airport_code
+                        const city = d.CityName || d.destination?.city_name
+                        const country = d.CountryName || d.destination?.country_name
+                        const score = d.ThemeScore || d.match_score || 0
+                        return (
+                          <div key={`${code}-${idx}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                                <span className="text-white font-bold text-xs">{code}</span>
+                              </div>
+                              <div>
+                                <h5 className="font-semibold text-gray-900">{city}</h5>
+                                <p className="text-sm text-gray-600">{country}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h5 className="font-semibold text-gray-900">{destination.cityName}</h5>
-                              <p className="text-sm text-gray-600">{destination.countryName}</p>
+                            <div className="text-right">
+                              <div className="font-semibold text-gray-900">{Number(score).toFixed(1)}</div>
                             </div>
                           </div>
-                          
-                          <div className="flex items-center space-x-4">
-                            <div className="text-right">
-                              <div className="font-semibold text-gray-900">{destination.score.toFixed(1)}/10</div>
-                              <div className="text-sm text-gray-600">#{destination.rank}</div>
-                            </div>
-                            
-                            {destination.trending === 'up' && <TrendingUp size={16} className="text-green-500" />}
-                            {destination.trending === 'down' && <TrendingDown size={16} className="text-red-500" />}
-                            {destination.trending === 'stable' && <div className="w-4 h-4 bg-gray-400 rounded-full" />}
+                        )
+                      })}
+                    </div>
+
+                    <h4 className="text-lg font-semibold text-gray-900 mb-4">Top POIs</h4>
+                    <div className="space-y-3">
+                      {topPOIs.length === 0 && (
+                        <div className="text-sm text-gray-500">No POIs available for the top destination.</div>
+                      )}
+                      {topPOIs.map((p: any) => (
+                        <div key={p.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div>
+                            <h5 className="font-semibold text-gray-900">{p.name}</h5>
+                            <p className="text-sm text-gray-600">{p.categoryId}</p>
+                          </div>
+                          <div className="text-right text-sm">
+                            <div>Popularity: {p.popularityScore}</div>
+                            {p.rating ? <div>Rating: {p.rating}</div> : null}
                           </div>
                         </div>
                       ))}
