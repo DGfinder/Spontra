@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     let theme_scores: Record<string, number> | undefined
     if (body.themeScores) {
       theme_scores = Object.fromEntries(
-        Object.entries(body.themeScores).map(([k, v]: [string, number]) => [k, Math.round(Number(v) * 10)])
+        Object.entries(body.themeScores).map(([k, v]) => [k, Math.round(Number(v) * 10)])
       )
     }
 

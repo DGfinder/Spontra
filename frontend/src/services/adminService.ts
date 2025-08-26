@@ -298,22 +298,22 @@ class AdminService {
   // ============================================================================
 
   async getRouteDuration(origin: string, destination: string): Promise<any> {
-    const res = await this.apiRequest(`/reference/flight-times?mode=route&origin=${origin}&destination=${destination}`)
+    const res = await this.apiRequest<{duration?: any}>(`/reference/flight-times?mode=route&origin=${origin}&destination=${destination}`)
     return res.data?.duration
   }
 
   async listDurationsForOrigin(origin: string, limit = 50): Promise<any[]> {
-    const res = await this.apiRequest(`/reference/flight-times?mode=origin&origin=${origin}&limit=${limit}`)
+    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=origin&origin=${origin}&limit=${limit}`)
     return res.data?.items || []
   }
 
   async listByDurationRange(origin: string, min = 0, max = 1440, limit = 50): Promise<any[]> {
-    const res = await this.apiRequest(`/reference/flight-times?mode=range&origin=${origin}&min=${min}&max=${max}&limit=${limit}`)
+    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=range&origin=${origin}&min=${min}&max=${max}&limit=${limit}`)
     return res.data?.items || []
   }
 
   async listPopularDestinations(origin: string, directOnly = false, limit = 20): Promise<any[]> {
-    const res = await this.apiRequest(`/reference/flight-times?mode=popular&origin=${origin}&directOnly=${directOnly}&limit=${limit}`)
+    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=popular&origin=${origin}&directOnly=${directOnly}&limit=${limit}`)
     return res.data?.items || []
   }
 
