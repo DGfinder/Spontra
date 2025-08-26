@@ -24,6 +24,7 @@ import {
   AlertTriangle
 } from 'lucide-react'
 import { AdminDestination } from '@/types/admin'
+import adminService from '@/services/adminService'
 
 interface DestinationStats {
   totalDestinations: number
@@ -45,145 +46,33 @@ export default function DestinationManagement() {
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [editingDestination, setEditingDestination] = useState<AdminDestination | null>(null)
 
-  // Mock data
-  const mockStats: DestinationStats = {
-    totalDestinations: 47,
-    activeDestinations: 42,
-    pendingApproval: 3,
-    topPerforming: 12,
-    totalBookings: 15623,
-    totalRevenue: 1245670
-  }
-
-  const mockDestinations: AdminDestination[] = [
-    {
-      iataCode: 'BCN',
-      cityName: 'Barcelona',
-      countryName: 'Spain',
-      countryCode: 'ES',
-      continent: 'Europe',
-      coordinates: { lat: 41.3851, lng: 2.1734 },
-      isActive: true,
-      isPopular: true,
-      highlights: ['Gothic Quarter', 'Park Güell', 'Sagrada Família', 'Las Ramblas'],
-      themeScores: {
-        vibe: 9.2,        // Nightlife & Social (avg of nightlife + romance: 9.2 + 8.1 / 2 = 8.65)
-        adventure: 6.5,   // Adventure (unchanged)
-        discover: 8.8,    // Culture & Food (avg of culture + food: 8.7 + 8.9 / 2 = 8.8)
-        indulge: 7.6,     // Shopping & Luxury (avg of shopping + relaxation: 7.8 + 7.3 / 2 = 7.55)
-        nature: 5.2       // Nature (unchanged)
-      },
-      supportedActivities: ['nightlife', 'restaurants', 'culture', 'sightseeing', 'luxury_shopping'],
-      metrics: {
-        totalBookings: 3456,
-        totalRevenue: 287500,
-        averageStay: 3.2,
-        popularityScore: 9.1,
-        contentCount: 234,
-        creatorCount: 67
-      },
-      description: 'Vibrant Mediterranean city known for art, architecture, and nightlife',
-      imageUrl: '/images/destinations/barcelona.jpg',
-      lastUpdated: '2024-01-15T10:00:00Z'
-    },
-    {
-      iataCode: 'AMS',
-      cityName: 'Amsterdam',
-      countryName: 'Netherlands',
-      countryCode: 'NL',
-      continent: 'Europe',
-      coordinates: { lat: 52.3676, lng: 4.9041 },
-      isActive: true,
-      isPopular: true,
-      highlights: ['Anne Frank House', 'Van Gogh Museum', 'Canal District', 'Jordaan District'],
-      themeScores: {
-        vibe: 8.2,        // Nightlife & Social (avg of nightlife + romance: 8.1 + 8.3 / 2 = 8.2)
-        adventure: 5.8,   // Adventure (unchanged)
-        discover: 8.3,    // Culture & Food (avg of culture + food: 9.0 + 7.5 / 2 = 8.25)
-        indulge: 8.0,     // Shopping & Luxury (avg of shopping + relaxation: 8.2 + 7.8 / 2 = 8.0)
-        nature: 6.7       // Nature (unchanged)
-      },
-      supportedActivities: ['cultural_tours', 'nightlife', 'luxury_shopping', 'romantic_dining', 'museum_visits', 'art_galleries'],
-      metrics: {
-        totalBookings: 2890,
-        totalRevenue: 234500,
-        averageStay: 2.8,
-        popularityScore: 8.7,
-        contentCount: 189,
-        creatorCount: 45
-      },
-      description: 'Canal-lined city known for museums, cycling culture, and liberal atmosphere',
-      imageUrl: '/images/destinations/amsterdam.jpg',
-      lastUpdated: '2024-01-14T15:30:00Z'
-    },
-    {
-      iataCode: 'ROM',
-      cityName: 'Rome',
-      countryName: 'Italy',
-      countryCode: 'IT',
-      continent: 'Europe',
-      coordinates: { lat: 41.9028, lng: 12.4964 },
-      isActive: true,
-      isPopular: true,
-      highlights: ['Colosseum', 'Vatican City', 'Trevi Fountain', 'Roman Forum'],
-      themeScores: {
-        vibe: 8.4,        // Nightlife & Social (avg of nightlife + romance: 7.5 + 9.2 / 2 = 8.35)
-        adventure: 6.2,   // Adventure (unchanged)
-        discover: 9.6,    // Culture & Food (avg of culture + food: 9.8 + 9.4 / 2 = 9.6)
-        indulge: 7.0,     // Shopping & Luxury (avg of shopping + relaxation: 7.1 + 6.9 / 2 = 7.0)
-        nature: 4.8       // Nature (unchanged)
-      },
-      supportedActivities: ['cultural_tours', 'food_tours', 'romantic_dining', 'historical_sites', 'cooking_classes'],
-      metrics: {
-        totalBookings: 2345,
-        totalRevenue: 198750,
-        averageStay: 3.5,
-        popularityScore: 8.9,
-        contentCount: 156,
-        creatorCount: 38
-      },
-      description: 'Eternal City with ancient history, incredible cuisine, and romantic atmosphere',
-      imageUrl: '/images/destinations/rome.jpg',
-      lastUpdated: '2024-01-13T09:15:00Z'
-    },
-    {
-      iataCode: 'PRG',
-      cityName: 'Prague',
-      countryName: 'Czech Republic',
-      countryCode: 'CZ',
-      continent: 'Europe',
-      coordinates: { lat: 50.0755, lng: 14.4378 },
-      isActive: false,
-      isPopular: false,
-      highlights: ['Prague Castle', 'Charles Bridge', 'Old Town Square', 'Wenceslas Square'],
-      themeScores: {
-        vibe: 8.5,        // Nightlife & Social (avg of nightlife + romance: 8.3 + 8.7 / 2 = 8.5)
-        adventure: 5.5,   // Adventure (unchanged)
-        discover: 8.2,    // Culture & Food (avg of culture + food: 8.6 + 7.8 / 2 = 8.2)
-        indulge: 7.1,     // Shopping & Luxury (avg of shopping + relaxation: 6.9 + 7.2 / 2 = 7.05)
-        nature: 6.1       // Nature (unchanged)
-      },
-      supportedActivities: ['nightlife', 'cultural_tours', 'romantic_dining', 'beer_tours', 'historical_sites'],
-      metrics: {
-        totalBookings: 1234,
-        totalRevenue: 98750,
-        averageStay: 2.9,
-        popularityScore: 7.8,
-        contentCount: 78,
-        creatorCount: 23
-      },
-      description: 'Fairy-tale city with Gothic architecture, rich history, and vibrant beer culture',
-      imageUrl: '/images/destinations/prague.jpg',
-      lastUpdated: '2024-01-10T12:00:00Z'
-    }
-  ]
-
   useEffect(() => {
-    setTimeout(() => {
-      setStats(mockStats)
-      setDestinations(mockDestinations)
-      setIsLoading(false)
-    }, 1000)
+    const load = async () => {
+      try {
+        const res = await adminService.getDestinations({ limit: 60 })
+        const items = res.items || []
+        setDestinations(items as unknown as AdminDestination[])
+
+        const totalBookings = items.reduce((s: number, d: any) => s + (d.metrics?.totalBookings || 0), 0)
+        const totalRevenue = items.reduce((s: number, d: any) => s + (d.metrics?.totalRevenue || 0), 0)
+        const activeCount = items.filter((d: any) => d.isActive).length
+        const topPerforming = items.filter((d: any) => (d.metrics?.popularityScore || 0) >= 8.5).length
+
+        setStats({
+          totalDestinations: res.total,
+          activeDestinations: activeCount,
+          pendingApproval: 0,
+          topPerforming,
+          totalBookings,
+          totalRevenue
+        })
+      } catch (e) {
+        console.error('Failed to load destinations', e)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    load()
   }, [])
 
   const getThemeColor = (score: number) => {
@@ -201,13 +90,17 @@ export default function DestinationManagement() {
     try {
       console.log('Updating destination:', { destination: destination.iataCode, updates })
       
-      setDestinations(prev => prev.map(d => 
-        d.iataCode === destination.iataCode 
-          ? { ...d, ...updates, lastUpdated: new Date().toISOString() }
-          : d
-      ))
-      
-      alert('Destination updated successfully')
+      const ok = await adminService.updateDestination(destination.iataCode, updates)
+      if (ok) {
+        setDestinations(prev => prev.map(d => 
+          d.iataCode === destination.iataCode 
+            ? { ...d, ...updates, lastUpdated: new Date().toISOString() }
+            : d
+        ))
+        alert('Destination updated successfully')
+      } else {
+        alert('Update failed')
+      }
     } catch (error) {
       console.error('Failed to update destination:', error)
       alert('Failed to update destination')

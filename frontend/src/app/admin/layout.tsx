@@ -21,6 +21,7 @@ import {
   MessageSquare,
   TrendingUp,
   Database,
+  Plane,
   Zap,
   Brain,
   DollarSign,
@@ -86,7 +87,19 @@ const navigation: NavigationItem[] = [
       { id: 'destinations-add', label: 'Add New Destination', icon: Plus, href: '/admin/destinations/add' },
       { id: 'destinations-themes', label: 'Themes & Categories', icon: Star, href: '/admin/destinations/themes' },
       { id: 'destinations-featured', label: 'Featured Cities', icon: Target, href: '/admin/destinations/featured' },
-      { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' }
+      { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' },
+      { id: 'airports', label: 'Airports (Read-only)', icon: Globe, href: '/admin/airports' }
+    ]
+  },
+  {
+    id: 'operations',
+    label: 'Flight Reference',
+    icon: Globe,
+    href: '/admin/ops',
+    section: 'primary',
+    children: [
+      { id: 'airlines', label: 'Airlines (Read-only)', icon: Plane, href: '/admin/airlines' },
+      { id: 'aircraft', label: 'Aircraft Types (Read-only)', icon: Database, href: '/admin/aircraft' }
     ]
   },
   {

@@ -20,8 +20,12 @@ class AdminService {
   private config: AdminServiceConfig
 
   constructor(config?: Partial<AdminServiceConfig>) {
+    const localBase = (typeof window !== 'undefined') 
+      ? `${window.location.origin}/api/admin`
+      : (process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:8082')
+
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:8082',
+      baseUrl: localBase,
       timeout: 30000,
       ...config
     }
@@ -287,6 +291,44 @@ class AdminService {
       `/destinations/admin?${params}`
     )
     return response.data!
+  }
+
+  // ============================================================================
+  // THEME DEFINITIONS MANAGEMENT
+  // ============================================================================
+
+  async listThemeDefinitions(): Promise<{ themes: Array<{ key: string; name: string; description: string; keywords: string[] }>; total: number }> {
+    const response = await fetch(`${this.config.baseUrl}/themes/definitions`, { cache: 'no-store' })
+    const json = await response.json()
+    if (!json.success) throw new Error(json.error || 'Failed to load theme definitions')
+    const data = json.data || {}
+    return { themes: data.themes || [], total: data.total || 0 }
+  }
+
+  async createOrUpdateThemeDefinition(theme: { key: string; name: string; description?: string; keywords?: string[] }): Promise<boolean> {
+    const response = await fetch(`${this.config.baseUrl}/themes/definitions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(theme)
+    })
+    const json = await response.json()
+    return !!json.success
+  }
+
+  async updateThemeDefinition(key: string, updates: { name?: string; description?: string; keywords?: string[] }): Promise<boolean> {
+    const response = await fetch(`${this.config.baseUrl}/themes/definitions/${key}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates)
+    })
+    const json = await response.json()
+    return !!json.success
+  }
+
+  async deleteThemeDefinition(key: string): Promise<boolean> {
+    const response = await fetch(`${this.config.baseUrl}/themes/definitions/${key}`, { method: 'DELETE' })
+    const json = await response.json()
+    return !!json.success
   }
 
   /**

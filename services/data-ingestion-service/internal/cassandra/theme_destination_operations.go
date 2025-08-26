@@ -9,6 +9,7 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
+    "strings"
 
 	"spontra/data-ingestion-service/internal/models"
 )
@@ -459,4 +460,168 @@ func (c *Client) InitializeThemeDefinitions(ctx context.Context) error {
 
 	log.Println("Theme definitions initialized successfully")
 	return nil
+}
+
+// ThemeDefinitionDB represents a theme definition row in Cassandra
+type ThemeDefinitionDB struct {
+    Key         string            `db:"theme_key"`
+    Name        string            `db:"theme_name"`
+    Description string            `db:"description"`
+    Keywords    map[string]struct{} `db:"keywords"`
+    CreatedAt   time.Time         `db:"created_at"`
+}
+
+// GetAllThemeDefinitions retrieves all theme definitions from Cassandra
+func (c *Client) GetAllThemeDefinitions(ctx context.Context) ([]ThemeDefinitionDB, error) {
+    query := `
+        SELECT theme_key, theme_name, description, keywords, created_at
+        FROM theme_definitions
+    `
+
+    iter := c.session.Query(query).Iter()
+    defer iter.Close()
+
+    var defs []ThemeDefinitionDB
+    var def ThemeDefinitionDB
+    for iter.Scan(&def.Key, &def.Name, &def.Description, &def.Keywords, &def.CreatedAt) {
+        // copy to avoid pointer aliasing
+        copied := ThemeDefinitionDB{
+            Key: def.Key,
+            Name: def.Name,
+            Description: def.Description,
+            Keywords: def.Keywords,
+            CreatedAt: def.CreatedAt,
+        }
+        defs = append(defs, copied)
+    }
+
+    if err := iter.Close(); err != nil {
+        return nil, fmt.Errorf("failed to list theme definitions: %w", err)
+    }
+    return defs, nil
+}
+
+// UpsertThemeDefinition creates or updates a theme definition
+func (c *Client) UpsertThemeDefinition(ctx context.Context, def ThemeDefinitionDB) error {
+    if def.CreatedAt.IsZero() {
+        def.CreatedAt = time.Now()
+    }
+    query := `
+        INSERT INTO theme_definitions (theme_key, theme_name, description, keywords, created_at)
+        VALUES (?, ?, ?, ?, ?)
+    `
+    if err := c.session.Query(query,
+        def.Key, def.Name, def.Description, def.Keywords, def.CreatedAt,
+    ).Exec(); err != nil {
+        return fmt.Errorf("failed to upsert theme definition: %w", err)
+    }
+    return nil
+}
+
+// DeleteThemeDefinition deletes a theme definition by key
+func (c *Client) DeleteThemeDefinition(ctx context.Context, key string) error {
+    query := `DELETE FROM theme_definitions WHERE theme_key = ?`
+    if err := c.session.Query(query, key).Exec(); err != nil {
+        return fmt.Errorf("failed to delete theme definition: %w", err)
+    }
+    return nil
+}
+
+// CachedRecommendationMeta holds cache entry metadata
+type CachedRecommendationMeta struct {
+    CacheKey       string    `db:"cache_key"`
+    OriginAirport  string    `db:"origin_airport"`
+    ThemeName      string    `db:"theme_name"`
+    MaxFlightHours int       `db:"max_flight_hours"`
+    GenerationDate time.Time `db:"generation_date"`
+    ExpiresAt      time.Time `db:"expires_at"`
+    CreatedAt      time.Time `db:"created_at"`
+}
+
+// ListCachedRecommendations returns recent cache entries
+func (c *Client) ListCachedRecommendations(ctx context.Context, limit int) ([]CachedRecommendationMeta, error) {
+    if limit <= 0 || limit > 500 {
+        limit = 100
+    }
+    query := `
+        SELECT cache_key, origin_airport, theme_name, max_flight_hours,
+               generation_date, expires_at, created_at
+        FROM destination_recommendations_cache
+        LIMIT ?
+    `
+    iter := c.session.Query(query, limit).Iter()
+    defer iter.Close()
+
+    var out []CachedRecommendationMeta
+    var row CachedRecommendationMeta
+    for iter.Scan(&row.CacheKey, &row.OriginAirport, &row.ThemeName, &row.MaxFlightHours, &row.GenerationDate, &row.ExpiresAt, &row.CreatedAt) {
+        out = append(out, row)
+    }
+    if err := iter.Close(); err != nil {
+        return nil, fmt.Errorf("failed to list cached recommendations: %w", err)
+    }
+    return out, nil
+}
+
+// DeleteCachedRecommendation deletes a cache row by key
+func (c *Client) DeleteCachedRecommendation(ctx context.Context, cacheKey string) error {
+    query := `DELETE FROM destination_recommendations_cache WHERE cache_key = ?`
+    if err := c.session.Query(query, cacheKey).Exec(); err != nil {
+        return fmt.Errorf("failed to delete cached recommendation: %w", err)
+    }
+    return nil
+}
+
+// GetDestinationIDByIataCode retrieves the UUID id for a destination by IATA code
+func (c *Client) GetDestinationIDByIataCode(ctx context.Context, iataCode string) (uuid.UUID, error) {
+    // Use secondary index on iata_code to fetch id
+    query := `SELECT id FROM destinations WHERE iata_code = ? LIMIT 1`
+    var id uuid.UUID
+    if err := c.session.Query(query, iataCode).WithContext(ctx).Scan(&id); err != nil {
+        if err == gocql.ErrNotFound {
+            return uuid.Nil, nil
+        }
+        return uuid.Nil, fmt.Errorf("failed to get destination id by iata: %w", err)
+    }
+    return id, nil
+}
+
+// UpdateDestinationByID updates selected fields for a destination row
+func (c *Client) UpdateDestinationByID(ctx context.Context, id uuid.UUID, updates struct{
+    Description *string
+    Highlights  *[]string
+    ThemeScores *map[string]int
+}) error {
+    // Build dynamic update
+    setParts := []string{}
+    args := []interface{}{}
+    now := time.Now()
+
+    if updates.Description != nil {
+        setParts = append(setParts, "description = ?")
+        args = append(args, *updates.Description)
+    }
+    if updates.Highlights != nil {
+        setParts = append(setParts, "highlights = ?")
+        args = append(args, *updates.Highlights)
+    }
+    if updates.ThemeScores != nil {
+        setParts = append(setParts, "theme_scores = ?")
+        args = append(args, *updates.ThemeScores)
+    }
+
+    // Always update updated_at
+    setParts = append(setParts, "updated_at = ?")
+    args = append(args, now)
+
+    if len(setParts) == 0 {
+        return nil
+    }
+
+    stmt := fmt.Sprintf("UPDATE destinations SET %s WHERE id = ?", strings.Join(setParts, ", "))
+    args = append(args, id)
+    if err := c.session.Query(stmt, args...).WithContext(ctx).Exec(); err != nil {
+        return fmt.Errorf("failed to update destination: %w", err)
+    }
+    return nil
 }

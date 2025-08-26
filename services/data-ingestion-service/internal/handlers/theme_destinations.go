@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+    "github.com/google/uuid"
 
 	"spontra/data-ingestion-service/internal/cassandra"
 	"spontra/data-ingestion-service/internal/models"
@@ -316,37 +317,25 @@ func (h *ThemeDestinationHandler) GetDestinationsByTheme(c *gin.Context) {
 
 // GetThemeDefinitions returns all available theme definitions
 func (h *ThemeDestinationHandler) GetThemeDefinitions(c *gin.Context) {
-	themes := []ThemeDefinition{
-		{
-			Key:         "party",
-			Name:        "Social & Entertainment",
-			Description: "Nightlife, bars, clubs, music festivals, food scenes, social dining experiences",
-			Keywords:    []string{"nightlife", "bars", "clubs", "restaurants", "music", "festivals", "social"},
-		},
-		{
-			Key:         "adventure",
-			Name:        "Active & Outdoor",
-			Description: "Hiking, extreme sports, nature activities, budget backpacking, outdoor wellness",
-			Keywords:    []string{"hiking", "sports", "nature", "outdoor", "backpacking", "adventure", "mountains"},
-		},
-		{
-			Key:         "learn",
-			Name:        "Cultural & Creative",
-			Description: "Museums, history, arts districts, creative scenes, digital nomad hubs, education",
-			Keywords:    []string{"museums", "history", "culture", "arts", "creative", "learning", "architecture"},
-		},
-		{
-			Key:         "shopping",
-			Name:        "Luxury & Indulgent",
-			Description: "Fashion, luxury shopping, spas, wellness experiences, romantic getaways, premium services",
-			Keywords:    []string{"shopping", "luxury", "fashion", "spas", "wellness", "romance", "premium"},
-		},
-		{
-			Key:         "beach",
-			Name:        "Relaxation & Family",
-			Description: "Coastal destinations, family activities, leisure travel, beach wellness, water sports",
-			Keywords:    []string{"beach", "coast", "family", "relaxation", "water", "leisure", "islands"},
-		},
+	defs, err := h.cassandraClient.GetAllThemeDefinitions(c.Request.Context())
+	if err != nil {
+		log.Printf("Failed to fetch theme definitions: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch theme definitions",
+		})
+		return
+	}
+
+	themes := make([]ThemeDefinition, 0, len(defs))
+	for _, d := range defs {
+		var keywords []string
+		for k := range d.Keywords { keywords = append(keywords, k) }
+		themes = append(themes, ThemeDefinition{
+			Key: d.Key,
+			Name: d.Name,
+			Description: d.Description,
+			Keywords: keywords,
+		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -354,6 +343,150 @@ func (h *ThemeDestinationHandler) GetThemeDefinitions(c *gin.Context) {
 		"total":      len(themes),
 		"timestamp":  time.Now().Format(time.RFC3339),
 	})
+}
+
+// CreateThemeDefinition creates a new or updates an existing theme definition
+func (h *ThemeDestinationHandler) CreateThemeDefinition(c *gin.Context) {
+	var req struct {
+		Key         string   `json:"key" binding:"required"`
+		Name        string   `json:"name" binding:"required"`
+		Description string   `json:"description"`
+		Keywords    []string `json:"keywords"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		return
+	}
+
+	keywordsSet := make(map[string]struct{})
+	for _, k := range req.Keywords { keywordsSet[k] = struct{}{} }
+
+	def := cassandra.ThemeDefinitionDB{
+		Key: req.Key,
+		Name: req.Name,
+		Description: req.Description,
+		Keywords: keywordsSet,
+		CreatedAt: time.Now(),
+	}
+	if err := h.cassandraClient.UpsertThemeDefinition(c.Request.Context(), def); err != nil {
+		log.Printf("Failed to upsert theme definition: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save theme definition"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+// UpdateThemeDefinition updates an existing definition by key
+func (h *ThemeDestinationHandler) UpdateThemeDefinition(c *gin.Context) {
+	key := c.Param("key")
+	if key == "" { c.JSON(http.StatusBadRequest, gin.H{"error": "key is required"}); return }
+
+	var req struct {
+		Name        *string  `json:"name"`
+		Description *string  `json:"description"`
+		Keywords    []string `json:"keywords"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		return
+	}
+
+	keywordsSet := make(map[string]struct{})
+	for _, k := range req.Keywords { keywordsSet[k] = struct{}{} }
+
+	def := cassandra.ThemeDefinitionDB{ Key: key, CreatedAt: time.Now() }
+	if req.Name != nil { def.Name = *req.Name }
+	if req.Description != nil { def.Description = *req.Description }
+	if len(req.Keywords) > 0 { def.Keywords = keywordsSet }
+
+	if err := h.cassandraClient.UpsertThemeDefinition(c.Request.Context(), def); err != nil {
+		log.Printf("Failed to update theme definition: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update theme definition"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+// DeleteThemeDefinition deletes a definition by key
+func (h *ThemeDestinationHandler) DeleteThemeDefinition(c *gin.Context) {
+	key := c.Param("key")
+	if key == "" { c.JSON(http.StatusBadRequest, gin.H{"error": "key is required"}); return }
+	if err := h.cassandraClient.DeleteThemeDefinition(c.Request.Context(), key); err != nil {
+		log.Printf("Failed to delete theme definition: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete theme definition"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+// ListRecommendationsCache returns recent cache entries
+func (h *ThemeDestinationHandler) ListRecommendationsCache(c *gin.Context) {
+    limitStr := c.Query("limit")
+    limit := 100
+    if limitStr != "" {
+        if n, err := strconv.Atoi(limitStr); err == nil { limit = n }
+    }
+    entries, err := h.cassandraClient.ListCachedRecommendations(c.Request.Context(), limit)
+    if err != nil {
+        log.Printf("Failed to list cache: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to list cache"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{ "items": entries, "total": len(entries) })
+}
+
+// DeleteRecommendationCache deletes a cache entry by cache_key
+func (h *ThemeDestinationHandler) DeleteRecommendationCache(c *gin.Context) {
+    key := c.Param("cacheKey")
+    if key == "" { c.JSON(http.StatusBadRequest, gin.H{"error": "cacheKey is required"}); return }
+    if err := h.cassandraClient.DeleteCachedRecommendation(c.Request.Context(), key); err != nil {
+        log.Printf("Failed to delete cache entry: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete cache entry"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+// UpdateDestinationByIata updates description/highlights/theme scores for a destination
+func (h *ThemeDestinationHandler) UpdateDestinationByIata(c *gin.Context) {
+    iata := strings.ToUpper(c.Param("iata"))
+    if iata == "" { c.JSON(http.StatusBadRequest, gin.H{"error": "iata is required"}); return }
+
+    var req struct {
+        Description *string           `json:"description"`
+        Highlights  *[]string         `json:"highlights"`
+        ThemeScores *map[string]int   `json:"theme_scores"`
+    }
+    if err := c.ShouldBindJSON(&req); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+        return
+    }
+
+    id, err := h.cassandraClient.GetDestinationIDByIataCode(c.Request.Context(), iata)
+    if err != nil {
+        log.Printf("Failed to lookup destination id: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Lookup failed"})
+        return
+    }
+    if id == (uuid.UUID{}) {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Destination not found"})
+        return
+    }
+
+    updates := struct{
+        Description *string
+        Highlights  *[]string
+        ThemeScores *map[string]int
+    }{ Description: req.Description, Highlights: req.Highlights, ThemeScores: req.ThemeScores }
+
+    if err := h.cassandraClient.UpdateDestinationByID(c.Request.Context(), id, updates); err != nil {
+        log.Printf("Failed to update destination: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "Update failed"})
+        return
+    }
+    c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
 // GetDestinationsByCountry returns destinations grouped by country

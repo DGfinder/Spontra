@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import adminService from '@/services/adminService'
 import {
   Star,
   Plus,
@@ -75,96 +76,6 @@ export default function ThemeManagementPage() {
     icon: 'Star'
   })
 
-  // Mock data
-  const mockThemes: Theme[] = [
-    {
-      id: '1',
-      name: 'City Vibe',
-      key: 'vibe',
-      icon: 'Zap',
-      color: 'text-purple-600',
-      description: 'Nightlife, culture, and urban energy that makes a city come alive after dark',
-      isActive: true,
-      destinations: 47,
-      averageScore: 7.2,
-      created: '2023-06-01',
-      updated: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'Adventure',
-      key: 'adventure',
-      icon: 'Mountain',
-      color: 'text-orange-600',
-      description: 'Outdoor activities, extreme sports, and thrilling experiences for adrenaline seekers',
-      isActive: true,
-      destinations: 42,
-      averageScore: 6.8,
-      created: '2023-06-01',
-      updated: '2024-01-12'
-    },
-    {
-      id: '3',
-      name: 'Discovery',
-      key: 'discover',
-      icon: 'Compass',
-      color: 'text-blue-600',
-      description: 'Historical sites, museums, cultural exploration, and learning experiences',
-      isActive: true,
-      destinations: 45,
-      averageScore: 8.1,
-      created: '2023-06-01',
-      updated: '2024-01-18'
-    },
-    {
-      id: '4',
-      name: 'Indulgence',
-      key: 'indulge',
-      icon: 'Coffee',
-      color: 'text-amber-600',
-      description: 'Fine dining, luxury shopping, spas, and premium experiences',
-      isActive: true,
-      destinations: 38,
-      averageScore: 7.5,
-      created: '2023-06-01',
-      updated: '2024-01-10'
-    },
-    {
-      id: '5',
-      name: 'Nature',
-      key: 'nature',
-      icon: 'TreePine',
-      color: 'text-green-600',
-      description: 'Natural beauty, parks, outdoor settings, and eco-friendly activities',
-      isActive: true,
-      destinations: 35,
-      averageScore: 6.9,
-      created: '2023-06-01',
-      updated: '2024-01-16'
-    },
-    {
-      id: '6',
-      name: 'Romance',
-      key: 'romance',
-      icon: 'Heart',
-      color: 'text-pink-600',
-      description: 'Romantic settings, couples activities, and intimate experiences',
-      isActive: false,
-      destinations: 0,
-      averageScore: 0,
-      created: '2023-12-15',
-      updated: '2023-12-15'
-    }
-  ]
-
-  const mockStats: ThemeStats = {
-    totalThemes: 6,
-    activeThemes: 5,
-    averageUtilization: 73.2,
-    topPerformingTheme: 'Discovery',
-    needsAttention: 2
-  }
-
   const mockDestinationScores: DestinationThemeScore[] = [
     { iataCode: 'ROM', cityName: 'Rome', countryName: 'Italy', score: 9.2, rank: 1, trending: 'up' },
     { iataCode: 'ATH', cityName: 'Athens', countryName: 'Greece', score: 8.9, rank: 2, trending: 'stable' },
@@ -173,22 +84,41 @@ export default function ThemeManagementPage() {
     { iataCode: 'VIE', cityName: 'Vienna', countryName: 'Austria', score: 8.3, rank: 5, trending: 'stable' }
   ]
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true)
-      try {
-        await new Promise(resolve => setTimeout(resolve, 800))
-        setThemes(mockThemes)
-        setStats(mockStats)
-        setSelectedTheme(mockThemes[0])
-      } catch (error) {
-        console.error('Failed to load themes:', error)
-      } finally {
-        setIsLoading(false)
-      }
+  const loadThemes = async () => {
+    setIsLoading(true)
+    try {
+      const res = await adminService.listThemeDefinitions()
+      const now = new Date().toISOString().split('T')[0]
+      const mapped: Theme[] = res.themes.map((t, idx) => ({
+        id: `${idx}`,
+        name: t.name,
+        key: t.key,
+        icon: 'Star',
+        color: 'text-blue-600',
+        description: t.description,
+        isActive: true,
+        destinations: 0,
+        averageScore: 0,
+        created: now,
+        updated: now
+      }))
+      setThemes(mapped)
+      setStats({
+        totalThemes: mapped.length,
+        activeThemes: mapped.filter(x => x.isActive).length,
+        averageUtilization: 0,
+        topPerformingTheme: mapped[0]?.name || '-',
+        needsAttention: 0
+      })
+      if (mapped[0]) setSelectedTheme(mapped[0])
+    } catch (e) {
+      console.error('Failed to load themes:', e)
+    } finally {
+      setIsLoading(false)
     }
-    loadData()
-  }, [])
+  }
+
+  useEffect(() => { loadThemes() }, [])
 
   const getIconComponent = (iconName: string) => {
     const iconMap: Record<string, any> = {
@@ -205,44 +135,24 @@ export default function ThemeManagementPage() {
     return true
   })
 
-  const handleCreateTheme = () => {
-    const theme: Theme = {
-      id: Date.now().toString(),
-      name: newTheme.name,
-      key: newTheme.key,
-      icon: newTheme.icon,
-      color: newTheme.color,
-      description: newTheme.description,
-      isActive: true,
-      destinations: 0,
-      averageScore: 0,
-      created: new Date().toISOString().split('T')[0],
-      updated: new Date().toISOString().split('T')[0]
-    }
-    
-    setThemes([...themes, theme])
+  const handleCreateTheme = async () => {
+    await adminService.createOrUpdateThemeDefinition({ key: newTheme.key, name: newTheme.name, description: newTheme.description, keywords: [] })
     setShowCreateModal(false)
-    setNewTheme({
-      name: '',
-      key: '',
-      description: '',
-      color: 'text-blue-600',
-      icon: 'Star'
-    })
+    setNewTheme({ name: '', key: '', description: '', color: 'text-blue-600', icon: 'Star' })
+    loadThemes()
   }
 
-  const toggleThemeStatus = (themeId: string) => {
-    setThemes(themes.map(theme => 
-      theme.id === themeId ? { ...theme, isActive: !theme.isActive } : theme
-    ))
+  const toggleThemeStatus = async (_themeId: string) => {
+    // No-op on backend; we keep this UI-only for now
   }
 
-  const deleteTheme = (themeId: string) => {
-    if (confirm('Are you sure you want to delete this theme? This action cannot be undone.')) {
-      setThemes(themes.filter(theme => theme.id !== themeId))
-      if (selectedTheme?.id === themeId) {
-        setSelectedTheme(themes.find(t => t.id !== themeId) || null)
-      }
+  const deleteTheme = async (themeId: string) => {
+    const t = themes.find(x => x.id === themeId)
+    if (!t) return
+    if (confirm('Are you sure you want to delete this theme?')) {
+      await adminService.deleteThemeDefinition(t.key)
+      if (selectedTheme?.id === themeId) setSelectedTheme(null)
+      loadThemes()
     }
   }
 

@@ -34,6 +34,9 @@ import {
   Zap
 } from 'lucide-react'
 import { AdminDestination } from '@/types/admin'
+import POIManagement from '@/components/admin/POIManagement'
+import { convertActivitiesToPOIs } from '@/utils/poiMigration'
+import { poiService } from '@/services/poiService'
 
 interface ThemeDetails {
   name: string
@@ -67,6 +70,8 @@ export default function DestinationDetailPage() {
   const [isEditing, setIsEditing] = useState(false)
   const [newHighlight, setNewHighlight] = useState('')
   const [newActivity, setNewActivity] = useState('')
+  const [poiRefreshTrigger, setPOIRefreshTrigger] = useState(0)
+  const [isMigrating, setIsMigrating] = useState(false)
 
   // Theme configuration
   const themeDetails: Record<string, ThemeDetails> = {
@@ -216,13 +221,21 @@ export default function DestinationDetailPage() {
 
   const handleSave = async () => {
     if (!destination) return
-    
     setIsSaving(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const updates = {
+        description: destination.description,
+        highlights: destination.highlights,
+        themeScores: destination.themeScores
+      }
+      const res = await fetch(`/api/admin/destinations/${destinationId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error || 'Update failed')
       setIsEditing(false)
-      // Show success message
     } catch (error) {
       console.error('Failed to save destination:', error)
     } finally {
@@ -265,6 +278,52 @@ export default function DestinationDetailPage() {
       supportedActivities: [...destination.supportedActivities, newActivity.trim()]
     })
     setNewActivity('')
+  }
+
+  const handleMigrateActivities = async () => {
+    if (!destination || destination.supportedActivities.length === 0) {
+      alert('No activities found to migrate')
+      return
+    }
+
+    if (!confirm(`Convert ${destination.supportedActivities.length} activities to POIs? This will create new POI entries.`)) {
+      return
+    }
+
+    setIsMigrating(true)
+    try {
+      const migrationResult = convertActivitiesToPOIs(destination, {
+        defaultCoordinates: destination.coordinates,
+        generateDescriptions: true,
+        defaultPriceLevel: 'moderate'
+      })
+
+      if (migrationResult.generatedPOIs.length === 0) {
+        alert('No POIs could be generated from existing activities')
+        return
+      }
+
+      // Create POIs via API
+      let successCount = 0
+      for (const poiData of migrationResult.generatedPOIs) {
+        try {
+          await poiService.createPOI(destinationId, poiData)
+          successCount++
+        } catch (error) {
+          console.error('Failed to create POI:', poiData.name, error)
+        }
+      }
+
+      // Refresh POI management component
+      setPOIRefreshTrigger(prev => prev + 1)
+      
+      alert(`Migration completed! ${successCount} of ${migrationResult.generatedPOIs.length} POIs created successfully.`)
+    } catch (error) {
+      console.error('Migration failed:', error)
+      alert('Migration failed. Please try again.')
+    } finally {
+      setIsMigrating(false)
+    }
   }
 
   const removeActivity = (index: number) => {
@@ -432,6 +491,7 @@ export default function DestinationDetailPage() {
           {[
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'themes', label: 'Themes', icon: Star },
+            { id: 'pois', label: 'Points of Interest', icon: MapPin },
             { id: 'content', label: 'Content', icon: Video },
             { id: 'highlights', label: 'Highlights', icon: Target },
             { id: 'analytics', label: 'Analytics', icon: TrendingUp }
@@ -663,6 +723,82 @@ export default function DestinationDetailPage() {
                   )
                 })}
               </div>
+            </div>
+          )}
+
+          {activeTab === 'pois' && (
+            <div className="space-y-6">
+              {/* Migration Section */}
+              {destination && destination.supportedActivities.length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-medium text-blue-800">Activity Migration Available</h3>
+                      <p className="text-sm text-blue-600 mt-1">
+                        Convert {destination.supportedActivities.length} existing activities into structured POIs
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleMigrateActivities}
+                      disabled={isMigrating}
+                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {isMigrating ? (
+                        <>
+                          <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                          Migrating...
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={16} className="mr-2" />
+                          Migrate Activities
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              <POIManagement 
+              destinationId={destinationId}
+              isEditing={isEditing}
+              refreshTrigger={poiRefreshTrigger}
+              onPOIUpdate={(poi) => {
+                console.log('POI updated:', poi)
+                // Force POI component to refresh if needed
+                setPOIRefreshTrigger(prev => prev + 1)
+                // Could also update destination metrics here
+              }}
+              onPOICreate={(poi) => {
+                console.log('POI created:', poi)
+                // Force POI component to refresh
+                setPOIRefreshTrigger(prev => prev + 1)
+                // Update destination content count if available
+                if (destination) {
+                  setDestination({
+                    ...destination,
+                    metrics: {
+                      ...destination.metrics,
+                      contentCount: destination.metrics.contentCount + 1
+                    }
+                  })
+                }
+              }}
+              onPOIDelete={(poiId) => {
+                console.log('POI deleted:', poiId)
+                setPOIRefreshTrigger(prev => prev + 1)
+                // Update destination content count if available
+                if (destination) {
+                  setDestination({
+                    ...destination,
+                    metrics: {
+                      ...destination.metrics,
+                      contentCount: Math.max(0, destination.metrics.contentCount - 1)
+                    }
+                  })
+                }
+              }}
+              />
             </div>
           )}
 

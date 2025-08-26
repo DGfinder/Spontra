@@ -182,8 +182,20 @@ func (a *App) setupRoutes() {
 		themes := v1.Group("/themes")
 		{
 			themes.GET("/definitions", a.themeDestHandler.GetThemeDefinitions)
+			themes.POST("/definitions", a.themeDestHandler.CreateThemeDefinition)
+			themes.PATCH("/definitions/:key", a.themeDestHandler.UpdateThemeDefinition)
+			themes.DELETE("/definitions/:key", a.themeDestHandler.DeleteThemeDefinition)
+			// Cache management
+			themes.GET("/cache/recommendations", a.themeDestHandler.ListRecommendationsCache)
+			themes.DELETE("/cache/recommendations/:cacheKey", a.themeDestHandler.DeleteRecommendationCache)
 			themes.POST("/destinations", a.themeDestHandler.GetDestinationsByTheme)
 			themes.GET("/countries/:country/destinations", a.themeDestHandler.GetDestinationsByCountry)
+		}
+
+		// Data updates
+		data := v1.Group("/data")
+		{
+			data.PATCH("/destinations/:iata", a.themeDestHandler.UpdateDestinationByIata)
 		}
 	}
 }
