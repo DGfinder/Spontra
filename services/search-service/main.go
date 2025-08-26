@@ -66,6 +66,7 @@ func main() {
 	// Initialize repositories
 	sessionRepo = repository.NewSessionRepository(db.DB)
 	historyRepo = repository.NewHistoryRepository(db.DB)
+	durationRepo := repository.NewDurationRepository(db.DB)
 
 	// Initialize services
 	searchService = services.NewSearchService(cfg, db, redisClient, elasticsearchClient, sessionRepo, historyRepo)
@@ -121,6 +122,27 @@ func main() {
 		destinations := v1.Group("/destinations")
 		{
 			destinations.GET("/:airport", getDestinationInfo)
+		}
+
+		// Reference data routes (Postgres)
+		reference := v1.Group("/reference")
+		{
+			rh := handlers.NewReferenceHandler(db.DB)
+			reference.GET("/airlines", rh.GetAirlines)
+			reference.GET("/aircraft", rh.GetAircraft)
+		}
+
+		// Flight durations (Postgres)
+		durations := v1.Group("/durations")
+		{
+			dh := handlers.NewDurationHandler(durationRepo)
+			durations.GET("/route", dh.GetRouteDuration)
+			durations.GET("/origin/:origin", dh.ListByOrigin)
+			durations.GET("/direct", dh.GetDirect)
+			durations.GET("/range", dh.ListByRange)
+			durations.GET("/popular", dh.PopularDestinations)
+			durations.GET("/stats/routes", dh.RouteStats)
+			durations.GET("/stats/connectivity/:airport", dh.Connectivity)
 		}
 	}
 

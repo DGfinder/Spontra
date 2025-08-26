@@ -18,8 +18,9 @@ export default function AircraftPage() {
   const search = async (query: string) => {
     setLoading(true)
     try {
-      // Placeholder until backend route is available
-      setResults([])
+      const res = await fetch(`/api/admin/reference/aircraft?q=${encodeURIComponent(query)}`, { cache: 'no-store' })
+      const json = await res.json()
+      setResults((json.data?.items || []) as AircraftType[])
     } finally {
       setLoading(false)
     }

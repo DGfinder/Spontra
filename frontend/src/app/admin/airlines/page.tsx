@@ -12,12 +12,9 @@ export default function AirlinesPage() {
   const search = async (query: string) => {
     setLoading(true)
     try {
-      // Placeholder: try backend search-service when available; fallback to empty
-      const base = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL || ''
-      if (base) {
-        // Implement when backend endpoint exists
-      }
-      setResults([])
+      const res = await fetch(`/api/admin/reference/airlines?q=${encodeURIComponent(query)}`, { cache: 'no-store' })
+      const json = await res.json()
+      setResults((json.data?.items || []) as Airline[])
     } finally {
       setLoading(false)
     }

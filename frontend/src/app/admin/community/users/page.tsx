@@ -17,8 +17,10 @@ export default function UsersAdminPage() {
   const search = async (query: string) => {
     setLoading(true)
     try {
-      // Placeholder: integrate user-service when available
-      setResults([])
+      const res = await fetch(`/api/admin/users?q=${encodeURIComponent(query)}`, { cache: 'no-store' })
+      const json = await res.json()
+      const items = (json.data?.items || []) as UserRow[]
+      setResults(items)
     } finally {
       setLoading(false)
     }

@@ -43,7 +43,8 @@ import {
   Shield as Security,
   ChevronDown,
   ChevronRight,
-  Plus
+  Plus,
+  Clock
 } from 'lucide-react'
 import { adminAuthService } from '@/services/adminAuthService'
 import { AdminUser } from '@/types/admin'
@@ -88,6 +89,7 @@ const navigation: NavigationItem[] = [
       { id: 'destinations-themes', label: 'Themes & Categories', icon: Star, href: '/admin/destinations/themes' },
       { id: 'destinations-featured', label: 'Featured Cities', icon: Target, href: '/admin/destinations/featured' },
       { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' },
+      { id: 'destinations-cache', label: 'Recommendations Cache', icon: Database, href: '/admin/destinations/cache' },
       { id: 'airports', label: 'Airports (Read-only)', icon: Globe, href: '/admin/airports' }
     ]
   },
@@ -99,7 +101,8 @@ const navigation: NavigationItem[] = [
     section: 'primary',
     children: [
       { id: 'airlines', label: 'Airlines (Read-only)', icon: Plane, href: '/admin/airlines' },
-      { id: 'aircraft', label: 'Aircraft Types (Read-only)', icon: Database, href: '/admin/aircraft' }
+      { id: 'aircraft', label: 'Aircraft Types (Read-only)', icon: Database, href: '/admin/aircraft' },
+      { id: 'flight-times', label: 'Flight Times', icon: Clock, href: '/admin/flight-times' }
     ]
   },
   {
