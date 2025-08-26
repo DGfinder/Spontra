@@ -262,6 +262,7 @@ export default function UGCManagementPage() {
       description: 'Local insider tips for getting the most out of your Amsterdam canal cruise experience.',
       type: 'tip',
       status: 'approved',
+      content: 'Tips and insider advice for Amsterdam canal cruises',
       submittedAt: '2024-01-20T09:20:00Z',
       approvedAt: '2024-01-21T11:30:00Z',
       creator: {

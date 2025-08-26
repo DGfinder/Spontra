@@ -161,7 +161,7 @@ export default function SecuritySettings() {
     setSettings({
       ...settings,
       [section]: {
-        ...settings[section as keyof SecuritySettings],
+        ...(settings[section as keyof SecuritySettings] as any),
         [subsection]: {
           ...(settings[section as keyof SecuritySettings] as any)[subsection],
           [field]: value

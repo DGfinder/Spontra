@@ -97,7 +97,11 @@ export default function MarketingCampaignsPage() {
       const connectionStatus = await marketingCampaignsService.checkConnection()
       setServiceStatus(prev => ({
         ...prev,
-        campaigns: connectionStatus
+        campaigns: {
+          connected: connectionStatus.connected,
+          lastChecked: new Date(),
+          error: connectionStatus.error || null
+        }
       }))
 
       if (connectionStatus.connected) {

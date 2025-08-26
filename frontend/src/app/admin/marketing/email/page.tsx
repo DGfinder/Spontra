@@ -43,12 +43,20 @@ import {
   Wifi,
   WifiOff
 } from 'lucide-react'
-import { emailMarketingService, EmailCampaign, EmailStats, EmailSegment } from '@/services/emailMarketingService'
+import { emailMarketingService, EmailCampaign, EmailStats } from '@/services/emailMarketingService'
 
 interface ConnectionStatus {
   connected: boolean
   lastChecked: Date | null
   error: string | null
+}
+
+interface EmailSegment {
+  id: string
+  name: string
+  criteria: string[]
+  totalRecipients: number
+  description: string
 }
 
 interface ServiceStatus {
@@ -94,23 +102,31 @@ export default function EmailMarketingPage() {
 
     try {
       // Check service connection status
-      const connectionStatus = await emailMarketingService.checkConnection()
+      const connectionStatus = await emailMarketingService.checkConnections()
       setServiceStatus({
-        emailProvider: connectionStatus.emailProvider || { connected: false, lastChecked: null, error: null },
+        emailProvider: {
+          connected: connectionStatus.emailProvider || false,
+          lastChecked: new Date(),
+          error: connectionStatus.errors?.[0] || null
+        },
         provider: connectionStatus.provider || null
       })
 
       // Load data if email provider is connected
-      if (connectionStatus.emailProvider?.connected) {
+      if (connectionStatus.emailProvider) {
         const [statsData, campaignsData, segmentsData] = await Promise.all([
-          emailMarketingService.getStats(),
+          emailMarketingService.getEmailStats(),
           emailMarketingService.getCampaigns(),
           emailMarketingService.getSegments()
         ])
 
         setStats(statsData)
-        setCampaigns(campaignsData)
-        setSegments(segmentsData)
+        setCampaigns(campaignsData.campaigns || [])
+        setSegments(segmentsData.map(segment => ({
+          ...segment,
+          totalRecipients: segment.subscribers,
+          criteria: segment.criteria.map(c => `${c.field} ${c.operator} ${c.value}`)
+        })))
       } else {
         // Set empty state when no connections
         setStats({

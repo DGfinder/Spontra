@@ -148,6 +148,7 @@ export default function DestinationDetailPage() {
     cityName: 'Barcelona',
     countryName: 'Spain',
     countryCode: 'ES',
+    continent: 'Europe',
     coordinates: { lat: 41.3874, lng: 2.1686 },
     isActive: true,
     isPopular: true,
@@ -164,8 +165,7 @@ export default function DestinationDetailPage() {
       popularityScore: 9.2,
       contentCount: 89,
       averageStay: 4.2,
-      returnVisitors: 23,
-      seasonalTrend: 'up'
+      creatorCount: 23
     },
     description: 'A vibrant Mediterranean city known for its stunning architecture, rich culture, and dynamic nightlife. From the Gothic Quarter to modern beaches, Barcelona offers endless discoveries.',
     highlights: [
@@ -176,7 +176,7 @@ export default function DestinationDetailPage() {
       'Las Ramblas',
       'Casa Batlló'
     ],
-    activities: [
+    supportedActivities: [
       'Architecture Tours',
       'Beach Activities',
       'Tapas Tours',
@@ -186,13 +186,7 @@ export default function DestinationDetailPage() {
       'Art Galleries',
       'Flamenco Shows'
     ],
-    bestTimeToVisit: 'April to June, September to October',
-    averageTemperature: '15-25°C',
-    primaryLanguage: 'Spanish/Catalan',
-    currency: 'EUR',
-    timeZone: 'CET',
-    createdAt: '2023-06-15T09:30:00Z',
-    updatedAt: '2024-01-20T14:22:00Z'
+    lastUpdated: '2024-01-20T14:22:00Z'
   }
 
   useEffect(() => {
@@ -268,7 +262,7 @@ export default function DestinationDetailPage() {
     if (!destination || !newActivity.trim()) return
     setDestination({
       ...destination,
-      activities: [...destination.activities, newActivity.trim()]
+      supportedActivities: [...destination.supportedActivities, newActivity.trim()]
     })
     setNewActivity('')
   }
@@ -277,7 +271,7 @@ export default function DestinationDetailPage() {
     if (!destination) return
     setDestination({
       ...destination,
-      activities: destination.activities.filter((_, i) => i !== index)
+      supportedActivities: destination.supportedActivities.filter((_, i) => i !== index)
     })
   }
 
@@ -510,19 +504,6 @@ export default function DestinationDetailPage() {
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Best Time to Visit</label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          value={destination.bestTimeToVisit}
-                          onChange={(e) => setDestination({...destination, bestTimeToVisit: e.target.value})}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                        />
-                      ) : (
-                        <p className="text-gray-900">{destination.bestTimeToVisit}</p>
-                      )}
-                    </div>
                   </div>
                   
                   <div className="mt-4">
@@ -582,9 +563,9 @@ export default function DestinationDetailPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <Heart size={16} className="text-red-600 mr-2" />
-                        <span className="text-sm text-gray-600">Return Visitors</span>
+                        <span className="text-sm text-gray-600">Creator Count</span>
                       </div>
-                      <span className="font-semibold text-gray-900">{destination.metrics.returnVisitors}%</span>
+                      <span className="font-semibold text-gray-900">{destination.metrics.creatorCount}</span>
                     </div>
                   </div>
                 </div>
@@ -801,7 +782,7 @@ export default function DestinationDetailPage() {
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  {destination.activities.map((activity, index) => (
+                  {destination.supportedActivities.map((activity, index) => (
                     <div key={index} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
                       <span>{activity}</span>
                       {isEditing && (

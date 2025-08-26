@@ -126,7 +126,7 @@ export default function GeneralSettings() {
     setSettings({
       ...settings,
       [section]: {
-        ...settings[section],
+        ...(settings[section] as any),
         [field]: value
       }
     })

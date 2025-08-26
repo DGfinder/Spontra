@@ -243,7 +243,7 @@ class SocialMediaService {
 
       const params = new URLSearchParams()
       Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
+        if (value !== undefined && value !== '' && value !== null) {
           params.set(key, value.toString())
         }
       })
@@ -339,7 +339,7 @@ class SocialMediaService {
     try {
       const params = new URLSearchParams()
       Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
+        if (value !== undefined && value !== '' && value !== null) {
           params.set(key, value.toString())
         }
       })
@@ -448,7 +448,7 @@ class SocialMediaService {
     try {
       const params = new URLSearchParams()
       Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== '') {
+        if (value !== undefined && value !== '' && value !== null) {
           params.set(key, value.toString())
         }
       })

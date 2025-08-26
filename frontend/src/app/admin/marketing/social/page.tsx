@@ -112,11 +112,15 @@ export default function SocialMediaPage() {
 
     try {
       // Check service connection status
-      const connectionStatus = await socialMediaService.checkConnection()
-      const connectedCount = Object.values(connectionStatus.platforms).filter(p => p.connected).length
+      const connectionStatus = await socialMediaService.checkConnections()
+      const platformsObj = (connectionStatus.platforms || []).reduce((acc: any, platform: any) => {
+        acc[platform.platform] = platform
+        return acc
+      }, {})
+      const connectedCount = Object.values(platformsObj).filter((p: any) => p.connected).length
       
       setServiceStatus({
-        platforms: connectionStatus.platforms || {},
+        platforms: platformsObj,
         connectedCount,
         totalPlatforms: 6
       })
@@ -124,14 +128,14 @@ export default function SocialMediaPage() {
       // Load data if any platforms are connected
       if (connectedCount > 0) {
         const [statsData, postsData, ideasData] = await Promise.all([
-          socialMediaService.getStats(),
-          socialMediaService.getPosts(),
-          socialMediaService.getContentIdeas()
+          socialMediaService.getSocialStats(),
+          socialMediaService.getPosts({}),
+          socialMediaService.getContentIdeas({})
         ])
 
         setStats(statsData)
-        setPosts(postsData)
-        setContentIdeas(ideasData)
+        setPosts(postsData.posts || [])
+        setContentIdeas(ideasData || [])
       } else {
         // Set empty state when no connections
         setStats({
@@ -139,7 +143,7 @@ export default function SocialMediaPage() {
           totalFollowers: 0,
           totalImpressions: 0,
           avgEngagementRate: 0,
-          topPerformingPost: null,
+          topPerformingPost: '',
           growthRate: 0,
           platformBreakdown: []
         })
@@ -517,7 +521,7 @@ export default function SocialMediaPage() {
                     <h4 className="font-medium text-gray-900 mb-2">{idea.title}</h4>
                     <p className="text-sm text-gray-600 mb-3">{idea.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{idea.category}</span>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{idea.contentType}</span>
                       <button className="text-sm text-blue-600 hover:text-blue-700">Use Idea</button>
                     </div>
                   </div>

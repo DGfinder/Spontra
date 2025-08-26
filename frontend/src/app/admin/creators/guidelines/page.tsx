@@ -29,6 +29,7 @@ import {
   Shield,
   Zap,
   TrendingUp,
+  TrendingDown,
   Download,
   Upload,
   Copy,

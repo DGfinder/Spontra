@@ -316,7 +316,7 @@ export default function EditorialCalendarPage() {
       const eventStart = new Date(event.startDate)
       const eventEnd = event.endDate ? new Date(event.endDate) : eventStart
       
-      return date >= eventStart.toDateString() === date.toDateString() ||
+      return eventStart.toDateString() === date.toDateString() ||
              (date >= eventStart && date <= eventEnd)
     })
   }
