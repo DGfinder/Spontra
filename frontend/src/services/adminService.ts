@@ -302,13 +302,13 @@ class AdminService {
     return res.data?.duration
   }
 
-  async listDurationsForOrigin(origin: string, limit = 50): Promise<any[]> {
-    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=origin&origin=${origin}&limit=${limit}`)
+  async listDurationsForOrigin(origin: string, limit = 50, offset = 0): Promise<any[]> {
+    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=origin&origin=${origin}&limit=${limit}&offset=${offset}`)
     return res.data?.items || []
   }
 
-  async listByDurationRange(origin: string, min = 0, max = 1440, limit = 50): Promise<any[]> {
-    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=range&origin=${origin}&min=${min}&max=${max}&limit=${limit}`)
+  async listByDurationRange(origin: string, min = 0, max = 1440, limit = 50, offset = 0): Promise<any[]> {
+    const res = await this.apiRequest<{items?: any[]}>(`/reference/flight-times?mode=range&origin=${origin}&min=${min}&max=${max}&limit=${limit}&offset=${offset}`)
     return res.data?.items || []
   }
 

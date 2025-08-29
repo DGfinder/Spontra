@@ -10,8 +10,6 @@ import (
 	"github.com/gocql/gocql"
 	"github.com/google/uuid"
     "strings"
-
-	"spontra/data-ingestion-service/internal/models"
 )
 
 // ThemeDestination represents a destination with theme scoring for Cassandra
@@ -367,37 +365,6 @@ func (c *Client) GetCachedRecommendations(ctx context.Context, cacheKey string) 
 	}
 
 	return recommendationsJSON, nil
-}
-
-// GetFlightRoutesFromOrigin gets all flight routes from a specific origin
-func (c *Client) GetFlightRoutesFromOrigin(ctx context.Context, origin string) ([]models.FlightRoute, error) {
-	query := `
-		SELECT id, origin_airport_code, destination_airport_code,
-			   estimated_duration_hours, estimated_duration_minutes, total_duration_minutes,
-			   created_at, updated_at
-		FROM flight_routes
-		WHERE origin_airport_code = ?
-	`
-
-	iter := c.session.Query(query, origin).Iter()
-	defer iter.Close()
-
-	var routes []models.FlightRoute
-	var route models.FlightRoute
-
-	for iter.Scan(
-		&route.ID, &route.OriginAirportCode, &route.DestinationAirportCode,
-		&route.EstimatedDurationHours, &route.EstimatedDurationMinutes, &route.TotalDurationMinutes,
-		&route.CreatedAt, &route.UpdatedAt,
-	) {
-		routes = append(routes, route)
-	}
-
-	if err := iter.Close(); err != nil {
-		return nil, fmt.Errorf("failed to get flight routes from origin: %w", err)
-	}
-
-	return routes, nil
 }
 
 // InitializeThemeDefinitions populates the theme definitions table

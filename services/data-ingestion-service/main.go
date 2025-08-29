@@ -154,6 +154,13 @@ func (a *App) setupRoutes() {
 			providers.GET("/:provider/status", a.getProviderStatus)
 		}
 
+		// Admin seeding (development only)
+		admin := v1.Group("/admin")
+		{
+			// Seed destinations using search-service durations
+			admin.POST("/seed/destinations", a.SeedDestinations)
+		}
+
 		// Kafka producer routes
 		kafkaRoutes := v1.Group("/kafka")
 		{

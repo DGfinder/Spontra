@@ -10,7 +10,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
@@ -34,10 +33,10 @@ func InitTracing(config TracingConfig) (func(), error) {
 	tp := trace.NewTracerProvider(
 		trace.WithBatcher(exp),
 		trace.WithResource(resource.NewWithAttributes(
-			semconv.SchemaURL,
-			semconv.ServiceName(config.ServiceName),
-			semconv.ServiceVersion(config.ServiceVersion),
-			semconv.DeploymentEnvironment(config.Environment),
+			"",
+			attribute.String("service.name", config.ServiceName),
+			attribute.String("service.version", config.ServiceVersion),
+			attribute.String("deployment.environment", config.Environment),
 			attribute.String("service.namespace", "spontra"),
 		)),
 		trace.WithSampler(trace.AlwaysSample()), // Use AlwaysSample for development

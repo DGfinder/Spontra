@@ -1,7 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: [],
+    serverComponentsExternalPackages: ['cassandra-driver', 'pg'],
+  },
+  webpack: (config) => {
+    config.resolve = config.resolve || {}
+    config.resolve.alias = Object.assign({}, config.resolve.alias, {
+      kerberos: false,
+      '@mongodb-js/zstd': false,
+    })
+    return config
   },
   env: {
     // Set these environment variables in Vercel dashboard when backend services are deployed

@@ -12,9 +12,7 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	go.opentelemetry.io/otel v1.21.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
-	go.opentelemetry.io/otel/propagation v1.21.0
 	go.opentelemetry.io/otel/sdk v1.21.0
-	go.opentelemetry.io/otel/semconv/v1.17.0 v1.17.0
 	go.opentelemetry.io/otel/trace v1.21.0
 )
 

@@ -62,7 +62,7 @@ func (r *DurationRepository) GetFlightDuration(originAirport, destinationAirport
 }
 
 // GetFlightDurationsForOrigin retrieves all flight durations from a specific origin
-func (r *DurationRepository) GetFlightDurationsForOrigin(originAirport string, limit int) ([]FlightDuration, error) {
+func (r *DurationRepository) GetFlightDurationsForOrigin(originAirport string, limit int, offset int) ([]FlightDuration, error) {
 	if limit <= 0 {
 		limit = 50
 	}
@@ -72,9 +72,9 @@ func (r *DurationRepository) GetFlightDurationsForOrigin(originAirport string, l
 		FROM flight_durations 
 		WHERE origin_airport = $1 
 		ORDER BY duration_minutes ASC 
-		LIMIT $2`
+		LIMIT $2 OFFSET $3`
 
-	rows, err := r.db.Query(query, originAirport, limit)
+	rows, err := r.db.Query(query, originAirport, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get flight durations for origin: %w", err)
 	}
@@ -138,7 +138,7 @@ func (r *DurationRepository) GetDirectFlights(originAirport, destinationAirport 
 }
 
 // GetFlightsByDurationRange retrieves flights within a specific duration range
-func (r *DurationRepository) GetFlightsByDurationRange(originAirport string, minDuration, maxDuration int, limit int) ([]FlightDuration, error) {
+func (r *DurationRepository) GetFlightsByDurationRange(originAirport string, minDuration, maxDuration int, limit int, offset int) ([]FlightDuration, error) {
 	if limit <= 0 {
 		limit = 50
 	}
@@ -150,9 +150,9 @@ func (r *DurationRepository) GetFlightsByDurationRange(originAirport string, min
 		AND duration_minutes >= $2 
 		AND duration_minutes <= $3
 		ORDER BY duration_minutes ASC 
-		LIMIT $4`
+		LIMIT $4 OFFSET $5`
 
-	rows, err := r.db.Query(query, originAirport, minDuration, maxDuration, limit)
+	rows, err := r.db.Query(query, originAirport, minDuration, maxDuration, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get flights by duration range: %w", err)
 	}

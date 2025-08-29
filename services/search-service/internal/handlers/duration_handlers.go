@@ -43,12 +43,13 @@ func (h *DurationHandler) ListByOrigin(c *gin.Context) {
         return
     }
     limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
-    list, err := h.durations.GetFlightDurationsForOrigin(origin, limit)
+    offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
+    list, err := h.durations.GetFlightDurationsForOrigin(origin, limit, offset)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
-    c.JSON(http.StatusOK, gin.H{"items": list, "count": len(list)})
+    c.JSON(http.StatusOK, gin.H{"items": list, "count": len(list), "offset": offset, "limit": limit})
 }
 
 // GetDirect returns direct flight duration for a route
@@ -73,16 +74,17 @@ func (h *DurationHandler) ListByRange(c *gin.Context) {
     min, _ := strconv.Atoi(c.DefaultQuery("min", "0"))
     max, _ := strconv.Atoi(c.DefaultQuery("max", "1440"))
     limit, _ := strconv.Atoi(c.DefaultQuery("limit", "50"))
+    offset, _ := strconv.Atoi(c.DefaultQuery("offset", "0"))
     if origin == "" {
         c.JSON(http.StatusBadRequest, gin.H{"error": "origin is required"})
         return
     }
-    list, err := h.durations.GetFlightsByDurationRange(origin, min, max, limit)
+    list, err := h.durations.GetFlightsByDurationRange(origin, min, max, limit, offset)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
         return
     }
-    c.JSON(http.StatusOK, gin.H{"items": list, "count": len(list)})
+    c.JSON(http.StatusOK, gin.H{"items": list, "count": len(list), "offset": offset, "limit": limit})
 }
 
 // PopularDestinations returns popular destinations from an origin

@@ -11,11 +11,14 @@ export async function GET(req: NextRequest) {
     const destination = searchParams.get('destination') || ''
     const mode = searchParams.get('mode') || '' // route|origin|direct|range|popular|stats|connectivity
 
+    const limit = searchParams.get('limit') || '50'
+    const offset = searchParams.get('offset') || '0'
+
     let target = ''
     if (mode === 'route' && origin && destination) target = `/api/v1/durations/route?origin=${origin}&destination=${destination}`
-    else if (mode === 'origin' && origin) target = `/api/v1/durations/origin/${origin}?limit=${searchParams.get('limit') || '50'}`
+    else if (mode === 'origin' && origin) target = `/api/v1/durations/origin/${origin}?limit=${limit}&offset=${offset}`
     else if (mode === 'direct' && origin && destination) target = `/api/v1/durations/direct?origin=${origin}&destination=${destination}`
-    else if (mode === 'range' && origin) target = `/api/v1/durations/range?origin=${origin}&min=${searchParams.get('min') || '0'}&max=${searchParams.get('max') || '1440'}&limit=${searchParams.get('limit') || '50'}`
+    else if (mode === 'range' && origin) target = `/api/v1/durations/range?origin=${origin}&min=${searchParams.get('min') || '0'}&max=${searchParams.get('max') || '1440'}&limit=${limit}&offset=${offset}`
     else if (mode === 'popular' && origin) target = `/api/v1/durations/popular?origin=${origin}&directOnly=${searchParams.get('directOnly') || 'false'}&limit=${searchParams.get('limit') || '20'}`
     else if (mode === 'stats') target = `/api/v1/durations/stats/routes`
     else if (mode === 'connectivity' && origin) target = `/api/v1/durations/stats/connectivity/${origin}`
