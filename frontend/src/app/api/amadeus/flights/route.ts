@@ -73,38 +73,26 @@ export async function POST(req: NextRequest) {
       const duration = firstItin?.duration || ''
       const depISO = firstSeg?.departure?.at || ''
       const arrISO = lastSeg?.arrival?.at || ''
-      const formatHM = (iso: string) => iso ? new Date(iso).toISOString().substring(11,16) : ''
+      const formatHM = (iso: string) => {
+        if (!iso) return ''
+        try {
+          const d = new Date(iso)
+          return d.toISOString().substring(11, 16)
+        } catch { return '' }
+      }
       const priceTotal = Number.parseFloat(offer?.price?.total || '0')
-      const baseFare = Number.parseFloat(offer?.price?.base || '0') || Math.round(priceTotal * 0.75)
+      const baseFare = Number.parseFloat(offer?.price?.base || '0')
+      const feeSum = Array.isArray(offer?.price?.fees) ? offer.price.fees.reduce((s, f) => s + (Number.parseFloat(f.amount) || 0), 0) : 0
+      const taxes = Math.max(0, priceTotal - (Number.isFinite(baseFare) ? baseFare : 0) - feeSum)
       const totalPrice = Math.round(priceTotal)
-      
-      // Calculate price breakdown
-      const taxes = Math.round(priceTotal * 0.20)
-      const fees = Math.round(priceTotal * 0.05)
-      
-      // Generate contextual badges based on various factors
-      const badges = ['Best Overall', 'Party Ready', 'Early Explorer', 'Weekend Perfect', 'Budget Choice']
-      const badge = badges[idx % badges.length]
-      
-      // Generate fare classes (mock data for enhanced display)
-      const fareClasses = [
-        {
-          type: 'ECONOMY' as const,
-          price: totalPrice,
-          availability: Math.floor(Math.random() * 9) + 1
-        },
-        {
-          type: 'PREMIUM_ECONOMY' as const,
-          price: Math.round(totalPrice * 1.4),
-          availability: Math.floor(Math.random() * 5) + 1
-        },
-        {
-          type: 'BUSINESS' as const,
-          price: Math.round(totalPrice * 2.8),
-          availability: Math.floor(Math.random() * 3) + 1
-        }
-      ]
-      
+
+      // Deterministic confidence based on relative price ranking
+      const confidence = 95 - Math.min(idx, 10)
+
+      // Arrival context based on arrival time-of-day
+      const hour = arrISO ? new Date(arrISO).getUTCHours() : 12
+      const context = hour < 12 ? 'morning arrival' : hour < 18 ? 'afternoon arrival' : hour < 22 ? 'evening arrival' : 'late night arrival'
+
       return {
         id: offer.id || `offer-${idx}`,
         price: totalPrice,
@@ -115,15 +103,13 @@ export async function POST(req: NextRequest) {
         stops: (firstItin?.segments?.length || 1) - 1,
         airline: firstSeg?.carrierCode || offer?.validatingAirlineCodes?.[0] || 'XX',
         aircraftType: firstSeg?.aircraft?.code || 'A320',
-        badge: badge,
-        arrivalContext: `Perfect for ${['morning activities', 'afternoon exploration', 'evening entertainment', 'late night arrival'][idx % 4]}`,
-        bookingLink: `https://booking-example.com/flight/${offer.id}`,
-        confidence: Math.floor(Math.random() * 20) + 80, // 80-99%
-        fareClasses,
+        // Optional fields derived deterministically
+        arrivalContext: context,
+        confidence,
         priceBreakdown: {
-          baseFare: Math.round(baseFare),
-          taxes,
-          fees
+          baseFare: Math.round(Number.isFinite(baseFare) ? baseFare : Math.round(priceTotal * 0.75)),
+          taxes: Math.round(taxes),
+          fees: Math.round(feeSum)
         }
       }
     })

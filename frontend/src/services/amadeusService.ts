@@ -268,6 +268,7 @@ class AmadeusService {
   // Direct destination exploration using Amadeus API (no theme cities)
   async exploreDestinations(params: {
     origin: string
+    minFlightTime?: number
     maxFlightTime?: number
     theme?: string
     departureDate?: string
@@ -294,7 +295,8 @@ class AmadeusService {
       const recommendations = await this.convertFlightDestinationsToRecommendations(
         destinations,
         params.origin,
-        params.theme || 'general'
+        params.theme || 'general',
+        { minFlightTime: params.minFlightTime, maxFlightTime: params.maxFlightTime }
       )
 
       return recommendations
@@ -330,7 +332,8 @@ class AmadeusService {
   async convertFlightDestinationsToRecommendations(
     flightDestinations: any[],
     originAirport: string,
-    theme: string
+    theme: string,
+    filter?: { minFlightTime?: number; maxFlightTime?: number }
   ): Promise<DestinationRecommendation[]> {
     const client = this.getClient()
 

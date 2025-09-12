@@ -71,3 +71,54 @@ export async function cacheSet(key: string, value: string, opts?: CacheOptions):
   }
   mem.set(key, value)
 }
+
+// Admin helpers
+export async function cacheDel(key: string): Promise<void> {
+  const r = getRedis()
+  if (r) {
+    try { await r.del(key); } catch {}
+  }
+  // remove from memory LRU if present
+  // @ts-ignore access internal map for administrative delete
+  if (mem && mem.map && typeof mem.map.delete === 'function') {
+    // @ts-ignore
+    mem.map.delete(key)
+  }
+}
+
+export async function cacheKeys(prefix: string): Promise<string[]> {
+  const r = getRedis()
+  const keys: string[] = []
+  if (r) {
+    try {
+      let cursor = '0'
+      do {
+        // @ts-ignore
+        const res = await r.scan(cursor, 'MATCH', `${prefix}*`, 'COUNT', 100)
+        cursor = res[0]
+        const batch = res[1] as string[]
+        keys.push(...batch)
+      } while (cursor !== '0')
+    } catch {}
+  }
+  // add memory entries
+  // @ts-ignore
+  if (mem && mem.map) {
+    // @ts-ignore
+    for (const k of mem.map.keys()) {
+      if (k.startsWith(prefix)) keys.push(k)
+    }
+  }
+  return Array.from(new Set(keys))
+}
+
+export async function cacheTTL(key: string): Promise<number | null> {
+  const r = getRedis()
+  if (r) {
+    try {
+      const ttl = await r.ttl(key)
+      return ttl
+    } catch { return null }
+  }
+  return null
+}

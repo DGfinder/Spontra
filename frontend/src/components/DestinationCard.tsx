@@ -1,4 +1,5 @@
 import { DestinationRecommendation } from '@/services/apiClient'
+import { publicPoiService } from '@/services/publicPoiService'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'
 import { getThemeBgClass, getThemeClasses, validateTheme, type ThemeKey } from '@/lib/theme'
 import { Card, CardHeader, CardMedia, CardStats, CardInsight, CardAction, Badge, PriceBadge, VisaFreeBadge } from '@/components/ui'
@@ -63,9 +64,38 @@ export function DestinationCard({
   onExplore,
   allDestinations = [] 
 }: DestinationCardProps) {
+  const [pois, setPois] = React.useState<{ id: string; name: string; theme?: string }[]>([])
+  React.useEffect(() => {
+    const destCode = result?.destination?.airport_code
+    if (!destCode) return
+    publicPoiService
+      .list(destCode, { theme: selectedTheme, limit: 5 })
+      .then((items) => {
+        if (Array.isArray(items)) {
+          setPois(items.slice(0, 3).map((p: any) => ({ id: p.id, name: p.name, theme: p.theme })))
+        }
+      })
+      .catch(() => {})
+  }, [result?.destination?.airport_code, selectedTheme])
   const destination = result.destination
   const flightTime = result.flight_route.total_duration_minutes / 60
   const flagEmoji = getCountryFlag(destination.country_code)
+  const [assignedVideos, setAssignedVideos] = React.useState<any[]>([])
+  const [showVideo, setShowVideo] = React.useState<{ url: string; title: string } | null>(null)
+
+  React.useEffect(() => {
+    const code = result?.destination?.airport_code
+    if (!code) return
+    const t = (selectedTheme || '').toLowerCase()
+    const params = new URLSearchParams({ destination: code })
+    if (t) params.set('theme', t)
+    fetch(`/api/media/assign?${params.toString()}`, { cache: 'no-store' })
+      .then(r => r.json())
+      .then(json => {
+        if (json?.ok) setAssignedVideos((json.data || []).slice(0, 3))
+      })
+      .catch(() => {})
+  }, [result?.destination?.airport_code, selectedTheme])
   
   // Generate analytics data with error handling
   const analytics = generateDestinationAnalytics(result, allDestinations || [])
@@ -171,8 +201,52 @@ export function DestinationCard({
               {activity}
             </span>
           ))}
+          {pois.map((p) => (
+            <span key={p.id} className="bg-emerald-500/20 text-emerald-200 px-2 py-1 rounded text-xs" title={p.theme || ''}>
+              {p.name}
+            </span>
+          ))}
         </div>
       </div>
+
+      {/* Videos (assigned) */}
+      {assignedVideos.length > 0 && (
+        <div className="mb-4">
+          <div className="text-white/80 text-sm mb-2">Videos</div>
+          <div className="flex gap-2">
+            {assignedVideos.map((v: any, i: number) => (
+              <button key={v.id || i} className="group relative w-28 h-16 bg-white/10 rounded overflow-hidden border border-white/20 hover:border-orange-400/60"
+                onClick={() => setShowVideo({ url: v.url, title: v.title })}
+                aria-label={`Play video ${v.title}`}>
+                {v.thumbnail ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white/70 text-xs">Preview</div>
+                )}
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] p-1 truncate">{v.title}</div>
+              </button>
+            ))}
+          </div>
+          {showVideo && (
+            <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+              <div className="relative w-full max-w-3xl bg-black/90 border border-white/20 rounded-lg p-3">
+                <button className="absolute top-2 right-2 text-white/80 hover:text-white" onClick={() => setShowVideo(null)} aria-label="Close video">✕</button>
+                <div className="w-full aspect-video">
+                  <iframe
+                    src={showVideo.url.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
+                    title={showVideo.title}
+                    className="w-full h-full rounded"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="mt-2 text-white/90 text-sm truncate">{showVideo.title}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Analytics Insights */}
       <div className="mb-4 space-y-2">

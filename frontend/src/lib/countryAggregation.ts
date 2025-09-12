@@ -21,6 +21,7 @@ export interface CountryAggregation {
     currency: string
   }
   averagePrice: number
+  currencySymbol?: string
   topActivities: string[]
   averageFlightTime: number
 }
@@ -73,6 +74,13 @@ function extractPrice(priceString: string | undefined): number {
   const match = priceString.match(/[\d,.]+/)
   return match ? parseFloat(match[0].replace(',', '')) : 0
 }
+
+function extractCurrencySymbol(priceString: string | undefined): string | undefined {
+  if (!priceString) return undefined
+  const m = priceString.match(/[А$ге?]/)
+  return m ? m[0] : undefined
+}
+
 
 /**
  * Aggregate destinations by country, showing cheapest per country
@@ -239,3 +247,4 @@ export function filterByPriceRange(
     return price >= minPrice && price <= maxPrice
   })
 }
+

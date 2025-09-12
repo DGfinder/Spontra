@@ -133,6 +133,18 @@ export default function GeneralSettings() {
     setHasChanges(true)
   }
 
+  const updateFeature = (field: string, value: any) => {
+    if (!settings) return
+    setSettings({
+      ...settings,
+      features: {
+        ...settings.features,
+        [field]: value
+      }
+    })
+    setHasChanges(true)
+  }
+
   const resetSettings = () => {
     loadSettings()
     setHasChanges(false)
@@ -312,6 +324,40 @@ export default function GeneralSettings() {
                   <option value="pt">Portuguese</option>
                 </select>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Flags */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <Zap size={20} className="text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Feature Flags</h3>
+                <p className="text-sm text-gray-600">Toggle key features and caching</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 space-y-4">
+            <label className="flex items-center justify-between">
+              <span className="text-gray-800">Use Backend Explore API</span>
+              <input type="checkbox" checked={settings.features.backendExploreEnabled as any}
+                onChange={(e) => updateFeature('backendExploreEnabled', e.target.checked)} />
+            </label>
+            <label className="flex items-center justify-between">
+              <span className="text-gray-800">Enable Duration Enrichment</span>
+              <input type="checkbox" checked={settings.features.durationEnrichmentEnabled as any}
+                onChange={(e) => updateFeature('durationEnrichmentEnabled', e.target.checked)} />
+            </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Destination Cache TTL (seconds)</label>
+              <input type="number" min={30} max={3600}
+                value={(settings.features as any).destinationCacheTTLSeconds ?? 120}
+                onChange={(e) => updateFeature('destinationCacheTTLSeconds', Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-transparent" />
             </div>
           </div>
         </div>
