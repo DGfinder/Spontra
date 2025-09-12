@@ -410,6 +410,51 @@ class AdminService {
     return response.data?.success || false
   }
 
+  /**
+   * Bulk update destinations
+   */
+  async bulkUpdateDestinations(
+    action: 'activate' | 'deactivate' | 'mark_popular' | 'unmark_popular' | 'show' | 'hide' | 'delete',
+    destinationIds: string[],
+    updates?: Record<string, any>
+  ): Promise<{ success: number; failed: number; total: number }> {
+    const response = await this.apiRequest<{ 
+      success: boolean
+      results: { total: number; successful: number; failed: number; action: string }
+    }>(`/destinations/bulk`, {
+      method: 'POST',
+      body: JSON.stringify({ action, destinationIds, updates })
+    })
+    
+    return response.data?.results || { success: 0, failed: destinationIds.length, total: destinationIds.length }
+  }
+
+  /**
+   * Get destination analytics
+   */
+  async getDestinationAnalytics(
+    timeRange: '24h' | '7d' | '30d' | '90d' = '30d',
+    filters?: {
+      countries?: string[]
+      minScore?: number
+      maxScore?: number
+      activeOnly?: boolean
+    }
+  ): Promise<any> {
+    const params = new URLSearchParams()
+    params.set('timeRange', timeRange)
+    
+    if (filters) {
+      if (filters.countries) params.set('countries', filters.countries.join(','))
+      if (filters.minScore !== undefined) params.set('minScore', filters.minScore.toString())
+      if (filters.maxScore !== undefined) params.set('maxScore', filters.maxScore.toString())
+      if (filters.activeOnly !== undefined) params.set('activeOnly', filters.activeOnly.toString())
+    }
+
+    const response = await this.apiRequest(`/destinations/analytics?${params}`)
+    return response.data
+  }
+
   // ============================================================================
   // SYSTEM MONITORING
   // ============================================================================

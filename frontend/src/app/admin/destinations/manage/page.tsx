@@ -21,10 +21,18 @@ import {
   Calendar,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  BarChart3,
+  Settings,
+  Download,
+  Upload
 } from 'lucide-react'
 import { AdminDestination } from '@/types/admin'
 import adminService from '@/services/adminService'
+import { DestinationControls } from '@/components/admin/DestinationControls'
+import { BulkDestinationActions } from '@/components/admin/BulkDestinationActions'
+import { DestinationAnalytics } from '@/components/admin/DestinationAnalytics'
+import { SearchFilterControls } from '@/components/admin/SearchFilterControls'
 
 interface DestinationStats {
   totalDestinations: number
@@ -45,6 +53,13 @@ export default function DestinationManagement() {
   const [filterStatus, setFilterStatus] = useState('all')
   const [showDestinationModal, setShowDestinationModal] = useState(false)
   const [editingDestination, setEditingDestination] = useState<AdminDestination | null>(null)
+  
+  // New state for enhanced functionality
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState<'manage' | 'analytics'>('manage')
+  const [showFilters, setShowFilters] = useState(false)
+  const [searchFilters, setSearchFilters] = useState<any>({})
+  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('30d')
 
   useEffect(() => {
     const load = async () => {
@@ -107,6 +122,86 @@ export default function DestinationManagement() {
     }
   }
 
+  // New bulk operations handler
+  const handleBulkAction = async (action: string, destinationIds: string[]) => {
+    try {
+      const updates: Partial<AdminDestination> = {}
+      
+      switch (action) {
+        case 'activate':
+          updates.isActive = true
+          break
+        case 'deactivate':
+          updates.isActive = false
+          break
+        case 'mark_popular':
+          updates.isPopular = true
+          break
+        case 'unmark_popular':
+          updates.isPopular = false
+          break
+        case 'show':
+          updates.isVisible = true
+          break
+        case 'hide':
+          updates.isVisible = false
+          break
+        case 'delete':
+          // Handle deletion logic
+          break
+      }
+
+      // Apply updates to selected destinations
+      for (const id of destinationIds) {
+        await adminService.updateDestination(id, updates)
+      }
+
+      // Update local state
+      setDestinations(prev => prev.map(d => 
+        destinationIds.includes(d.iataCode) 
+          ? { ...d, ...updates, lastUpdated: new Date().toISOString() }
+          : d
+      ))
+
+      alert(`Successfully updated ${destinationIds.length} destinations`)
+    } catch (error) {
+      console.error('Bulk action failed:', error)
+      alert('Bulk action failed')
+    }
+  }
+
+  // Export functionality
+  const handleExport = (destinationsToExport: AdminDestination[]) => {
+    const csvContent = [
+      ['IATA Code', 'City', 'Country', 'Active', 'Popular', 'Score', 'Bookings', 'Revenue'].join(','),
+      ...destinationsToExport.map(d => [
+        d.iataCode,
+        d.cityName,
+        d.countryName,
+        d.isActive,
+        d.isPopular,
+        d.metrics.popularityScore,
+        d.metrics.totalBookings,
+        d.metrics.totalRevenue
+      ].join(','))
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `destinations-${new Date().toISOString().split('T')[0]}.csv`
+    a.click()
+    window.URL.revokeObjectURL(url)
+  }
+
+  // Import functionality
+  const handleImport = async (file: File) => {
+    // Implement CSV import logic
+    console.log('Importing file:', file.name)
+    // This would parse the CSV and update destinations
+  }
+
   const filteredDestinations = destinations.filter(dest => {
     if (searchQuery && !dest.cityName.toLowerCase().includes(searchQuery.toLowerCase()) && 
         !dest.countryName.toLowerCase().includes(searchQuery.toLowerCase())) return false
@@ -155,12 +250,53 @@ export default function DestinationManagement() {
         </div>
         
         <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+          >
+            <Filter size={16} className="mr-2" />
+            {showFilters ? 'Hide' : 'Show'} Filters
+          </button>
           <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <Plus size={16} className="mr-2" />
             Add Destination
           </button>
         </div>
       </div>
+
+      {/* Tab Navigation */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { id: 'manage', label: 'Manage', icon: Settings },
+            { id: 'analytics', label: 'Analytics', icon: BarChart3 }
+          ].map((tab) => {
+            const IconComponent = tab.icon
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <IconComponent size={16} className="mr-2" />
+                {tab.label}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
+
+      {/* Search Filters */}
+      {showFilters && (
+        <SearchFilterControls
+          onFiltersChange={setSearchFilters}
+          initialFilters={searchFilters}
+        />
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -241,67 +377,100 @@ export default function DestinationManagement() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        {/* Filters */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">All Destinations</h3>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-600">{filteredDestinations.length} of {destinations.length}</span>
+      {/* Tab Content */}
+      {activeTab === 'manage' && (
+        <>
+          {/* Bulk Actions */}
+          <BulkDestinationActions
+            destinations={destinations}
+            selectedDestinations={selectedDestinations}
+            onSelectionChange={setSelectedDestinations}
+            onBulkAction={handleBulkAction}
+            onExport={handleExport}
+            onImport={handleImport}
+          />
+
+          {/* Main Content */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+            {/* Filters */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">All Destinations</h3>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">{filteredDestinations.length} of {destinations.length}</span>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                {/* Search */}
+                <div className="relative flex-1 max-w-md">
+                  <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search destinations..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Country Filter */}
+                <select
+                  value={filterCountry}
+                  onChange={(e) => setFilterCountry(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="all">All Countries</option>
+                  {uniqueCountries.map(country => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+
+                {/* Status Filter */}
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative flex-1 max-w-md">
-              <Search size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search destinations..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-3 py-2 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-              />
-            </div>
-
-            {/* Country Filter */}
-            <select
-              value={filterCountry}
-              onChange={(e) => setFilterCountry(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="all">All Countries</option>
-              {uniqueCountries.map(country => (
-                <option key={country} value={country}>{country}</option>
-              ))}
-            </select>
-
-            {/* Status Filter */}
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2"
-            >
-              <option value="all">All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Destination Grid */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredDestinations.map((destination) => (
-              <div
-                key={destination.iataCode}
-                className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => {
-                  setSelectedDestination(destination)
-                  setShowDestinationModal(true)
-                }}
-              >
+            {/* Destination Grid */}
+            <div className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredDestinations.map((destination) => (
+                  <div
+                    key={destination.iataCode}
+                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                  >
+                    {/* Selection Checkbox */}
+                    <div className="flex items-center justify-between mb-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedDestinations.includes(destination.iataCode)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedDestinations([...selectedDestinations, destination.iataCode])
+                          } else {
+                            setSelectedDestinations(selectedDestinations.filter(id => id !== destination.iataCode))
+                          }
+                        }}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <button
+                        onClick={() => {
+                          setSelectedDestination(destination)
+                          setShowDestinationModal(true)
+                        }}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        <MoreHorizontal size={16} />
+                      </button>
+                    </div>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -346,28 +515,46 @@ export default function DestinationManagement() {
                   </div>
                 </div>
 
-                {/* Top Themes */}
-                <div>
-                  <div className="text-sm font-medium text-gray-700 mb-2">Top Themes</div>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(destination.themeScores)
-                      .sort(([,a], [,b]) => b - a)
-                      .slice(0, 3)
-                      .map(([theme, score]) => (
-                        <span
-                          key={theme}
-                          className={`px-2 py-1 rounded text-xs font-medium ${getThemeColor(score)}`}
-                        >
-                          {theme} ({score.toFixed(1)})
-                        </span>
-                      ))}
+                    {/* Highlights */}
+                    <div>
+                      <div className="text-sm font-medium text-gray-700 mb-2">Highlights</div>
+                      <div className="flex flex-wrap gap-2">
+                        {destination.highlights.slice(0, 3).map((highlight, index) => (
+                          <span
+                            key={index}
+                            className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700"
+                          >
+                            {highlight}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Controls */}
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <DestinationControls
+                        destination={destination}
+                        onUpdate={handleUpdateDestination}
+                        showAdvanced={false}
+                      />
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
+
+      {/* Analytics Tab */}
+      {activeTab === 'analytics' && (
+        <DestinationAnalytics
+          destinations={destinations}
+          timeRange={timeRange}
+          onTimeRangeChange={setTimeRange}
+        />
+      )}
+
 
       {/* Destination Detail Modal */}
       {showDestinationModal && selectedDestination && (
@@ -396,32 +583,12 @@ export default function DestinationManagement() {
             </div>
             
             <div className="p-6 space-y-6">
-              {/* Status Controls */}
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => handleUpdateDestination(selectedDestination, { isActive: !selectedDestination.isActive })}
-                  className={`flex items-center px-4 py-2 rounded-lg font-medium ${
-                    selectedDestination.isActive 
-                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                      : 'bg-green-100 text-green-700 hover:bg-green-200'
-                  }`}
-                >
-                  {selectedDestination.isActive ? <XCircle size={16} className="mr-2" /> : <CheckCircle size={16} className="mr-2" />}
-                  {selectedDestination.isActive ? 'Deactivate' : 'Activate'}
-                </button>
-                
-                <button
-                  onClick={() => handleUpdateDestination(selectedDestination, { isPopular: !selectedDestination.isPopular })}
-                  className={`flex items-center px-4 py-2 rounded-lg font-medium ${
-                    selectedDestination.isPopular
-                      ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <Star size={16} className="mr-2" />
-                  {selectedDestination.isPopular ? 'Remove from Popular' : 'Mark as Popular'}
-                </button>
-              </div>
+              {/* Enhanced Destination Controls */}
+              <DestinationControls
+                destination={selectedDestination}
+                onUpdate={handleUpdateDestination}
+                showAdvanced={true}
+              />
 
               {/* Performance Metrics */}
               <div>

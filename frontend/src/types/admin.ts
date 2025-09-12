@@ -236,14 +236,8 @@ export interface AdminDestination {
   }
   isActive: boolean
   isPopular: boolean
+  isVisible?: boolean  // New: Controls search visibility
   highlights: string[]
-  themeScores: {
-    vibe: number         // Social & Entertainment (was: nightlife + romance)
-    adventure: number    // Active & Outdoor (unchanged)
-    discover: number     // Cultural & Creative (was: culture + food)
-    indulge: number      // Luxury & Indulgent (was: shopping + relaxation)
-    nature: number       // Nature & Relaxation (unchanged)
-  }
   supportedActivities: string[]
   metrics: {
     totalBookings: number
