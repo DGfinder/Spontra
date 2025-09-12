@@ -38,6 +38,7 @@ import POIManagement from '@/components/admin/POIManagement'
 import { convertActivitiesToPOIs } from '@/utils/poiMigration'
 import { poiService } from '@/services/poiService'
 
+
 interface ThemeDetails {
   name: string
   score: number
@@ -157,6 +158,7 @@ export default function DestinationDetailPage() {
     coordinates: { lat: 41.3874, lng: 2.1686 },
     isActive: true,
     isPopular: true,
+    isVisible: true,
     themeScores: {
       vibe: 9.2,
       adventure: 7.8,
@@ -659,6 +661,7 @@ export default function DestinationDetailPage() {
               </div>
             </div>
           )}
+
 
           {activeTab === 'themes' && (
             <div>

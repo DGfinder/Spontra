@@ -238,6 +238,13 @@ export interface AdminDestination {
   isPopular: boolean
   isVisible?: boolean  // New: Controls search visibility
   highlights: string[]
+  themeScores: {
+    vibe: number
+    adventure: number
+    discover: number
+    indulge: number
+    nature: number
+  }
   supportedActivities: string[]
   metrics: {
     totalBookings: number

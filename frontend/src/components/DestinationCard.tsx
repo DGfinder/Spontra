@@ -1,3 +1,4 @@
+import React from 'react'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { publicPoiService } from '@/services/publicPoiService'
 import { generateDestinationAnalytics, getTrendDisplay, getBookingUrgencyDisplay, getPriceRankingDisplay } from '@/lib/priceAnalytics'

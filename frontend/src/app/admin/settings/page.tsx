@@ -59,6 +59,9 @@ interface SystemSettings {
     reviewsEnabled: boolean
     searchEnabled: boolean
     analyticsEnabled: boolean
+    backendExploreEnabled: boolean
+    durationEnrichmentEnabled: boolean
+    destinationCacheTTLSeconds: number
   }
   configured: boolean
 }
@@ -497,7 +500,7 @@ export default function GeneralSettings() {
           </div>
 
           <div className="p-6 space-y-4">
-            {Object.entries(settings.features).map(([key, value]) => (
+            {Object.entries(settings.features).filter(([key, value]) => typeof value === 'boolean').map(([key, value]) => (
               <div key={key} className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-gray-900 capitalize">
@@ -510,7 +513,7 @@ export default function GeneralSettings() {
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={value}
+                    checked={value as boolean}
                     onChange={(e) => updateSettings('features', key, e.target.checked)}
                     className="sr-only peer"
                   />

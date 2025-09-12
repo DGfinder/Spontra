@@ -426,7 +426,12 @@ class AdminService {
       body: JSON.stringify({ action, destinationIds, updates })
     })
     
-    return response.data?.results || { success: 0, failed: destinationIds.length, total: destinationIds.length }
+    const results = response.data?.results
+    return results ? { 
+      success: results.successful, 
+      failed: results.failed, 
+      total: results.total 
+    } : { success: 0, failed: destinationIds.length, total: destinationIds.length }
   }
 
   /**

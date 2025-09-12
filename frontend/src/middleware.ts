@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // Protect /api/admin routes with JWT verification
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   if (!pathname.startsWith('/api/admin')) return NextResponse.next()
 
@@ -36,7 +36,7 @@ export function middleware(req: NextRequest) {
       ['verify']
     )
 
-    const ok = await crypto.subtle.verify('HMAC', key, sig, enc.encode(data))
+    const ok = await crypto.subtle.verify('HMAC', key, sig as unknown as ArrayBuffer, enc.encode(data))
     if (!ok) throw new Error('Invalid signature')
 
     // Claims validation
