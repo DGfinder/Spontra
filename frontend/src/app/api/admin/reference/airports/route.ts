@@ -1,0 +1,53 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { Client as PgClient } from 'pg'
+
+export const runtime = 'nodejs'
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const q = (searchParams.get('q') || '').trim()
+  const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10) || 20, 50)
+
+  if (!q || q.length < 2) {
+    return NextResponse.json({ ok: true, items: [], count: 0 })
+  }
+
+  const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
+  if (!pgUrl) {
+    // Graceful fallback when DB is not configured
+    return NextResponse.json({ ok: false, error: 'Database URL not configured' }, { status: 503 })
+  }
+
+  const pg = new PgClient({ connectionString: pgUrl })
+  try {
+    await pg.connect()
+    // Search by code, city, name, or country
+    const { rows } = await pg.query(
+      `SELECT iata_code, name, city, country, latitude, longitude
+       FROM airports
+       WHERE LOWER(iata_code) LIKE LOWER($1) || '%'
+          OR LOWER(city) LIKE '%' || LOWER($1) || '%'
+          OR LOWER(name) LIKE '%' || LOWER($1) || '%'
+          OR LOWER(country) LIKE '%' || LOWER($1) || '%'
+       ORDER BY city ASC, name ASC
+       LIMIT $2`,
+      [q, limit]
+    )
+
+    const items = rows.map((r: any) => ({
+      code: (r.iata_code || '').toUpperCase(),
+      name: r.name || '',
+      city: r.city || '',
+      country: r.country || '',
+      latitude: typeof r.latitude === 'number' ? r.latitude : null,
+      longitude: typeof r.longitude === 'number' ? r.longitude : null,
+    }))
+
+    return NextResponse.json({ ok: true, items, count: items.length })
+  } catch (e: any) {
+    return NextResponse.json({ ok: false, error: e?.message || 'Query failed' }, { status: 500 })
+  } finally {
+    try { await pg.end() } catch {}
+  }
+}
+

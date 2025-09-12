@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { AirportSearch } from '@/components/AirportSearch'
+import airportsData from '@/data/airports.json'
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft,
@@ -67,6 +69,11 @@ export default function AddDestinationPage() {
   const [newHighlight, setNewHighlight] = useState('')
   const [newActivity, setNewActivity] = useState('')
 
+  // Quick Add state
+  const [quickIata, setQuickIata] = useState('')
+  const [isQuickSubmitting, setIsQuickSubmitting] = useState(false)
+  const [quickError, setQuickError] = useState<string | null>(null)
+
   const [destination, setDestination] = useState<NewDestination>({
     iataCode: '',
     cityName: '',
@@ -127,6 +134,78 @@ export default function AddDestinationPage() {
     }
   }
 
+  // Simple country name -> ISO2 mapping for common cases
+  const getCountryCode = (countryName: string): string => {
+    const countryMap: Record<string, string> = {
+      'Spain': 'ES',
+      'France': 'FR',
+      'Italy': 'IT',
+      'Germany': 'DE',
+      'United Kingdom': 'GB',
+      'Portugal': 'PT',
+      'Netherlands': 'NL',
+      'Greece': 'GR',
+      'Czech Republic': 'CZ',
+      'Austria': 'AT',
+      'Poland': 'PL',
+      'Hungary': 'HU',
+      'Croatia': 'HR',
+      'Switzerland': 'CH',
+      'Belgium': 'BE',
+      'Ireland': 'IE',
+      'Denmark': 'DK',
+      'Sweden': 'SE',
+      'Norway': 'NO',
+      'Finland': 'FI',
+      'Iceland': 'IS'
+    }
+    return countryMap[countryName] || countryName.slice(0, 2).toUpperCase()
+  }
+
+  const handleQuickAirportChange = (code: string) => {
+    setQuickIata(code?.toUpperCase() || '')
+    if (!code) return
+    const airport: any = (airportsData as any[]).find((a) => a.code?.toUpperCase() === code.toUpperCase())
+    if (airport) {
+      setDestination((prev) => ({
+        ...prev,
+        iataCode: airport.code?.toUpperCase() || prev.iataCode,
+        cityName: airport.city || prev.cityName,
+        countryName: airport.country || prev.countryName,
+        countryCode: airport.country ? getCountryCode(airport.country) : prev.countryCode,
+      }))
+    }
+  }
+
+  const handleQuickCreate = async () => {
+    setQuickError(null)
+    if (!destination.iataCode || destination.iataCode.length !== 3) {
+      setQuickError('Select a valid airport/city (IATA code)')
+      return
+    }
+    setIsQuickSubmitting(true)
+    try {
+      const res = await fetch('/api/admin/destinations/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          iataCode: destination.iataCode,
+          whitelisted: true,
+          themeScores: destination.themeScores,
+        })
+      })
+      const json = await res.json()
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || 'Failed to save preferences')
+      }
+      router.push(`/admin/destinations/${encodeURIComponent(destination.iataCode)}`)
+    } catch (e: any) {
+      setQuickError(e?.message || 'Failed to create destination')
+    } finally {
+      setIsQuickSubmitting(false)
+    }
+  }
+
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {}
 
@@ -137,9 +216,7 @@ export default function AddDestinationPage() {
       if (!destination.cityName) newErrors.cityName = 'City name is required'
       if (!destination.countryName) newErrors.countryName = 'Country name is required'
       if (!destination.countryCode) newErrors.countryCode = 'Country code is required'
-      
-      if (!destination.coordinates.lat) newErrors.lat = 'Latitude is required'
-      if (!destination.coordinates.lng) newErrors.lng = 'Longitude is required'
+      // Coordinates optional (can be auto-derived later)
     }
 
     if (step === 2) {
@@ -282,6 +359,87 @@ export default function AddDestinationPage() {
             <p className="text-gray-600">Step {currentStep} of 6: {getStepTitle(currentStep)}</p>
           </div>
         </div>
+      </div>
+
+      {/* Quick Add (recommended) */}
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Quick Add (Select City/Airport and Set Themes)</h3>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">Search City or Airport</label>
+            <AirportSearch
+              value={quickIata}
+              onChange={handleQuickAirportChange}
+              placeholder="Start typing a city or airport name"
+            />
+            {destination.iataCode && (
+              <div className="text-sm text-gray-700">
+                <div className="font-medium">Selected: {destination.cityName || '—'} ({destination.iataCode})</div>
+                <div className="text-gray-600">{destination.countryName} {destination.countryCode ? `· ${destination.countryCode}` : ''}</div>
+              </div>
+            )}
+          </div>
+
+          {/* Theme scores quick editor */}
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">Theme Scores</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {Object.entries(themeConfig).map(([key, theme]) => {
+                const score = destination.themeScores[key as keyof typeof destination.themeScores]
+                return (
+                  <div key={`quick-${key}`} className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <theme.icon size={18} className={theme.color} />
+                        <span className="font-medium text-gray-900">{theme.name}</span>
+                      </div>
+                      <span className="text-sm text-gray-700">{score.toFixed(1)}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={10}
+                      step={0.5}
+                      value={score}
+                      onChange={(e) => updateThemeScore(key, parseFloat(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-gray-500">This will whitelist the destination and save theme scores. You can add POIs on the next page.</p>
+          <button
+            onClick={handleQuickCreate}
+            disabled={isQuickSubmitting || !destination.iataCode}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            {isQuickSubmitting ? (
+              <>
+                <Loader className="animate-spin mr-2" size={16} />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save size={16} className="mr-2" />
+                Create & Manage POIs
+              </>
+            )}
+          </button>
+        </div>
+
+        {quickError && (
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center">
+            <AlertCircle size={16} className="mr-2" />
+            {quickError}
+          </div>
+        )}
       </div>
 
       {/* Progress Bar */}

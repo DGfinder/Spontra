@@ -86,6 +86,7 @@ const navigation: NavigationItem[] = [
     children: [
       { id: 'destinations-browse', label: 'Browse Destinations', icon: MapPin, href: '/admin/destinations/manage' },
       { id: 'destinations-add', label: 'Add New Destination', icon: Plus, href: '/admin/destinations/add' },
+      { id: 'destinations-add-quick', label: 'Quick Add (Recommended)', icon: Plus, href: '/admin/destinations/add/quick' },
       { id: 'destinations-themes', label: 'Themes & Categories', icon: Star, href: '/admin/destinations/themes' },
       { id: 'destinations-featured', label: 'Featured Cities', icon: Target, href: '/admin/destinations/featured' },
       { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' },
