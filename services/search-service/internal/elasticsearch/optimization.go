@@ -2,10 +2,8 @@ package elasticsearch
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/olivere/elastic/v7"
 	"spontra/search-service/internal/models"
@@ -36,7 +34,7 @@ func DefaultOptimizationConfig() *OptimizationConfig {
 // OptimizeIndices applies performance optimizations to all indices
 func (c *Client) OptimizeIndices() error {
 	config := DefaultOptimizationConfig()
-	
+
 	indices := []string{
 		c.getFlightIndex(),
 		c.getAirportIndex(),
@@ -57,11 +55,11 @@ func (c *Client) optimizeIndex(index string, config *OptimizationConfig) error {
 
 	// Update index settings for performance
 	settings := map[string]interface{}{
-		"refresh_interval":          config.RefreshInterval,
-		"number_of_replicas":        config.ReplicaCount,
-		"max_concurrent_shards":     config.MaxConcurrentShards,
-		"indices.queries.cache.size": config.QueryCacheSize,
-		"indices.fielddata.cache.size": config.FielddataSize,
+		"refresh_interval":                               config.RefreshInterval,
+		"number_of_replicas":                             config.ReplicaCount,
+		"max_concurrent_shards":                          config.MaxConcurrentShards,
+		"indices.queries.cache.size":                     config.QueryCacheSize,
+		"indices.fielddata.cache.size":                   config.FielddataSize,
 		"index.routing.allocation.total_shards_per_node": 2,
 	}
 
@@ -86,13 +84,13 @@ func (c *Client) BulkIndexFlights(flights []models.Flight) error {
 
 	config := DefaultOptimizationConfig()
 	bulkService := c.client.Bulk()
-	
+
 	for i, flight := range flights {
 		request := elastic.NewBulkIndexRequest().
 			Index(c.getFlightIndex()).
 			Id(flight.ID.String()).
 			Doc(flight)
-		
+
 		bulkService.Add(request)
 
 		// Execute batch when reaching batch size
@@ -113,7 +111,7 @@ func (c *Client) BulkIndexFlights(flights []models.Flight) error {
 			}
 
 			log.Printf("Bulk indexed %d flights", len(response.Items))
-			
+
 			// Reset bulk service for next batch
 			bulkService = c.client.Bulk()
 		}
@@ -130,13 +128,13 @@ func (c *Client) BulkIndexAirports(airports []models.AirportSuggestion) error {
 
 	config := DefaultOptimizationConfig()
 	bulkService := c.client.Bulk()
-	
+
 	for i, airport := range airports {
 		request := elastic.NewBulkIndexRequest().
 			Index(c.getAirportIndex()).
 			Id(airport.Code).
 			Doc(airport)
-		
+
 		bulkService.Add(request)
 
 		// Execute batch when reaching batch size
@@ -157,7 +155,7 @@ func (c *Client) BulkIndexAirports(airports []models.AirportSuggestion) error {
 			}
 
 			log.Printf("Bulk indexed %d airports", len(response.Items))
-			
+
 			// Reset bulk service for next batch
 			bulkService = c.client.Bulk()
 		}
@@ -249,117 +247,16 @@ func (c *Client) SetupSearchTemplates() error {
 	return c.CreateSearchTemplate("airport_autocomplete", airportTemplate)
 }
 
-// SearchFlightsWithTemplate uses the optimized search template
+// SearchFlightsWithTemplate falls back to the standard search when templates are unavailable
 func (c *Client) SearchFlightsWithTemplate(req *models.FlightSearchRequest) (*models.FlightSearchResponse, error) {
-	startTime := time.Now()
-
-	// Prepare template parameters
-	params := map[string]interface{}{
-		"origin":      req.OriginAirport,
-		"destination": req.DestinationAirport,
-		"max_results": req.MaxResults,
-		"sort_order":  req.SortOrder,
-	}
-
-	// Date range
-	if req.FlexibleDates && req.FlexibleDatesRange > 0 {
-		startDate := req.DepartureDate.AddDate(0, 0, -req.FlexibleDatesRange)
-		endDate := req.DepartureDate.AddDate(0, 0, req.FlexibleDatesRange)
-		params["date_from"] = startDate.Format(time.RFC3339)
-		params["date_to"] = endDate.Format(time.RFC3339)
-	} else {
-		startOfDay := time.Date(req.DepartureDate.Year(), req.DepartureDate.Month(), req.DepartureDate.Day(), 0, 0, 0, 0, req.DepartureDate.Location())
-		endOfDay := startOfDay.Add(24 * time.Hour)
-		params["date_from"] = startOfDay.Format(time.RFC3339)
-		params["date_to"] = endOfDay.Format(time.RFC3339)
-	}
-
-	// Optional parameters
-	if req.CabinClass != "" {
-		params["cabin_class"] = req.CabinClass
-	}
-	if req.DirectFlightsOnly {
-		params["direct_only"] = true
-	}
-	if req.SortBy == "price" {
-		params["sort_price"] = true
-	} else if req.SortBy == "duration" {
-		params["sort_duration"] = true
-	}
-
-	// Execute template search
-	searchResult, err := c.client.SearchTemplate().
-		Index(c.getFlightIndex()).
-		Id("flight_search").
-		BodyJson(map[string]interface{}{"params": params}).
-		Do(context.Background())
-
-	if err != nil {
-		return nil, fmt.Errorf("template search failed: %w", err)
-	}
-
-	// Parse results
-	flights := make([]models.Flight, 0, len(searchResult.Hits.Hits))
-	for _, hit := range searchResult.Hits.Hits {
-		var flight models.Flight
-		if err := json.Unmarshal(hit.Source, &flight); err != nil {
-			log.Printf("Failed to unmarshal flight: %v", err)
-			continue
-		}
-		flights = append(flights, flight)
-	}
-
-	searchTime := time.Since(startTime)
-
-	response := &models.FlightSearchResponse{
-		SearchID:      req.ID,
-		SearchRequest: *req,
-		Flights:       flights,
-		SearchMetadata: models.SearchMetadata{
-			TotalResults:    int(searchResult.TotalHits()),
-			ResultsReturned: len(flights),
-			SearchTime:      searchTime,
-		},
-		CreatedAt: time.Now(),
-		ExpiresAt: time.Now().Add(c.cfg.CacheTimeout),
-	}
-
-	return response, nil
+	log.Println("Search template execution not supported by current Elasticsearch client; using standard search")
+	return c.SearchFlights(req)
 }
 
-// SearchAirportsWithTemplate uses the optimized autocomplete template
+// SearchAirportsWithTemplate falls back to the standard autocomplete when templates are unavailable
 func (c *Client) SearchAirportsWithTemplate(query string, limit int) ([]models.AirportSuggestion, error) {
-	if limit <= 0 {
-		limit = 10
-	}
-
-	params := map[string]interface{}{
-		"query": query,
-		"limit": limit,
-	}
-
-	searchResult, err := c.client.SearchTemplate().
-		Index(c.getAirportIndex()).
-		Id("airport_autocomplete").
-		BodyJson(map[string]interface{}{"params": params}).
-		Do(context.Background())
-
-	if err != nil {
-		return nil, fmt.Errorf("template search failed: %w", err)
-	}
-
-	suggestions := make([]models.AirportSuggestion, 0, len(searchResult.Hits.Hits))
-	for _, hit := range searchResult.Hits.Hits {
-		var airport models.AirportSuggestion
-		if err := json.Unmarshal(hit.Source, &airport); err != nil {
-			log.Printf("Failed to unmarshal airport: %v", err)
-			continue
-		}
-		airport.Relevance = float64(*hit.Score)
-		suggestions = append(suggestions, airport)
-	}
-
-	return suggestions, nil
+	log.Println("Airport search template execution not supported by current Elasticsearch client; using standard autocomplete")
+	return c.SearchAirports(query, limit)
 }
 
 // ForceRefresh forces a refresh of all indices
@@ -367,7 +264,7 @@ func (c *Client) ForceRefresh() error {
 	_, err := c.client.Refresh().
 		Index(c.getFlightIndex(), c.getAirportIndex()).
 		Do(context.Background())
-	
+
 	if err != nil {
 		return fmt.Errorf("failed to refresh indices: %w", err)
 	}
@@ -389,13 +286,13 @@ func (c *Client) GetIndexStats() (map[string]interface{}, error) {
 	result := make(map[string]interface{})
 	for indexName, indexStats := range stats.Indices {
 		result[indexName] = map[string]interface{}{
-			"docs_count":         indexStats.Total.Docs.Count,
-			"docs_deleted":       indexStats.Total.Docs.Deleted,
-			"store_size_bytes":   indexStats.Total.Store.SizeInBytes,
-			"query_total":        indexStats.Total.Search.QueryTotal,
-			"query_time_millis":  indexStats.Total.Search.QueryTimeInMillis,
-			"fetch_total":        indexStats.Total.Search.FetchTotal,
-			"fetch_time_millis":  indexStats.Total.Search.FetchTimeInMillis,
+			"docs_count":        indexStats.Total.Docs.Count,
+			"docs_deleted":      indexStats.Total.Docs.Deleted,
+			"store_size_bytes":  indexStats.Total.Store.SizeInBytes,
+			"query_total":       indexStats.Total.Search.QueryTotal,
+			"query_time_millis": indexStats.Total.Search.QueryTimeInMillis,
+			"fetch_total":       indexStats.Total.Search.FetchTotal,
+			"fetch_time_millis": indexStats.Total.Search.FetchTimeInMillis,
 		}
 	}
 

@@ -12,12 +12,12 @@ import (
 
 // SearchAggregations contains aggregated search data
 type SearchAggregations struct {
-	PriceRanges      []PriceRange      `json:"price_ranges"`
-	Airlines         []AirlineCount    `json:"airlines"`
-	DepartureTimes   []TimeSlot        `json:"departure_times"`
-	DurationRanges   []DurationRange   `json:"duration_ranges"`
-	StopsDistribution []StopsCount     `json:"stops_distribution"`
-	PopularRoutes    []RouteCount      `json:"popular_routes"`
+	PriceRanges       []PriceRange    `json:"price_ranges"`
+	Airlines          []AirlineCount  `json:"airlines"`
+	DepartureTimes    []TimeSlot      `json:"departure_times"`
+	DurationRanges    []DurationRange `json:"duration_ranges"`
+	StopsDistribution []StopsCount    `json:"stops_distribution"`
+	PopularRoutes     []RouteCount    `json:"popular_routes"`
 }
 
 type PriceRange struct {
@@ -27,8 +27,8 @@ type PriceRange struct {
 }
 
 type AirlineCount struct {
-	Airline string `json:"airline"`
-	Count   int64  `json:"count"`
+	Airline  string  `json:"airline"`
+	Count    int64   `json:"count"`
 	AvgPrice float64 `json:"avg_price"`
 }
 
@@ -49,9 +49,9 @@ type StopsCount struct {
 }
 
 type RouteCount struct {
-	Origin      string `json:"origin"`
-	Destination string `json:"destination"`
-	Count       int64  `json:"count"`
+	Origin      string  `json:"origin"`
+	Destination string  `json:"destination"`
+	Count       int64   `json:"count"`
 	AvgPrice    float64 `json:"avg_price"`
 }
 
@@ -112,9 +112,10 @@ func (c *Client) GetSearchAggregations(req *models.FlightSearchRequest) (*Search
 	// Parse price ranges
 	if priceAgg, found := searchResult.Aggregations.Histogram("price_ranges"); found {
 		for _, bucket := range priceAgg.Buckets {
+			key := bucket.Key
 			aggregations.PriceRanges = append(aggregations.PriceRanges, PriceRange{
-				Min:   *bucket.Key,
-				Max:   *bucket.Key + 50,
+				Min:   key,
+				Max:   key + 50,
 				Count: bucket.DocCount,
 			})
 		}
@@ -137,10 +138,13 @@ func (c *Client) GetSearchAggregations(req *models.FlightSearchRequest) (*Search
 	// Parse departure times
 	if timeAgg, found := searchResult.Aggregations.DateHistogram("departure_times"); found {
 		for _, bucket := range timeAgg.Buckets {
-			if timeStr, ok := bucket.KeyAsString; ok && *timeStr != "" {
-				// Parse hour from the time string
+			timeStr := bucket.KeyAsString
+			if timeStr != nil && *timeStr != "" {
 				var hour int
-				fmt.Sscanf(*timeStr, "%d", &hour)
+				_, err := fmt.Sscanf(*timeStr, "%d", &hour)
+				if err != nil {
+					continue
+				}
 				aggregations.DepartureTimes = append(aggregations.DepartureTimes, TimeSlot{
 					Hour:  hour,
 					Count: bucket.DocCount,
@@ -152,8 +156,9 @@ func (c *Client) GetSearchAggregations(req *models.FlightSearchRequest) (*Search
 	// Parse duration ranges
 	if durationAgg, found := searchResult.Aggregations.Histogram("duration_ranges"); found {
 		for _, bucket := range durationAgg.Buckets {
-			minHours := *bucket.Key / 60
-			maxHours := (*bucket.Key + 60) / 60
+			key := bucket.Key
+			minHours := key / 60
+			maxHours := (key + 60) / 60
 			aggregations.DurationRanges = append(aggregations.DurationRanges, DurationRange{
 				MinHours: minHours,
 				MaxHours: maxHours,
@@ -426,9 +431,10 @@ func (c *Client) SearchWithFacets(req *models.FlightSearchRequest) (*models.Flig
 	// Price ranges facet
 	if priceAgg, found := searchResult.Aggregations.Histogram("price_ranges"); found {
 		for _, bucket := range priceAgg.Buckets {
+			key := bucket.Key
 			facets.PriceRanges = append(facets.PriceRanges, PriceRange{
-				Min:   *bucket.Key,
-				Max:   *bucket.Key + 100,
+				Min:   key,
+				Max:   key + 100,
 				Count: bucket.DocCount,
 			})
 		}

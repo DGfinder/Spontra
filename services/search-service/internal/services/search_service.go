@@ -1,20 +1,24 @@
 package services
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"sort"
+	"strings"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"spontra/search-service/internal/cache"
 	"spontra/search-service/internal/config"
 	"spontra/search-service/internal/database"
 	"spontra/search-service/internal/elasticsearch"
 	"spontra/search-service/internal/models"
 	"spontra/search-service/internal/repository"
-	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 // SearchService handles flight search orchestration
@@ -79,7 +83,7 @@ func (s *SearchService) SearchFlights(req *models.FlightSearchRequest) (*models.
 		cachedResponse.SearchMetadata.CacheHit = true
 		cachedResponse.SearchMetadata.FromCache = true
 		cachedResponse.SearchMetadata.SearchTime = time.Since(startTime)
-		
+
 		log.Printf("Cache hit for search %s", req.ID)
 		return &cachedResponse, nil
 	}
@@ -146,7 +150,7 @@ func (s *SearchService) orchestrateSearch(req *models.FlightSearchRequest) ([]mo
 	}
 
 	results := make(chan providerResult, len(s.cfg.EnabledProviders))
-	
+
 	// Launch searches to all enabled providers
 	for _, provider := range s.cfg.EnabledProviders {
 		go func(p string) {
@@ -179,7 +183,7 @@ func (s *SearchService) orchestrateSearch(req *models.FlightSearchRequest) ([]mo
 	}
 
 	metadata.TotalResults = len(allFlights)
-	
+
 	return allFlights, metadata, nil
 }
 
@@ -192,6 +196,8 @@ func (s *SearchService) searchProvider(provider string, req *models.FlightSearch
 		return s.searchDataIngestion(req)
 	case "elasticsearch":
 		return s.searchElasticsearch(req)
+	case "local-catalog":
+		return s.searchLocalCatalog(req)
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", provider)
 	}
@@ -205,14 +211,59 @@ func (s *SearchService) searchAmadeus(req *models.FlightSearchRequest) ([]models
 
 // searchDataIngestion searches using the data-ingestion service
 func (s *SearchService) searchDataIngestion(req *models.FlightSearchRequest) ([]models.Flight, error) {
-	// This would make an HTTP request to the data-ingestion service
-	// For now, return empty results as placeholder
-	log.Printf("Searching data-ingestion service for %s->%s", req.OriginAirport, req.DestinationAirport)
-	return []models.Flight{}, nil
+	serviceURL := strings.TrimSpace(s.cfg.DataIngestionServiceURL)
+	if serviceURL == "" {
+		log.Printf("Data ingestion service URL not configured, using local catalog for %s->%s", req.OriginAirport, req.DestinationAirport)
+		return s.searchLocalCatalog(req)
+	}
+
+	endpoint := strings.TrimRight(serviceURL, "/") + "/api/v1/search/flights"
+
+	payload, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode request for data-ingestion: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), s.cfg.ProviderTimeout)
+	defer cancel()
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(payload))
+	if err != nil {
+		return nil, fmt.Errorf("failed to build data-ingestion request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(httpReq)
+	if err != nil {
+		log.Printf("Data ingestion service unavailable (%v), using local catalog for %s->%s", err, req.OriginAirport, req.DestinationAirport)
+		return s.searchLocalCatalog(req)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= http.StatusInternalServerError || resp.StatusCode == http.StatusBadGateway {
+		log.Printf("Data ingestion service returned %d, using local catalog for %s->%s", resp.StatusCode, req.OriginAirport, req.DestinationAirport)
+		return s.searchLocalCatalog(req)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("data-ingestion service returned status %d", resp.StatusCode)
+	}
+
+	var result models.FlightSearchResponse
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		log.Printf("Failed to decode data-ingestion response (%v), using local catalog for %s->%s", err, req.OriginAirport, req.DestinationAirport)
+		return s.searchLocalCatalog(req)
+	}
+
+	return result.Flights, nil
 }
 
 // searchElasticsearch searches using Elasticsearch
 func (s *SearchService) searchElasticsearch(req *models.FlightSearchRequest) ([]models.Flight, error) {
+	if s.elasticsearch == nil {
+		return []models.Flight{}, nil
+	}
+
 	response, err := s.elasticsearch.SearchFlights(req)
 	if err != nil {
 		return nil, err
@@ -236,10 +287,10 @@ func (s *SearchService) applyFilters(flights []models.Flight, req *models.Flight
 		}
 
 		// Flight duration filters
-		if req.MinFlightDurationHours != nil && flight.Duration < (*req.MinFlightDurationHours * 60) {
+		if req.MinFlightDurationHours != nil && flight.Duration < (*req.MinFlightDurationHours*60) {
 			continue
 		}
-		if req.MaxFlightDurationHours != nil && flight.Duration > (*req.MaxFlightDurationHours * 60) {
+		if req.MaxFlightDurationHours != nil && flight.Duration > (*req.MaxFlightDurationHours*60) {
 			continue
 		}
 
@@ -279,7 +330,7 @@ func (s *SearchService) applyFilters(flights []models.Flight, req *models.Flight
 func (s *SearchService) applySorting(flights []models.Flight, sortBy, sortOrder string) []models.Flight {
 	sort.Slice(flights, func(i, j int) bool {
 		ascending := sortOrder == "asc"
-		
+
 		switch sortBy {
 		case "price":
 			if ascending {

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -47,10 +48,10 @@ func (h *SearchHandler) SearchFlights(c *gin.Context) {
 
 	// Validate required fields
 	if req.OriginAirport == "" || req.DestinationAirport == "" {
-		err := &models.ValidationError{Message: "Origin and destination airports are required"}
+		err := fmt.Errorf("origin and destination airports are required")
 		tracing.SetSpanError(ctx, err)
 		h.metrics.RecordSearchRequest(req.OriginAirport, req.DestinationAirport, "error", 0, 0)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Message})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -70,7 +71,7 @@ func (h *SearchHandler) SearchFlights(c *gin.Context) {
 		tracing.SearchOrigin(req.OriginAirport),
 		tracing.SearchDestination(req.DestinationAirport),
 		tracing.SearchDate(req.DepartureDate.Format("2006-01-02")),
-		tracing.SearchPassengers(req.Passengers),
+		tracing.SearchPassengers(req.PassengerCount),
 	)
 
 	// Perform search using optimized Elasticsearch

@@ -71,6 +71,41 @@ Before you begin, ensure you have the following installed:
    cd services/data-ingestion-service && go run main.go
    ```
 
+### Minimal Search Slice
+
+If you want to demo the flight search without the full stack, the search-service now ships with a `local-catalog` provider that works entirely offline.
+
+1. Start the light dependencies:
+   ```bash
+   docker compose -f docker/docker-compose.dev.yml up postgres redis
+   ```
+2. In another shell boot the service with local configuration:
+   ```bash
+   DATABASE_URL=postgres://spontra:development@localhost:5432/spontra?sslmode=disable \
+   REDIS_URL=redis://localhost:6379 \
+   PORT=8084 \
+   go run ./services/search-service
+   ```
+3. Trigger a sample search once the server prints `Search service starting`:
+   ```bash
+   curl -s http://localhost:8084/api/v1/search/flights \
+     -H "Content-Type: application/json" \
+     -d '{
+       "origin_airport": "LHR",
+       "destination_airport": "BCN",
+       "departure_date": "2025-10-01T08:00:00Z",
+       "trip_type": "oneway",
+       "passenger_count": 1,
+       "preferred_activities": ["food", "nightlife"]
+     }' | jq '.flights[0]'
+   ```
+4. Airport autocomplete will fall back to the curated catalog if Elasticsearch is missing:
+   ```bash
+   curl -s 'http://localhost:8084/api/v1/search/suggestions/airports?q=lhr' | jq
+   ```
+
+The service still connects to Postgres and Redis for sessions and caching, but Elasticsearch, Kafka, and Cassandra are no longer required for a working demo.
+
 ### Running Tests
 
 - **All tests:** `make test`
@@ -251,3 +286,7 @@ docker exec -it spontra_redis_1 redis-cli
 - Check the [troubleshooting section](#troubleshooting)
 - Review existing [GitHub issues](https://github.com/your-org/spontra/issues)
 - Create a new issue if you encounter bugs or have questions
+
+
+
+

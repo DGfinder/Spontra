@@ -14,6 +14,7 @@ import (
 	"spontra/search-service/internal/config"
 	"spontra/search-service/internal/database"
 	"spontra/search-service/internal/elasticsearch"
+	"spontra/search-service/internal/handlers"
 	"spontra/search-service/internal/models"
 	"spontra/search-service/internal/repository"
 	"spontra/search-service/internal/services"
@@ -60,7 +61,11 @@ func main() {
 	// Initialize Elasticsearch
 	elasticsearchClient, err = elasticsearch.NewClient(cfg)
 	if err != nil {
-		log.Fatal("Failed to connect to Elasticsearch:", err)
+		if cfg.Environment == "production" {
+			log.Fatal("Failed to connect to Elasticsearch:", err)
+		}
+		log.Printf("Elasticsearch disabled: %v", err)
+		elasticsearchClient = nil
 	}
 
 	// Initialize repositories
@@ -82,7 +87,7 @@ func main() {
 	}
 
 	router := gin.Default()
-	
+
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -270,7 +275,10 @@ func getAirportSuggestions(c *gin.Context) {
 
 	// Check cache first
 	cacheKey := cache.NewCacheKeyBuilder("airport").AirportSuggestions(query)
-	var suggestions []models.AirportSuggestion
+	var (
+		suggestions  []models.AirportSuggestion
+		usedFallback bool
+	)
 	if err := redisClient.Get(cacheKey, &suggestions); err == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"suggestions": suggestions,
@@ -279,28 +287,42 @@ func getAirportSuggestions(c *gin.Context) {
 		return
 	}
 
-	// Search Elasticsearch
-	suggestions, err = elasticsearchClient.SearchAirports(query, limit)
-	if err != nil {
-		log.Printf("Airport search failed: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Airport search failed",
-			"details": err.Error(),
+	if elasticsearchClient != nil {
+		suggestions, err = elasticsearchClient.SearchAirports(query, limit)
+		if err != nil {
+			log.Printf("Airport search failed: %v, switching to local catalog", err)
+			suggestions = services.GetLocalAirportSuggestions(query, limit)
+			usedFallback = true
+		}
+	} else {
+		suggestions = services.GetLocalAirportSuggestions(query, limit)
+		usedFallback = true
+	}
+
+	if len(suggestions) == 0 {
+		c.JSON(http.StatusOK, gin.H{
+			"suggestions": []models.AirportSuggestion{},
+			"from_cache":  false,
+			"fallback":    usedFallback,
 		})
 		return
 	}
 
-	// Cache results for 1 hour
 	go func() {
 		if err := redisClient.Set(cacheKey, suggestions, cfg.AirportCacheTTL); err != nil {
 			log.Printf("Failed to cache airport suggestions: %v", err)
 		}
 	}()
 
-	c.JSON(http.StatusOK, gin.H{
+	response := gin.H{
 		"suggestions": suggestions,
 		"from_cache":  false,
-	})
+	}
+	if usedFallback {
+		response["fallback"] = true
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // Cache management handlers
@@ -358,7 +380,7 @@ func findSimilarDestinations(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	proxyRequest(c, "GET", fmt.Sprintf("/api/v1/explore/destinations/%s/similar?origin=%s", airport, origin))
 }
 
@@ -371,7 +393,7 @@ func getDestinationInfo(c *gin.Context) {
 // proxyRequest handles proxying requests to the data-ingestion-service
 func proxyRequest(c *gin.Context, method, path string) {
 	targetURL := cfg.DataIngestionServiceURL + path
-	
+
 	var body io.Reader
 	if method == "POST" || method == "PUT" {
 		// Read the request body
@@ -399,7 +421,7 @@ func proxyRequest(c *gin.Context, method, path string) {
 	// Copy relevant headers
 	req.Header.Set("Content-Type", c.GetHeader("Content-Type"))
 	req.Header.Set("Accept", c.GetHeader("Accept"))
-	
+
 	// Forward the request
 	resp, err := httpClient.Do(req)
 	if err != nil {

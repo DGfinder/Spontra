@@ -6,6 +6,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -63,16 +64,16 @@ func InitTracing(config TracingConfig) (func(), error) {
 func StartSpan(ctx context.Context, spanName string, attributes ...attribute.KeyValue) (context.Context, oteltrace.Span) {
 	tracer := otel.Tracer("spontra-search-service")
 	spanCtx, span := tracer.Start(ctx, spanName)
-	
+
 	// Add default attributes
 	span.SetAttributes(
 		attribute.String("service.name", "search-service"),
 		attribute.String("service.namespace", "spontra"),
 	)
-	
+
 	// Add custom attributes
 	span.SetAttributes(attributes...)
-	
+
 	return spanCtx, span
 }
 
@@ -97,27 +98,27 @@ func SetSpanAttributes(ctx context.Context, attributes ...attribute.KeyValue) {
 func SetSpanError(ctx context.Context, err error) {
 	span := oteltrace.SpanFromContext(ctx)
 	span.RecordError(err)
-	span.SetStatus(oteltrace.StatusError, err.Error())
+	span.SetStatus(codes.Error, err.Error())
 }
 
 // SetSpanSuccess marks the current span as successful
 func SetSpanSuccess(ctx context.Context) {
 	span := oteltrace.SpanFromContext(ctx)
-	span.SetStatus(oteltrace.StatusOK, "")
+	span.SetStatus(codes.Ok, "")
 }
 
 // TraceWrapper wraps a function with tracing
 func TraceWrapper(ctx context.Context, spanName string, fn func(context.Context) error, attributes ...attribute.KeyValue) error {
 	spanCtx, span := StartSpan(ctx, spanName, attributes...)
 	defer span.End()
-	
+
 	err := fn(spanCtx)
 	if err != nil {
 		SetSpanError(spanCtx, err)
 	} else {
 		SetSpanSuccess(spanCtx)
 	}
-	
+
 	return err
 }
 
@@ -128,7 +129,7 @@ var (
 	HTTPURLKey        = attribute.Key("http.url")
 	HTTPStatusCodeKey = attribute.Key("http.status_code")
 	HTTPUserAgentKey  = attribute.Key("http.user_agent")
-	
+
 	// Search attributes
 	SearchOriginKey      = attribute.Key("search.origin")
 	SearchDestinationKey = attribute.Key("search.destination")
@@ -136,24 +137,24 @@ var (
 	SearchPassengersKey  = attribute.Key("search.passengers")
 	SearchProviderKey    = attribute.Key("search.provider")
 	SearchResultsKey     = attribute.Key("search.results_count")
-	
+
 	// Database attributes
-	DBSystemKey      = attribute.Key("db.system")
-	DBNameKey        = attribute.Key("db.name")
-	DBOperationKey   = attribute.Key("db.operation")
-	DBTableKey       = attribute.Key("db.sql.table")
-	
+	DBSystemKey    = attribute.Key("db.system")
+	DBNameKey      = attribute.Key("db.name")
+	DBOperationKey = attribute.Key("db.operation")
+	DBTableKey     = attribute.Key("db.sql.table")
+
 	// Cache attributes
-	CacheSystemKey   = attribute.Key("cache.system")
+	CacheSystemKey    = attribute.Key("cache.system")
 	CacheOperationKey = attribute.Key("cache.operation")
-	CacheKeyKey      = attribute.Key("cache.key")
-	CacheHitKey      = attribute.Key("cache.hit")
-	
+	CacheKeyKey       = attribute.Key("cache.key")
+	CacheHitKey       = attribute.Key("cache.hit")
+
 	// Business attributes
-	UserIDKey        = attribute.Key("user.id")
-	SessionIDKey     = attribute.Key("session.id")
-	OperationKey     = attribute.Key("operation")
-	ResourceKey      = attribute.Key("resource")
+	UserIDKey    = attribute.Key("user.id")
+	SessionIDKey = attribute.Key("session.id")
+	OperationKey = attribute.Key("operation")
+	ResourceKey  = attribute.Key("resource")
 )
 
 // Common attribute constructors
