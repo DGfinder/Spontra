@@ -91,7 +91,8 @@ const navigation: NavigationItem[] = [
       { id: 'destinations-featured', label: 'Featured Cities', icon: Target, href: '/admin/destinations/featured' },
       { id: 'destinations-seasonal', label: 'Seasonal Collections', icon: Calendar, href: '/admin/destinations/seasonal' },
       { id: 'destinations-cache', label: 'Recommendations Cache', icon: Database, href: '/admin/destinations/cache' },
-      { id: 'airports', label: 'Airports (Read-only)', icon: Globe, href: '/admin/airports' }
+      { id: 'airports', label: 'Airports (Read-only)', icon: Globe, href: '/admin/airports' },
+      { id: 'airports-manage', label: 'Manage Airports', icon: Settings, href: '/admin/airports/manage' }
     ]
   },
   {

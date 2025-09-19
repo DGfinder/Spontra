@@ -91,6 +91,47 @@ cd frontend && npm run dev
 - **Databases**: Multi-store approach for optimal data patterns
 - **Monitoring**: Prometheus, Grafana, and distributed tracing
 
+## Data Management
+
+### Airport Data Management
+
+Spontra maintains up-to-date airport data using the OpenFlights dataset:
+
+```bash
+# Update airport data from OpenFlights
+python scripts/update_airports_from_openflights.py
+
+# This script will:
+# 1. Clone/update the OpenFlights repository
+# 2. Process airports.dat with country name resolution
+# 3. Generate temp/airports_openflights.csv
+# 4. Load data into PostgreSQL airports table
+```
+
+**Dependencies**: Requires `pycountry` Python package for country name resolution.
+
+### Flight Duration Data
+
+For development and testing, flight durations are calculated using geographic distance and typical flight patterns:
+
+```bash
+# Populate flight durations (European routes)
+cd services/search-service/scripts
+python populate_flight_durations.py
+
+# Generates 3,080+ flight duration records for 56 major European airports
+# Based on great circle distance calculations with realistic flight time estimates
+```
+
+**Note**: This provides estimated flight times for development. For production, integrate with airline schedule APIs (Amadeus, Sabre, etc.) for real scheduled flight data.
+
+### Database Schema
+
+- **airports**: 5,970+ airports with IATA codes, coordinates, and country data
+- **flight_durations**: Calculated flight times between European airport pairs
+- **search_sessions**: User search history and preferences
+- **search_history**: Detailed search analytics
+
 ## Development
 
 See [Development Guide](docs/development.md) for detailed setup instructions.

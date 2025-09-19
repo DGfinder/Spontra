@@ -23,24 +23,34 @@ export async function GET(req: NextRequest) {
     await pg.connect()
     // Search by code, city, name, or country
     const { rows } = await pg.query(
-      `SELECT iata_code, name, city, country, latitude, longitude
+      `SELECT iata_code, name, city, country, country_code, timezone, latitude, longitude
        FROM airports
-       WHERE LOWER(iata_code) LIKE LOWER($1) || '%'
-          OR LOWER(city) LIKE '%' || LOWER($1) || '%'
-          OR LOWER(name) LIKE '%' || LOWER($1) || '%'
-          OR LOWER(country) LIKE '%' || LOWER($1) || '%'
+       WHERE is_active = true
+         AND (
+            LOWER(iata_code) LIKE LOWER($1) || '%'
+         OR LOWER(city) LIKE '%' || LOWER($1) || '%'
+         OR LOWER(name) LIKE '%' || LOWER($1) || '%'
+         OR LOWER(country) LIKE '%' || LOWER($1) || '%'
+         )
        ORDER BY city ASC, name ASC
        LIMIT $2`,
       [q, limit]
     )
+    const toNumber = (value: any) => {
+      if (value === null || value === undefined || value === '') return null
+      const num = typeof value === 'number' ? value : Number(value)
+      return Number.isFinite(num) ? num : null
+    }
 
     const items = rows.map((r: any) => ({
       code: (r.iata_code || '').toUpperCase(),
       name: r.name || '',
       city: r.city || '',
       country: r.country || '',
-      latitude: typeof r.latitude === 'number' ? r.latitude : null,
-      longitude: typeof r.longitude === 'number' ? r.longitude : null,
+      countryCode: (r.country_code || '').toUpperCase(),
+      timezone: r.timezone || '',
+      latitude: toNumber(r.latitude),
+      longitude: toNumber(r.longitude),
     }))
 
     return NextResponse.json({ ok: true, items, count: items.length })

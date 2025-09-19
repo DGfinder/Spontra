@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: spontra
       POSTGRES_PASSWORD: development
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d
@@ -104,7 +104,7 @@ services:
       dockerfile: Dockerfile
     environment:
       PORT: "8084"
-      DATABASE_URL: "postgres://spontra:development@postgres/spontra?sslmode=disable"
+      DATABASE_URL: "postgres://spontra:development@postgres/search_service_db?sslmode=disable"
       REDIS_URL: "redis://redis:6379"
       ELASTICSEARCH_URL: "http://elasticsearch:9200"
       DATA_INGESTION_SERVICE_URL: "http://data-ingestion-service:8081"

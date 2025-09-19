@@ -294,6 +294,49 @@ class AdminService {
   }
 
   // ============================================================================
+  // AIRPORTS MANAGEMENT
+  // ============================================================================
+
+  async getAirportStats(): Promise<any> {
+    const res = await this.apiRequest(`/airports/stats`)
+    return res.data
+  }
+
+  async listAirports(params: {
+    page?: number
+    limit?: number
+    search?: string
+    filter?: 'all' | 'active' | 'inactive'
+    sort?: 'city' | 'name' | 'country' | 'flight_count'
+    order?: 'asc' | 'desc'
+  } = {}): Promise<any> {
+    const searchParams = new URLSearchParams()
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined) {
+        searchParams.set(key, value.toString())
+      }
+    })
+    
+    const res = await this.apiRequest(`/airports/list?${searchParams}`)
+    return res.data
+  }
+
+  async toggleAirportStatus(iataCode: string, isActive: boolean): Promise<any> {
+    const res = await this.apiRequest(`/airports/toggle`, {
+      method: 'POST',
+      body: JSON.stringify({ iata_code: iataCode, is_active: isActive })
+    })
+    return res.data
+  }
+
+  async syncAirportsWithFlights(): Promise<any> {
+    const res = await this.apiRequest(`/airports/sync-with-flights`, {
+      method: 'POST'
+    })
+    return res.data
+  }
+
+  // ============================================================================
   // FLIGHT TIMES (REFERENCE)
   // ============================================================================
 

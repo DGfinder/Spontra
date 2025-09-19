@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { AirportSearch } from '@/components/AirportSearch'
-import airportsData from '@/data/airports.json'
+import { AirportSearch, AirportSearchResult } from '@/components/AirportSearch'
 import { useRouter } from 'next/navigation'
 import {
   ArrowLeft,
@@ -163,18 +162,28 @@ export default function AddDestinationPage() {
   }
 
   const handleQuickAirportChange = (code: string) => {
-    setQuickIata(code?.toUpperCase() || '')
-    if (!code) return
-    const airport: any = (airportsData as any[]).find((a) => a.code?.toUpperCase() === code.toUpperCase())
-    if (airport) {
-      setDestination((prev) => ({
-        ...prev,
-        iataCode: airport.code?.toUpperCase() || prev.iataCode,
-        cityName: airport.city || prev.cityName,
-        countryName: airport.country || prev.countryName,
-        countryCode: airport.country ? getCountryCode(airport.country) : prev.countryCode,
-      }))
-    }
+    const normalized = code?.toUpperCase() || ''
+    setQuickIata(normalized)
+    setDestination((prev) => ({
+      ...prev,
+      iataCode: normalized,
+    }))
+  }
+
+  const handleAirportSelect = (airport: AirportSearchResult) => {
+    setQuickIata(airport.code)
+    setDestination((prev) => ({
+      ...prev,
+      iataCode: airport.code,
+      cityName: airport.city || prev.cityName,
+      countryName: airport.country || prev.countryName,
+      countryCode: airport.countryCode || (airport.country ? getCountryCode(airport.country) : prev.countryCode),
+      coordinates: {
+        lat: airport.latitude ?? prev.coordinates.lat,
+        lng: airport.longitude ?? prev.coordinates.lng,
+      },
+      timeZone: airport.timezone || prev.timeZone,
+    }))
   }
 
   const handleQuickCreate = async () => {
@@ -372,7 +381,9 @@ export default function AddDestinationPage() {
             <AirportSearch
               value={quickIata}
               onChange={handleQuickAirportChange}
+              onSelect={handleAirportSelect}
               placeholder="Start typing a city or airport name"
+              disabled={isQuickSubmitting}
             />
             {destination.iataCode && (
               <div className="text-sm text-gray-700">
