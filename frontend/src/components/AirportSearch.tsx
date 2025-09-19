@@ -24,7 +24,15 @@ interface AirportSearchProps {
 
 const DEFAULT_ENDPOINT = '/api/admin/reference/airports'
 const MIN_QUERY_LENGTH = 2
-const MAX_RESULTS = 8\n\nconst normalizeMaybeNumber = (value: any): number | null => {\n  if (value === null || value === undefined || value === '') return null\n  const num = typeof value === 'number' ? value : Number(value)\n  return Number.isFinite(num) ? num : null\n}\n\nexport function AirportSearch({
+const MAX_RESULTS = 8
+
+const normalizeMaybeNumber = (value: any): number | null => {
+  if (value === null || value === undefined || value === '') return null
+  const num = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(num) ? num : null
+}
+
+export function AirportSearch({
   value,
   onChange,
   onSelect,
@@ -49,6 +57,7 @@ const MAX_RESULTS = 8\n\nconst normalizeMaybeNumber = (value: any): number | nul
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false)
+        setSelectedIndex(-1)
       }
     }
 
@@ -56,167 +65,165 @@ const MAX_RESULTS = 8\n\nconst normalizeMaybeNumber = (value: any): number | nul
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Fetch suggestions when the user types
-  useEffect(() => {
-    if (!isOpen || searchTerm.trim().length < MIN_QUERY_LENGTH) {
+  // Search for airports
+  const searchAirports = async (query: string) => {
+    if (query.length < MIN_QUERY_LENGTH) {
       setResults([])
-      setSelectedIndex(-1)
-      activeRequest.current?.abort()
+      setIsOpen(false)
       return
     }
 
-    const controller = new AbortController()
-    activeRequest.current?.abort()
-    activeRequest.current = controller
+    // Cancel any ongoing request
+    if (activeRequest.current) {
+      activeRequest.current.abort()
+    }
 
-    const fetchSuggestions = async () => {
-      setIsLoading(true)
-      setFetchError(null)
-      try {
-        const url = `${apiEndpoint}?q=${encodeURIComponent(searchTerm.trim())}&limit=${MAX_RESULTS}`
-        const res = await fetch(url, { signal: controller.signal })
-        if (!res.ok) {
-          throw new Error(`Search failed (${res.status})`)
-        }
-        const data = await res.json()
-        const items = Array.isArray(data?.items) ? data.items : []
-        const mapped: AirportSearchResult[] = items.map((item: any) => ({
-          code: (item.code || '').toUpperCase(),
+    setIsLoading(true)
+    setFetchError(null)
+    
+    // Create new abort controller for this request
+    activeRequest.current = new AbortController()
+
+    try {
+      const response = await fetch(
+        `${apiEndpoint}?q=${encodeURIComponent(query)}&limit=${MAX_RESULTS}`,
+        { signal: activeRequest.current.signal }
+      )
+
+      if (!response.ok) {
+        throw new Error(`Search failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.ok && Array.isArray(data.items)) {
+        const transformedResults: AirportSearchResult[] = data.items.map((item: any) => ({
+          code: item.code || '',
           name: item.name || '',
           city: item.city || '',
           country: item.country || '',
-          countryCode: (item.countryCode || item.country_code || '').toUpperCase() || undefined,
-          timezone: item.timezone || undefined,
-          latitude: item.latitude === undefined ? null : item.latitude,
-          longitude: item.longitude === undefined ? null : item.longitude,
+          countryCode: item.countryCode || '',
+          timezone: item.timezone || '',
+          latitude: normalizeMaybeNumber(item.latitude),
+          longitude: normalizeMaybeNumber(item.longitude)
         }))
-        setResults(mapped)
+        
+        setResults(transformedResults)
+        setIsOpen(transformedResults.length > 0)
         setSelectedIndex(-1)
-      } catch (error: any) {
-        if (controller.signal.aborted) return
+      } else {
         setResults([])
-        setFetchError(error?.message || 'Search failed')
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoading(false)
+        setIsOpen(false)
+        if (!data.ok) {
+          setFetchError(data.error || 'Search failed')
         }
       }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Airport search error:', error)
+        setFetchError(error.message || 'Search failed')
+        setResults([])
+        setIsOpen(false)
+      }
+    } finally {
+      setIsLoading(false)
+      activeRequest.current = null
     }
+  }
 
-    fetchSuggestions()
-
-    return () => {
-      controller.abort()
-    }
-  }, [searchTerm, isOpen, apiEndpoint])
-
-  // Sync external value to the input display
-  useEffect(() => {
-    if (!value) {
+  // Handle input changes
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value
+    setSearchTerm(newValue)
+    onChange(newValue)
+    
+    // Reset selected airport if user is typing
+    if (selectedAirport && newValue !== selectedAirport.code) {
       setSelectedAirport(null)
-      setSearchTerm('')
-      return
-    }
-
-    if (selectedAirport && selectedAirport.code === value.toUpperCase()) {
-      setSearchTerm(formatAirportLabel(selectedAirport))
-      return
-    }
-
-    if (value.length === 3) {
-      void fetchAirportDetails(value)
-    } else {
-      setSearchTerm(value)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
-
-  const fetchAirportDetails = async (code: string) => {
-    try {
-      const url = `${apiEndpoint}?q=${encodeURIComponent(code)}&limit=1`
-      const res = await fetch(url)
-      if (!res.ok) return
-      const data = await res.json()
-      const match = Array.isArray(data?.items)
-        ? data.items.find((item: any) => (item.code || '').toUpperCase() === code.toUpperCase())
-        : null
-      if (match) {
-        const airport: AirportSearchResult = {
-          code: (match.code || '').toUpperCase(),
-          name: match.name || '',
-          city: match.city || '',
-          country: match.country || '',
-          countryCode: (match.countryCode || match.country_code || '').toUpperCase() || undefined,
-          timezone: match.timezone || undefined,
-          latitude: match.latitude === undefined ? null : match.latitude,
-          longitude: match.longitude === undefined ? null : match.longitude,
-        }
-        setSelectedAirport(airport)
-        setSearchTerm(formatAirportLabel(airport))
-        onChange(airport.code)
-        onSelect?.(airport)
-      }
-    } catch {
-      // ignore detail fetch errors; they will be handled by manual selection
     }
   }
 
-  const formatAirportLabel = (airport: AirportSearchResult) => {
-    const city = airport.city || airport.name
-    return city ? `${city} (${airport.code})` : airport.code
-  }
+  // Handle keyboard navigation
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen || results.length === 0) return
 
-  const selectAirport = (airport: AirportSearchResult) => {
-    setSelectedAirport(airport)
-    setSearchTerm(formatAirportLabel(airport))
-    setIsOpen(false)
-    setSelectedIndex(-1)
-    onChange(airport.code)
-    onSelect?.(airport)
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
-    setSearchTerm(inputValue)
-    setIsOpen(true)
-    setFetchError(null)
-
-    if (inputValue.length === 3) {
-      void fetchAirportDetails(inputValue.toUpperCase())
-    }
-  }
-
-  const handleInputFocus = () => {
-    if (searchTerm.length >= MIN_QUERY_LENGTH) {
-      setIsOpen(true)
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return
-
-    switch (e.key) {
+    switch (event.key) {
       case 'ArrowDown':
-        e.preventDefault()
-        setSelectedIndex(prev => (prev < results.length - 1 ? prev + 1 : prev))
+        event.preventDefault()
+        setSelectedIndex(prev => (prev + 1) % results.length)
         break
       case 'ArrowUp':
-        e.preventDefault()
-        setSelectedIndex(prev => (prev > 0 ? prev - 1 : -1))
+        event.preventDefault()
+        setSelectedIndex(prev => prev <= 0 ? results.length - 1 : prev - 1)
         break
       case 'Enter':
-        e.preventDefault()
+        event.preventDefault()
         if (selectedIndex >= 0 && results[selectedIndex]) {
-          selectAirport(results[selectedIndex])
+          handleSelect(results[selectedIndex])
         }
         break
       case 'Escape':
-        e.preventDefault()
         setIsOpen(false)
+        setSelectedIndex(-1)
         inputRef.current?.blur()
         break
     }
   }
+
+  // Handle airport selection
+  const handleSelect = async (airport: AirportSearchResult) => {
+    setSelectedAirport(airport)
+    setSearchTerm(airport.code)
+    onChange(airport.code)
+    setIsOpen(false)
+    setSelectedIndex(-1)
+    
+    if (onSelect) {
+      // Fetch detailed airport information
+      try {
+        const response = await fetch('/api/amadeus/airport', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: airport.code })
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.ok && data.data) {
+            // Enhance airport data with API response
+            const enhancedAirport: AirportSearchResult = {
+              ...airport,
+              timezone: data.data.timeZone?.timeZoneId || airport.timezone,
+              latitude: normalizeMaybeNumber(data.data.geoCode?.latitude) || airport.latitude,
+              longitude: normalizeMaybeNumber(data.data.geoCode?.longitude) || airport.longitude
+            }
+            onSelect(enhancedAirport)
+          } else {
+            onSelect(airport)
+          }
+        } else {
+          onSelect(airport)
+        }
+      } catch (error) {
+        console.warn('Failed to fetch detailed airport info:', error)
+        onSelect(airport)
+      }
+    }
+  }
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim() !== '') {
+        searchAirports(searchTerm.trim())
+      } else {
+        setResults([])
+        setIsOpen(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [searchTerm, apiEndpoint])
 
   return (
     <div ref={containerRef} className="relative">
@@ -225,54 +232,59 @@ const MAX_RESULTS = 8\n\nconst normalizeMaybeNumber = (value: any): number | nul
         type="text"
         value={searchTerm}
         onChange={handleInputChange}
-        onFocus={handleInputFocus}
         onKeyDown={handleKeyDown}
+        onFocus={() => {
+          if (results.length > 0) {
+            setIsOpen(true)
+          }
+        }}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full px-4 py-3 bg-white text-black rounded text-sm border-0 focus:ring-2 focus:ring-orange-500 transition-all duration-200"
+        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+        } ${fetchError ? 'border-red-500' : 'border-gray-300'}`}
+        autoComplete="off"
       />
+      
+      {isLoading && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+        </div>
+      )}
 
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-64 overflow-y-auto">
-          {isLoading && (
-            <div className="px-4 py-3 text-sm text-gray-500">Searching…</div>
-          )}
+      {fetchError && (
+        <div className="absolute top-full left-0 right-0 mt-1 p-2 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm z-50">
+          {fetchError}
+        </div>
+      )}
 
-          {!isLoading && fetchError && (
-            <div className="px-4 py-3 text-sm text-red-600">{fetchError}</div>
-          )}
-
-          {!isLoading && !fetchError && results.length === 0 && searchTerm.length >= MIN_QUERY_LENGTH && (
-            <div className="px-4 py-3 text-sm text-gray-500">No airports found</div>
-          )}
-
-          {!isLoading && !fetchError && results.map((airport, index) => (
-            <button
+      {isOpen && results.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-64 overflow-auto">
+          {results.map((airport, index) => (
+            <div
               key={airport.code}
-              type="button"
-              onClick={() => selectAirport(airport)}
-              className={`w-full text-left px-4 py-3 text-sm hover:bg-orange-50 border-b border-gray-100 last:border-b-0 transition-colors duration-150 ${
-                index === selectedIndex ? 'bg-orange-50 text-orange-700' : 'text-gray-900'
+              onClick={() => handleSelect(airport)}
+              className={`px-3 py-2 cursor-pointer hover:bg-gray-50 ${
+                index === selectedIndex ? 'bg-blue-50 border-l-4 border-blue-500' : ''
               }`}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">{airport.city || airport.name}</div>
-                  <div className="text-xs text-gray-500">{airport.name}</div>
+                  <div className="font-semibold text-gray-900">
+                    {airport.code} - {airport.name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {airport.city}, {airport.country}
+                  </div>
                 </div>
-                <div className="text-xs font-mono bg-gray-100 px-2 py-1 rounded">
+                <div className="text-xs text-gray-400">
                   {airport.code}
                 </div>
               </div>
-              <div className="mt-1 text-[11px] text-gray-500">
-                {airport.country}
-              </div>
-            </button>
+            </div>
           ))}
         </div>
       )}
     </div>
   )
 }
-
-
