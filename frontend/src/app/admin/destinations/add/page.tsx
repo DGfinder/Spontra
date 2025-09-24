@@ -1,962 +1,364 @@
 'use client'
 
-import { useState } from 'react'
-import { AirportSearch, AirportSearchResult } from '@/components/AirportSearch'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import {
-  ArrowLeft,
-  Save,
-  Plus,
-  X,
-  MapPin,
-  Globe,
-  Clock,
-  Thermometer,
-  CreditCard,
-  Languages,
-  Star,
-  Mountain,
-  Coffee,
-  TreePine,
-  Zap,
-  Compass,
-  Upload,
-  AlertCircle,
-  CheckCircle,
-  Loader
-} from 'lucide-react'
+import { Loader, MapPin, ArrowLeft, CheckCircle, XCircle } from 'lucide-react'
 
-interface NewDestination {
-  iataCode: string
-  cityName: string
-  countryName: string
-  countryCode: string
-  coordinates: {
-    lat: number | null
-    lng: number | null
-  }
-  description: string
-  themeScores: {
-    vibe: number
-    adventure: number
-    discover: number
-    indulge: number
-    nature: number
-  }
-  highlights: string[]
-  activities: string[]
-  bestTimeToVisit: string
-  averageTemperature: string
-  primaryLanguage: string
-  currency: string
-  timeZone: string
-  images: File[]
-}
+import { AirportSearch, AirportSearchResult } from '@/components/AirportSearch'
+import { DestinationThemeSlug } from '@/components/admin/AddReelDialog'\nimport { normaliseMediaUrls } from '@/lib/mediaValidation'
 
-interface ThemeConfig {
-  name: string
-  icon: React.ComponentType<{ size?: string | number; className?: string }>
-  color: string
-  description: string
+const THEME_ORDER: DestinationThemeSlug[] = ['vibe', 'adventure', 'discover', 'indulge', 'nature']
+
+function parseUrls(input: string) {
+  return input
+    .split(/\r?\n|,|\s/)
+    .map((chunk) => chunk.trim())
+    .filter(Boolean)
 }
 
 export default function AddDestinationPage() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
   const [currentStep, setCurrentStep] = useState(1)
-  const [newHighlight, setNewHighlight] = useState('')
-  const [newActivity, setNewActivity] = useState('')
-
-  // Quick Add state
-  const [quickIata, setQuickIata] = useState('')
-  const [isQuickSubmitting, setIsQuickSubmitting] = useState(false)
-  const [quickError, setQuickError] = useState<string | null>(null)
-
-  const [destination, setDestination] = useState<NewDestination>({
-    iataCode: '',
-    cityName: '',
-    countryName: '',
-    countryCode: '',
-    coordinates: {
-      lat: null,
-      lng: null
-    },
-    description: '',
-    themeScores: {
-      vibe: 5.0,
-      adventure: 5.0,
-      discover: 5.0,
-      indulge: 5.0,
-      nature: 5.0
-    },
-    highlights: [],
-    activities: [],
-    bestTimeToVisit: '',
-    averageTemperature: '',
-    primaryLanguage: '',
-    currency: '',
-    timeZone: '',
-    images: []
+  const [selectedAirport, setSelectedAirport] = useState<AirportSearchResult | null>(null)
+  const [iataCode, setIataCode] = useState('')
+  const [cityName, setCityName] = useState('')
+  const [countryName, setCountryName] = useState('')
+  const [countryCode, setCountryCode] = useState('')
+  const [description, setDescription] = useState('')
+  const [heroImage, setHeroImage] = useState('')
+  const [highlightsText, setHighlightsText] = useState('')
+  const [enabledThemes, setEnabledThemes] = useState<Record<DestinationThemeSlug, boolean>>({
+    vibe: false,
+    adventure: false,
+    discover: false,
+    indulge: false,
+    nature: false,
   })
+  const [themeUrls, setThemeUrls] = useState<Record<DestinationThemeSlug, string>>({
+    vibe: '',
+    adventure: '',
+    discover: '',
+    indulge: '',
+    nature: '',
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const themeConfig: Record<string, ThemeConfig> = {
-    vibe: {
-      name: 'City Vibe',
-      icon: Zap,
-      color: 'text-purple-600',
-      description: 'Nightlife, culture, and urban energy'
-    },
-    adventure: {
-      name: 'Adventure',
-      icon: Mountain,
-      color: 'text-orange-600',
-      description: 'Outdoor activities and thrilling experiences'
-    },
-    discover: {
-      name: 'Discovery',
-      icon: Compass,
-      color: 'text-blue-600',
-      description: 'Historical sites and cultural exploration'
-    },
-    indulge: {
-      name: 'Indulgence',
-      icon: Coffee,
-      color: 'text-amber-600',
-      description: 'Fine dining, shopping, and luxury experiences'
-    },
-    nature: {
-      name: 'Nature',
-      icon: TreePine,
-      color: 'text-green-600',
-      description: 'Natural beauty and outdoor settings'
-    }
-  }
+  const enabledThemeList = useMemo(() => THEME_ORDER.filter((theme) => enabledThemes[theme]), [enabledThemes])
 
-  // Simple country name -> ISO2 mapping for common cases
-  const getCountryCode = (countryName: string): string => {
-    const countryMap: Record<string, string> = {
-      'Spain': 'ES',
-      'France': 'FR',
-      'Italy': 'IT',
-      'Germany': 'DE',
-      'United Kingdom': 'GB',
-      'Portugal': 'PT',
-      'Netherlands': 'NL',
-      'Greece': 'GR',
-      'Czech Republic': 'CZ',
-      'Austria': 'AT',
-      'Poland': 'PL',
-      'Hungary': 'HU',
-      'Croatia': 'HR',
-      'Switzerland': 'CH',
-      'Belgium': 'BE',
-      'Ireland': 'IE',
-      'Denmark': 'DK',
-      'Sweden': 'SE',
-      'Norway': 'NO',
-      'Finland': 'FI',
-      'Iceland': 'IS'
-    }
-    return countryMap[countryName] || countryName.slice(0, 2).toUpperCase()
-  }
-
-  const handleQuickAirportChange = (code: string) => {
-    const normalized = code?.toUpperCase() || ''
-    setQuickIata(normalized)
-    setDestination((prev) => ({
-      ...prev,
-      iataCode: normalized,
-    }))
-  }
+  const canContinueStep1 = iataCode.length === 3 && cityName && countryName
+  const canContinueStep2 = enabledThemeList.length > 0
 
   const handleAirportSelect = (airport: AirportSearchResult) => {
-    setQuickIata(airport.code)
-    setDestination((prev) => ({
-      ...prev,
-      iataCode: airport.code,
-      cityName: airport.city || prev.cityName,
-      countryName: airport.country || prev.countryName,
-      countryCode: airport.countryCode || (airport.country ? getCountryCode(airport.country) : prev.countryCode),
-      coordinates: {
-        lat: airport.latitude ?? prev.coordinates.lat,
-        lng: airport.longitude ?? prev.coordinates.lng,
-      },
-      timeZone: airport.timezone || prev.timeZone,
-    }))
-  }
-
-  const handleQuickCreate = async () => {
-    setQuickError(null)
-    if (!destination.iataCode || destination.iataCode.length !== 3) {
-      setQuickError('Select a valid airport/city (IATA code)')
-      return
-    }
-    setIsQuickSubmitting(true)
-    try {
-      const res = await fetch('/api/admin/destinations/preferences', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          iataCode: destination.iataCode,
-          whitelisted: true,
-          themeScores: destination.themeScores,
-        })
-      })
-      const json = await res.json()
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || 'Failed to save preferences')
-      }
-      router.push(`/admin/destinations/${encodeURIComponent(destination.iataCode)}`)
-    } catch (e: any) {
-      setQuickError(e?.message || 'Failed to create destination')
-    } finally {
-      setIsQuickSubmitting(false)
-    }
-  }
-
-  const validateStep = (step: number): boolean => {
-    const newErrors: Record<string, string> = {}
-
-    if (step === 1) {
-      if (!destination.iataCode) newErrors.iataCode = 'IATA code is required'
-      else if (destination.iataCode.length !== 3) newErrors.iataCode = 'IATA code must be 3 characters'
-      
-      if (!destination.cityName) newErrors.cityName = 'City name is required'
-      if (!destination.countryName) newErrors.countryName = 'Country name is required'
-      if (!destination.countryCode) newErrors.countryCode = 'Country code is required'
-      // Coordinates optional (can be auto-derived later)
-    }
-
-    if (step === 2) {
-      if (!destination.description) newErrors.description = 'Description is required'
-      else if (destination.description.length < 50) newErrors.description = 'Description must be at least 50 characters'
-    }
-
-    if (step === 4) {
-      if (destination.highlights.length === 0) newErrors.highlights = 'At least one highlight is required'
-      if (destination.activities.length === 0) newErrors.activities = 'At least one activity is required'
-    }
-
-    if (step === 5) {
-      if (!destination.bestTimeToVisit) newErrors.bestTimeToVisit = 'Best time to visit is required'
-      if (!destination.primaryLanguage) newErrors.primaryLanguage = 'Primary language is required'
-      if (!destination.currency) newErrors.currency = 'Currency is required'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(currentStep + 1)
-    }
-  }
-
-  const handlePrevious = () => {
-    setCurrentStep(currentStep - 1)
-    setErrors({})
+    setSelectedAirport(airport)
+    setIataCode((airport.code || '').toUpperCase())
+    setCityName(airport.city || '')
+    setCountryName(airport.country || '')
+    setCountryCode((airport.countryCode || '').toUpperCase())
   }
 
   const handleSubmit = async () => {
-    if (!validateStep(5)) return
+    setError(null)
+
+    for (const theme of enabledThemeList) {
+      const parsed = parseUrls(themeUrls[theme])
+      if (parsed.length < 5 || parsed.length > 10) {
+        setError(`Theme ${theme} requires between 5 and 10 URLs. Currently ${parsed.length}.`)
+        setCurrentStep(3)
+        return
+      }
+      const validation = normaliseMediaUrls(parsed)
+      if (!validation.ok) {
+        setError(`Theme ${theme}: ${validation.error}`)
+        setCurrentStep(3)
+        return
+      }
+    }
 
     setIsSubmitting(true)
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // In real implementation, make API call to create destination
-      console.log('Creating destination:', destination)
-      
-      // Redirect to destination detail page or manage page
-      router.push('/admin/destinations/manage')
-    } catch (error) {
-      console.error('Failed to create destination:', error)
-      setErrors({ submit: 'Failed to create destination. Please try again.' })
-    } finally {
+      if (description || heroImage || highlightsText) {
+        await fetch('/api/admin/destinations/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            airport_code: iataCode,
+            city: cityName,
+            country: countryName,
+            country_code: countryCode,
+            description: description || undefined,
+            hero_image: heroImage || undefined,
+            highlights: highlightsText
+              .split(/\r?\n/)
+              .map((line) => line.trim())
+              .filter(Boolean),
+          }),
+        })
+      }
+
+      for (const theme of enabledThemeList) {
+        const urls = parseUrls(themeUrls[theme])
+        const validation = normaliseMediaUrls(urls)
+        if (!validation.ok) {
+          throw new Error(`Theme ${theme}: ${validation.error}`)
+        }
+
+        const reelsResponse = await fetch(`/api/admin/destinations/${encodeURIComponent(iataCode)}/themes/${theme}/reels`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls: validation.urls }),
+        })
+        if (!reelsResponse.ok) {
+          const data = await reelsResponse.json().catch(() => ({}))
+          throw new Error(data?.error || `Failed to create reels for ${theme}`)
+        }
+
+        const patchResponse = await fetch(`/api/admin/destinations/${encodeURIComponent(iataCode)}/themes/${theme}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isEnabled: true, min: 5, max: 10 }),
+        })
+        if (!patchResponse.ok) {
+          const data = await patchResponse.json().catch(() => ({}))
+          throw new Error(data?.error || `Failed to enable ${theme}`)
+        }
+      }
+
+      router.push(`/admin/destinations/${iataCode}?tab=media`)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create destination')
       setIsSubmitting(false)
     }
   }
 
-  const addHighlight = () => {
-    if (newHighlight.trim()) {
-      setDestination({
-        ...destination,
-        highlights: [...destination.highlights, newHighlight.trim()]
-      })
-      setNewHighlight('')
-    }
-  }
-
-  const removeHighlight = (index: number) => {
-    setDestination({
-      ...destination,
-      highlights: destination.highlights.filter((_, i) => i !== index)
-    })
-  }
-
-  const addActivity = () => {
-    if (newActivity.trim()) {
-      setDestination({
-        ...destination,
-        activities: [...destination.activities, newActivity.trim()]
-      })
-      setNewActivity('')
-    }
-  }
-
-  const removeActivity = (index: number) => {
-    setDestination({
-      ...destination,
-      activities: destination.activities.filter((_, i) => i !== index)
-    })
-  }
-
-  const updateThemeScore = (theme: string, score: number) => {
-    setDestination({
-      ...destination,
-      themeScores: {
-        ...destination.themeScores,
-        [theme]: Math.max(0, Math.min(10, score))
-      }
-    })
-  }
-
-  const handleImageUpload = (files: FileList) => {
-    const newImages = Array.from(files)
-    setDestination({
-      ...destination,
-      images: [...destination.images, ...newImages].slice(0, 10) // Limit to 10 images
-    })
-  }
-
-  const removeImage = (index: number) => {
-    setDestination({
-      ...destination,
-      images: destination.images.filter((_, i) => i !== index)
-    })
-  }
-
-  const getStepTitle = (step: number) => {
-    switch (step) {
-      case 1: return 'Basic Information'
-      case 2: return 'Description'
-      case 3: return 'Theme Scores'
-      case 4: return 'Highlights & Activities'
-      case 5: return 'Travel Information'
-      case 6: return 'Images'
-      default: return 'Add Destination'
-    }
-  }
-
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+    <div className="space-y-6 p-6">
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        <ArrowLeft className="cursor-pointer" size={18} onClick={() => router.push('/admin/destinations/manage')} />
+        <span>Add Destination</span>
+      </div>
+
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <h1 className="text-xl font-semibold text-gray-900">Reels-first destination setup</h1>
+          <p className="text-sm text-gray-600">Select a city, enable themes, and paste 5–10 media URLs per theme.</p>
+        </div>
+
+        <div className="px-6 py-5 space-y-6">
+          <div className="flex items-center justify-between">
+            {[1, 2, 3].map((step) => (
+              <div key={step} className="flex items-center gap-2">
+                <div
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
+                    step === currentStep
+                      ? 'bg-blue-600 text-white'
+                      : step < currentStep
+                      ? 'bg-green-500 text-white'
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  {step < currentStep ? <CheckCircle size={16} /> : step}
+                </div>
+                {step < 3 && <div className="h-0.5 w-16 bg-gray-200" />}
+              </div>
+            ))}
+          </div>
+
+          {currentStep === 1 && (
+            <div className="space-y-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700">Search city or airport</label>
+                <AirportSearch
+                  value={iataCode}
+                  onChange={(value) => setIataCode(value.toUpperCase())}
+                  onSelect={handleAirportSelect}
+                  placeholder="Start typing a city or airport name"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">City</label>
+                  <input
+                    value={cityName}
+                    onChange={(event) => setCityName(event.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Country</label>
+                  <input
+                    value={countryName}
+                    onChange={(event) => setCountryName(event.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Country code</label>
+                  <input
+                    value={countryCode}
+                    onChange={(event) => setCountryCode(event.target.value.toUpperCase())}
+                    maxLength={2}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-4 border-t border-gray-200 pt-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Description</label>
+                  <textarea
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
+                    rows={4}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Hero image URL</label>
+                  <input
+                    value={heroImage}
+                    onChange={(event) => setHeroImage(event.target.value)}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    placeholder="https://cdn.spontra.com/media/..."
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Highlights (one per line)</label>
+                  <textarea
+                    value={highlightsText}
+                    onChange={(event) => setHighlightsText(event.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  disabled={!canContinueStep1}
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 2 && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                {THEME_ORDER.map((theme) => (
+                  <label
+                    key={theme}
+                    className={`flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition-colors ${
+                      enabledThemes[theme]
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 bg-white text-gray-700'
+                    }`}
+                  >
+                    <span className="font-medium capitalize">{theme}</span>
+                    <input
+                      type="checkbox"
+                      checked={enabledThemes[theme]}
+                      onChange={(event) =>
+                        setEnabledThemes((prev) => ({
+                          ...prev,
+                          [theme]: event.target.checked,
+                        }))
+                      }
+                    />
+                  </label>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>Select at least one theme to curate.</span>
+                <div className="space-x-2">
+                  <button
+                    onClick={() => setCurrentStep(1)}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={() => setCurrentStep(3)}
+                    disabled={!canContinueStep2}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Continue
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              {enabledThemeList.map((theme) => {
+                const urls = parseUrls(themeUrls[theme])
+                const status = urls.length >= 5 && urls.length <= 10
+                return (
+                  <div key={theme} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm font-medium text-gray-700">
+                      <span className="capitalize">{theme}</span>
+                      <span className={status ? 'text-green-600' : 'text-amber-600'}>
+                        {urls.length} URL(s) detected
+                      </span>
+                    </div>
+                    <textarea
+                      value={themeUrls[theme]}
+                      onChange={(event) =>
+                        setThemeUrls((prev) => ({
+                          ...prev,
+                          [theme]: event.target.value,
+                        }))
+                      }
+                      rows={6}
+                      placeholder={`Paste 5-10 media URLs for ${theme}`}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                    />
+                  </div>
+                )
+              })}
+
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <CheckCircle size={16} className="text-green-600" /> Minimum 5, maximum 10 URLs per theme.
+                </div>
+                <button
+                  onClick={() => setCurrentStep(2)}
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Back
+                </button>
+              </div>
+            </div>
+          )}
+
+          {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+        </div>
+
+        <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
           <button
             onClick={() => router.push('/admin/destinations/manage')}
-            className="p-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 transition-colors"
+            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            disabled={isSubmitting}
           >
-            <ArrowLeft size={20} />
+            Cancel
           </button>
-          
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Destination</h1>
-            <p className="text-gray-600">Step {currentStep} of 6: {getStepTitle(currentStep)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Add (recommended) */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Quick Add (Select City/Airport and Set Themes)</h3>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Search City or Airport</label>
-            <AirportSearch
-              value={quickIata}
-              onChange={handleQuickAirportChange}
-              onSelect={handleAirportSelect}
-              placeholder="Start typing a city or airport name"
-              disabled={isQuickSubmitting}
-            />
-            {destination.iataCode && (
-              <div className="text-sm text-gray-700">
-                <div className="font-medium">Selected: {destination.cityName || 'â€”'} ({destination.iataCode})</div>
-                <div className="text-gray-600">{destination.countryName} {destination.countryCode ? `Â· ${destination.countryCode}` : ''}</div>
-              </div>
-            )}
-          </div>
-
-          {/* Theme scores quick editor */}
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700">Theme Scores</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(themeConfig).map(([key, theme]) => {
-                const score = destination.themeScores[key as keyof typeof destination.themeScores]
-                return (
-                  <div key={`quick-${key}`} className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <theme.icon size={18} className={theme.color} />
-                        <span className="font-medium text-gray-900">{theme.name}</span>
-                      </div>
-                      <span className="text-sm text-gray-700">{score.toFixed(1)}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={10}
-                      step={0.5}
-                      value={score}
-                      onChange={(e) => updateThemeScore(key, parseFloat(e.target.value))}
-                      className="w-full"
-                    />
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <p className="text-sm text-gray-500">This will whitelist the destination and save theme scores. You can add POIs on the next page.</p>
           <button
-            onClick={handleQuickCreate}
-            disabled={isQuickSubmitting || !destination.iataCode}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+            onClick={handleSubmit}
+            disabled={currentStep !== 3 || isSubmitting}
+            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {isQuickSubmitting ? (
-              <>
-                <Loader className="animate-spin mr-2" size={16} />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save size={16} className="mr-2" />
-                Create & Manage POIs
-              </>
-            )}
+            {isSubmitting ? <Loader className="mr-2 animate-spin" size={16} /> : null}
+            {isSubmitting ? 'Creating…' : 'Create destination'}
           </button>
         </div>
-
-        {quickError && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center">
-            <AlertCircle size={16} className="mr-2" />
-            {quickError}
-          </div>
-        )}
-      </div>
-
-      {/* Progress Bar */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          {[1, 2, 3, 4, 5, 6].map((step) => (
-            <div key={step} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step < currentStep 
-                  ? 'bg-green-500 text-white' 
-                  : step === currentStep 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-200 text-gray-600'
-              }`}>
-                {step < currentStep ? <CheckCircle size={16} /> : step}
-              </div>
-              {step < 6 && (
-                <div className={`w-16 h-1 mx-2 ${
-                  step < currentStep ? 'bg-green-500' : 'bg-gray-200'
-                }`} />
-              )}
-            </div>
-          ))}
-        </div>
-        
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${(currentStep / 6) * 100}%` }}
-          />
-        </div>
-      </div>
-
-      {/* Form Content */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        {currentStep === 1 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  IATA Code *
-                  <span className="text-xs text-gray-500 ml-2">(3 characters)</span>
-                </label>
-                <input
-                  type="text"
-                  value={destination.iataCode}
-                  onChange={(e) => setDestination({...destination, iataCode: e.target.value.toUpperCase()})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.iataCode ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  maxLength={3}
-                  placeholder="e.g. NYC"
-                />
-                {errors.iataCode && <p className="text-red-500 text-xs mt-1">{errors.iataCode}</p>}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">City Name *</label>
-                <input
-                  type="text"
-                  value={destination.cityName}
-                  onChange={(e) => setDestination({...destination, cityName: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.cityName ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. Barcelona"
-                />
-                {errors.cityName && <p className="text-red-500 text-xs mt-1">{errors.cityName}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Country Name *</label>
-                <input
-                  type="text"
-                  value={destination.countryName}
-                  onChange={(e) => setDestination({...destination, countryName: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.countryName ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. Spain"
-                />
-                {errors.countryName && <p className="text-red-500 text-xs mt-1">{errors.countryName}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Country Code *</label>
-                <input
-                  type="text"
-                  value={destination.countryCode}
-                  onChange={(e) => setDestination({...destination, countryCode: e.target.value.toUpperCase()})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.countryCode ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  maxLength={2}
-                  placeholder="e.g. ES"
-                />
-                {errors.countryCode && <p className="text-red-500 text-xs mt-1">{errors.countryCode}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Latitude *</label>
-                <input
-                  type="number"
-                  step="any"
-                  value={destination.coordinates.lat || ''}
-                  onChange={(e) => setDestination({
-                    ...destination, 
-                    coordinates: {...destination.coordinates, lat: parseFloat(e.target.value) || null}
-                  })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.lat ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. 41.3874"
-                />
-                {errors.lat && <p className="text-red-500 text-xs mt-1">{errors.lat}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Longitude *</label>
-                <input
-                  type="number"
-                  step="any"
-                  value={destination.coordinates.lng || ''}
-                  onChange={(e) => setDestination({
-                    ...destination, 
-                    coordinates: {...destination.coordinates, lng: parseFloat(e.target.value) || null}
-                  })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.lng ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. 2.1686"
-                />
-                {errors.lng && <p className="text-red-500 text-xs mt-1">{errors.lng}</p>}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Description</h3>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Destination Description *
-                <span className="text-xs text-gray-500 ml-2">(minimum 50 characters)</span>
-              </label>
-              <textarea
-                value={destination.description}
-                onChange={(e) => setDestination({...destination, description: e.target.value})}
-                rows={6}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                  errors.description ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Describe what makes this destination special. Include key attractions, culture, atmosphere, and what travelers can expect..."
-              />
-              <div className="flex items-center justify-between mt-2">
-                {errors.description && <p className="text-red-500 text-xs">{errors.description}</p>}
-                <p className="text-xs text-gray-500">{destination.description.length} characters</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Theme Scores</h3>
-              <p className="text-gray-600">Rate how well this destination matches each theme (0-10 scale)</p>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {Object.entries(themeConfig).map(([key, theme]) => {
-                const score = destination.themeScores[key as keyof typeof destination.themeScores]
-                return (
-                  <div key={key} className="bg-gray-50 rounded-lg p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={`p-2 rounded-lg ${theme.color} bg-opacity-10`}>
-                          <theme.icon size={20} className={theme.color} />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">{theme.name}</h4>
-                          <p className="text-sm text-gray-600">{theme.description}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-gray-900">{score.toFixed(1)}</div>
-                        <div className="text-sm text-gray-600">/ 10</div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        step="0.1"
-                        value={score}
-                        onChange={(e) => updateThemeScore(key, parseFloat(e.target.value))}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                      />
-                      <div className="flex justify-between text-xs text-gray-500">
-                        <span>0</span>
-                        <span>2.5</span>
-                        <span>5</span>
-                        <span>7.5</span>
-                        <span>10</span>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {currentStep === 4 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Highlights & Activities</h3>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Highlights */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-gray-900">Key Highlights *</h4>
-                  <span className="text-xs text-gray-500">{destination.highlights.length} highlights</span>
-                </div>
-                
-                <div className="space-y-3 mb-4">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newHighlight}
-                      onChange={(e) => setNewHighlight(e.target.value)}
-                      placeholder="Add a highlight (e.g. Sagrada Familia)"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                      onKeyPress={(e) => e.key === 'Enter' && addHighlight()}
-                    />
-                    <button
-                      onClick={addHighlight}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                  
-                  {errors.highlights && <p className="text-red-500 text-xs">{errors.highlights}</p>}
-                </div>
-                
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {destination.highlights.map((highlight, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-gray-900">{highlight}</span>
-                      <button
-                        onClick={() => removeHighlight(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Activities */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium text-gray-900">Activities *</h4>
-                  <span className="text-xs text-gray-500">{destination.activities.length} activities</span>
-                </div>
-                
-                <div className="space-y-3 mb-4">
-                  <div className="flex space-x-2">
-                    <input
-                      type="text"
-                      value={newActivity}
-                      onChange={(e) => setNewActivity(e.target.value)}
-                      placeholder="Add an activity (e.g. Architecture Tours)"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                      onKeyPress={(e) => e.key === 'Enter' && addActivity()}
-                    />
-                    <button
-                      onClick={addActivity}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      <Plus size={16} />
-                    </button>
-                  </div>
-                  
-                  {errors.activities && <p className="text-red-500 text-xs">{errors.activities}</p>}
-                </div>
-                
-                <div className="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
-                  {destination.activities.map((activity, index) => (
-                    <div key={index} className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                      <span>{activity}</span>
-                      <button
-                        onClick={() => removeActivity(index)}
-                        className="ml-2 text-blue-600 hover:text-blue-800"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 5 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Travel Information</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Clock size={16} className="inline mr-2" />
-                  Best Time to Visit *
-                </label>
-                <input
-                  type="text"
-                  value={destination.bestTimeToVisit}
-                  onChange={(e) => setDestination({...destination, bestTimeToVisit: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.bestTimeToVisit ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. April to June, September to October"
-                />
-                {errors.bestTimeToVisit && <p className="text-red-500 text-xs mt-1">{errors.bestTimeToVisit}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Thermometer size={16} className="inline mr-2" />
-                  Average Temperature
-                </label>
-                <input
-                  type="text"
-                  value={destination.averageTemperature}
-                  onChange={(e) => setDestination({...destination, averageTemperature: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  placeholder="e.g. 15-25Â°C"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Languages size={16} className="inline mr-2" />
-                  Primary Language *
-                </label>
-                <input
-                  type="text"
-                  value={destination.primaryLanguage}
-                  onChange={(e) => setDestination({...destination, primaryLanguage: e.target.value})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.primaryLanguage ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="e.g. Spanish/Catalan"
-                />
-                {errors.primaryLanguage && <p className="text-red-500 text-xs mt-1">{errors.primaryLanguage}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <CreditCard size={16} className="inline mr-2" />
-                  Currency *
-                </label>
-                <input
-                  type="text"
-                  value={destination.currency}
-                  onChange={(e) => setDestination({...destination, currency: e.target.value.toUpperCase()})}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent ${
-                    errors.currency ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  maxLength={3}
-                  placeholder="e.g. EUR"
-                />
-                {errors.currency && <p className="text-red-500 text-xs mt-1">{errors.currency}</p>}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Globe size={16} className="inline mr-2" />
-                  Time Zone
-                </label>
-                <input
-                  type="text"
-                  value={destination.timeZone}
-                  onChange={(e) => setDestination({...destination, timeZone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                  placeholder="e.g. CET (Central European Time)"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentStep === 6 && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900">Images (Optional)</h3>
-            
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-              <h4 className="text-lg font-medium text-gray-900 mb-2">Upload destination images</h4>
-              <p className="text-gray-600 mb-4">
-                Add photos that showcase your destination (max 10 images, 5MB each)
-              </p>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => e.target.files && handleImageUpload(e.target.files)}
-                className="hidden"
-                id="image-upload"
-              />
-              <label
-                htmlFor="image-upload"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
-              >
-                <Plus size={16} className="mr-2" />
-                Choose Images
-              </label>
-            </div>
-
-            {destination.images.length > 0 && (
-              <div>
-                <h4 className="font-medium text-gray-900 mb-4">
-                  Uploaded Images ({destination.images.length}/10)
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {destination.images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
-                        <img
-                          src={URL.createObjectURL(image)}
-                          alt={`Upload ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-          <button
-            onClick={handlePrevious}
-            disabled={currentStep === 1}
-            className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-
-          <div className="text-sm text-gray-500">
-            Step {currentStep} of 6
-          </div>
-
-          {currentStep < 6 ? (
-            <button
-              onClick={handleNext}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader className="animate-spin mr-2" size={16} />
-                  Creating...
-                </>
-              ) : (
-                <>
-                  <Save size={16} className="mr-2" />
-                  Create Destination
-                </>
-              )}
-            </button>
-          )}
-        </div>
-
-        {errors.submit && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center">
-            <AlertCircle size={16} className="text-red-500 mr-2" />
-            <p className="text-red-700 text-sm">{errors.submit}</p>
-          </div>
-        )}
       </div>
     </div>
   )
 }
+

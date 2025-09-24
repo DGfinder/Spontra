@@ -1,0 +1,71 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum MediaKind {
+  video
+  image
+}
+
+enum AspectRatio {
+  _9_16
+  _1_1
+  _16_9
+}
+
+model CityTheme {
+  id               Int      @id @default(autoincrement())
+  iata             String   @db.VarChar(3)
+  themeSlug        String   @db.VarChar(32)
+  isEnabled        Boolean  @default(false)
+  minMediaRequired Int      @default(5)
+  maxMediaAllowed  Int      @default(10)
+  notes            String?
+  reels            Reel[]
+
+  @@unique([iata, themeSlug])
+  @@index([iata])
+  @@index([themeSlug])
+}
+
+model Reel {
+  id        Int         @id @default(autoincrement())
+  iata      String      @db.VarChar(3)
+  themeSlug String      @db.VarChar(32)
+  title     String?
+  caption   String?
+  language  String      @default("en") @db.VarChar(8)
+  isActive  Boolean     @default(true)
+  sortOrder Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  media     ReelMedia[]
+  theme     CityTheme?  @relation(fields: [iata, themeSlug], references: [iata, themeSlug], onDelete: SetNull)
+
+  @@index([iata, themeSlug, isActive])
+}
+
+model ReelMedia {
+  id         Int        @id @default(autoincrement())
+  reelId     Int
+  kind       MediaKind
+  sourceUrl  String
+  providerId String?
+  aspect     AspectRatio @default(_9_16)
+  durationMs Int?
+  width      Int?
+  height     Int?
+  altText    String?
+  credit     String?
+  license    String?
+  sortOrder  Int        @default(0)
+  isActive   Boolean    @default(true)
+  reel       Reel       @relation(fields: [reelId], references: [id], onDelete: Cascade)
+
+  @@index([reelId, isActive])
+}
