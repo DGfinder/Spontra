@@ -28,7 +28,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const client = await getAdminDbClient()
     try {
       const overlayResult = await client.query(
-        SELECT
+        `SELECT
             a.iata_code,
             a.name,
             a.city,
@@ -39,8 +39,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             dest.hero_image
          FROM airports a
          LEFT JOIN destinations_enhanced dest ON dest.airport_code = a.iata_code
-         WHERE a.iata_code = 
-         LIMIT 1,
+         WHERE a.iata_code = $1
+         LIMIT 1`,
         [iata]
       )
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       }
 
       const readinessResult = await client.query(
-        SELECT
+        `SELECT
             ct."themeSlug" AS theme_slug,
             ct."isEnabled" AS is_enabled,
             ct."minMediaRequired" AS min_media_required,
@@ -58,9 +58,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             view.is_ready
          FROM "CityTheme" ct
          LEFT JOIN city_theme_ready view
-           ON view.iata = ct.iata AND view.theme_slug = ct."themeSlug"
-         WHERE ct.iata = 
-         ORDER BY ct."themeSlug",
+           ON view.iata = ct.iata
+          AND view.theme_slug = ct."themeSlug"
+         WHERE ct.iata = $1
+         ORDER BY ct."themeSlug"`,
         [iata]
       )
 

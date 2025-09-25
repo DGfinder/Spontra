@@ -2,16 +2,15 @@ import { ReactNode } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-import AdminShell from '@/components/admin/AdminShell'
 import { getSessionFromCookies } from '@/lib/adminAuth'
+import AdminClientProviders from './AdminClientProviders'
 
 export default async function AdminPanelLayout({ children }: { children: ReactNode }) {
-  const cookieStore = cookies()
-  const session = await getSessionFromCookies(cookieStore)
+  const session = await getSessionFromCookies(cookies())
 
   if (!session) {
     redirect('/admin/login')
   }
 
-  return <AdminShell session={session}>{children}</AdminShell>
+  return <AdminClientProviders session={session}>{children}</AdminClientProviders>
 }

@@ -143,3 +143,7 @@ See [Deployment Guide](docs/deployment.md) for production deployment instruction
 ## Contributing
 
 See [Contributing Guide](docs/contributing.md) for development guidelines and best practices.
+## Admin Panel Resources
+- Quickstart: [docs/ADMIN_PANEL_QUICKSTART.md](docs/ADMIN_PANEL_QUICKSTART.md)
+- Cheat Sheet: [docs/ADMIN_PANEL_CHEATSHEET.md](docs/ADMIN_PANEL_CHEATSHEET.md)
+- Production Checklist: [docs/ADMIN_PRODUCTION_CHECKLIST.md](docs/ADMIN_PRODUCTION_CHECKLIST.md)

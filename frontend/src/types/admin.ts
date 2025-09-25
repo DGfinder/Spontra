@@ -1,4 +1,4 @@
-// Admin Dashboard Types and Interfaces
+﻿// Admin Dashboard Types and Interfaces
 
 export interface AdminUser {
   id: string
@@ -17,6 +17,16 @@ export interface AdminUser {
   lastFailedLogin?: string | null
   accountLockedUntil?: string | null
 }
+
+export interface AdminSession {
+  user: AdminUser
+  token: string
+  expiresAt: string
+  lastActivity: string
+  ipAddress?: string
+  userAgent?: string
+}
+
 
 export type AdminRole = 'admin'
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { CheckCircle, Download, Mail, Calendar, MapPin, Plane, Users, CreditCard, Clock } from 'lucide-react'
@@ -243,7 +243,7 @@ export function BookingConfirmation({
           <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
             <h3 className="text-xl font-bold mb-4 flex items-center space-x-2">
               <Clock size={20} className="text-green-400" />
-              <span>What's Next?</span>
+              <span>What&rsquo;s Next?</span>
             </h3>
             
             <div className="space-y-3 text-white/80">

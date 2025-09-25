@@ -1,11 +1,8 @@
-// Price trend analysis and analytics utilities
-// Leverages Amadeus analytics data and historical patterns
-
-import { DestinationRecommendation } from '@/services/apiClient'
+﻿import { DestinationRecommendation } from '@/services/apiClient'
 
 export interface PriceTrend {
   direction: 'up' | 'down' | 'stable'
-  change: number // Percentage change
+  change: number
   confidence: 'high' | 'medium' | 'low'
   period: '7d' | '30d' | '90d'
   description: string
@@ -15,7 +12,7 @@ export interface SeasonalInsight {
   currentSeason: 'peak' | 'shoulder' | 'off-season'
   bestMonths: string[]
   worstMonths: string[]
-  seasonalDiscount: number // Percentage savings in off-season
+  seasonalDiscount: number
   recommendation: string
 }
 
@@ -31,195 +28,161 @@ export interface DestinationAnalytics {
   priceTrend: PriceTrend
   seasonalInsight: SeasonalInsight
   bookingInsight: BookingInsight
-  popularityScore: number // 0-100 based on searches/bookings
+  popularityScore: number
   priceRanking: 'excellent' | 'good' | 'fair' | 'expensive'
-  competitiveIndex: number // How this price compares to similar destinations
-  travelersChoiceRank?: number // Ranking among similar destinations
+  competitiveIndex: number
+  travelersChoiceRank?: number
 }
 
-// Mock price trend data based on destination characteristics
-// In production, this would come from historical pricing APIs
-const SEASONAL_PATTERNS: Record<string, SeasonalInsight> = {
-  // European destinations
-  'ES': {
-    currentSeason: 'shoulder',
-    bestMonths: ['Apr', 'May', 'Sep', 'Oct'],
-    worstMonths: ['Jul', 'Aug'],
-    seasonalDiscount: 25,
-    recommendation: 'Visit in spring/fall for 25% savings and perfect weather'
-  },
-  'IT': {
-    currentSeason: 'shoulder',
-    bestMonths: ['Apr', 'May', 'Sep', 'Oct'],
-    worstMonths: ['Jun', 'Jul', 'Aug'],
-    seasonalDiscount: 30,
-    recommendation: 'Avoid summer crowds - spring offers 30% savings'
-  },
-  'FR': {
-    currentSeason: 'peak',
-    bestMonths: ['Nov', 'Dec', 'Jan', 'Feb'],
-    worstMonths: ['Jun', 'Jul', 'Aug'],
-    seasonalDiscount: 20,
-    recommendation: 'Winter visits offer 20% savings and festive atmosphere'
-  },
-  'GR': {
-    currentSeason: 'off-season',
-    bestMonths: ['May', 'Jun', 'Sep'],
-    worstMonths: ['Jul', 'Aug'],
-    seasonalDiscount: 35,
-    recommendation: 'Perfect timing! Off-season offers 35% savings'
+const defaultSeasonalInsight: SeasonalInsight = {
+  currentSeason: 'shoulder',
+  bestMonths: ['Apr', 'May', 'Sep', 'Oct'],
+  worstMonths: ['Jul', 'Aug'],
+  seasonalDiscount: 15,
+  recommendation: 'Shoulder season offers pleasant weather and better prices.'
+}
+
+const getSeasonalInsight = (countryCode: string): SeasonalInsight => {
+  switch (countryCode) {
+    case 'ES':
+    case 'IT':
+      return {
+        currentSeason: 'shoulder',
+        bestMonths: ['Apr', 'May', 'Sep', 'Oct'],
+        worstMonths: ['Jun', 'Jul', 'Aug'],
+        seasonalDiscount: 25,
+        recommendation: 'Visit during spring or autumn to avoid crowds and save about 25%.'
+      }
+    case 'FR':
+      return {
+        currentSeason: 'peak',
+        bestMonths: ['Nov', 'Dec', 'Jan'],
+        worstMonths: ['Jun', 'Jul', 'Aug'],
+        seasonalDiscount: 18,
+        recommendation: 'Winter city breaks are quieter and roughly 18% cheaper.'
+      }
+    case 'TH':
+      return {
+        currentSeason: 'off-season',
+        bestMonths: ['Nov', 'Dec', 'Jan'],
+        worstMonths: ['Apr', 'May'],
+        seasonalDiscount: 30,
+        recommendation: 'Tropical rains ease off in winter, bringing 30% savings.'
+      }
+    default:
+      return defaultSeasonalInsight
   }
 }
 
-// Price trend simulation based on various factors
-function generatePriceTrend(
-  destination: DestinationRecommendation,
-  popularityScore: number
-): PriceTrend {
-  const price = parseFloat((destination.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
-  const countryCode = destination.destination.country_code
-  
-  // Simulate trends based on popularity and seasonal factors
-  let direction: 'up' | 'down' | 'stable' = 'stable'
-  let change = 0
-  let confidence: 'high' | 'medium' | 'low' = 'medium'
-  let description = 'Prices stable over the last month'
+const getPopularityScore = (destination: DestinationRecommendation): number => {
+  const base = destination.destination.popularity_score ?? 60
+  return Math.min(100, Math.max(30, base))
+}
 
-  // High popularity destinations tend to have upward price pressure
-  if (popularityScore > 80) {
-    direction = 'up'
-    change = Math.floor(Math.random() * 15) + 5 // 5-20% increase
-    confidence = 'high'
-    description = `Prices trending up ${change}% due to high demand`
-  } else if (popularityScore < 40) {
-    direction = 'down'
-    change = Math.floor(Math.random() * 12) + 3 // 3-15% decrease
-    confidence = 'medium'
-    description = `Prices down ${change}% - great deals available`
-  } else if (price < 200) {
-    // Good deals tend to be stable or trending up as they get discovered
-    direction = Math.random() > 0.6 ? 'up' : 'stable'
-    change = direction === 'up' ? Math.floor(Math.random() * 8) + 2 : 0
-    description = direction === 'up' ? 
-      `Prices rising ${change}% as deal gains popularity` : 
-      'Prices stable - book soon to secure deal'
+const buildPriceTrend = (destination: DestinationRecommendation, popularityScore: number): PriceTrend => {
+  const price = parseFloat((destination.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+  if (!Number.isFinite(price) || price <= 0) {
+    return {
+      direction: 'stable',
+      change: 0,
+      confidence: 'low',
+      period: '30d',
+      description: 'Recent data unavailable; assuming stable pricing.'
+    }
+  }
+
+  if (popularityScore >= 80) {
+    return {
+      direction: 'up',
+      change: 12,
+      confidence: 'high',
+      period: '30d',
+      description: 'Demand is increasing and prices are trending upward.'
+    }
+  }
+
+  if (popularityScore <= 45) {
+    return {
+      direction: 'down',
+      change: 8,
+      confidence: 'medium',
+      period: '30d',
+      description: 'Demand has cooled and prices are easing slightly.'
+    }
   }
 
   return {
-    direction,
-    change,
-    confidence,
+    direction: 'stable',
+    change: 0,
+    confidence: 'medium',
     period: '30d',
-    description
+    description: 'Prices are holding steady in the past month.'
   }
 }
 
-// Generate seasonal insights based on destination and current date
-function generateSeasonalInsight(destination: DestinationRecommendation): SeasonalInsight {
-  const countryCode = destination.destination.country_code
-  const defaultInsight: SeasonalInsight = {
-    currentSeason: 'shoulder',
-    bestMonths: ['Apr', 'May', 'Sep', 'Oct'],
-    worstMonths: ['Jul', 'Aug'],
-    seasonalDiscount: 15,
-    recommendation: 'Visit in shoulder season for better prices'
-  }
-
-  return SEASONAL_PATTERNS[countryCode] || defaultInsight
-}
-
-// Generate booking recommendations based on price and trends
-function generateBookingInsight(
-  destination: DestinationRecommendation,
-  priceTrend: PriceTrend,
-  popularityScore: number
-): BookingInsight {
-  const price = parseFloat((destination.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
-  
-  // Excellent deals (under €200) with upward trends = book now
-  if (price < 200 && priceTrend.direction === 'up') {
+const buildBookingInsight = (trend: PriceTrend, price: number): BookingInsight => {
+  if (trend.direction === 'up') {
     return {
       optimalBookingWindow: '1-2 weeks ahead',
       priceAlert: 'book_now',
       savingsPotential: 0,
       urgency: 'high',
-      reasoning: 'Excellent price trending up - book now to secure deal'
+      reasoning: 'Prices are climbing; booking soon will lock in current rates.'
     }
   }
-  
-  // Good deals with stable prices = moderate urgency
-  if (price < 250 && priceTrend.direction === 'stable') {
+
+  if (trend.direction === 'down') {
     return {
-      optimalBookingWindow: '2-4 weeks ahead',
-      priceAlert: 'price_watch',
-      savingsPotential: 10,
-      urgency: 'medium',
-      reasoning: 'Good price - monitor for potential 10% savings'
-    }
-  }
-  
-  // High prices with downward trend = wait
-  if (price > 300 && priceTrend.direction === 'down') {
-    return {
-      optimalBookingWindow: '4-6 weeks ahead',
+      optimalBookingWindow: '3-4 weeks ahead',
       priceAlert: 'wait',
-      savingsPotential: priceTrend.change,
+      savingsPotential: Math.max(5, trend.change),
       urgency: 'low',
-      reasoning: `Prices dropping ${priceTrend.change}% - wait for better deals`
+      reasoning: 'Prices are softening. Waiting could save a little more.'
     }
   }
-  
-  // Default recommendation
+
   return {
-    optimalBookingWindow: '3-4 weeks ahead',
-    priceAlert: 'price_watch',
-    savingsPotential: 5,
-    urgency: 'medium',
-    reasoning: 'Monitor prices for optimal booking timing'
+    optimalBookingWindow: price < 250 ? '2-3 weeks ahead' : '4-6 weeks ahead',
+    priceAlert: price < 250 ? 'price_watch' : 'wait',
+    savingsPotential: price < 250 ? 5 : 10,
+    urgency: price < 250 ? 'medium' : 'low',
+    reasoning: 'Monitor fares. There is still a small window for adjustments.'
   }
 }
 
-// Calculate competitive pricing index
-function calculateCompetitiveIndex(
-  destination: DestinationRecommendation,
-  allDestinations: DestinationRecommendation[]
-): number {
+const computeCompetitiveIndex = (destination: DestinationRecommendation, peers: DestinationRecommendation[]): number => {
   const price = parseFloat((destination.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
-  const allPrices = allDestinations
-    .map(d => parseFloat((d.estimated_flight_price || '0').replace(/[^0-9.-]/g, '')))
-    .filter(p => p > 0)
-    .sort((a, b) => a - b)
-  
-  const position = allPrices.indexOf(price)
-  const percentile = (1 - (position / allPrices.length)) * 100
-  
-  return Math.round(percentile)
+  const peerPrices = peers
+    .map((peer) => parseFloat((peer.estimated_flight_price || '0').replace(/[^0-9.-]/g, '')))
+    .filter((value) => Number.isFinite(value) && value > 0)
+
+  if (!Number.isFinite(price) || peerPrices.length === 0) {
+    return 50
+  }
+
+  const cheaper = peerPrices.filter((value) => value <= price).length
+  const percentile = Math.round((cheaper / peerPrices.length) * 100)
+  return Math.min(100, Math.max(0, percentile))
 }
 
-// Determine price ranking category
-function getPriceRanking(competitiveIndex: number): 'excellent' | 'good' | 'fair' | 'expensive' {
-  if (competitiveIndex >= 80) return 'excellent'
-  if (competitiveIndex >= 60) return 'good'
-  if (competitiveIndex >= 40) return 'fair'
+const rankPrice = (index: number): DestinationAnalytics['priceRanking'] => {
+  if (index >= 80) return 'excellent'
+  if (index >= 60) return 'good'
+  if (index >= 40) return 'fair'
   return 'expensive'
 }
 
-/**
- * Generate comprehensive analytics for a destination
- */
 export function generateDestinationAnalytics(
   destination: DestinationRecommendation,
   allDestinations: DestinationRecommendation[]
 ): DestinationAnalytics {
-  // Use Amadeus analytics data or simulate based on destination characteristics
-  const popularityScore = destination.destination.popularity_score || 
-    Math.floor(Math.random() * 40) + 50 // 50-90 range
-
-  const priceTrend = generatePriceTrend(destination, popularityScore)
-  const seasonalInsight = generateSeasonalInsight(destination)
-  const bookingInsight = generateBookingInsight(destination, priceTrend, popularityScore)
-  const competitiveIndex = calculateCompetitiveIndex(destination, allDestinations)
-  const priceRanking = getPriceRanking(competitiveIndex)
+  const popularityScore = getPopularityScore(destination)
+  const priceTrend = buildPriceTrend(destination, popularityScore)
+  const seasonalInsight = getSeasonalInsight(destination.destination.country_code)
+  const price = parseFloat((destination.estimated_flight_price || '0').replace(/[^0-9.-]/g, ''))
+  const bookingInsight = buildBookingInsight(priceTrend, price)
+  const competitiveIndex = computeCompetitiveIndex(destination, allDestinations)
+  const priceRanking = rankPrice(competitiveIndex)
 
   return {
     priceTrend,
@@ -228,100 +191,94 @@ export function generateDestinationAnalytics(
     popularityScore,
     priceRanking,
     competitiveIndex,
-    travelersChoiceRank: popularityScore > 80 ? Math.floor(Math.random() * 10) + 1 : undefined
+    travelersChoiceRank: popularityScore > 85 ? Math.floor(Math.random() * 10) + 1 : undefined,
   }
 }
 
-/**
- * Get trend icon and color for UI display
- */
 export function getTrendDisplay(trend: PriceTrend) {
   switch (trend.direction) {
     case 'up':
       return {
-        icon: '📈',
+        icon: 'UP',
         color: 'text-red-400',
         bgColor: 'bg-red-900/20',
-        borderColor: 'border-red-500/30'
+        borderColor: 'border-red-500/30',
+        label: 'Rising prices',
       }
     case 'down':
       return {
-        icon: '📉',
+        icon: 'DOWN',
         color: 'text-green-400',
         bgColor: 'bg-green-900/20',
-        borderColor: 'border-green-500/30'
+        borderColor: 'border-green-500/30',
+        label: 'Prices dropping',
       }
-    case 'stable':
+    default:
       return {
-        icon: '📊',
+        icon: 'STABLE',
         color: 'text-blue-400',
         bgColor: 'bg-blue-900/20',
-        borderColor: 'border-blue-500/30'
+        borderColor: 'border-blue-500/30',
+        label: 'Stable pricing',
       }
   }
 }
 
-/**
- * Get booking urgency display
- */
 export function getBookingUrgencyDisplay(urgency: 'high' | 'medium' | 'low') {
   switch (urgency) {
     case 'high':
       return {
-        icon: '🔥',
+        icon: 'HIGH',
         color: 'text-red-400',
         bgColor: 'bg-red-900/20',
-        text: 'Book Now'
+        text: 'Book now',
       }
     case 'medium':
       return {
-        icon: '⏰',
+        icon: 'MED',
         color: 'text-yellow-400',
         bgColor: 'bg-yellow-900/20',
-        text: 'Monitor'
+        text: 'Monitor prices',
       }
-    case 'low':
+    default:
       return {
-        icon: '😌',
+        icon: 'LOW',
         color: 'text-green-400',
         bgColor: 'bg-green-900/20',
-        text: 'Wait'
+        text: 'Low urgency',
       }
   }
 }
 
-/**
- * Get price ranking badge
- */
 export function getPriceRankingDisplay(ranking: 'excellent' | 'good' | 'fair' | 'expensive') {
   switch (ranking) {
     case 'excellent':
       return {
-        icon: '🎯',
+        icon: 'EXCELLENT',
         color: 'text-green-400',
         bgColor: 'bg-green-900/20',
-        text: 'Excellent Deal'
+        text: 'Excellent deal',
       }
     case 'good':
       return {
-        icon: '👍',
+        icon: 'GOOD',
         color: 'text-blue-400',
         bgColor: 'bg-blue-900/20',
-        text: 'Good Value'
+        text: 'Good value',
       }
     case 'fair':
       return {
-        icon: '💰',
+        icon: 'FAIR',
         color: 'text-yellow-400',
         bgColor: 'bg-yellow-900/20',
-        text: 'Fair Price'
+        text: 'Fair price',
       }
-    case 'expensive':
+    default:
       return {
-        icon: '💸',
+        icon: 'PREMIUM',
         color: 'text-red-400',
         bgColor: 'bg-red-900/20',
-        text: 'Premium'
+        text: 'Premium',
       }
   }
 }

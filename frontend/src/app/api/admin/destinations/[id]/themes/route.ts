@@ -9,7 +9,7 @@ const paramsSchema = z.object({
   id: z.string().min(3).max(3),
 })
 
-const ThemeRowSchema = z.object({
+const themeRowSchema = z.object({
   theme_slug: z.string(),
   is_enabled: z.boolean(),
   min_media_required: z.number(),
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const { id } = paramsSchema.parse(params)
     const iata = id.toUpperCase()
 
-    const rateKey = 	hemes:list:
+    const rateKey = `themes:list:${admin.userId ?? admin.email ?? admin.role}`
     const rate = consumeRateLimit(rateKey, 60, 60_000)
     if (!rate.allowed) {
       return NextResponse.json({ error: 'Rate limit exceeded', resetAt: rate.resetAt }, { status: 429 })
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     const client = await getAdminDbClient()
     try {
       const result = await client.query(
-        SELECT
+        `SELECT
             ct."themeSlug" AS theme_slug,
             ct."isEnabled" AS is_enabled,
             ct."minMediaRequired" AS min_media_required,
@@ -44,13 +44,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
          LEFT JOIN city_theme_ready view
            ON view.iata = ct.iata
           AND view.theme_slug = ct."themeSlug"
-         WHERE ct.iata = 
-         ORDER BY ct."themeSlug",
+         WHERE ct.iata = $1
+         ORDER BY ct."themeSlug"`,
         [iata]
       )
 
       const themes = result.rows.map((row) => {
-        const parsed = ThemeRowSchema.parse(row)
+        const parsed = themeRowSchema.parse(row)
         return {
           themeSlug: parsed.theme_slug,
           isEnabled: parsed.is_enabled,

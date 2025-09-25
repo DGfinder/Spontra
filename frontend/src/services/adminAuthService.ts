@@ -160,6 +160,28 @@ class AdminAuthService {
     }
   }
 
+  async refreshToken(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/admin/auth/refresh', { method: 'POST' })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok || !payload?.token) {
+        return false
+      }
+
+      const user = (payload.user as AdminUser | undefined) ?? this.getCurrentUser()
+      if (!user) {
+        return false
+      }
+
+      const session = this.buildSession(user, payload.token, payload.expiresAt)
+      this.persistSession(session)
+      return true
+    } catch (error) {
+      console.warn('Admin token refresh failed:', error)
+      return false
+    }
+  }
+
   async logout(): Promise<void> {
     try {
       await fetch('/api/admin/auth/logout', { method: 'POST' })

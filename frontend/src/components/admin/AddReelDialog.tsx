@@ -1,7 +1,7 @@
-'use client'
+ï»¿"use client"
 
-import { useState } from 'react'
-import { X, Loader, PlusCircle } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Loader, PlusCircle, X } from 'lucide-react'
 
 import { normaliseMediaUrls } from '@/lib/mediaValidation'
 
@@ -17,11 +17,18 @@ interface AddReelDialogProps {
   onCreated?: (count: number) => void
 }
 
-function parseUrls(input: string) {
-  return input
+const parseUrls = (input: string) =>
+  input
     .split(/\r?\n|,|\s/)
     .map((chunk) => chunk.trim())
     .filter(Boolean)
+
+const THEME_LABELS: Record<DestinationThemeSlug, string> = {
+  vibe: 'Vibe',
+  adventure: 'Adventure',
+  discover: 'Discover',
+  indulge: 'Indulge',
+  nature: 'Nature',
 }
 
 export default function AddReelDialog({
@@ -33,52 +40,55 @@ export default function AddReelDialog({
   onClose,
   onCreated,
 }: AddReelDialogProps) {
-  const [urlsText, setUrlsText] = useState('')
+  const [rawText, setRawText] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!open) return null
+  const urls = useMemo(() => parseUrls(rawText), [rawText])
 
-  const urls = parseUrls(urlsText)
+  if (!open) return null
 
   const handleSubmit = async () => {
     setError(null)
-    const uniqueUrls = Array.from(new Set(urls))
 
-    if (uniqueUrls.length < minRequired) {
-      setError(Add at least  media URLs for .)
+    if (urls.length < minRequired) {
+      setError(`Add at least ${minRequired} media URL${minRequired === 1 ? '' : 's'} for ${THEME_LABELS[themeSlug]}.`)
       return
     }
-    if (uniqueUrls.length > maxAllowed) {
-      setError(Limit is  URLs per submission.)
+    if (urls.length > maxAllowed) {
+      setError(`Limit is ${maxAllowed} URLs per submission.`)
       return
     }
 
-    const validation = normaliseMediaUrls(uniqueUrls)
+    const validation = normaliseMediaUrls(urls)
     if (!validation.ok) {
-      setError(validation.error)
+      setError(validation.error ?? 'Invalid media URLs')
       return
     }
 
     setIsSubmitting(true)
     try {
-      const res = await fetch(/api/admin/destinations//themes//reels, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ urls: validation.urls }),
-      })
+      const response = await fetch(
+        `/api/admin/destinations/${encodeURIComponent(iata)}/themes/${themeSlug}/reels`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls: validation.urls }),
+        },
+      )
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
         throw new Error(data?.error || 'Failed to create reels')
       }
 
-      const json = await res.json()
-      onCreated?.(Array.isArray(json?.data) ? json.data.length : validation.urls.length)
-      setUrlsText('')
+      const json = await response.json()
+      const createdCount = Array.isArray(json?.data) ? json.data.length : validation.urls.length
+      onCreated?.(createdCount)
+      setRawText('')
       onClose()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to create reels')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create reels')
     } finally {
       setIsSubmitting(false)
     }
@@ -98,26 +108,26 @@ export default function AddReelDialog({
         <div className="flex items-center gap-3 border-b border-gray-200 px-6 py-4">
           <PlusCircle className="text-blue-600" size={22} />
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Add media for {iata} • {themeSlug}</h2>
-            <p className="text-sm text-gray-600">Paste between {minRequired} and {maxAllowed} video/image URLs.</p>
+            <h2 className="text-lg font-semibold text-gray-900">Add media for {iata} â€” {THEME_LABELS[themeSlug]}</h2>
+            <p className="text-sm text-gray-600">Paste between {minRequired} and {maxAllowed} video or image URLs.</p>
           </div>
         </div>
 
-        <div className="px-6 py-5 space-y-4">
+        <div className="space-y-4 px-6 py-5">
           <textarea
-            value={urlsText}
-            onChange={(event) => setUrlsText(event.target.value)}
-            placeholder="https:// ..."
+            value={rawText}
+            onChange={(event) => setRawText(event.target.value)}
+            placeholder="https://cdn.example.com/media/..."
             rows={8}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           />
 
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span>{urls.length} URL(s) detected</span>
-            <span>{minRequired} required • max {maxAllowed}</span>
+            <span>{minRequired} required â€” max {maxAllowed}</span>
           </div>
 
-          {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+          {error ? <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
@@ -136,10 +146,10 @@ export default function AddReelDialog({
             {isSubmitting ? (
               <>
                 <Loader className="mr-2 animate-spin" size={16} />
-                Saving…
+                Saving...
               </>
             ) : (
-              'Add Media'
+              'Add media'
             )}
           </button>
         </div>

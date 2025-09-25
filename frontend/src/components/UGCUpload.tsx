@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef } from 'react'
 import { Upload, MapPin, Clock, Star, Award, X, CheckCircle } from 'lucide-react'
@@ -186,7 +186,7 @@ export function UGCUpload({
             <CheckCircle size={64} className="text-green-500 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 mb-2">Upload Successful!</h3>
             <p className="text-gray-600 mb-4">
-              Your video is being reviewed and will be live soon. You've earned 10 reward points!
+              Your video is being reviewed and will be live soon. You&rsquo;ve earned 10 reward points!
             </p>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <p className="text-green-800 font-medium">+€1 Travel Credit Added</p>

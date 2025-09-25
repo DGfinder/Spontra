@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react'
+﻿import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react'
 import { airportCodeSchema } from '@/lib/validations'
 import { usePreferences, useSearchActions } from '@/store/searchStore'
 import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
@@ -448,7 +448,7 @@ export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
           {/* No results message */}
           {query.length >= 1 && suggestions.length === 0 && (
             <li className="px-4 py-2 text-sm text-gray-500 text-center">
-              No airports found matching "{query}"
+              No airports found matching &ldquo;{query}&rdquo;
             </li>
           )}
 

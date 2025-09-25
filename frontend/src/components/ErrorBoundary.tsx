@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Component, ReactNode, ErrorInfo } from 'react'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
@@ -85,7 +85,7 @@ function DefaultErrorFallback({ error, errorInfo, resetError }: DefaultErrorFall
         </h1>
         
         <p className="text-white/70 mb-6 leading-relaxed">
-          We're sorry, but something unexpected happened. Please try refreshing the page or go back to the home page.
+          We&rsquo;re sorry, but something unexpected happened. Please try refreshing the page or go back to the home page.
         </p>
 
         {/* Error Details (Development only) */}

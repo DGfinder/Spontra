@@ -11,7 +11,7 @@ const paramsSchema = z.object({
 
 const patchBodySchema = z.object({
   isActive: z.boolean().optional(),
-  sortOrder: z.number().int().min(0).max(1000).optional(),
+  sortOrder: z.number().int().min(0).max(1000).nullable().optional(),
   altText: z.string().max(500).nullable().optional(),
   credit: z.string().max(200).nullable().optional(),
   license: z.string().max(200).nullable().optional(),
@@ -22,7 +22,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const admin = await requireAdminContext(request)
     const { id } = paramsSchema.parse(params)
     const mediaId = Number(id)
-    if (Number.isNaN(mediaId)) {
+    if (!Number.isInteger(mediaId) || mediaId <= 0) {
       return NextResponse.json({ error: 'Invalid media id' }, { status: 400 })
     }
 
@@ -31,59 +31,62 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    const rate = consumeRateLimit(
-eel-media:patch:, 40, 60_000)
+    const rateKey = `reel-media:patch:${admin.userId ?? admin.email ?? admin.role}`
+    const rate = consumeRateLimit(rateKey, 40, 60_000)
     if (!rate.allowed) {
       return NextResponse.json({ error: 'Rate limit exceeded', resetAt: rate.resetAt }, { status: 429 })
     }
 
     const client = await getAdminDbClient()
     try {
-      const existingResult = await client.query('SELECT id FROM "ReelMedia" WHERE id = ', [mediaId])
+      const existingResult = await client.query('SELECT id FROM "ReelMedia" WHERE id = $1', [mediaId])
       if (existingResult.rowCount === 0) {
         return NextResponse.json({ error: 'Reel media not found' }, { status: 404 })
       }
 
       const updates: string[] = []
-      const values: any[] = []
+      const values: Array<string | number | boolean | null> = []
       let index = 1
 
       if (body.isActive !== undefined) {
-        updates.push("isActive" = {index})
+        updates.push(`"isActive" = $${index}`)
         values.push(body.isActive)
         index += 1
       }
       if (body.sortOrder !== undefined) {
-        updates.push("sortOrder" = {index})
+        updates.push(`"sortOrder" = $${index}`)
         values.push(body.sortOrder)
         index += 1
       }
       if (body.altText !== undefined) {
-        updates.push("altText" = {index})
-        values.push(body.altText)
+        updates.push(`"altText" = $${index}`)
+        values.push(body.altText ?? null)
         index += 1
       }
       if (body.credit !== undefined) {
-        updates.push(credit = {index})
-        values.push(body.credit)
+        updates.push(`credit = $${index}`)
+        values.push(body.credit ?? null)
         index += 1
       }
       if (body.license !== undefined) {
-        updates.push(license = {index})
-        values.push(body.license)
+        updates.push(`license = $${index}`)
+        values.push(body.license ?? null)
         index += 1
       }
 
+      if (updates.length === 0) {
+        return NextResponse.json({ error: 'No valid fields provided' }, { status: 400 })
+      }
+
+      updates.push(`"updatedAt" = NOW()`)
       values.push(mediaId)
 
-      const updateResult = await client.query(
-        UPDATE "ReelMedia"
-         SET 
-         WHERE id = {index}
-         RETURNING id, "reelId", kind, "sourceUrl", "providerId", aspect, "durationMs", width, height, "altText", credit, license, "sortOrder", "isActive",
-        values
-      )
+      const updateSql = `UPDATE "ReelMedia"
+        SET ${updates.join(', ')}
+        WHERE id = $${index}
+        RETURNING id, "reelId", kind, "sourceUrl", "providerId", aspect, "durationMs", width, height, "altText", credit, license, "sortOrder", "isActive", "createdAt", "updatedAt"`
 
+      const updateResult = await client.query(updateSql, values)
       const row = updateResult.rows[0]
 
       console.info(

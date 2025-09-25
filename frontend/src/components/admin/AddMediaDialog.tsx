@@ -1,4 +1,4 @@
-'use client'
+ï»¿"use client"
 
 import { useMemo, useState } from 'react'
 import { Loader, PlusCircle, X } from 'lucide-react'
@@ -12,50 +12,50 @@ interface AddMediaDialogProps {
   onCreated?: (count: number) => void
 }
 
-function extractUrls(input: string) {
-  return input
+const extractUrls = (input: string) =>
+  input
     .split(/\r?\n|,|\s/)
     .map((chunk) => chunk.trim())
     .filter(Boolean)
-}
 
 export default function AddMediaDialog({ open, reelId, onClose, onCreated }: AddMediaDialogProps) {
   const [rawText, setRawText] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const rawUrls = useMemo(() => extractUrls(rawText), [rawText])
+  const urls = useMemo(() => extractUrls(rawText), [rawText])
 
   if (!open) return null
 
   const handleSubmit = async () => {
     setError(null)
 
-    const validation = normaliseMediaUrls(rawUrls)
+    const validation = normaliseMediaUrls(urls)
     if (!validation.ok) {
-      setError(validation.error)
+      setError(validation.error ?? 'Invalid media URLs')
       return
     }
 
     setIsSubmitting(true)
     try {
-      const res = await fetch(/api/admin/reels//media, {
+      const response = await fetch(`/api/admin/reels/${reelId}/media`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ urls: validation.urls }),
       })
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}))
         throw new Error(data?.error || 'Failed to add media')
       }
 
-      const json = await res.json()
-      onCreated?.(Array.isArray(json?.data) ? json.data.length : validation.urls.length)
+      const json = await response.json()
+      const createdCount = Array.isArray(json?.data) ? json.data.length : validation.urls.length
+      onCreated?.(createdCount)
       setRawText('')
       onClose()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to add media')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add media')
     } finally {
       setIsSubmitting(false)
     }
@@ -84,17 +84,17 @@ export default function AddMediaDialog({ open, reelId, onClose, onCreated }: Add
           <textarea
             value={rawText}
             onChange={(event) => setRawText(event.target.value)}
-            placeholder="https://cdn.spontra.com/media/..."
+            placeholder="https://cdn.example.com/media/..."
             rows={6}
             className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           />
 
           <div className="flex items-center justify-between text-sm text-gray-600">
-            <span>{rawUrls.length} URL(s) detected</span>
-            <span>Allowed hosts: CDN / Stream providers</span>
+            <span>{urls.length} URL(s) detected</span>
+            <span>Allowed hosts: CDN / stream providers</span>
           </div>
 
-          {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+          {error ? <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
@@ -113,9 +113,10 @@ export default function AddMediaDialog({ open, reelId, onClose, onCreated }: Add
             {isSubmitting ? (
               <>
                 <Loader className="mr-2 animate-spin" size={16} />
-                Saving…\n              </>
+                Saving...
+              </>
             ) : (
-              'Add Media'
+              'Add media'
             )}
           </button>
         </div>
@@ -123,4 +124,3 @@ export default function AddMediaDialog({ open, reelId, onClose, onCreated }: Add
     </div>
   )
 }
-

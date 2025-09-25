@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { requireAdminContext, AdminAuthError } from '@/lib/adminAuth'
 import { getAdminDbClient } from '@/lib/dbAdmin'
-import { consumeRateLimit } from '@/lib/rateLimit'\nimport { evaluateReelGating } from '@/lib/themeReadiness'
+import { consumeRateLimit } from '@/lib/rateLimit'
 
 type DestinationThemeSlug = 'adventure' | 'nature' | 'vibe' | 'indulge' | 'discover'
 
@@ -17,7 +17,7 @@ const bodySchema = z
     isEnabled: z.boolean().optional(),
     min: z.number().int().min(0).max(50).optional(),
     max: z.number().int().min(0).max(50).optional(),
-    notes: z.string().max(1024).optional(),
+    notes: z.string().max(1024).nullable().optional(),
   })
   .refine((payload) => Object.keys(payload).length > 0, {
     message: 'Payload must include at least one field to update',
@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     const client = await getAdminDbClient()
     try {
       const existingResult = await client.query(
-        'SELECT id, "isEnabled", "minMediaRequired", "maxMediaAllowed" FROM "CityTheme" WHERE iata = $1 AND "themeSlug" = $2',
+        'SELECT id, "isEnabled" AS "isEnabled", "minMediaRequired" AS "minMediaRequired", "maxMediaAllowed" AS "maxMediaAllowed" FROM "CityTheme" WHERE iata = $1 AND "themeSlug" = $2',
         [iata, themeSlug]
       )
 
@@ -50,21 +50,21 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
       const existing = existingResult.rows[0] as {
         id: number
-        isenabled: boolean
-        minmediarequired: number
-        maxmediaallowed: number
+        isEnabled: boolean
+        minMediaRequired: number
+        maxMediaAllowed: number
       }
 
-      const nextMin = body.min ?? existing.minmediarequired
-      const nextMax = body.max ?? existing.maxmediaallowed
+      const nextMin = body.min ?? existing.minMediaRequired
+      const nextMax = body.max ?? existing.maxMediaAllowed
 
       if (nextMin > nextMax) {
         return NextResponse.json({ error: 'min cannot exceed max' }, { status: 400 })
       }
 
-      const enabling = body.isEnabled === undefined ? existing.isenabled : body.isEnabled
+      const nextEnabled = body.isEnabled ?? existing.isEnabled
 
-      if (enabling) {
+      if (nextEnabled) {
         const reelCountResult = await client.query(
           'SELECT COUNT(*) AS active_count FROM "Reel" WHERE iata = $1 AND "themeSlug" = $2 AND "isActive" = true',
           [iata, themeSlug]
@@ -94,34 +94,33 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
         }
       }
 
-      await client.query(
-        'UPDATE "CityTheme" SET "isEnabled" = $1, "minMediaRequired" = $2, "maxMediaAllowed" = $3, notes = COALESCE($4, notes) WHERE id = $5',
-        [
-          enabling,
-          nextMin,
-          nextMax,
-          body.notes ?? null,
-          existingRow.id,
-        ]
+      const updateResult = await client.query(
+        `UPDATE "CityTheme"
+            SET "isEnabled" = $1,
+                "minMediaRequired" = $2,
+                "maxMediaAllowed" = $3,
+                notes = COALESCE($4, notes),
+                updated_at = NOW()
+          WHERE id = $5
+          RETURNING
+            "themeSlug" AS theme_slug,
+            "isEnabled" AS is_enabled,
+            "minMediaRequired" AS min_media_required,
+            "maxMediaAllowed" AS max_media_allowed`,
+        [nextEnabled, nextMin, nextMax, body.notes ?? null, existing.id]
       )
 
-      const refreshed = await client.query(
+      const readinessResult = await client.query(
         `SELECT
-            ct."themeSlug" AS theme_slug,
-            ct."isEnabled" AS is_enabled,
-            ct."minMediaRequired" AS min_media_required,
-            ct."maxMediaAllowed" AS max_media_allowed,
             COALESCE(view.reel_count, 0) AS reel_count,
             view.is_ready
-         FROM "CityTheme" ct
-         LEFT JOIN city_theme_ready view
-           ON view.iata = ct.iata
-          AND view.theme_slug = ct."themeSlug"
-         WHERE ct.iata = $1 AND ct."themeSlug" = $2`,
+         FROM city_theme_ready view
+         WHERE view.iata = $1 AND view.theme_slug = $2`,
         [iata, themeSlug]
       )
 
-      const row = refreshed.rows[0]
+      const refreshed = updateResult.rows[0]
+      const readinessRow = readinessResult.rows[0] ?? { reel_count: 0, is_ready: false }
 
       console.info(
         JSON.stringify({
@@ -131,7 +130,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
           theme: themeSlug,
           adminRole: admin.role,
           adminUser: admin.userId ?? admin.email,
-          isEnabled: enabling,
+          isEnabled: nextEnabled,
           min: nextMin,
           max: nextMax,
         })
@@ -140,12 +139,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({
         ok: true,
         data: {
-          themeSlug: row.theme_slug,
-          isEnabled: row.is_enabled,
-          min: row.min_media_required,
-          max: row.max_media_allowed,
-          reelCount: Number(row.reel_count ?? 0),
-          isReady: Boolean(row.is_ready),
+          themeSlug: refreshed.theme_slug,
+          isEnabled: refreshed.is_enabled,
+          min: refreshed.min_media_required,
+          max: refreshed.max_media_allowed,
+          reelCount: Number(readinessRow.reel_count ?? 0),
+          isReady: Boolean(readinessRow.is_ready),
         },
       })
     } finally {
@@ -164,5 +163,3 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     return NextResponse.json({ error: 'Failed to update theme configuration' }, { status: 500 })
   }
 }
-
-
