@@ -21,7 +21,7 @@ const themeRowSchema = z.object({
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    requireAdminContext(request, ['owner', 'admin', 'curator', 'analyst', 'support'])
+    await requireAdminContext(request)
     const { id } = paramsSchema.parse(params)
     const iata = id.toUpperCase()
 

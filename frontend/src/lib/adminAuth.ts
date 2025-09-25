@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import { jwtVerify, SignJWT } from 'jose'
 import type { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies'
 
-export const ADMIN_ROLES = ['owner', 'admin', 'curator', 'analyst', 'support'] as const
+export const ADMIN_ROLES = ['admin'] as const
 export type AdminRole = (typeof ADMIN_ROLES)[number]
 
 export interface AdminRequestContext {
@@ -30,17 +30,23 @@ export interface AdminSessionPayload {
 
 const SESSION_COOKIE_NAME = 'admin_session'
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60 // 7 days
+const DEVELOPMENT_FALLBACK_SECRET = 'dev-admin-panel-secret-change-me'
 
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.ADMIN_PANEL_JWT_SECRET
+  const secret =
+    process.env.ADMIN_PANEL_JWT_SECRET ||
+    (process.env.NODE_ENV !== 'production' ? process.env.NEXTAUTH_SECRET : undefined) ||
+    (process.env.NODE_ENV !== 'production' ? DEVELOPMENT_FALLBACK_SECRET : undefined)
+
   if (!secret) {
     throw new Error('ADMIN_PANEL_JWT_SECRET environment variable is required for admin authentication')
   }
+
   return new TextEncoder().encode(secret)
 }
 
 export async function createAdminSessionToken(payload: Omit<AdminSessionPayload, 'issuedAt'>): Promise<string> {
-  const token = await new SignJWT({ role: payload.role, email: payload.email, userId: payload.userId })
+  const token = await new SignJWT({ role: 'admin', email: payload.email, userId: payload.userId })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + SESSION_MAX_AGE)
@@ -53,10 +59,9 @@ export async function verifyAdminSessionToken(token?: string | null): Promise<Ad
   if (!token) return null
   try {
     const { payload } = await jwtVerify(token, getJwtSecret())
-    const role = payload.role as AdminRole | undefined
-    if (!role || !ADMIN_ROLES.includes(role)) return null
+    if (payload.role !== 'admin') return null
     return {
-      role,
+      role: 'admin',
       email: typeof payload.email === 'string' ? payload.email : undefined,
       userId: typeof payload.userId === 'string' ? payload.userId : undefined,
       issuedAt: typeof payload.iat === 'number' ? payload.iat : Date.now(),
@@ -77,19 +82,16 @@ function parseRoleFromHeaders(request: NextRequest): AdminRole | null {
     const value = request.headers.get(header)
     if (!value) continue
     const normalised = value.trim().toLowerCase()
-    if (ADMIN_ROLES.includes(normalised as AdminRole)) {
-      return normalised as AdminRole
+    if (normalised === 'admin') {
+      return 'admin'
     }
   }
   return null
 }
 
-export async function requireAdminContext(request: NextRequest, allowedRoles: AdminRole[]): Promise<AdminRequestContext> {
+export async function requireAdminContext(request: NextRequest): Promise<AdminRequestContext> {
   const headerRole = parseRoleFromHeaders(request)
   if (headerRole) {
-    if (!allowedRoles.includes(headerRole)) {
-      throw new AdminAuthError('Forbidden for this admin role', 403)
-    }
     return { role: headerRole }
   }
 
@@ -97,10 +99,6 @@ export async function requireAdminContext(request: NextRequest, allowedRoles: Ad
   const session = await verifyAdminSessionToken(token)
   if (!session) {
     throw new AdminAuthError('Missing admin credentials', 401)
-  }
-
-  if (!allowedRoles.includes(session.role)) {
-    throw new AdminAuthError('Forbidden for this admin role', 403)
   }
 
   return { role: session.role, email: session.email, userId: session.userId }

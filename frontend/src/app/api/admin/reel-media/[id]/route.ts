@@ -19,7 +19,7 @@ const patchBodySchema = z.object({
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const admin = requireAdminContext(request, ['owner', 'admin', 'curator'])
+    const admin = await requireAdminContext(request)
     const { id } = paramsSchema.parse(params)
     const mediaId = Number(id)
     if (Number.isNaN(mediaId)) {
@@ -31,7 +31,8 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }
 
-    const rate = consumeRateLimit(eel-media:patch:, 40, 60_000)
+    const rate = consumeRateLimit(
+eel-media:patch:, 40, 60_000)
     if (!rate.allowed) {
       return NextResponse.json({ error: 'Rate limit exceeded', resetAt: rate.resetAt }, { status: 429 })
     }

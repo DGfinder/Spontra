@@ -20,7 +20,7 @@ const updateSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = requireAdminContext(req, ['owner', 'admin', 'curator'])
+    const admin = await requireAdminContext(req)
     const payload = updateSchema.parse(await req.json())
     const airportCode = payload.airport_code.toUpperCase()
 
@@ -116,3 +116,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Update failed' }, { status: 500 })
   }
 }
+

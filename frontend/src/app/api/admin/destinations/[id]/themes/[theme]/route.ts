@@ -25,7 +25,7 @@ const bodySchema = z
 
 export async function PATCH(request: NextRequest, { params }: { params: { id: string; theme: string } }) {
   try {
-    const admin = requireAdminContext(request, ['owner', 'admin', 'curator'])
+    const admin = await requireAdminContext(request)
     const { id, theme } = paramsSchema.parse(params)
     const body = bodySchema.parse(await request.json())
     const iata = id.toUpperCase()

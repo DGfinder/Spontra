@@ -1,11 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Edit, Loader, MapPin, Plane, Search, ShieldAlert } from 'lucide-react'
 
 import AddReelDialog, { DestinationThemeSlug } from '@/components/admin/AddReelDialog'
 import OverlayEditorModal from '@/components/admin/OverlayEditorModal'
+import { getThemeColor, getThemeTextClass, type ThemeKey } from '@/lib/theme'
 
 interface ThemeStatus {
   themeSlug: DestinationThemeSlug
@@ -49,7 +50,7 @@ export default function DestinationsManagePage() {
     max: number
   } | null>(null)
   const [editing, setEditing] = useState<DestinationRow | null>(null)
-  const [updatingTheme, setUpdatingTheme] = useState<string | null>(null)
+  const [updatingTheme, setUpdatingTheme] = useState<string | null>(null)\r\n  const [countryFilter, setCountryFilter] = useState<string>('')\r\n  const [cityFilter, setCityFilter] = useState<string>('')
 
   const loadDestinations = useCallback(async () => {
     setLoading(true)
@@ -98,19 +99,41 @@ export default function DestinationsManagePage() {
   }, [loadDestinations])
 
   useEffect(() => {
-    if (!searchTerm) {
-      setFilteredDestinations(destinations)
-      return
+    const countryParam = searchParams.get('country')
+    const cityParam = searchParams.get('city')
+    const normalisedCountry = countryParam ? countryParam.toUpperCase() : ''
+    const nextCity = cityParam ?? ''
+    setCountryFilter((prev) => (prev === normalisedCountry ? prev : normalisedCountry))
+    setCityFilter((prev) => (prev === nextCity ? prev : nextCity))
+  }, [searchParams])
+
+  useEffect(() => {
+    let working = destinations
+
+    if (countryFilter) {
+      working = working.filter((dest) => {
+        const codeMatch = dest.countryCode ? dest.countryCode.toUpperCase() === countryFilter : false
+        const nameMatch = dest.country.toUpperCase() === countryFilter
+        return codeMatch || nameMatch
+      })
     }
-    const term = searchTerm.toLowerCase()
-    setFilteredDestinations(
-      destinations.filter((dest) =>
+
+    if (cityFilter) {
+      const cityValue = cityFilter.toLowerCase()
+      working = working.filter((dest) => dest.city.toLowerCase() === cityValue)
+    }
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase()
+      working = working.filter((dest) =>
         dest.city.toLowerCase().includes(term) ||
         dest.country.toLowerCase().includes(term) ||
         dest.airportCode.toLowerCase().includes(term)
       )
-    )
-  }, [destinations, searchTerm])
+    }
+
+    setFilteredDestinations(working)
+  }, [destinations, searchTerm, countryFilter, cityFilter])
 
   const handleToggleTheme = async (destination: DestinationRow, status: ThemeStatus) => {
     const nextEnabled = !status.isEnabled
@@ -176,6 +199,12 @@ export default function DestinationsManagePage() {
     }
   }
 
+  const clearLocationFilters = () => {
+    setCountryFilter('')
+    setCityFilter('')
+    router.replace('/admin/destinations/manage')
+  }
+
   const totalDestinations = useMemo(() => filteredDestinations.length, [filteredDestinations])
 
   return (
@@ -184,7 +213,7 @@ export default function DestinationsManagePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Destinations curation</h1>
           <p className="text-sm text-gray-600">
-            Enable a theme only after 5–10 active reels exist for that destination.
+            Enable a theme only after 5ï¿½10 active reels exist for that destination.
           </p>
         </div>
         <div className="relative">
@@ -202,9 +231,26 @@ export default function DestinationsManagePage() {
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
+      {(countryFilter || cityFilter) && (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="font-medium">Active filters:</span>
+            {countryFilter ? <span>Country: {countryFilter}</span> : null}
+            {cityFilter ? <span>City: {cityFilter}</span> : null}
+          </div>
+          <button
+            type="button"
+            onClick={clearLocationFilters}
+            className="rounded-md border border-blue-200 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Loader className="animate-spin" size={16} /> Loading destinations…
+          <Loader className="animate-spin" size={16} /> Loading destinationsï¿½
         </div>
       ) : totalDestinations === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-sm text-gray-600">
@@ -218,8 +264,10 @@ export default function DestinationsManagePage() {
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Destination</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">Flights</th>
                 {THEME_ORDER.map((theme) => (
-                  <th key={theme} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-                    {theme}
+                  <th key={theme} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
+                    <span className={`${getThemeTextClass(theme as ThemeKey)} font-bold`}>
+                      {theme}
+                    </span>
                   </th>
                 ))}
               </tr>
@@ -288,9 +336,12 @@ export default function DestinationsManagePage() {
                               checked={themeStatus.isEnabled}
                               onChange={() => handleToggleTheme(destination, themeStatus)}
                               disabled={isUpdating}
-                              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className={`h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-offset-1 ${getThemeTextClass(theme as ThemeKey)}`}
+                              style={{ accentColor: getThemeColor(theme as ThemeKey) }}
                             />
-                            <span>{themeStatus.isEnabled ? 'Enabled' : 'Disabled'}</span>
+                            <span className={themeStatus.isEnabled ? getThemeTextClass(theme as ThemeKey) : 'text-gray-600'}>
+                              {themeStatus.isEnabled ? 'Enabled' : 'Disabled'}
+                            </span>
                           </label>
                           <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${chipClass}`}>
                             {themeStatus.reelCount} / {themeStatus.min}-{themeStatus.max}
@@ -300,7 +351,7 @@ export default function DestinationsManagePage() {
                           </span>
                           <button
                             onClick={() => router.push(`/admin/destinations/${destination.airportCode}?tab=media&theme=${theme}`)}
-                            className="text-xs font-medium text-blue-600 hover:underline"
+                            className={`text-xs font-medium hover:underline ${getThemeTextClass(theme as ThemeKey)}`}
                           >
                             Manage reels
                           </button>

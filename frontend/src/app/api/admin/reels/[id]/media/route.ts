@@ -16,7 +16,7 @@ const postBodySchema = z.object({
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const admin = requireAdminContext(request, ['owner', 'admin', 'curator'])
+    const admin = await requireAdminContext(request)
     const { id } = paramsSchema.parse(params)
     const reelId = Number(id)
     if (Number.isNaN(reelId)) {

@@ -12,6 +12,7 @@ interface Airport {
 type Suggestion = Airport & { type: 'AIRPORT' | 'CITY' }
 
 interface ValidatedAirportSearchProps {
+  id?: string
   value: string
   onChange: (code: string) => void
   placeholder?: string
@@ -60,6 +61,7 @@ function normalize(text: string): string {
 }
 
 export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
+  id,
   value,
   onChange,
   placeholder = 'Type airport name or code',
@@ -332,6 +334,7 @@ export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
     <div className="relative">
       <input
         ref={inputRef}
+        id={id}
         type="text"
         value={query}
         onChange={handleInputChange}

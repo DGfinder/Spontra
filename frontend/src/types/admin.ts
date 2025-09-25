@@ -18,32 +18,9 @@ export interface AdminUser {
   accountLockedUntil?: string | null
 }
 
-export type AdminRole = 'super_admin' | 'content_moderator' | 'analytics_manager' | 'customer_service' | 'business_manager'
+export type AdminRole = 'admin'
 
-export type AdminPermission = 
-  // Content Management
-  | 'content.view' | 'content.moderate' | 'content.delete' | 'content.featured'
-  // Creator Management  
-  | 'creators.view' | 'creators.manage' | 'creators.payouts' | 'creators.suspend'
-  // Analytics
-  | 'analytics.view' | 'analytics.export' | 'analytics.configure'
-  // Destination Management
-  | 'destinations.view' | 'destinations.edit' | 'destinations.create'
-  // System Administration
-  | 'system.monitor' | 'system.configure' | 'system.users' | 'system.logs'
-  // Financial
-  | 'finance.view' | 'finance.manage' | 'finance.payouts'
-  // Support
-  | 'support.view' | 'support.manage' | 'support.escalate'
-
-export interface AdminSession {
-  user: AdminUser
-  token: string
-  expiresAt: string
-  lastActivity: string
-  ipAddress: string
-  userAgent: string
-}
+export type AdminPermission = string;
 
 // Content Moderation Types
 export interface ModerationQueue {

@@ -42,7 +42,7 @@ function mapThemeReadiness(rows: any[]) {
 
 export async function GET(request: NextRequest) {
   try {
-    const admin = requireAdminContext(request, ['owner', 'admin', 'curator', 'analyst', 'support'])
+    const admin = await requireAdminContext(request)
     const query = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams))
     if (!query.success) {
       return NextResponse.json({ error: 'Invalid query parameters', details: query.error.issues }, { status: 400 })
@@ -165,4 +165,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Query failed' }, { status: 500 })
   }
 }
+
 

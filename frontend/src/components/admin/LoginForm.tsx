@@ -3,6 +3,8 @@
 import { FormEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+import { adminAuthService } from '@/services/adminAuthService'
+
 interface LoginFormProps {
   onSubmit?: (email: string, password: string) => Promise<void>
 }
@@ -20,15 +22,10 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
     setError(null)
 
     try {
-      const res = await fetch('/api/admin/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.error || 'Invalid credentials')
+      const result = await adminAuthService.login({ email, password })
+      if (!result.success) {
+        setError(result.error || 'Invalid credentials')
+        return
       }
 
       await onSubmit?.(email, password)
@@ -68,8 +65,9 @@ export default function LoginForm({ onSubmit }: LoginFormProps) {
         disabled={loading}
         className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? 'Signing in…' : 'Sign in'}
+        {loading ? 'Signing in...' : 'Sign in'}
       </button>
     </form>
   )
 }
+
