@@ -129,6 +129,10 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
   const passengerLabel = passengerCount === 1 ? '1 passenger' : `${passengerCount} passengers`
   const travelerSummary = `${passengerLabel} - ${CABIN_LABELS[cabinSelection]}`
   const cabinOptions: Array<'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'> = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']
+  
+  // Determine search mode and button text
+  const isDirectSearch = formValues.destinationAirport && formValues.destinationAirport !== formValues.departureAirport
+  const submitButtonText = isDirectSearch ? 'Search flights' : 'Explore destinations'
 
   const adjustPassengers = (delta: number) => {
     const next = Math.min(8, Math.max(1, passengerCount + delta))
@@ -448,7 +452,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
               style={{
                 background: `linear-gradient(135deg, ${themeColor} 0%, ${themeHover} 100%)`,
               }}
-              aria-label={isLoading ? 'Searching for flights' : 'Search for flights'}
+              aria-label={isLoading ? 'Searching...' : submitButtonText}
             >
               {isLoading ? (
                 <>
@@ -456,7 +460,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                   Searching...
                 </>
               ) : (
-                'Search flights'
+                submitButtonText
               )}
             </button>
 

@@ -13,9 +13,9 @@ enum MediaKind {
 }
 
 enum AspectRatio {
-  _9_16
-  _1_1
-  _16_9
+  NINE_SIXTEEN
+  ONE_ONE
+  SIXTEEN_NINE
 }
 
 model CityTheme {
@@ -56,7 +56,7 @@ model ReelMedia {
   kind       MediaKind
   sourceUrl  String
   providerId String?
-  aspect     AspectRatio @default(_9_16)
+  aspect     AspectRatio @default(NINE_SIXTEEN)
   durationMs Int?
   width      Int?
   height     Int?
@@ -68,4 +68,19 @@ model ReelMedia {
   reel       Reel       @relation(fields: [reelId], references: [id], onDelete: Cascade)
 
   @@index([reelId, isActive])
+}
+
+model SearchAnalytics {
+  id          Int      @id @default(autoincrement())
+  query       String   @unique @db.VarChar(255)
+  searchCount Int      @default(1) @map("search_count")
+  resultCount Int      @default(0) @map("result_count")
+  searchDate  DateTime @default(now()) @map("search_date")
+  lastSearched DateTime @default(now()) @map("last_searched")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([query])
+  @@index([searchCount(sort: Desc)])
+  @@index([lastSearched(sort: Desc)])
+  @@map("search_analytics")
 }

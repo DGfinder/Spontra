@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { enableMockFallbacks, getErrorMessage } from '@/lib/environment'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
@@ -19,6 +20,8 @@ import { getThemeColor, getThemeGradient, type ThemeKey } from '@/lib/theme'
 interface FormData {
   selectedTheme: string
   departureAirport: string
+  destinationAirport?: string
+  destinationAirportDetailed?: string
   departureDate: string
   returnDate?: string
   passengers: number
@@ -27,6 +30,7 @@ interface FormData {
   flightTimeRange?: [number, number]
   minFlightTime?: number
   maxFlightTimeRange?: number
+  cabinClass?: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'
 }
 
 interface CountryResult {
@@ -174,8 +178,9 @@ export function LandingPageForm() {
     setSelectedFlight 
   } = useNavigationActions()
   
-  // Use the destination explore hook
+  // Use the destination explore hook and router
   const { exploreDestinations, retry } = useDestinationExplore()
+  const router = useRouter()
 
   const currentTheme = THEMES.find(t => t.id === formData.selectedTheme) || THEMES[0]
 
@@ -189,7 +194,26 @@ export function LandingPageForm() {
 
   const handleSubmit = async (data: FormData) => {
     try {
-      console.log(`Searching destinations within ${data.maxFlightTime} hours from ${data.departureAirport}`)
+      // DIRECT SEARCH MODE: Both airports specified
+      if (data.destinationAirport && data.departureAirport && data.destinationAirport !== data.departureAirport) {
+        console.log(`🛫 Direct flight search: ${data.departureAirport} → ${data.destinationAirport}`)
+        
+        const params = new URLSearchParams({
+          origin: data.departureAirport,
+          destination: data.destinationAirport,
+          departureDate: data.departureDate,
+          passengers: data.passengers.toString(),
+          ...(data.returnDate && data.tripType === 'return' && { returnDate: data.returnDate }),
+          ...(data.cabinClass && { cabinClass: data.cabinClass })
+        })
+        
+        // Navigate to direct flight search page
+        router.push(`/flights?${params.toString()}`)
+        return
+      }
+
+      // THEME-BASED EXPLORATION MODE (existing flow)
+      console.log(`🌍 Exploring destinations within ${data.maxFlightTime} hours from ${data.departureAirport}`)
       
       // Call the API to explore destinations
       const response = await exploreDestinations(data)
