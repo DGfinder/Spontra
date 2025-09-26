@@ -1,70 +1,45 @@
+import { cn } from '@/lib/utils'
+
 interface TripTypeToggleProps {
   tripType: 'one-way' | 'return'
   onTripTypeChange: (tripType: 'one-way' | 'return') => void
+  accentColor?: string
 }
 
-export function TripTypeToggle({ tripType, onTripTypeChange }: TripTypeToggleProps) {
+const OPTIONS: Array<{ label: string; value: 'one-way' | 'return' }> = [
+  { label: 'Return', value: 'return' },
+  { label: 'One way', value: 'one-way' },
+]
+
+export function TripTypeToggle({ tripType, onTripTypeChange, accentColor = '#f97316' }: TripTypeToggleProps) {
   return (
-    <div>
-      <label className="block text-white/90 mb-2 font-muli" style={{ fontSize: '12px' }}>
-        TRIP TYPE
+    <div className="space-y-2">
+      <label className="flex items-center justify-between text-white/80 uppercase tracking-[0.18em] text-[11px] font-semibold font-muli">
+        <span>Trip type</span>
       </label>
-      <div className="grid grid-cols-2 gap-1 bg-white/20 rounded p-1">
-        <button
-          type="button"
-          onClick={() => onTripTypeChange('return')}
-          className={`rounded font-muli ${
-            tripType === 'return'
-              ? 'bg-white text-black'
-              : 'text-white'
-          }`}
-          onMouseEnter={(e) => {
-            if (tripType !== 'return') {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (tripType !== 'return') {
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }
-          }}
-          style={{
-            height: '32px',
-            fontSize: '11px',
-            transition: 'all 200ms ease-out'
-          }}
-          aria-pressed={tripType === 'return'}
-        >
-          Return
-        </button>
-        <button
-          type="button"
-          onClick={() => onTripTypeChange('one-way')}
-          className={`rounded font-muli ${
-            tripType === 'one-way'
-              ? 'bg-white text-black'
-              : 'text-white'
-          }`}
-          onMouseEnter={(e) => {
-            if (tripType !== 'one-way') {
-              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (tripType !== 'one-way') {
-              e.currentTarget.style.backgroundColor = 'transparent'
-            }
-          }}
-          style={{
-            height: '32px',
-            fontSize: '11px',
-            transition: 'all 200ms ease-out'
-          }}
-          aria-pressed={tripType === 'one-way'}
-        >
-          One way
-        </button>
+      <div className="flex items-center gap-2 rounded-full bg-white/10 p-1.5 backdrop-blur-sm">
+        {OPTIONS.map((option) => {
+          const isActive = tripType === option.value
+          return (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => onTripTypeChange(option.value)}
+              className={cn(
+                'flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200',
+                isActive
+                  ? 'text-slate-900 shadow-[0_12px_24px_rgba(0,0,0,0.35)]'
+                  : 'text-white/70 hover:text-white'
+              )}
+              style={isActive ? { backgroundColor: accentColor } : undefined}
+              aria-pressed={isActive}
+            >
+              {option.label}
+            </button>
+          )
+        })}
       </div>
     </div>
   )
 }
+

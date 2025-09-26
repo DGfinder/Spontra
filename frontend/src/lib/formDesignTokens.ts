@@ -1,50 +1,54 @@
 // Design tokens for consistent form styling
 export const FORM_DESIGN_TOKENS = {
   // Field dimensions
-  fieldHeight: 'h-8',           // 32px
-  fieldPadding: 'px-3 py-2',    // Consistent padding
-  fieldBorderRadius: 'rounded-md',
-  
+  fieldHeight: 'h-12', // 48px inputs
+  fieldPadding: 'px-4 py-3',
+  fieldBorderRadius: 'rounded-2xl',
+
   // Typography
-  labelFontSize: 'text-xs',     // 12px
-  fieldFontSize: 'text-sm',     // 14px
-  buttonFontSize: 'text-lg',    // 18px
-  
+  labelFontSize: 'text-[11px]',
+  fieldFontSize: 'text-[15px]',
+  buttonFontSize: 'text-[16px]',
+
   // Spacing
-  fieldGap: 'gap-2',           // 8px between fields
-  sectionGap: 'gap-3',         // 12px between sections
-  
+  fieldGap: 'space-y-2',
+  sectionGap: 'space-y-5',
+
   // Colors
-  errorColor: 'text-red-400',
-  errorBgColor: 'bg-red-50',
-  errorBorderColor: 'ring-red-500',
-  successColor: 'text-green-400',
+  errorColor: 'text-red-300',
+  errorBgColor: 'bg-red-900/20',
+  errorBorderColor: 'border-red-400',
+  successColor: 'text-emerald-300',
   warningColor: 'text-yellow-300',
-  
+
   // Focus states
-  focusRing: 'focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-  focusRingError: 'focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
-  
+  focusRing: 'focus:ring-2 focus:ring-[var(--ring-color)] focus:ring-offset-0 focus:ring-offset-transparent',
+  focusRingError: 'focus:ring-2 focus:ring-red-400 focus:ring-offset-0',
+
   // Transitions
   transition: 'transition-all duration-200 ease-out',
-  
+
   // Button dimensions
-  buttonHeight: 'h-12',        // 48px
+  buttonHeight: 'h-12',
   buttonPadding: 'px-6 py-3',
-  
+
   // Preset button dimensions
-  presetButtonHeight: 'h-8',   // 32px
-  presetButtonPadding: 'px-3 py-1.5',
+  presetButtonHeight: 'h-10',
+  presetButtonPadding: 'px-4 py-2',
 } as const
 
 // Theme-aware focus colors
 export const getThemeFocusRing = (theme: string) => {
-  const themeColors = {
-    adventure: 'focus:ring-yellow-500',
-    vibe: 'focus:ring-orange-500', 
-    nature: 'focus:ring-green-500',
-    indulge: 'focus:ring-pink-500',
-    discover: 'focus:ring-purple-500',
+  const themeColors: Record<string, string> = {
+    adventure: '#f97316',
+    nature: '#10b981',
+    indulge: '#d946ef',
+    vibe: '#ec4899',
+    discover: '#06b6d4',
   }
-  return themeColors[theme as keyof typeof themeColors] || 'focus:ring-blue-500'
+  const fallback = '#60a5fa'
+  return {
+    className: FORM_DESIGN_TOKENS.focusRing,
+    ringColor: themeColors[theme] ?? fallback,
+  }
 }

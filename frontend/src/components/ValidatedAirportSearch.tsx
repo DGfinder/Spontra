@@ -419,7 +419,7 @@ export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
                     aria-selected={idx === selectedIndex}
                   >
                     <div className="font-medium text-sm">{item.code} - {item.city}</div>
-                    <div className="text-xs text-gray-500">{item.name}{item.country ? ` • ${item.country}` : ''}</div>
+                    <div className="text-xs text-gray-500">{item.name}{item.country ? ` / ${item.country}` : ''}</div>
                   </li>
                 )
               })
@@ -454,7 +454,7 @@ export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
 
           {/* Loading state for remote search */}
           {isFetching && (
-            <li className="px-4 py-2 text-xs text-gray-500 text-center">Searching…</li>
+            <li className="px-4 py-2 text-xs text-gray-500 text-center">Searching...</li>
           )}
         </ul>
       )}

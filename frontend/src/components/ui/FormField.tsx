@@ -1,5 +1,8 @@
-﻿import React from 'react'
+import React from 'react'
 import { FORM_DESIGN_TOKENS, getThemeFocusRing } from '@/lib/formDesignTokens'
+import { cn } from '@/lib/utils'
+
+type ThemeName = string
 
 export interface FormFieldProps {
   label: string
@@ -8,7 +11,7 @@ export interface FormFieldProps {
   required?: boolean
   children: React.ReactNode
   className?: string
-  theme?: string
+  theme?: ThemeName
 }
 
 export function FormField({
@@ -22,34 +25,49 @@ export function FormField({
 }: FormFieldProps) {
   const errorId = htmlFor ? `${htmlFor}-error` : undefined
   const hasError = Boolean(error)
+  const focus = getThemeFocusRing(theme)
+
+  const clonedChild = React.cloneElement(children as React.ReactElement, {
+    'aria-describedby': hasError ? errorId : undefined,
+    'aria-invalid': hasError,
+    className: cn(
+      'w-full font-muli text-[15px] text-white placeholder:text-white/45',
+      'border border-white/12 bg-white/[0.07] rounded-2xl px-4 py-3 shadow-sm',
+      'hover:border-white/25 focus:outline-none',
+      FORM_DESIGN_TOKENS.transition,
+      focus.className,
+      hasError ? 'border-red-400 bg-red-900/20 focus:ring-red-400' : '',
+      (children as React.ReactElement).props.className,
+    ),
+    style: {
+      ...(children as React.ReactElement).props.style,
+      ...(hasError ? {} : { ['--ring-color' as '--ring-color']: focus.ringColor }),
+    },
+  })
 
   return (
-    <div className={`${FORM_DESIGN_TOKENS.fieldGap} ${className}`}>
+    <div className={cn('space-y-2', className)}>
       <label
-        className={`block ${FORM_DESIGN_TOKENS.labelFontSize} font-muli text-white/90 mb-2`}
+        className={cn(
+          'flex items-center justify-between text-white/80 uppercase tracking-[0.18em]',
+          'font-semibold font-muli',
+          'text-[11px]'
+        )}
         htmlFor={htmlFor}
       >
-        {label}
-        {required ? <span className="ml-1 text-red-400" aria-label="required">*</span> : null}
+        <span>{label}</span>
+        {required ? <span className="text-red-300 ml-1" aria-label="required">*</span> : null}
       </label>
 
       <div className="relative">
-        {React.cloneElement(children as React.ReactElement, {
-          'aria-describedby': hasError ? errorId : undefined,
-          'aria-invalid': hasError,
-          className: `${FORM_DESIGN_TOKENS.transition} ${
-            hasError
-              ? `${FORM_DESIGN_TOKENS.errorBorderColor} ${FORM_DESIGN_TOKENS.errorBgColor}`
-              : getThemeFocusRing(theme)
-          } ${(children as React.ReactElement).props.className || ''}`,
-        })}
+        {clonedChild}
       </div>
 
       {hasError ? (
         <div
           id={errorId}
           role="alert"
-          className={`${FORM_DESIGN_TOKENS.errorColor} ${FORM_DESIGN_TOKENS.labelFontSize} mt-1`}
+          className={cn('text-red-300 text-[11px] font-muli')}
         >
           {error}
         </div>
@@ -62,23 +80,22 @@ export interface FormInputProps extends React.InputHTMLAttributes<HTMLInputEleme
   variant?: 'default' | 'error'
 }
 
-export function FormInput({ variant = 'default', className = '', ...props }: FormInputProps) {
-  const baseClasses = `
-    w-full bg-white text-black rounded border-0 font-muli
-    ${FORM_DESIGN_TOKENS.fieldHeight}
-    ${FORM_DESIGN_TOKENS.fieldPadding}
-    ${FORM_DESIGN_TOKENS.fieldFontSize}
-    ${FORM_DESIGN_TOKENS.transition}
-  `.trim()
-
-  const variantClasses = variant === 'error'
-    ? `${FORM_DESIGN_TOKENS.errorBorderColor} ${FORM_DESIGN_TOKENS.errorBgColor}`
-    : ''
+export function FormInput({ variant = 'default', className = '', style, ...props }: FormInputProps) {
+  const baseClasses = cn(
+    'w-full font-muli text-[15px] text-white placeholder:text-white/45',
+    'border border-white/12 bg-white/[0.07] rounded-2xl px-4 py-3 shadow-sm',
+    'hover:border-white/25 focus:outline-none',
+    FORM_DESIGN_TOKENS.transition,
+    FORM_DESIGN_TOKENS.focusRing,
+    variant === 'error' ? `${FORM_DESIGN_TOKENS.errorBorderColor} bg-red-900/20 focus:ring-red-400` : '',
+    className,
+  )
 
   return (
     <input
       {...props}
-      className={`${baseClasses} ${variantClasses} ${className}`}
+      className={baseClasses}
+      style={style}
     />
   )
 }
@@ -87,23 +104,22 @@ export interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectEl
   variant?: 'default' | 'error'
 }
 
-export function FormSelect({ variant = 'default', className = '', ...props }: FormSelectProps) {
-  const baseClasses = `
-    w-full bg-white text-black rounded border-0 font-muli
-    ${FORM_DESIGN_TOKENS.fieldHeight}
-    ${FORM_DESIGN_TOKENS.fieldPadding}
-    ${FORM_DESIGN_TOKENS.fieldFontSize}
-    ${FORM_DESIGN_TOKENS.transition}
-  `.trim()
-
-  const variantClasses = variant === 'error'
-    ? `${FORM_DESIGN_TOKENS.errorBorderColor} ${FORM_DESIGN_TOKENS.errorBgColor}`
-    : ''
+export function FormSelect({ variant = 'default', className = '', style, ...props }: FormSelectProps) {
+  const baseClasses = cn(
+    'w-full font-muli text-[15px] text-white',
+    'border border-white/12 bg-white/[0.07] rounded-2xl px-4 py-3 shadow-sm',
+    'hover:border-white/25 focus:outline-none appearance-none',
+    FORM_DESIGN_TOKENS.transition,
+    FORM_DESIGN_TOKENS.focusRing,
+    variant === 'error' ? `${FORM_DESIGN_TOKENS.errorBorderColor} bg-red-900/20 focus:ring-red-400` : '',
+    className,
+  )
 
   return (
     <select
       {...props}
-      className={`${baseClasses} ${variantClasses} ${className}`}
+      className={baseClasses}
+      style={style}
     />
   )
 }

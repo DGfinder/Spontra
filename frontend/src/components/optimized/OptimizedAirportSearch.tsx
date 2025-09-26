@@ -47,7 +47,7 @@ const AirportItem = React.memo(({ airport, searchTerm, onClick }: { airport: Air
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-medium text-white">{highlightMatch(airport.code, searchTerm)}</span>
-            <span className="text-white/60">•</span>
+            <span className="text-white/60">/</span>
             <span className="truncate text-white/80">{highlightMatch(airport.name, searchTerm)}</span>
           </div>
           <div className="flex items-center gap-1 text-sm text-white/60">
@@ -68,7 +68,7 @@ export const OptimizedAirportSearch = React.memo<OptimizedAirportSearchProps>(({
   value,
   onChange,
   onValueChange,
-  placeholder = 'Search airports…',
+  placeholder = 'Search airports...',
   error,
   disabled = false,
   airports,
@@ -219,7 +219,7 @@ export const OptimizedAirportSearch = React.memo<OptimizedAirportSearchProps>(({
           </div>
           {filteredAirports.length === 8 ? (
             <div className="border-t border-white/10 px-3 py-2 text-xs text-white/60">
-              Showing first 8 results. Keep typing to refine…
+              Showing first 8 results. Keep typing to refine...
             </div>
           ) : null}
         </div>
