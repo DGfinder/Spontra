@@ -2,11 +2,11 @@
 
 ## Configuration
 - [ ] `ADMIN_PANEL_EMAIL` and `ADMIN_PANEL_PASSWORD` set to non-default values.
-- [ ] `ADMIN_PANEL_JWT_SECRET` provisioned (=32 chars) and shared with the server runtime.
+- [ ] `ADMIN_PANEL_JWT_SECRET` provisioned (>=32 chars) and shared with the server runtime.
 - [ ] Location dataset regenerated (`node scripts/generate-admin-locations.js`) after latest airport import.
 
 ## Application Health
-- [ ] Dashboard “Ready destinations” > 0 and “Needs attention” cleared or triaged.
+- [ ] Dashboard "Ready destinations" > 0 and "Needs attention" cleared or triaged.
 - [ ] Moderation queue empty or actively monitored.
 - [ ] Detail editor saves succeed (test overview + activities updates).
 - [ ] Theme toggles enforce reel gating (verify warning toast on insufficient media).

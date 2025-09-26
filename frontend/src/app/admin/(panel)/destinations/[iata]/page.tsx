@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -292,7 +292,7 @@ export default function DestinationDetailPage({ params }: { params: { iata: stri
   if (loading) {
     return (
       <div className='flex min-h-[60vh] items-center justify-center text-sm text-slate-600'>
-        <Loader className='mr-2 animate-spin' size={16} /> Loading destinationâ€¦
+        <Loader className='mr-2 animate-spin' size={16} /> Loading destination...
       </div>
     )
   }
@@ -573,7 +573,7 @@ export default function DestinationDetailPage({ params }: { params: { iata: stri
                   <div>
                     <h3 className='text-sm font-semibold text-slate-900 capitalize'>{theme.themeSlug}</h3>
                     <p className='text-xs text-slate-500'>
-                      {theme.reelCount} reel(s) Â· min {theme.min} Â· max {theme.max}
+                      {theme.reelCount} reel(s) / min {theme.min} / max {theme.max}
                     </p>
                   </div>
                 </div>
@@ -587,7 +587,7 @@ export default function DestinationDetailPage({ params }: { params: { iata: stri
                       <ShieldAlert size={14} /> Needs media
                     </span>
                   )}
-                  <span>Â·</span>
+                  <span>/</span>
                   <span>{theme.isEnabled ? 'Enabled' : 'Disabled'}</span>
                 </div>
               </div>

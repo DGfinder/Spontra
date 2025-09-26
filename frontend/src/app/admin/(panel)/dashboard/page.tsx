@@ -1,12 +1,12 @@
-﻿import type { ComponentType } from 'react'
-import { Activity, ClipboardList, MapPin, ShieldCheck, Video } from 'lucide-react'
+﻿import { Activity, ClipboardList, MapPin, ShieldCheck, Video } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface MetricCard {
   id: string
   title: string
   value: string
   helper: string
-  icon: ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
 }
 
 const METRICS: MetricCard[] = [

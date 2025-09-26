@@ -89,7 +89,7 @@ export default function ReelList({ iata, themeSlug, onChange }: ReelListProps) {
   if (loading) {
     return (
       <div className="flex items-center gap-2 rounded-lg border border-dashed border-slate-200 bg-white/5 p-4 text-sm text-white/70">
-        <Loader size={16} className="animate-spin" /> Loading reels…
+        <Loader size={16} className="animate-spin" /> Loading reels...
       </div>
     )
   }
@@ -120,7 +120,7 @@ export default function ReelList({ iata, themeSlug, onChange }: ReelListProps) {
               <div key={item.id} className="flex items-center justify-between rounded-md border border-white/10 bg-black/40 p-2 text-xs">
                 <div className="space-y-1 text-white/80">
                   <p>
-                    <span className="font-medium">Media #{item.id}</span> • {item.kind.toUpperCase()}
+                    <span className="font-medium">Media #{item.id}</span> / {item.kind.toUpperCase()}
                   </p>
                   <p className="truncate text-white/60">{item.sourceUrl}</p>
                 </div>

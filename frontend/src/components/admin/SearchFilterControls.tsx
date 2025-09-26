@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import {
@@ -253,7 +253,7 @@ export function SearchFilterControls({ onFiltersChange, initialFilters }: Search
           </div>
           
           <div>
-            <label className="block text-xs text-gray-600 mb-1">Min Revenue (€)</label>
+            <label className="block text-xs text-gray-600 mb-1">Min Revenue (EUR)</label>
             <input
               type="number"
               min="0"

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React, { useState } from 'react'
 import {
@@ -191,7 +191,7 @@ export function DestinationControls({
                 <TrendingUp size={12} className="text-green-600" />
               </div>
               <div className="text-lg font-semibold text-gray-900">
-                €{destination.metrics.totalRevenue.toLocaleString()}
+                EUR {destination.metrics.totalRevenue.toLocaleString()}
               </div>
             </div>
           </div>

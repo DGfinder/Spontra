@@ -108,7 +108,7 @@ export default function AddReelDialog({
         <div className="flex items-center gap-3 border-b border-gray-200 px-6 py-4">
           <PlusCircle className="text-blue-600" size={22} />
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Add media for {iata} — {THEME_LABELS[themeSlug]}</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Add media for {iata} - {THEME_LABELS[themeSlug]}</h2>
             <p className="text-sm text-gray-600">Paste between {minRequired} and {maxAllowed} video or image URLs.</p>
           </div>
         </div>
@@ -124,7 +124,7 @@ export default function AddReelDialog({
 
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span>{urls.length} URL(s) detected</span>
-            <span>{minRequired} required — max {maxAllowed}</span>
+            <span>{minRequired} required - max {maxAllowed}</span>
           </div>
 
           {error ? <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div> : null}

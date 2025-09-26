@@ -14,7 +14,7 @@ interface DestinationCardProps {
 }
 
 const getFlagEmoji = (countryCode: string) => {
-  if (!countryCode || countryCode.length !== 2) return '🌐'
+  if (!countryCode || countryCode.length !== 2) return '??'
   const base = 127397
   const upper = countryCode.toUpperCase()
   return String.fromCodePoint(upper.charCodeAt(0) + base, upper.charCodeAt(1) + base)
@@ -66,7 +66,7 @@ export function DestinationCard({
             <h3 className="truncate text-2xl font-semibold">{destination.city_name}</h3>
             <p className="flex flex-wrap items-center gap-2 text-sm text-white/70">
               <span className="truncate">{destination.country_name}</span>
-              <span className="text-white/40">•</span>
+              <span className="text-white/40">/</span>
               <span>{matchPercent}% match</span>
             </p>
           </div>
@@ -86,7 +86,7 @@ export function DestinationCard({
         <div className="rounded-lg border border-white/15 bg-black/20 p-3">
           <p className="text-xs text-white/60">Price outlook</p>
           <p className="mt-1 text-lg font-semibold">{rankingDisplay.text}</p>
-          <p className="text-xs text-white/50">Competitive index: {analytics?.competitiveIndex?.toFixed(0) ?? '—'}</p>
+          <p className="text-xs text-white/50">Competitive index: {analytics?.competitiveIndex?.toFixed(0) ?? '-'}</p>
         </div>
       </section>
 
@@ -107,7 +107,7 @@ export function DestinationCard({
         </div>
         <div className="rounded-lg border border-white/10 bg-blue-900/20 p-3">
           <div className="mb-1 flex items-center gap-2">
-            <span className="text-lg">🌤️</span>
+            <span className="text-lg">SUN</span>
             <span className="text-xs font-medium text-blue-300">Seasonal insight</span>
           </div>
           <p className="text-xs text-white/80">{analytics?.seasonalInsight?.recommendation || 'Seasonal information unavailable'}</p>
@@ -126,7 +126,7 @@ export function DestinationCard({
           onClick={handleExplore}
           className="w-full rounded-lg border border-white/20 bg-white/10 py-3 text-sm font-medium transition hover:border-white/40 hover:bg-white/20"
         >
-          Explore {destination.city_name} →
+          Explore {destination.city_name} {'->'}
         </button>
       </footer>
     </div>
