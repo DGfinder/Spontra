@@ -408,19 +408,8 @@ export function LandingPageForm() {
       {navigation.currentStep === 'search' && (
       <div className="absolute inset-0 left-[3vw] z-20 grid grid-cols-1 md:grid-cols-[380px_1fr] lg:grid-cols-[420px_1fr] xl:grid-cols-[450px_1fr] items-start pt-20 sm:pt-24 md:pt-28">
         {/* Form Panel with Overlay - Responsive */}
-        <div 
-          className="relative p-4 md:p-5 w-full h-[calc(100vh-8rem)] lg:h-[calc(100vh-10rem)] flex"
-          style={{ 
-            maxHeight: 'calc(100vh - 6rem)'
-          }}
-        >
-          {/* Form Panel Overlay */}
-          <div 
-            className="absolute inset-0 z-0 rounded-lg"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.702)' }}
-          />
-          <div className="relative z-10 flex flex-col justify-start w-full no-scrollbar overflow-hidden pt-1 pb-6 md:pb-8"
-            style={{ marginLeft: '8px' }}>
+        <div className="relative flex w-full p-4 md:p-5">
+          <div className="flex w-full flex-col justify-start pt-1 pb-6 md:pb-8 ml-2">
             <SearchFormErrorBoundary>
               <SearchForm
                 themes={THEMES}
@@ -430,7 +419,6 @@ export function LandingPageForm() {
             </SearchFormErrorBoundary>
           </div>
         </div>
-
         {/* Emphasized Blurb - floats over hero for better visibility */}
         <div
           className="hidden md:flex"
