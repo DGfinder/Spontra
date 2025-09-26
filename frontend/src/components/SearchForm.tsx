@@ -129,10 +129,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
           <div className="flex-1 overflow-y-auto pr-1 md:overflow-visible md:pr-0">
             <div className="space-y-5 px-6 pt-6 pb-3 md:pb-5">
               <header className="space-y-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-white/60">
-                  <span>Plan</span>
-                </div>
-                <div className="space-y-2">
+                                <div className="space-y-2">
                   <h2 className="text-[26px] font-semibold leading-tight text-white">What are you looking for?</h2>
                   <p className="text-sm text-white/70">{themeSubtitle}</p>
                 </div>
@@ -141,9 +138,6 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
               <section className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Theme</span>
-                  <span className="rounded-full border border-white/10 bg-white/[0.06] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-white/60">
-                    Changes background
-                  </span>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {themes.map((theme) => {
