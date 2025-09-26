@@ -6,6 +6,8 @@ import { getAdminDbClient } from '@/lib/dbAdmin'
 import { consumeRateLimit } from '@/lib/rateLimit'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 const updateSchema = z.object({
   airport_code: z.string().length(3),
@@ -116,4 +118,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Update failed' }, { status: 500 })
   }
 }
-

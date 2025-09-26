@@ -1,5 +1,2 @@
-﻿import { redirect } from 'next/navigation'
-
-export default function AdminRootPage() {
-  redirect('/admin/dashboard')
-}
+﻿export const dynamic = 'force-dynamic'
+export { default } from './(panel)/page'

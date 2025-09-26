@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
+
 import { requireAdminContext, AdminAuthError } from '@/lib/adminAuth'
 import { getAdminDbClient } from '@/lib/dbAdmin'
 import { consumeRateLimit } from '@/lib/rateLimit'
@@ -264,4 +268,3 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: 'Failed to create reels' }, { status: 500 })
   }
 }
-

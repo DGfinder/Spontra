@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { apiClient } from '@/services/apiClient'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // GET /api/admin/destinations
 // Aggregates destinations from backend exploration index to feed admin UI
@@ -113,5 +115,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to load destinations' }, { status: 500 })
   }
 }
-
 

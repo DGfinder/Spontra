@@ -3,6 +3,8 @@ import { Client as PgClient } from 'pg'
 // Use dynamic import to avoid bundling optional native deps (e.g., kerberos)
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function POST() {
   const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL || 'postgres://spontra:development@localhost/spontra?sslmode=disable'

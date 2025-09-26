@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,5 +16,4 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to fetch aircraft' }, { status: 500 })
   }
 }
-
 

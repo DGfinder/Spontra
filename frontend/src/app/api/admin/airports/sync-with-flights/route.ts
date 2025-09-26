@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Client as PgClient } from 'pg'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function POST(req: NextRequest) {
   const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL

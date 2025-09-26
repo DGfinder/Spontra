@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // PATCH /api/admin/themes/definitions/[key]
 export async function PATCH(req: NextRequest, { params }: { params: { key: string } }) {
@@ -34,5 +36,4 @@ export async function DELETE(_req: NextRequest, { params }: { params: { key: str
     return NextResponse.json({ success: false, error: 'Failed to delete' }, { status: 500 })
   }
 }
-
 

@@ -239,6 +239,22 @@ export const destinationSearchApiSchema = z.object({
   path: ['maxFlightTime']
 })
 
+// Flight redirect validation
+export const flightRedirectSchema = z.object({
+  itineraryId: z.string().min(1, 'Itinerary identifier is required'),
+  origin: airportCodeSchema,
+  destination: airportCodeSchema,
+  departureDate: z.string().min(1, 'Departure date is required'),
+  returnDate: z.string().optional(),
+  adults: z.number().min(1, 'At least one adult is required').max(8, 'Maximum of eight travellers'),
+  cabinClass: z.enum(['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']),
+  carrierCode: z.string().min(2, 'Carrier code is required').max(3, 'Carrier code must be three letters'),
+  flightNumber: z.string().min(1, 'Flight number is required').max(6, 'Flight number must be up to six characters'),
+  stops: z.number().min(0).max(6).optional(),
+  price: z.number().min(0).optional(),
+  currency: z.string().length(3).optional(),
+  providerHint: z.string().optional(),
+})
 // Click tracking API validation
 export const clickEventApiSchema = z.object({
   id: z.string().min(1, 'Click ID is required'),
@@ -350,3 +366,4 @@ export const validateApiRequest = <T>(
     return { success: false, errors: { general: 'Validation failed' } }
   }
 }
+

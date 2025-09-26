@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Client as PgClient } from 'pg'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -60,4 +62,3 @@ export async function GET(req: NextRequest) {
     try { await pg.end() } catch {}
   }
 }
-

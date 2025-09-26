@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cacheGet, cacheSet } from '@/lib/cacheServer'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 function requireAdmin(req: NextRequest): boolean {
   const auth = req.headers.get('authorization') || req.headers.get('Authorization')
@@ -38,4 +40,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: e?.message || 'Failed to save videos' }, { status: 500 })
   }
 }
-

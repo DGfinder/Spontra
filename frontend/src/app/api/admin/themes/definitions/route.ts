@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { apiClient } from '@/services/apiClient'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // GET /api/admin/themes/definitions -> proxy to data-ingestion service
 export async function GET() {
@@ -32,5 +34,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Failed to save theme definition' }, { status: 500 })
   }
 }
-
 

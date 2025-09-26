@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // DELETE /api/admin/themes/cache/[cacheKey]
 export async function DELETE(_req: NextRequest, { params }: { params: { cacheKey: string } }) {
@@ -14,5 +16,4 @@ export async function DELETE(_req: NextRequest, { params }: { params: { cacheKey
     return NextResponse.json({ success: false, error: 'Failed to delete cache entry' }, { status: 500 })
   }
 }
-
 

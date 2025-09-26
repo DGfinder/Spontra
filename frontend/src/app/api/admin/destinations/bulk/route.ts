@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { apiClient } from '@/services/apiClient'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 interface BulkUpdateRequest {
   action: 'activate' | 'deactivate' | 'mark_popular' | 'unmark_popular' | 'show' | 'hide' | 'delete'

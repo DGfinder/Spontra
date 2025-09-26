@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 function requireAuth(req: NextRequest): string | null {
   const auth = req.headers.get('authorization') || req.headers.get('Authorization')
@@ -60,4 +62,3 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const data = await res.json().catch(() => ({}))
   return NextResponse.json(data, { status: res.status })
 }
-

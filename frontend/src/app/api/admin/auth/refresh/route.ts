@@ -3,6 +3,8 @@ import { SignJWT, jwtVerify } from 'jose'
 import { AdminUser } from '@/types/admin'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // Secure JWT secret validation (same as login route)
 const getJWTSecret = () => {

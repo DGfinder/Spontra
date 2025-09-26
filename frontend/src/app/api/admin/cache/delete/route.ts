@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cacheDel } from '@/lib/cacheServer'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,4 +17,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: e?.message || 'Failed to delete' }, { status: 500 })
   }
 }
-
