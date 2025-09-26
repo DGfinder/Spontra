@@ -122,22 +122,20 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
 
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
-          className="relative z-10 flex h-full flex-col"
+          className="relative z-10 flex flex-col"
           role="search"
           aria-label="Travel search form"
         >
-          <div className="flex-1 overflow-y-auto pr-1 md:overflow-visible md:pr-0">
-            <div className="space-y-5 px-6 pt-6 pb-3 md:pb-5">
+          <div className="flex-1">
+            <div className="space-y-6 px-7 pt-7 pb-4 md:pb-6">
               <header className="space-y-3">
                                 <div className="space-y-2">
                   <h2 className="text-[26px] font-semibold leading-tight text-white">What are you looking for?</h2>
-                  <p className="text-sm text-white/70">{themeSubtitle}</p>
                 </div>
               </header>
 
               <section className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Theme</span>
+                <div className="flex items-center gap-3">
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {themes.map((theme) => {
@@ -310,19 +308,10 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                 </div>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
                       Flight duration
                     </span>
-                    <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-                      <input
-                        type="checkbox"
-                        checked={!!formValues.directFlightsOnly}
-                        onChange={(event) => setValue('directFlightsOnly', event.target.checked as any)}
-                        className="h-4 w-4 rounded border-white/25 bg-transparent text-white focus:outline-none focus:ring-2 focus:ring-[var(--ring-color)] focus:ring-offset-0"
-                        />
-                      Only direct flights
-                    </label>
                   </div>
 
                   <FlightTimeSlider
