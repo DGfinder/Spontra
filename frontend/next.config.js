@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    serverComponentsExternalPackages: ['cassandra-driver', 'pg'],
+    serverComponentsExternalPackages: ['cassandra-driver'],
   },
   webpack: (config, { isServer }) => {
     config.resolve = config.resolve || {}
@@ -14,7 +14,6 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        pg: false,
         'cassandra-driver': false,
         uuid: false,
       }
@@ -24,7 +23,6 @@ const nextConfig = {
     if (isServer) {
       config.externals = config.externals || []
       config.externals.push({
-        'pg': 'commonjs pg',
         'cassandra-driver': 'commonjs cassandra-driver'
       })
     }

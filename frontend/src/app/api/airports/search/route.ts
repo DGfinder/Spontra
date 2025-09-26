@@ -1,30 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { neon } from '@neondatabase/serverless'
 import { getAirportHubInfo, calculateHubScore, getContextualSuggestions } from '@/lib/airlineHubs'
 
-// Dynamic import for pg to handle build-time issues
-let isPgMocked = false
-const PgClient = (() => {
-  try {
-    const pgModule = require('pg')
-    console.log('✅ Successfully loaded real pg module')
-    return pgModule.Client
-  } catch (error) {
-    console.warn('⚠️  Failed to load pg module, using mock client:', error?.message)
-    isPgMocked = true
-    return class MockClient {
-      constructor(config: any) {
-        console.warn('🔶 MockClient created - database functionality disabled')
-      }
-      async connect() {
-        throw new Error('Database unavailable: pg module could not be loaded. Please check database configuration.')
-      }
-      async query() { 
-        throw new Error('Database unavailable: pg module could not be loaded. Please check database configuration.')
-      }
-      async end() {}
-    }
-  }
-})()
+// Simple, clean connection - no more dynamic imports!
+const sql = neon(process.env.DATABASE_URL!)
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -258,125 +237,157 @@ export async function GET(req: NextRequest) {
   const includeCityGroups = searchParams.get('groupCities') === 'true'
   const fromAirport = searchParams.get('from') || undefined
   
-  console.log(`🔍 Airport search request: query="${query}", limit=${limit}, groupCities=${includeCityGroups}, from=${fromAirport || 'none'}`)
+  console.log(`🔍 Airport search: "${query}", limit=${limit}`)
 
-  // Initialize database connection early
-  const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
-  if (!pgUrl) {
-    console.error('❌ Database configuration missing: No DATABASE_URL or SEARCH_DATABASE_URL found')
-    return NextResponse.json({ 
-      ok: false, 
-      error: 'Database not configured. Please check environment variables.',
-      details: isPgMocked ? 'pg module could not be loaded' : 'Database URL missing'
+  // Early validation
+  if (!process.env.DATABASE_URL) {
+    return NextResponse.json({
+      ok: false,
+      error: 'Database not configured'
     }, { status: 503 })
   }
 
-  console.log(`🔍 Initializing database connection for search: "${query}"`)
-  console.log('🔧 Using pg module:', isPgMocked ? 'MOCK (disabled)' : 'REAL')
-  
-  const pg = new PgClient({ connectionString: pgUrl })
-
-  if (!query || query.length < 1) {
-    // Return contextual suggestions when query is empty
-    const contextualSuggestions = getContextualSuggestions('', fromAirport)
-    
-    // Get popular airports with hub info
-    const popularAirportCodes = ['LHR', 'CDG', 'FRA', 'AMS', 'JFK', 'LAX', 'ORD', 'ATL', 'DXB', 'SIN', 'NRT', 'HKG']
-    const popularQuery = `
-      SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-      FROM airports 
-      WHERE is_active = true AND iata_code = ANY($1)
-      ORDER BY 
-        CASE iata_code ${popularAirportCodes.map((code, i) => `WHEN '${code}' THEN ${i}`).join(' ')} END
-      LIMIT 12
-    `
-    
-    const { rows: popularRows } = await pg.query(popularQuery, [popularAirportCodes])
-    const popularAirports = popularRows.map((r: any) => {
-      const iataCode = r.iata_code?.toUpperCase() || ''
-      const airport: Airport = {
-        code: iataCode,
-        icao_code: r.icao_code?.toUpperCase() || '',
-        name: r.name || '',
-        city: r.city || '',
-        country: r.country || '',
-        latitude: parseFloat(r.latitude) || undefined,
-        longitude: parseFloat(r.longitude) || undefined,
-        timezone: r.timezone || '',
-        type: 'AIRPORT' as const,
-        importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
-        search_score: 1000
-      }
-      
-      // Add hub info
-      const hubInfo = getAirportHubInfo(iataCode)
-      if (hubInfo.length > 0) {
-        airport.hub_info = {
-          airlines: hubInfo.map(hub => ({
-            code: hub.airline,
-            name: hub.airlineName,
-            alliance: hub.alliance,
-            hubType: hub.hubType,
-            routes: hub.routes
-          })),
-          isHub: true,
-          hubScore: calculateHubScore(iataCode)
-        }
-      }
-      
-      return airport
-    })
-    
-    return NextResponse.json({ 
-      ok: true, 
-      results: popularAirports, 
-      cityGroups: [], 
-      totalCount: popularAirports.length,
-      suggestions: contextualSuggestions,
-      searchType: 'popular_airports' 
-    })
-  }
-
   try {
-    console.log('🔌 Attempting database connection...')
-    await pg.connect()
-    console.log('✅ Database connected successfully')
-    console.log(`🔍 Searching airports for: "${query}"`)
-    const queryStartTime = Date.now()
+    let airports: Airport[] = []
 
-    // Check if query matches a city code
-    const cityCodeMatch = CITY_CODES[query.toUpperCase()]
-    if (cityCodeMatch) {
-      console.log(`🏙️ City code detected: ${query.toUpperCase()}`)
+    if (!query || query.length < 1) {
+      // Return popular airports when no query
+      console.log('🏆 Returning popular airports')
+      const rows = await sql`
+        SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
+        FROM airports 
+        WHERE is_active = true 
+          AND iata_code = ANY(${['LHR', 'CDG', 'FRA', 'AMS', 'JFK', 'LAX', 'ORD', 'ATL', 'DXB', 'SIN']})
+        ORDER BY 
+          CASE iata_code 
+            WHEN 'LHR' THEN 1 WHEN 'CDG' THEN 2 WHEN 'FRA' THEN 3 
+            WHEN 'AMS' THEN 4 WHEN 'JFK' THEN 5 WHEN 'LAX' THEN 6
+            WHEN 'ORD' THEN 7 WHEN 'ATL' THEN 8 WHEN 'DXB' THEN 9 WHEN 'SIN' THEN 10
+          END
+      `
       
-      const placeholders = cityCodeMatch.airports.map((_, i) => `$${i + 1}`).join(', ')
-      const { rows } = await pg.query(
-        `SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-         FROM airports
-         WHERE is_active = true AND iata_code IN (${placeholders})
-         ORDER BY 
-           CASE iata_code ${cityCodeMatch.airports.map((code, i) => `WHEN $${i + 1} THEN ${i}`).join(' ')} END`,
-        cityCodeMatch.airports
-      )
+      airports = rows.map((row: any) => ({
+        code: row.iata_code,
+        icao_code: row.icao_code || '',
+        name: row.name,
+        city: row.city,
+        country: row.country,
+        latitude: row.latitude ? parseFloat(row.latitude) : undefined,
+        longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+        timezone: row.timezone || '',
+        type: 'AIRPORT' as const,
+        importance_score: 100,
+        search_score: 1000
+      }))
 
-      const cityAirports = rows.map((r: any) => {
-        const iataCode = r.iata_code?.toUpperCase() || ''
-        const airport: Airport = {
-          code: iataCode,
-          icao_code: r.icao_code?.toUpperCase() || '',
-          name: r.name || '',
-          city: r.city || '',
-          country: r.country || '',
-          latitude: parseFloat(r.latitude) || undefined,
-          longitude: parseFloat(r.longitude) || undefined,
-          timezone: r.timezone || '',
-          type: 'AIRPORT' as const,
-          importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
-          search_score: 1000
-        }
+    } else {
+      // Check if query matches a city code
+      const cityCodeMatch = CITY_CODES[query.toUpperCase()]
+      if (cityCodeMatch) {
+        console.log(`🏙️ City code detected: ${query.toUpperCase()}`)
         
-        // Add airline hub information
-        const hubInfo = getAirportHubInfo(iataCode)
+        const rows = await sql`
+          SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
+          FROM airports
+          WHERE is_active = true AND iata_code = ANY(${cityCodeMatch.airports})
+          ORDER BY 
+            CASE iata_code 
+              ${cityCodeMatch.airports.map((code, i) => `WHEN '${code}' THEN ${i}`).join(' ')}
+            END
+        `
+
+        airports = rows.map((row: any) => {
+          const airport: Airport = {
+            code: row.iata_code,
+            icao_code: row.icao_code || '',
+            name: row.name,
+            city: row.city,
+            country: row.country,
+            latitude: row.latitude ? parseFloat(row.latitude) : undefined,
+            longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+            timezone: row.timezone || '',
+            type: 'AIRPORT' as const,
+            importance_score: AIRPORT_IMPORTANCE[row.iata_code] || 50,
+            search_score: 1000
+          }
+          
+          // Add hub info if available
+          const hubInfo = getAirportHubInfo(row.iata_code)
+          if (hubInfo.length > 0) {
+            airport.hub_info = {
+              airlines: hubInfo.map(hub => ({
+                code: hub.airline,
+                name: hub.airlineName,
+                alliance: hub.alliance,
+                hubType: hub.hubType,
+                routes: hub.routes
+              })),
+              isHub: true,
+              hubScore: calculateHubScore(row.iata_code)
+            }
+          }
+          
+          return airport
+        })
+
+        const cityGroups = [{
+          city: cityCodeMatch.city,
+          country: cityCodeMatch.country,
+          airports: airports,
+          primary_code: airports[0]?.code
+        }]
+
+        return NextResponse.json({
+          ok: true,
+          results: airports,
+          cityGroups,
+          totalCount: airports.length,
+          searchType: 'city_code'
+        })
+      }
+
+      // Search airports by query
+      console.log(`🔍 Searching for: "${query}"`)
+      
+      const searchQuery = `%${query.toLowerCase()}%`
+      const rows = await sql`
+        SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
+        FROM airports
+        WHERE is_active = true
+          AND (
+            LOWER(name) LIKE ${searchQuery} OR
+            LOWER(city) LIKE ${searchQuery} OR
+            LOWER(iata_code) LIKE ${searchQuery} OR
+            LOWER(country) LIKE ${searchQuery}
+          )
+        ORDER BY 
+          CASE 
+            WHEN LOWER(iata_code) = ${query.toLowerCase()} THEN 1
+            WHEN LOWER(name) LIKE ${query.toLowerCase() + '%'} THEN 2
+            WHEN LOWER(city) LIKE ${query.toLowerCase() + '%'} THEN 3
+            ELSE 4
+          END,
+          name
+        LIMIT ${limit}
+      `
+
+      airports = rows.map((row: any) => {
+        const airport: Airport = {
+          code: row.iata_code,
+          icao_code: row.icao_code || '',
+          name: row.name,
+          city: row.city,
+          country: row.country,
+          latitude: row.latitude ? parseFloat(row.latitude) : undefined,
+          longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+          timezone: row.timezone || '',
+          type: 'AIRPORT' as const,
+          importance_score: 75,
+          search_score: 100
+        }
+
+        // Add hub info if available
+        const hubInfo = getAirportHubInfo(row.iata_code)
         if (hubInfo.length > 0) {
           airport.hub_info = {
             airlines: hubInfo.map(hub => ({
@@ -387,182 +398,44 @@ export async function GET(req: NextRequest) {
               routes: hub.routes
             })),
             isHub: true,
-            hubScore: calculateHubScore(iataCode)
+            hubScore: calculateHubScore(row.iata_code)
           }
         }
-        
+
+        // Calculate search score
+        airport.search_score = calculateSearchScore(query, airport)
         return airport
       })
-
-      return NextResponse.json({
-        ok: true,
-        results: cityAirports,
-        cityGroups: [{ 
-          city: cityCodeMatch.city, 
-          country: cityCodeMatch.country, 
-          airports: cityAirports,
-          primary_code: cityAirports[0]?.code
-        }],
-        totalCount: cityAirports.length,
-        searchType: 'city_code'
-      })
+      
+      // Re-sort by calculated search score
+      airports.sort((a, b) => b.search_score - a.search_score)
     }
-
-    // Full-text search with comprehensive matching
-    const searchQuery = `
-      SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-      FROM airports 
-      WHERE is_active = true
-        AND (
-          LOWER(iata_code) LIKE LOWER($1) || '%'
-          OR LOWER(icao_code) LIKE LOWER($1) || '%'
-          OR LOWER(name) LIKE '%' || LOWER($1) || '%'
-          OR LOWER(city) LIKE '%' || LOWER($1) || '%'
-          OR LOWER(country) LIKE '%' || LOWER($1) || '%'
-          OR LOWER(name) % LOWER($1) -- PostgreSQL similarity operator for fuzzy matching
-          OR LOWER(city) % LOWER($1)
-        )
-      ORDER BY 
-        -- Exact matches first
-        CASE 
-          WHEN LOWER(iata_code) = LOWER($1) THEN 1000
-          WHEN LOWER(icao_code) = LOWER($1) THEN 950
-          WHEN LOWER(iata_code) LIKE LOWER($1) || '%' THEN 900
-          WHEN LOWER(city) = LOWER($1) THEN 850
-          WHEN LOWER(name) LIKE LOWER($1) || '%' THEN 800
-          WHEN LOWER(city) LIKE LOWER($1) || '%' THEN 750
-          WHEN LOWER(name) LIKE '%' || LOWER($1) || '%' THEN 600
-          WHEN LOWER(city) LIKE '%' || LOWER($1) || '%' THEN 550
-          WHEN LOWER(country) LIKE '%' || LOWER($1) || '%' THEN 400
-          ELSE similarity(LOWER(name), LOWER($1)) * 300 + similarity(LOWER(city), LOWER($1)) * 200
-        END DESC,
-        -- Secondary sort by importance (major airports first)
-        CASE iata_code 
-          ${Object.entries(AIRPORT_IMPORTANCE).map(([code, score]) => `WHEN '${code}' THEN ${score}`).join(' ')}
-          ELSE 50
-        END DESC,
-        name ASC
-      LIMIT $2`
-
-    const { rows } = await pg.query(searchQuery, [query, limit * 2]) // Get more results for processing
-    
-    // Track search analytics (non-blocking)
-    if (query.length >= 3) {
-      pg.query(`
-        INSERT INTO search_analytics (query, result_count, search_date)
-        VALUES ($1, $2, NOW())
-        ON CONFLICT (query) DO UPDATE SET
-          search_count = search_analytics.search_count + 1,
-          last_searched = NOW(),
-          result_count = $2
-      `, [query.toLowerCase().trim(), rows.length]).catch(() => {
-        // Silently fail analytics - don't impact search functionality
-      })
-    }
-
-    const airports: Airport[] = rows.map((r: any) => {
-      const iataCode = r.iata_code?.toUpperCase() || ''
-      
-      const airport: Airport = {
-        code: iataCode,
-        icao_code: r.icao_code?.toUpperCase() || '',
-        name: r.name || '',
-        city: r.city || '',
-        country: r.country || '',
-        latitude: parseFloat(r.latitude) || undefined,
-        longitude: parseFloat(r.longitude) || undefined,
-        timezone: r.timezone || '',
-        type: 'AIRPORT' as const,
-        importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
-        search_score: 0
-      }
-      
-      // Add airline hub information
-      const hubInfo = getAirportHubInfo(iataCode)
-      if (hubInfo.length > 0) {
-        airport.hub_info = {
-          airlines: hubInfo.map(hub => ({
-            code: hub.airline,
-            name: hub.airlineName,
-            alliance: hub.alliance,
-            hubType: hub.hubType,
-            routes: hub.routes
-          })),
-          isHub: true,
-          hubScore: calculateHubScore(iataCode)
-        }
-      }
-      
-      // Calculate search score (now includes hub bonus)
-      airport.search_score = calculateSearchScore(query, airport)
-      return airport
-    }).filter((airport: Airport) => airport.search_score > 50) // Filter low relevance results
-    
-    // Re-sort by calculated search score
-    airports.sort((a, b) => b.search_score - a.search_score)
-
-    // Limit final results
-    const limitedAirports = airports.slice(0, limit)
 
     // Group multi-airport cities if requested
-    const cityGroups = includeCityGroups ? groupAirportsByCity(limitedAirports) : []
+    const cityGroups = includeCityGroups ? groupAirportsByCity(airports) : []
 
-    console.log(`✅ Found ${limitedAirports.length} airports (${cityGroups.length} city groups)`)
-
-    // Get contextual suggestions for partial matches
+    // Get contextual suggestions
     const suggestions = getContextualSuggestions(query, fromAirport)
-    
-    // Performance and result logging
-    const queryDuration = Date.now() - queryStartTime
-    const totalDuration = Date.now() - startTime
-    console.log(`✅ Search completed: ${limitedAirports.length} airports, ${cityGroups.length} city groups in ${queryDuration}ms (total: ${totalDuration}ms)`)
-    
+
+    const duration = Date.now() - startTime
+    console.log(`✅ Found ${airports.length} airports in ${duration}ms`)
+
     return NextResponse.json({
       ok: true,
-      results: limitedAirports,
+      results: airports,
       cityGroups,
-      totalCount: limitedAirports.length,
-      searchType: 'full_search',
-      suggestions: limitedAirports.length < 5 ? suggestions : undefined, // Only show suggestions if few results
-      performance: {
-        queryTimeMs: queryDuration,
-        totalTimeMs: totalDuration
-      }
+      totalCount: airports.length,
+      searchType: query ? 'search' : 'popular',
+      suggestions: airports.length < 5 ? suggestions : undefined,
+      performance: { queryTimeMs: duration }
     })
 
   } catch (error: any) {
     console.error('❌ Airport search error:', error)
-    
-    // Provide specific error messages based on error type
-    let errorMessage = 'Search failed'
-    let statusCode = 500
-    
-    if (error?.message?.includes('Database unavailable')) {
-      errorMessage = 'Airport search temporarily unavailable. Please try again later.'
-      statusCode = 503
-    } else if (error?.code === 'ECONNREFUSED' || error?.code === 'ENOTFOUND') {
-      errorMessage = 'Database connection failed. Please try again later.'
-      statusCode = 503
-    } else if (error?.code === '28P01') {
-      errorMessage = 'Database authentication failed.'
-      statusCode = 503
-    } else if (error?.message) {
-      errorMessage = error.message
-    }
-    
     return NextResponse.json({
-      ok: false, 
-      error: errorMessage,
-      details: {
-        type: error?.name || 'Unknown',
-        code: error?.code,
-        isPgMocked,
-        hasDbUrl: !!pgUrl
-      }
-    }, { status: statusCode })
-  } finally {
-    try { 
-      await pg.end() 
-    } catch {}
+      ok: false,
+      error: 'Airport search failed',
+      details: error.message
+    }, { status: 500 })
   }
 }

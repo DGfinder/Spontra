@@ -147,6 +147,14 @@ test-api.js
 test-*.js
 debug-*.js
 
+# Temporary test files that may contain credentials
+test_*.js
+test_*.py
+test_*.sh
+validate_*.py
+*_test.*
+debug_*.*
+
 # IDE and editor files
 *.swp
 *.swo
