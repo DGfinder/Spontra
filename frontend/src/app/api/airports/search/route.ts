@@ -2,14 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAirportHubInfo, calculateHubScore, getContextualSuggestions } from '@/lib/airlineHubs'
 
 // Dynamic import for pg to handle build-time issues
+let isPgMocked = false
 const PgClient = (() => {
   try {
-    return require('pg').Client
-  } catch {
+    const pgModule = require('pg')
+    console.log('✅ Successfully loaded real pg module')
+    return pgModule.Client
+  } catch (error) {
+    console.warn('⚠️  Failed to load pg module, using mock client:', error?.message)
+    isPgMocked = true
     return class MockClient {
-      constructor() {}
-      async connect() {}
-      async query() { return { rows: [] } }
+      constructor(config: any) {
+        console.warn('🔶 MockClient created - database functionality disabled')
+      }
+      async connect() {
+        throw new Error('Database unavailable: pg module could not be loaded. Please check database configuration.')
+      }
+      async query() { 
+        throw new Error('Database unavailable: pg module could not be loaded. Please check database configuration.')
+      }
       async end() {}
     }
   }
@@ -240,18 +251,29 @@ function groupAirportsByCity(airports: Airport[]): CityGroup[] {
 }
 
 export async function GET(req: NextRequest) {
+  const startTime = Date.now()
   const { searchParams } = new URL(req.url)
   const query = (searchParams.get('q') || '').trim()
   const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10) || 20, 50)
   const includeCityGroups = searchParams.get('groupCities') === 'true'
   const fromAirport = searchParams.get('from') || undefined
+  
+  console.log(`🔍 Airport search request: query="${query}", limit=${limit}, groupCities=${includeCityGroups}, from=${fromAirport || 'none'}`)
 
   // Initialize database connection early
   const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
   if (!pgUrl) {
-    return NextResponse.json({ ok: false, error: 'Database not configured' }, { status: 503 })
+    console.error('❌ Database configuration missing: No DATABASE_URL or SEARCH_DATABASE_URL found')
+    return NextResponse.json({ 
+      ok: false, 
+      error: 'Database not configured. Please check environment variables.',
+      details: isPgMocked ? 'pg module could not be loaded' : 'Database URL missing'
+    }, { status: 503 })
   }
 
+  console.log(`🔍 Initializing database connection for search: "${query}"`)
+  console.log('🔧 Using pg module:', isPgMocked ? 'MOCK (disabled)' : 'REAL')
+  
   const pg = new PgClient({ connectionString: pgUrl })
 
   if (!query || query.length < 1) {
@@ -316,8 +338,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    console.log('🔌 Attempting database connection...')
     await pg.connect()
+    console.log('✅ Database connected successfully')
     console.log(`🔍 Searching airports for: "${query}"`)
+    const queryStartTime = Date.now()
 
     // Check if query matches a city code
     const cityCodeMatch = CITY_CODES[query.toUpperCase()]
@@ -487,21 +512,54 @@ export async function GET(req: NextRequest) {
     // Get contextual suggestions for partial matches
     const suggestions = getContextualSuggestions(query, fromAirport)
     
+    // Performance and result logging
+    const queryDuration = Date.now() - queryStartTime
+    const totalDuration = Date.now() - startTime
+    console.log(`✅ Search completed: ${limitedAirports.length} airports, ${cityGroups.length} city groups in ${queryDuration}ms (total: ${totalDuration}ms)`)
+    
     return NextResponse.json({
       ok: true,
       results: limitedAirports,
       cityGroups,
       totalCount: limitedAirports.length,
       searchType: 'full_search',
-      suggestions: limitedAirports.length < 5 ? suggestions : undefined // Only show suggestions if few results
+      suggestions: limitedAirports.length < 5 ? suggestions : undefined, // Only show suggestions if few results
+      performance: {
+        queryTimeMs: queryDuration,
+        totalTimeMs: totalDuration
+      }
     })
 
   } catch (error: any) {
     console.error('❌ Airport search error:', error)
-    return NextResponse.json(
-      { ok: false, error: error?.message || 'Search failed' },
-      { status: 500 }
-    )
+    
+    // Provide specific error messages based on error type
+    let errorMessage = 'Search failed'
+    let statusCode = 500
+    
+    if (error?.message?.includes('Database unavailable')) {
+      errorMessage = 'Airport search temporarily unavailable. Please try again later.'
+      statusCode = 503
+    } else if (error?.code === 'ECONNREFUSED' || error?.code === 'ENOTFOUND') {
+      errorMessage = 'Database connection failed. Please try again later.'
+      statusCode = 503
+    } else if (error?.code === '28P01') {
+      errorMessage = 'Database authentication failed.'
+      statusCode = 503
+    } else if (error?.message) {
+      errorMessage = error.message
+    }
+    
+    return NextResponse.json({
+      ok: false, 
+      error: errorMessage,
+      details: {
+        type: error?.name || 'Unknown',
+        code: error?.code,
+        isPgMocked,
+        hasDbUrl: !!pgUrl
+      }
+    }, { status: statusCode })
   } finally {
     try { 
       await pg.end() 

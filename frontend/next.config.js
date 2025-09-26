@@ -10,7 +10,7 @@ const nextConfig = {
       '@mongodb-js/zstd': false,
     })
     
-    // Handle pg and other database modules for build
+    // Handle database modules - only disable on client side
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -18,6 +18,15 @@ const nextConfig = {
         'cassandra-driver': false,
         uuid: false,
       }
+    }
+    
+    // Don't bundle native dependencies on server side, but allow them to be required
+    if (isServer) {
+      config.externals = config.externals || []
+      config.externals.push({
+        'pg': 'commonjs pg',
+        'cassandra-driver': 'commonjs cassandra-driver'
+      })
     }
     
     return config
