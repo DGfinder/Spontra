@@ -3,12 +3,23 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['cassandra-driver', 'pg'],
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve = config.resolve || {}
     config.resolve.alias = Object.assign({}, config.resolve.alias, {
       kerberos: false,
       '@mongodb-js/zstd': false,
     })
+    
+    // Handle pg and other database modules for build
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        pg: false,
+        'cassandra-driver': false,
+        uuid: false,
+      }
+    }
+    
     return config
   },
   env: {

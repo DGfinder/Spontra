@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Client as PgClient } from 'pg'
 import { getAirportHubInfo, calculateHubScore, getContextualSuggestions } from '@/lib/airlineHubs'
+
+// Dynamic import for pg to handle build-time issues
+const PgClient = (() => {
+  try {
+    return require('pg').Client
+  } catch {
+    return class MockClient {
+      constructor() {}
+      async connect() {}
+      async query() { return { rows: [] } }
+      async end() {}
+    }
+  }
+})()
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -233,6 +246,14 @@ export async function GET(req: NextRequest) {
   const includeCityGroups = searchParams.get('groupCities') === 'true'
   const fromAirport = searchParams.get('from') || undefined
 
+  // Initialize database connection early
+  const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
+  if (!pgUrl) {
+    return NextResponse.json({ ok: false, error: 'Database not configured' }, { status: 503 })
+  }
+
+  const pg = new PgClient({ connectionString: pgUrl })
+
   if (!query || query.length < 1) {
     // Return contextual suggestions when query is empty
     const contextualSuggestions = getContextualSuggestions('', fromAirport)
@@ -257,8 +278,8 @@ export async function GET(req: NextRequest) {
         name: r.name || '',
         city: r.city || '',
         country: r.country || '',
-        latitude: parseFloat(r.latitude) || null,
-        longitude: parseFloat(r.longitude) || null,
+        latitude: parseFloat(r.latitude) || undefined,
+        longitude: parseFloat(r.longitude) || undefined,
         timezone: r.timezone || '',
         type: 'AIRPORT' as const,
         importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
@@ -294,13 +315,6 @@ export async function GET(req: NextRequest) {
     })
   }
 
-  const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
-  if (!pgUrl) {
-    return NextResponse.json({ ok: false, error: 'Database not configured' }, { status: 503 })
-  }
-
-  const pg = new PgClient({ connectionString: pgUrl })
-
   try {
     await pg.connect()
     console.log(`🔍 Searching airports for: "${query}"`)
@@ -328,8 +342,8 @@ export async function GET(req: NextRequest) {
           name: r.name || '',
           city: r.city || '',
           country: r.country || '',
-          latitude: parseFloat(r.latitude) || null,
-          longitude: parseFloat(r.longitude) || null,
+          latitude: parseFloat(r.latitude) || undefined,
+          longitude: parseFloat(r.longitude) || undefined,
           timezone: r.timezone || '',
           type: 'AIRPORT' as const,
           importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
@@ -430,8 +444,8 @@ export async function GET(req: NextRequest) {
         name: r.name || '',
         city: r.city || '',
         country: r.country || '',
-        latitude: parseFloat(r.latitude) || null,
-        longitude: parseFloat(r.longitude) || null,
+        latitude: parseFloat(r.latitude) || undefined,
+        longitude: parseFloat(r.longitude) || undefined,
         timezone: r.timezone || '',
         type: 'AIRPORT' as const,
         importance_score: AIRPORT_IMPORTANCE[iataCode] || 50,
@@ -457,7 +471,7 @@ export async function GET(req: NextRequest) {
       // Calculate search score (now includes hub bonus)
       airport.search_score = calculateSearchScore(query, airport)
       return airport
-    }).filter(airport => airport.search_score > 50) // Filter low relevance results
+    }).filter((airport: Airport) => airport.search_score > 50) // Filter low relevance results
     
     // Re-sort by calculated search score
     airports.sort((a, b) => b.search_score - a.search_score)

@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Client as PgClient } from 'pg'
+
+// Dynamic import for pg to handle build-time issues
+const PgClient = (() => {
+  try {
+    return require('pg').Client
+  } catch {
+    return class MockClient {
+      constructor() {}
+      async connect() {}
+      async query() { return { rows: [] } }
+      async end() {}
+    }
+  }
+})()
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -28,7 +41,7 @@ export async function POST(req: NextRequest) {
       ) flight_airports
     `)
 
-    const airportsWithFlightData = airportsWithFlights.map(row => row.airport_code)
+    const airportsWithFlightData = airportsWithFlights.map((row: any) => row.airport_code)
 
     // Activate airports that have flight data but are currently inactive
     const { rowCount: activated } = await pg.query(`

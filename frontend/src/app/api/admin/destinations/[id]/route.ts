@@ -67,7 +67,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         [iata]
       )
 
-      const themes = readinessResult.rows.map((row) => {
+      const themes = readinessResult.rows.map((row: any) => {
         const parsed = themeRowSchema.parse(row)
         return {
           themeSlug: parsed.theme_slug,

@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
         params
       )
 
-      const iataCodes = destinationsResult.rows.map((row) => row.airport_code)
+      const iataCodes = destinationsResult.rows.map((row: any) => row.airport_code)
 
       const readinessResult = await client.query(
         `SELECT

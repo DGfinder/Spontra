@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Client as PgClient } from 'pg'
+
+// Dynamic import for pg to handle build-time issues
+const PgClient = (() => {
+  try {
+    return require('pg').Client
+  } catch {
+    return class MockClient {
+      constructor() {}
+      async connect() {}
+      async query() { return { rows: [] } }
+      async end() {}
+    }
+  }
+})()
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

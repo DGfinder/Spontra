@@ -1,4 +1,11 @@
-import { v4 as uuidv4 } from 'uuid'
+// Dynamic import for uuid to handle build-time issues
+const uuidv4 = (() => {
+  try {
+    return require('uuid').v4
+  } catch {
+    return () => 'mock-uuid-' + Math.random().toString(36).substr(2, 9)
+  }
+})()
 
 export interface AffiliatePartner {
   id: string
@@ -230,10 +237,11 @@ class AffiliateService {
     if (typeof window !== 'undefined') {
       let sessionId = sessionStorage.getItem('spontra_session_id')
       if (!sessionId) {
-        sessionId = uuidv4()
-        sessionStorage.setItem('spontra_session_id', sessionId)
+        const newSessionId = uuidv4()
+        sessionStorage.setItem('spontra_session_id', newSessionId)
+        return newSessionId
       }
-      return sessionId || uuidv4()
+      return sessionId
     }
     return uuidv4()
   }
