@@ -3,7 +3,6 @@ import { Mountain, Trees, Sparkles, Music, Compass } from 'lucide-react'
 import { ValidatedAirportSearch } from './ValidatedAirportSearch'
 import { FlightTimeSlider } from './FlightTimeSlider'
 import { TripTypeToggle } from './TripTypeToggle'
-import { FlightTimePresets } from './FlightTimePresets'
 import { FormField, FormInput, FormSelect } from './ui/FormField'
 import { useOptimizedSearch } from '@/hooks/useOptimizedSearch'
 import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
@@ -127,8 +126,8 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
           role="search"
           aria-label="Travel search form"
         >
-          <div className="flex-1 overflow-y-auto pr-1">
-            <div className="space-y-6 px-6 pt-6 pb-4">
+          <div className="flex-1 overflow-y-auto pr-1 md:overflow-visible md:pr-0">
+            <div className="space-y-5 px-6 pt-6 pb-3 md:pb-5">
               <header className="space-y-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1 text-[11px] uppercase tracking-[0.28em] text-white/60">
                   <span>Plan</span>
@@ -316,7 +315,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                   </FormField>
                 </div>
 
-                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-3">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
                       Flight duration
@@ -331,16 +330,6 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                       Only direct flights
                     </label>
                   </div>
-
-                  <FlightTimePresets
-                    currentRange={formValues.flightTimeRange || [1, formValues.maxFlightTime || 8]}
-                    onPresetSelect={(range) => {
-                      setValue('flightTimeRange', range)
-                      setValue('minFlightTime', range[0])
-                      setValue('maxFlightTimeRange', range[1])
-                      setValue('maxFlightTime', range[1])
-                    }}
-                  />
 
                   <FlightTimeSlider
                     mode="range"
