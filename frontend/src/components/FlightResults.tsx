@@ -559,8 +559,9 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
                   basePrice={selectedFlight.price}
                   currency={selectedFlight.currency}
                   flightId={selectedFlight.id}
+                  deeplinkContext={(selectedFlight as any).deeplinkContext}
                   onBookingSelect={(option) => {
-                    // Open booking provider with affiliate URL if available
+                    // Fallback behavior for backward compatibility
                     const finalUrl = option.affiliateUrl || option.url
                     window.open(finalUrl, '_blank', 'noopener,noreferrer')
                     

@@ -1,9 +1,9 @@
-import React, { useCallback, useMemo, useEffect } from 'react'
-import { Mountain, Trees, Sparkles, Music, Compass } from 'lucide-react'
-import { ValidatedAirportSearch } from './ValidatedAirportSearch'
+import React, { useCallback, useMemo, useEffect, useState, useRef } from 'react'
+import { Mountain, Trees, Sparkles, Music, Compass, Users, ChevronDown, Minus, Plus } from 'lucide-react'
+import { WorldClassAirportSearch } from './WorldClassAirportSearch'
 import { FlightTimeSlider } from './FlightTimeSlider'
 import { TripTypeToggle } from './TripTypeToggle'
-import { FormField, FormInput, FormSelect } from './ui/FormField'
+import { FormField, FormInput } from './ui/FormField'
 import { useOptimizedSearch } from '@/hooks/useOptimizedSearch'
 import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
 import { cn } from '@/lib/utils'
@@ -52,16 +52,18 @@ const THEME_ICONS: Record<ThemeKey, typeof Mountain> = {
   discover: Compass,
 }
 
-const THEME_SUBTEXT: Record<ThemeKey, string> = {
-  adventure: 'Thrilling adventures with epic treks, canyons, and adrenaline charged escapes.',
-  nature: 'Reset in lush forests, hidden lakes, and mindful outdoor sanctuaries.',
-  indulge: 'Luxurious stays, spa rituals, and culinary journeys crafted for you.',
-  vibe: 'Feel the pulse of nightlife, music discoveries, and social energy worldwide.',
-  discover: 'Cultural deep-dives, local flavours, and stories from vibrant city streets.',
+const CABIN_LABELS: Record<'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST', string> = {
+  ECONOMY: 'Economy',
+  PREMIUM_ECONOMY: 'Premium',
+  BUSINESS: 'Business',
+  FIRST: 'First',
 }
 
 export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoading }) => {
   usePerformanceMonitoring('SearchForm')
+
+  const [travelersOpen, setTravelersOpen] = useState(false)
+  const travelersRef = useRef<HTMLDivElement | null>(null)
 
   const {
     handleSubmit,
@@ -76,6 +78,32 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
 
   useEffect(() => cleanup, [cleanup])
 
+  useEffect(() => {
+    if (!travelersOpen) return
+
+    const handlePointer = (event: MouseEvent | TouchEvent) => {
+      if (travelersRef.current && !travelersRef.current.contains(event.target as Node)) {
+        setTravelersOpen(false)
+      }
+    }
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setTravelersOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointer)
+    document.addEventListener('touchstart', handlePointer)
+    window.addEventListener('keydown', handleKey)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointer)
+      document.removeEventListener('touchstart', handlePointer)
+      window.removeEventListener('keydown', handleKey)
+    }
+  }, [travelersOpen])
+
   const handleFormSubmit = useCallback(async (data: FormData) => {
     await onSubmit(data)
   }, [onSubmit])
@@ -84,7 +112,6 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
   const themeColor = getThemeColor(themeKey)
   const themeHover = getThemeHoverColor(themeKey)
   const themeSurface = getThemeColorAlpha(themeKey, 0.12)
-  const themeSubtitle = THEME_SUBTEXT[themeKey] ?? 'Discover destinations tailored to your mood.'
 
   const { matchingCount, density } = useMemo(() => {
     return { matchingCount: null as number | null, density: [] as Array<{ hour: number; value: number }> }
@@ -97,14 +124,29 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
   ])
 
   const canSubmit = isValid && !isLoading
+  const passengerCount = formValues.passengers && formValues.passengers > 0 ? formValues.passengers : 1
+  const cabinSelection = (formValues.cabinClass || 'ECONOMY') as keyof typeof CABIN_LABELS
+  const passengerLabel = passengerCount === 1 ? '1 passenger' : `${passengerCount} passengers`
+  const travelerSummary = `${passengerLabel} - ${CABIN_LABELS[cabinSelection]}`
+  const cabinOptions: Array<'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'> = ['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST']
+
+  const adjustPassengers = (delta: number) => {
+    const next = Math.min(8, Math.max(1, passengerCount + delta))
+    setValue('passengers', next as any)
+  }
+
+  const handleCabinSelection = (option: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST') => {
+    setValue('cabinClass', option as any)
+  }
+
 
   return (
-    <div className="relative flex h-full w-full">
+    <div className="relative flex w-full">
       <div
-        className="relative h-full w-full overflow-hidden rounded-[28px] border backdrop-blur-xl"
+        className="relative w-full overflow-hidden rounded-[28px] border backdrop-blur-xl"
         style={{
-          borderColor: `${themeColor}33`,
-          boxShadow: `0 32px 64px rgba(0,0,0,0.45), 0 14px 32px rgba(0,0,0,0.35), 0 0 0 1px ${themeColor}1f`,
+          borderColor: 'rgba(255,255,255,0.08)',
+          boxShadow: '0 28px 48px rgba(0,0,0,0.45), 0 12px 28px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.04)',
         }}
       >
         <div
@@ -126,17 +168,13 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
           role="search"
           aria-label="Travel search form"
         >
-          <div className="flex-1">
+          <div>
             <div className="space-y-6 px-7 pt-7 pb-4 md:pb-6">
-              <header className="space-y-3">
-                                <div className="space-y-2">
-                  <h2 className="text-[26px] font-semibold leading-tight text-white">What are you looking for?</h2>
-                </div>
+              <header className="space-y-2">
+                <h2 className="text-[26px] font-semibold leading-tight text-white">What are you looking for?</h2>
               </header>
 
               <section className="space-y-3">
-                <div className="flex items-center gap-3">
-                </div>
                 <div className="flex flex-wrap gap-3">
                   {themes.map((theme) => {
                     const key = (theme.id || 'adventure') as ThemeKey
@@ -183,13 +221,17 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                     required
                     theme={formValues.selectedTheme}
                   >
-                    <ValidatedAirportSearch
+                    <WorldClassAirportSearch
                       id="departure-airport"
                       value={formValues.departureAirport}
                       onChange={(code) => setValue('departureAirport', code)}
-                      placeholder="Type city or airport"
-                      showInlineChips={false}
-                      />
+                      placeholder="Search departure airport or city"
+                      required
+                      showRecentAirports={true}
+                      showPopularDestinations={true}
+                      groupMultiAirportCities={true}
+                      className="text-sm"
+                    />
                   </FormField>
 
                   <FormField
@@ -197,12 +239,17 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                     htmlFor="destination-airport"
                     theme={formValues.selectedTheme}
                   >
-                    <ValidatedAirportSearch
+                    <WorldClassAirportSearch
                       id="destination-airport"
                       value={formValues.destinationAirport || ''}
-                      onChange={async (code) => {
+                      onChange={async (code, airport) => {
                         setValue('destinationAirport', code as any)
-                        if (code) {
+                        if (code && airport) {
+                          // Use airport data from the new component for better performance
+                          const detailed = `${airport.city}${airport.name ? ' - ' + airport.name : ''}`
+                          setValue('destinationAirportDetailed', detailed as any)
+                        } else if (code) {
+                          // Fallback for legacy compatibility
                           try {
                             const res = await fetch('/api/amadeus/airport', {
                               method: 'POST',
@@ -221,10 +268,12 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                           setValue('destinationAirportDetailed', '' as any)
                         }
                       }}
-                      placeholder="Anywhere"
-                      showInlineChips={false}
-                      aria-label="Destination airport (optional)"
-                      />
+                      placeholder="Anywhere (optional specific destination)"
+                      showRecentAirports={true}
+                      showPopularDestinations={true}
+                      groupMultiAirportCities={true}
+                      className="text-sm"
+                    />
                   </FormField>
 
                   {formValues.destinationAirport && formValues.departureAirport === formValues.destinationAirport && (
@@ -247,7 +296,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                       type="date"
                       {...register('departureDate')}
                       variant={hasFieldError('departureDate') ? 'error' : 'default'}
-                      />
+                    />
                   </FormField>
 
                   {formValues.tripType === 'return' ? (
@@ -262,50 +311,92 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                         type="date"
                         {...register('returnDate')}
                         variant={hasFieldError('returnDate') ? 'error' : 'default'}
-                        />
+                      />
                     </FormField>
                   ) : null}
                 </div>
 
-                <div className="grid gap-3 md:grid-cols-2">
-                  <FormField
-                    label="Passengers"
-                    htmlFor="passengers"
-                    error={getFieldError('passengers')}
-                    required
-                    theme={formValues.selectedTheme}
-                  >
-                    <FormSelect
-                      id="passengers"
-                      {...register('passengers', { valueAsNumber: true })}
-                      variant={hasFieldError('passengers') ? 'error' : 'default'}
-                      >
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-                        <option key={num} value={num}>
-                          {num} {num === 1 ? 'Passenger' : 'Passengers'}
-                        </option>
-                      ))}
-                    </FormSelect>
-                  </FormField>
+                <FormField
+                  label="Travelers"
+                  htmlFor="travelers"
+                  theme={formValues.selectedTheme}
+                >
+                  <div ref={travelersRef} className="relative">
+                    <button
+                      id="travelers"
+                      type="button"
+                      onClick={() => setTravelersOpen((prev) => !prev)}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-semibold transition-all duration-200',
+                        travelersOpen
+                          ? 'border-[#f6c96f] bg-white/[0.08] text-white'
+                          : 'border-white/12 bg-white/[0.04] text-white/80 hover:border-white/25 hover:text-white',
+                      )}
+                    >
+                      <span className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-white/70" aria-hidden="true" />
+                        <span>{travelerSummary}</span>
+                      </span>
+                      <ChevronDown
+                        aria-hidden="true"
+                        className={cn('h-4 w-4 text-white/60 transition-transform', travelersOpen && 'rotate-180')}
+                      />
+                    </button>
 
-                  <FormField
-                    label="Cabin class"
-                    htmlFor="cabin-class"
-                    theme={formValues.selectedTheme}
-                  >
-                    <FormSelect
-                      id="cabin-class"
-                      value={formValues.cabinClass || 'ECONOMY'}
-                      onChange={(event) => setValue('cabinClass', event.target.value as any)}
-                      >
-                      {['ECONOMY', 'PREMIUM_ECONOMY', 'BUSINESS', 'FIRST'].map((option) => (
-                        <option key={option} value={option}>
-                          {option.replace('_', ' ')}
-                        </option>
-                      ))}
-                    </FormSelect>
-                  </FormField>
-                </div>
+                    {travelersOpen ? (
+                      <div className="absolute left-0 right-0 mt-3 space-y-4 rounded-2xl border border-white/10 bg-[#0b0f12]/95 p-4 shadow-[0_20px_45px_rgba(0,0,0,0.45)] backdrop-blur-xl">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Passengers</span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => adjustPassengers(-1)}
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition hover:border-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={passengerCount <= 1}
+                              aria-label="Decrease passengers"
+                            >
+                              <Minus className="h-4 w-4" />
+                            </button>
+                            <span className="text-sm font-semibold text-white">{passengerCount}</span>
+                            <button
+                              type="button"
+                              onClick={() => adjustPassengers(1)}
+                              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-white transition hover:border-white/30 disabled:cursor-not-allowed disabled:opacity-40"
+                              disabled={passengerCount >= 8}
+                              aria-label="Increase passengers"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">Cabin class</span>
+                          <div className="mt-3 grid grid-cols-2 gap-2">
+                            {cabinOptions.map((option) => {
+                              const selected = cabinSelection === option
+                              return (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  onClick={() => handleCabinSelection(option)}
+                                  className={cn(
+                                    'rounded-xl border px-3 py-2 text-sm font-semibold transition-all duration-200',
+                                    selected
+                                      ? 'border-[#f6c96f] bg-[#f6c96f] text-slate-900 shadow-[0_12px_30px_rgba(0,0,0,0.4)]'
+                                      : 'border-white/12 bg-white/[0.05] text-white/70 hover:border-white/25 hover:text-white',
+                                  )}
+                                >
+                                  {CABIN_LABELS[option]}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </FormField>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-3">
                   <div className="flex flex-wrap items-center gap-3">

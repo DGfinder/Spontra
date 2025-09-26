@@ -9,6 +9,20 @@ interface BookingComparisonProps {
   basePrice: number
   currency: string
   flightId: string
+  deeplinkContext?: {
+    itineraryId: string
+    origin: string
+    destination: string
+    departureDate: string
+    returnDate?: string
+    adults: number
+    cabinClass: string
+    carrierCode: string
+    flightNumber: string
+    stops: number
+    price?: number
+    currency?: string
+  }
   onBookingSelect: (option: BookingOption) => void
   className?: string
 }
@@ -18,10 +32,78 @@ export function BookingComparison({
   basePrice,
   currency,
   flightId,
+  deeplinkContext,
   onBookingSelect,
   className = ''
 }: BookingComparisonProps) {
   const [showAllOptions, setShowAllOptions] = useState(false)
+  const [bookingStates, setBookingStates] = useState<{[key: string]: 'idle' | 'loading' | 'error'}>({})
+
+  // Handle real flight booking redirects
+  const handleBookingClick = async (option: BookingOption) => {
+    if (!deeplinkContext) {
+      // Fallback to existing behavior if no deeplink context
+      onBookingSelect(option)
+      return
+    }
+
+    const stateKey = option.provider.id
+    setBookingStates(prev => ({ ...prev, [stateKey]: 'loading' }))
+
+    try {
+      console.log('🔗 Creating booking redirect for:', option.provider.name)
+      
+      const response = await fetch('/api/redirect/flight', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itineraryId: deeplinkContext.itineraryId,
+          origin: deeplinkContext.origin,
+          destination: deeplinkContext.destination,
+          departureDate: deeplinkContext.departureDate,
+          returnDate: deeplinkContext.returnDate,
+          adults: deeplinkContext.adults,
+          cabinClass: deeplinkContext.cabinClass,
+          carrierCode: deeplinkContext.carrierCode,
+          flightNumber: deeplinkContext.flightNumber,
+          stops: deeplinkContext.stops,
+          price: deeplinkContext.price,
+          currency: deeplinkContext.currency
+        })
+      })
+
+      const result = await response.json()
+
+      if (result.ok && result.url) {
+        console.log('🚀 Opening booking URL:', result.provider, result.url)
+        window.open(result.url, '_blank', 'noopener,noreferrer')
+        setBookingStates(prev => ({ ...prev, [stateKey]: 'idle' }))
+
+        // Log successful redirect for analytics
+        console.log('✅ Affiliate redirect successful:', {
+          provider: result.provider,
+          originalProvider: option.provider.name,
+          price: option.price,
+          commission: option.estimatedCommission
+        })
+      } else {
+        throw new Error(result.error || 'Failed to create booking redirect')
+      }
+    } catch (error) {
+      console.error('❌ Booking redirect failed:', error)
+      setBookingStates(prev => ({ ...prev, [stateKey]: 'error' }))
+      
+      // Fallback to static URL or generic search
+      const fallbackUrl = option.url || `https://www.kayak.com/flights/${deeplinkContext.origin}-${deeplinkContext.destination}/${deeplinkContext.departureDate}`
+      console.log('🔄 Using fallback URL:', fallbackUrl)
+      window.open(fallbackUrl, '_blank', 'noopener,noreferrer')
+      
+      // Reset error state after brief display
+      setTimeout(() => {
+        setBookingStates(prev => ({ ...prev, [stateKey]: 'idle' }))
+      }, 3000)
+    }
+  }
   
   const bookingOptions = generateBookingOptions(airlineCode, basePrice, currency, flightId)
   const bestOption = getBestBookingOption(bookingOptions)
@@ -75,7 +157,7 @@ export function BookingComparison({
                 ? 'border-green-400 bg-green-400/5'
                 : 'border-white/20 bg-white/5'
             }`}
-            onClick={() => onBookingSelect(option)}
+            onClick={() => handleBookingClick(option)}
           >
             {/* Best Option Badge */}
             {option.provider.id === bestOption.provider.id && (
@@ -131,10 +213,25 @@ export function BookingComparison({
                   </div>
                 )}
                 <div className="mt-2">
-                  <button className="bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1">
-                    <span>Book Now</span>
-                    <ExternalLink size={12} />
+                  <button 
+                    className="bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1 disabled:opacity-50"
+                    disabled={bookingStates[option.provider.id] === 'loading'}
+                  >
+                    {bookingStates[option.provider.id] === 'loading' ? (
+                      <>
+                        <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Book Now</span>
+                        <ExternalLink size={12} />
+                      </>
+                    )}
                   </button>
+                  {bookingStates[option.provider.id] === 'error' && (
+                    <p className="text-red-300 text-xs mt-1">Redirect failed, trying fallback</p>
+                  )}
                 </div>
               </div>
             </div>
