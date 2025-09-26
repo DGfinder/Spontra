@@ -151,7 +151,7 @@ export default function PopularSearchesPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Search className="h-4 w-4 text-slate-400 mr-2" />
-                        <span className="text-sm font-medium text-slate-900">"{search.query}"</span>
+                        <span className="text-sm font-medium text-slate-900">&quot;{search.query}&quot;</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
