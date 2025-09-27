@@ -28,6 +28,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ error, errorInfo })
     
+    // Log error to Sentry with additional context
+    if (typeof window !== 'undefined') {
+      import('@sentry/nextjs').then((Sentry) => {
+        Sentry.withScope((scope) => {
+          scope.setTag('errorBoundary', true)
+          scope.setContext('errorBoundary', {
+            componentStack: errorInfo.componentStack,
+          })
+          Sentry.captureException(error)
+        })
+      })
+    }
+    
     // Call the onError callback if provided
     this.props.onError?.(error, errorInfo)
     
@@ -178,7 +191,16 @@ export function SearchFormErrorBoundary({ children }: { children: ReactNode }) {
     <ErrorBoundary 
       onError={(error, errorInfo) => {
         console.error('Search form error:', error)
-        // Report search form specific errors
+        // Report search form specific errors to Sentry
+        if (typeof window !== 'undefined') {
+          import('@sentry/nextjs').then((Sentry) => {
+            Sentry.withScope((scope) => {
+              scope.setTag('component', 'search-form')
+              scope.setContext('searchForm', { errorInfo })
+              Sentry.captureException(error)
+            })
+          })
+        }
       }}
       fallback={(error, errorInfo, resetError) => (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
@@ -203,7 +225,16 @@ export function FlightResultsErrorBoundary({ children }: { children: ReactNode }
     <ErrorBoundary 
       onError={(error, errorInfo) => {
         console.error('Flight results error:', error)
-        // Report flight results specific errors
+        // Report flight results specific errors to Sentry
+        if (typeof window !== 'undefined') {
+          import('@sentry/nextjs').then((Sentry) => {
+            Sentry.withScope((scope) => {
+              scope.setTag('component', 'flight-results')
+              scope.setContext('flightResults', { errorInfo })
+              Sentry.captureException(error)
+            })
+          })
+        }
       }}
       fallback={(error, errorInfo, resetError) => (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
@@ -237,7 +268,21 @@ export function BookingFlowErrorBoundary({ children }: { children: ReactNode }) 
     <ErrorBoundary 
       onError={(error, errorInfo) => {
         console.error('Booking flow error:', error)
-        // Critical: report booking errors immediately
+        // Critical: report booking errors immediately to Sentry
+        if (typeof window !== 'undefined') {
+          import('@sentry/nextjs').then((Sentry) => {
+            Sentry.withScope((scope) => {
+              scope.setTag('component', 'booking-flow')
+              scope.setLevel('error')
+              scope.setContext('booking', { 
+                errorInfo,
+                critical: true,
+                userImpact: 'booking_failure'
+              })
+              Sentry.captureException(error)
+            })
+          })
+        }
       }}
       fallback={(error, errorInfo, resetError) => (
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center max-w-md mx-auto">

@@ -48,19 +48,32 @@ export interface UserSessionPayload {
 
 const SESSION_COOKIE_NAME = 'user_session'
 const SESSION_MAX_AGE = 30 * 24 * 60 * 60 // 30 days
-const DEVELOPMENT_FALLBACK_SECRET = 'dev-user-auth-secret-change-me'
+const DEVELOPMENT_FALLBACK_SECRET = 'dev-user-auth-secret-change-me-not-for-production'
 
 function getJwtSecret(): Uint8Array {
-  const secret =
-    process.env.USER_AUTH_JWT_SECRET ||
-    process.env.JWT_SECRET ||
-    (process.env.NODE_ENV !== 'production' ? DEVELOPMENT_FALLBACK_SECRET : undefined)
+  const secret = process.env.USER_AUTH_JWT_SECRET || process.env.JWT_SECRET
 
-  if (!secret) {
+  // Strict production check - never allow fallback secrets in production
+  if (process.env.NODE_ENV === 'production') {
+    if (!secret) {
+      throw new Error('CRITICAL SECURITY ERROR: USER_AUTH_JWT_SECRET or JWT_SECRET environment variable is required in production')
+    }
+    if (secret === DEVELOPMENT_FALLBACK_SECRET || secret.includes('dev-') || secret.includes('change-me')) {
+      throw new Error('CRITICAL SECURITY ERROR: Development JWT secret detected in production. Set a secure USER_AUTH_JWT_SECRET.')
+    }
+    if (secret.length < 32) {
+      throw new Error('CRITICAL SECURITY ERROR: JWT secret must be at least 32 characters long in production.')
+    }
+  }
+
+  // Development fallback only in non-production environments
+  const finalSecret = secret || (process.env.NODE_ENV !== 'production' ? DEVELOPMENT_FALLBACK_SECRET : null)
+
+  if (!finalSecret) {
     throw new Error('USER_AUTH_JWT_SECRET or JWT_SECRET environment variable is required for user authentication')
   }
 
-  return new TextEncoder().encode(secret)
+  return new TextEncoder().encode(finalSecret)
 }
 
 export async function createUserSessionToken(payload: Omit<UserSessionPayload, 'issuedAt'>): Promise<string> {

@@ -6,13 +6,14 @@ import {
   USER_SESSION_MAX_AGE 
 } from '@/lib/userAuth'
 import { userRepository } from '@/lib/userRepository'
+import { signupRateLimit, emailBasedRateLimit } from '@/lib/rateLimitAuth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 const signupSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(8, 'Password must be at least 8 characters'), // Increased from 6 to 8
   firstName: z.string().min(1, 'First name is required').optional(),
   lastName: z.string().min(1, 'Last name is required').optional(),
   username: z.string().min(3, 'Username must be at least 3 characters').optional(),
@@ -21,7 +22,19 @@ const signupSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting first
+    const ipRateLimit = signupRateLimit(request)
+    if (ipRateLimit.limited) {
+      return ipRateLimit.response!
+    }
+
     const body = signupSchema.parse(await request.json())
+    
+    // Apply email-based rate limiting
+    const emailRateLimit = emailBasedRateLimit(request, body.email)
+    if (emailRateLimit.limited) {
+      return emailRateLimit.response!
+    }
     
     // Check if user already exists
     const emailTaken = await userRepository.isEmailTaken(body.email)

@@ -6,6 +6,7 @@ import {
   USER_SESSION_MAX_AGE 
 } from '@/lib/userAuth'
 import { userRepository } from '@/lib/userRepository'
+import { loginRateLimit, emailBasedRateLimit } from '@/lib/rateLimitAuth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -18,7 +19,19 @@ const loginSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting first
+    const ipRateLimit = loginRateLimit(request)
+    if (ipRateLimit.limited) {
+      return ipRateLimit.response!
+    }
+
     const body = loginSchema.parse(await request.json())
+    
+    // Apply email-based rate limiting for failed attempts
+    const emailRateLimit = emailBasedRateLimit(request, body.email)
+    if (emailRateLimit.limited) {
+      return emailRateLimit.response!
+    }
     
     // Verify user credentials
     const result = await userRepository.verifyUserPassword(body.email, body.password)

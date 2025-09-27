@@ -1,9 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Security headers to apply to all responses
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  // Prevent the page from being embedded in frames
+  response.headers.set('X-Frame-Options', 'DENY')
+  
+  // Prevent MIME type sniffing
+  response.headers.set('X-Content-Type-Options', 'nosniff')
+  
+  // Enable XSS protection
+  response.headers.set('X-XSS-Protection', '1; mode=block')
+  
+  // Prevent referrer leakage
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  
+  // Content Security Policy
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Note: 'unsafe-inline' should be removed in production
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "frame-src 'none'",
+    "object-src 'none'",
+    "base-uri 'self'"
+  ].join('; ')
+  response.headers.set('Content-Security-Policy', csp)
+  
+  // HTTPS enforcement in production
+  if (process.env.NODE_ENV === 'production') {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+  }
+  
+  // Permissions Policy
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  
+  return response
+}
+
 // Protect /api/admin routes with JWT verification
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
-  if (!pathname.startsWith('/api/admin')) return NextResponse.next()
+  
+  // Apply security headers to all responses
+  let response: NextResponse
+  
+  if (!pathname.startsWith('/api/admin')) {
+    response = NextResponse.next()
+    return addSecurityHeaders(response)
+  }
 
   const auth = req.headers.get('authorization') || req.headers.get('Authorization')
   if (!auth || !auth.startsWith('Bearer ')) {
@@ -56,13 +102,15 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    return NextResponse.next({
+    response = NextResponse.next({
       request: {
         headers: req.headers
       }
     })
+    return addSecurityHeaders(response)
   } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const errorResponse = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return addSecurityHeaders(errorResponse)
   }
 }
 
@@ -75,5 +123,13 @@ function base64UrlToUint8Array(base64Url: string): Uint8Array {
 }
 
 export const config = {
-  matcher: ['/api/admin/:path*']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }
