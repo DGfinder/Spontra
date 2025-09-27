@@ -100,11 +100,33 @@ jobs:
       working-directory: ./frontend
       run: npm run build
     
+    - name: Analyze bundle size
+      working-directory: ./frontend
+      run: npm run analyze
+      
+    - name: Check bundle size limits
+      working-directory: ./frontend
+      run: |
+        echo "🔍 Checking bundle size limits..."
+        npm run bundle:size || {
+          echo "❌ Bundle size exceeds limits!"
+          echo "📊 Current bundle analysis:"
+          ls -la .next/static/js/ | head -10
+          exit 1
+        }
+        echo "✅ Bundle size within limits"
+    
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: frontend-build
         path: frontend/.next
+        
+    - name: Upload bundle analysis
+      uses: actions/upload-artifact@v3
+      with:
+        name: bundle-analysis
+        path: frontend/analyze/
 
   # Security scanning
   security-scan:

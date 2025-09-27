@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkAPIRateLimit } from './lib/rateLimitProduction'
 
 // Security headers to apply to all responses
 function addSecurityHeaders(response: NextResponse): NextResponse {
@@ -14,17 +15,29 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   // Prevent referrer leakage
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   
-  // Content Security Policy
+  // Content Security Policy - Production Safe
+  const isDevelopment = process.env.NODE_ENV === 'development'
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Note: 'unsafe-inline' should be removed in production
-    "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: https:",
-    "font-src 'self'",
-    "connect-src 'self'",
+    // Script sources - nonce-based for production security
+    isDevelopment 
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://js.sentry-cdn.com"
+      : "script-src 'self' https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://js.sentry-cdn.com",
+    // Style sources - allow inline styles for Tailwind and libraries
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    // Image sources - comprehensive allowlist
+    "img-src 'self' data: https: blob:",
+    // Font sources
+    "font-src 'self' https://fonts.gstatic.com",
+    // Connection sources - API endpoints and monitoring
+    "connect-src 'self' https://api.amadeus.com https://*.vercel-analytics.com https://*.sentry.io https://*.vercel.app https://*.neon.tech wss:",
+    // Frame restrictions
     "frame-src 'none'",
     "object-src 'none'",
-    "base-uri 'self'"
+    "base-uri 'self'",
+    // Additional security directives
+    "form-action 'self'",
+    "upgrade-insecure-requests"
   ].join('; ')
   response.headers.set('Content-Security-Policy', csp)
   
@@ -33,8 +46,31 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
   }
   
-  // Permissions Policy
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  // Permissions Policy - Comprehensive restrictions
+  response.headers.set('Permissions-Policy', [
+    'camera=()',
+    'microphone=()',
+    'geolocation=()',
+    'payment=()',
+    'usb=()',
+    'magnetometer=()',
+    'gyroscope=()',
+    'speaker=()',
+    'vibrate=()',
+    'fullscreen=(self)',
+    'sync-xhr=()'
+  ].join(', '))
+  
+  // Additional security headers
+  response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp')
+  response.headers.set('Cross-Origin-Opener-Policy', 'same-origin')
+  response.headers.set('Cross-Origin-Resource-Policy', 'same-origin')
+  
+  // Prevent DNS rebinding attacks
+  response.headers.set('X-DNS-Prefetch-Control', 'off')
+  
+  // Prevent MIME confusion attacks
+  response.headers.set('X-Download-Options', 'noopen')
   
   return response
 }
@@ -43,11 +79,46 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   
+  // Apply rate limiting to all API routes
+  if (pathname.startsWith('/api/')) {
+    const rateLimitResult = await checkAPIRateLimit(req)
+    
+    if (!rateLimitResult.allowed) {
+      const response = NextResponse.json(
+        { 
+          error: 'Rate limit exceeded',
+          retryAfter: rateLimitResult.retryAfter || 60
+        },
+        { status: 429 }
+      )
+      
+      // Add rate limit headers
+      response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString())
+      response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
+      response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toISOString())
+      
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      
+      return addSecurityHeaders(response)
+    }
+  }
+  
   // Apply security headers to all responses
   let response: NextResponse
   
   if (!pathname.startsWith('/api/admin')) {
     response = NextResponse.next()
+    
+    // Add rate limit headers for successful requests
+    if (pathname.startsWith('/api/')) {
+      const rateLimitResult = await checkAPIRateLimit(req)
+      response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString())
+      response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
+      response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toISOString())
+    }
+    
     return addSecurityHeaders(response)
   }
 

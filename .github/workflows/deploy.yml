@@ -50,20 +50,25 @@ jobs:
     - name: Configure Docker to use gcloud as credential helper
       run: gcloud auth configure-docker
     
-    - name: Build and push user-service
-      run: |
-        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/user-service:${{ steps.vars.outputs.image-tag }} ./services/user-service
-        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/user-service:${{ steps.vars.outputs.image-tag }}
+    # Security scanning before build
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
     
     - name: Build and push search-service
       run: |
         docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/search-service:${{ steps.vars.outputs.image-tag }} ./services/search-service
         docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/search-service:${{ steps.vars.outputs.image-tag }}
-    
-    - name: Build and push pricing-service
-      run: |
-        docker build -f docker/Dockerfile.go-service -t $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/pricing-service:${{ steps.vars.outputs.image-tag }} ./services/pricing-service
-        docker push $REGISTRY/${{ secrets.GCP_PROJECT_ID }}/pricing-service:${{ steps.vars.outputs.image-tag }}
     
     - name: Build and push data-ingestion-service
       run: |
@@ -161,8 +166,40 @@ jobs:
     
     - name: Verify deployment
       run: |
-        kubectl rollout status deployment/user-service
         kubectl rollout status deployment/search-service
-        kubectl rollout status deployment/pricing-service
         kubectl rollout status deployment/data-ingestion-service
         kubectl rollout status deployment/frontend
+        
+    - name: Run health checks
+      run: |
+        # Wait for services to be ready
+        sleep 30
+        
+        # Get service URLs and run health checks
+        FRONTEND_URL=$(kubectl get service frontend-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        SEARCH_URL=$(kubectl get service search-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        
+        # Health check with retries
+        for i in {1..5}; do
+          echo "Health check attempt $i/5..."
+          
+          if curl -f "http://${FRONTEND_URL}/api/health" --max-time 10; then
+            echo "✅ Frontend health check passed"
+            break
+          elif [ $i -eq 5 ]; then
+            echo "❌ Frontend health check failed after 5 attempts"
+            exit 1
+          else
+            echo "⏳ Frontend not ready, waiting 30s..."
+            sleep 30
+          fi
+        done
+        
+    - name: Deployment rollback on failure
+      if: failure()
+      run: |
+        echo "🚨 Deployment failed, initiating rollback..."
+        kubectl rollout undo deployment/frontend
+        kubectl rollout undo deployment/search-service  
+        kubectl rollout undo deployment/data-ingestion-service
+        echo "📋 Rollback completed"

@@ -2,6 +2,9 @@ const { withSentryConfig } = require('@sentry/nextjs')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable standalone output for Docker production builds
+  output: 'standalone',
+  
   // Bundle optimization
   compiler: {
     // Remove console.log in production
@@ -13,19 +16,82 @@ const nextConfig = {
   // Performance optimizations
   swcMinify: true,
   
-  // Image optimization
+  // Image optimization with aggressive caching
   images: {
     formats: ['image/webp', 'image/avif'],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1 year for production
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    dangerouslyAllowSVG: false,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   
-  // Compression
+  // Compression and caching
   compress: true,
   
-  // Power-up optimizations
+  // Production optimizations
   poweredByHeader: false,
+  reactStrictMode: true,
+  
+  // Caching headers for static assets
+  async headers() {
+    return [
+      {
+        source: '/favicon.ico',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=86400', // 1 day
+          },
+        ],
+      },
+      {
+        source: '/images/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=604800', // 1 week
+          },
+        ],
+      },
+      {
+        source: '/(.*).webp',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000', // 30 days
+          },
+        ],
+      },
+      {
+        source: '/(.*).avif',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=2592000', // 30 days
+          },
+        ],
+      },
+    ]
+  },
   
   experimental: {
     serverComponentsExternalPackages: ['cassandra-driver'],
@@ -46,7 +112,7 @@ const nextConfig = {
       },
     },
   },
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     config.resolve = config.resolve || {}
     config.resolve.alias = Object.assign({}, config.resolve.alias, {
       kerberos: false,
@@ -68,6 +134,43 @@ const nextConfig = {
       config.externals.push({
         'cassandra-driver': 'commonjs cassandra-driver'
       })
+    }
+
+    // Bundle analyzer (only in development with ANALYZE=true)
+    if (!dev && process.env.ANALYZE === 'true') {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          openAnalyzer: false,
+          reportFilename: isServer ? '../analyze/server.html' : './analyze/client.html',
+        })
+      )
+    }
+
+    // Performance optimizations
+    if (!dev) {
+      // Split chunks optimization
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: 10,
+              enforce: true,
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              priority: 5,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      }
     }
     
     return config

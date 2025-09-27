@@ -19,8 +19,12 @@
         "db:migrate:status": "prisma migrate status",
         "db:studio": "prisma studio",
         "db:seed": "tsx prisma/seed.ts",
+        "migrate:safe": "tsx scripts/migration-safety.ts migrate",
+        "migrate:info": "tsx scripts/migration-safety.ts info",
         "email:test": "tsx scripts/test-email.ts",
-        "sentry:test": "tsx scripts/test-sentry.ts"
+        "sentry:test": "tsx scripts/test-sentry.ts",
+        "analyze": "ANALYZE=true npm run build",
+        "bundle:size": "npx bundlesize"
     },
     "dependencies": {
         "@headlessui/react": "^1.7.17",
@@ -69,10 +73,22 @@
         "@tailwindcss/forms": "^0.5.7",
         "@tailwindcss/typography": "^0.5.10",
         "@types/bcryptjs": "^2.4.6",
+        "bundlesize": "^0.18.2",
         "eslint": "^8.53.0",
         "eslint-config-next": "14.0.3",
         "prettier": "^3.0.3",
         "prisma": "^5.7.0",
-        "vitest": "^0.34.6"
-    }
+        "vitest": "^0.34.6",
+        "webpack-bundle-analyzer": "^4.10.1"
+    },
+    "bundlesize": [
+        {
+            "path": ".next/static/js/**/*.js",
+            "maxSize": "250 kB"
+        },
+        {
+            "path": ".next/static/css/**/*.css",
+            "maxSize": "50 kB"
+        }
+    ]
 }
