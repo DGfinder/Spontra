@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
     const { rows: airportsWithFlights } = await pg.query(`
       SELECT DISTINCT airport_code
       FROM (
-        SELECT origin_airport as airport_code FROM flight_durations
+        SELECT origin_airport_code as airport_code FROM flight_routes
         UNION
-        SELECT destination_airport as airport_code FROM flight_durations
+        SELECT destination_airport_code as airport_code FROM flight_routes
       ) flight_airports
     `)
 

@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { enableMockFallbacks, getErrorMessage } from '@/lib/environment'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
@@ -16,6 +17,7 @@ import { useDestinationExplore } from '@/hooks/useDestinationExplore'
 import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { getThemeColor, getThemeGradient, type ThemeKey } from '@/lib/theme'
+import { useUserAuth } from '@/contexts/UserAuthContext'
 
 interface FormData {
   selectedTheme: string
@@ -181,6 +183,9 @@ export function LandingPageForm() {
   // Use the destination explore hook and router
   const { exploreDestinations, retry } = useDestinationExplore()
   const router = useRouter()
+  
+  // Get user authentication state
+  const { user, isAuthenticated, logout } = useUserAuth()
 
   const currentTheme = THEMES.find(t => t.id === formData.selectedTheme) || THEMES[0]
 
@@ -419,8 +424,43 @@ export function LandingPageForm() {
             <span className="mx-1 sm:mx-2 text-base sm:text-lg md:text-xl text-white/60">|</span>
             <span className="text-base sm:text-lg md:text-xl font-normal tracking-wide">EXPLORE</span>
           </div>
-          <div className="text-white/80 text-xs sm:text-sm hover:text-white cursor-pointer font-muli transition-colors duration-200">
-            Sign In
+          <div className="text-white/80 text-xs sm:text-sm hover:text-white font-muli transition-colors duration-200">
+            {isAuthenticated ? (
+              <div className="relative group">
+                <button className="flex items-center space-x-2">
+                  <span>Hi, {user?.firstName || user?.username || 'User'}</span>
+                  <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center text-black text-xs font-semibold">
+                    {(user?.firstName?.[0] || user?.username?.[0] || user?.email?.[0] || 'U').toUpperCase()}
+                  </div>
+                </button>
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 top-full mt-2 w-48 bg-black/80 backdrop-blur-sm border border-white/20 rounded-lg py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <Link 
+                    href="/dashboard" 
+                    className="block px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    href="/auth/profile" 
+                    className="block px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="block w-full text-left px-4 py-2 text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link href="/auth/login" className="hover:text-white transition-colors">
+                Sign In
+              </Link>
+            )}
           </div>
         </div>
       </div>

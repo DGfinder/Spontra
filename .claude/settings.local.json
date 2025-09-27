@@ -58,7 +58,11 @@
       "Bash(npx eslint:*)",
       "Bash(dos2unix:*)",
       "Bash(sed:*)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)"
     ],
     "deny": []
   }

@@ -45,7 +45,10 @@ def calculate_theme_score(city: str, theme: str) -> float:
 def populate_theme_destination_cache():
     """Populate core theme-destination combinations using existing flight data"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     # Core themes and origins
     themes = ['adventure', 'party', 'learn', 'shopping', 'culture']

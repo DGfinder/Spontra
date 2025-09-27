@@ -267,8 +267,10 @@ def populate_flight_durations(cursor):
 def main():
     """Main function to populate flight durations."""
     # Get database URL from environment or use default
-    database_url = os.getenv("DATABASE_URL", 
-                           "postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable")
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     try:
         # Connect to database

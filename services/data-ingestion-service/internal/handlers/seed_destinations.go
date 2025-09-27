@@ -51,10 +51,10 @@ var seedAirports = []seedAirport{
 func (a *App) SeedDestinations(c *gin.Context) {
     // Read origin and DB URL
     origin := strings.ToUpper(c.DefaultQuery("origin", "LHR"))
-    pgURL := os.Getenv("SEARCH_DATABASE_URL")
+    pgURL := os.Getenv("DATABASE_URL")
     if pgURL == "" {
-        // host-bound Postgres from docker-compose
-        pgURL = "postgres://spontra:development@localhost/spontra?sslmode=disable"
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "DATABASE_URL environment variable not set"})
+        return
     }
 
     // Connect to Postgres
@@ -67,10 +67,10 @@ func (a *App) SeedDestinations(c *gin.Context) {
 
     // Query average durations joined with airports metadata
     const q = `
-        SELECT a.iata_code, COALESCE(a.city, ''), COALESCE(a.country, ''), COALESCE(a.country_code, ''), AVG(fd.duration_minutes)::int as avg_minutes
-        FROM flight_durations fd
-        JOIN airports a ON a.iata_code = fd.destination_airport
-        WHERE fd.origin_airport = $1
+        SELECT a.iata_code, COALESCE(a.city, ''), COALESCE(a.country, ''), COALESCE(a.country_code, ''), AVG(fr.total_duration_minutes)::int as avg_minutes
+        FROM flight_routes fr
+        JOIN airports a ON a.iata_code = fr.destination_airport_code
+        WHERE fr.origin_airport_code = $1
         GROUP BY a.iata_code, a.city, a.country, a.country_code
         ORDER BY avg_minutes ASC
         LIMIT 1000`

@@ -90,9 +90,9 @@ export async function GET(req: NextRequest) {
           airport_code,
           COUNT(*) as flight_count
         FROM (
-          SELECT origin_airport as airport_code FROM flight_durations
+          SELECT origin_airport_code as airport_code FROM flight_routes
           UNION ALL
-          SELECT destination_airport as airport_code FROM flight_durations
+          SELECT destination_airport_code as airport_code FROM flight_routes
         ) flight_airports
         GROUP BY airport_code
       ) flight_stats ON flight_stats.airport_code = a.iata_code

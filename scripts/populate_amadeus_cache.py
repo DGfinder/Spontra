@@ -23,7 +23,7 @@ class AmadeusFlightCache:
         self.client_id = os.getenv('AMADEUS_CLIENT_ID')
         self.client_secret = os.getenv('AMADEUS_CLIENT_SECRET')
         self.base_url = os.getenv('AMADEUS_BASE_URL', 'https://test.api.amadeus.com')
-        self.database_url = os.getenv('SEARCH_DATABASE_URL', os.getenv('DATABASE_URL'))
+        self.database_url = os.getenv('DATABASE_URL')
         
         if not all([self.client_id, self.client_secret, self.database_url]):
             raise ValueError("Missing required environment variables: AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET, DATABASE_URL")

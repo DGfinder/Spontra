@@ -96,7 +96,10 @@ def get_default_highlights(city: str) -> list:
 def create_destinations_from_airports():
     """Create destination records from airports with flight data"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     conn = psycopg2.connect(database_url)
     

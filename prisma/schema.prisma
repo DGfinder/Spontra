@@ -1,11 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
+// ============================================================================
+// ENUMS
+// ============================================================================
 
 enum MediaKind {
   video
@@ -18,69 +22,541 @@ enum AspectRatio {
   SIXTEEN_NINE
 }
 
-model CityTheme {
-  id               Int      @id @default(autoincrement())
-  iata             String   @db.VarChar(3)
-  themeSlug        String   @db.VarChar(32)
-  isEnabled        Boolean  @default(false)
-  minMediaRequired Int      @default(5)
-  maxMediaAllowed  Int      @default(10)
-  notes            String?
-  reels            Reel[]
-
-  @@unique([iata, themeSlug])
-  @@index([iata])
-  @@index([themeSlug])
+enum ActivityType {
+  activities
+  shopping
+  restaurants
+  nature
+  culture
+  nightlife
+  beaches
+  sightseeing
+  adventure
+  relaxation
 }
 
-model Reel {
-  id        Int         @id @default(autoincrement())
-  iata      String      @db.VarChar(3)
-  themeSlug String      @db.VarChar(32)
-  title     String?
-  caption   String?
-  language  String      @default("en") @db.VarChar(8)
-  isActive  Boolean     @default(true)
-  sortOrder Int         @default(0)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  media     ReelMedia[]
-  theme     CityTheme?  @relation(fields: [iata, themeSlug], references: [iata, themeSlug], onDelete: SetNull)
+enum BudgetLevel {
+  budget
+  mid_range
+  luxury
+  any
+}
 
-  @@index([iata, themeSlug, isActive])
+enum CreatorTier {
+  explorer
+  contributor
+  ambassador
+  creator
+}
+
+enum UserRole {
+  user
+  admin
+  moderator
+  creator
+}
+
+enum PriceTrendEnum {
+  increasing
+  decreasing
+  stable
+  volatile
+}
+
+enum NotificationType {
+  price_alert
+  system
+  marketing
+  creator_program
+}
+
+// ============================================================================
+// EXISTING AIRPORT MODEL (preserve current structure)
+// ============================================================================
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model Airport {
+  iataCode     String    @id @map("iata_code") @db.VarChar(3)
+  icaoCode     String?   @map("icao_code") @db.VarChar(4)
+  name         String    @db.VarChar(255)
+  city         String    @db.VarChar(100)
+  country      String    @db.VarChar(100)
+  latitude     Decimal?  @db.Decimal(10, 8)
+  longitude    Decimal?  @db.Decimal(11, 8)
+  timezone     String?   @db.VarChar(50)
+  elevation    Int?
+  url          String?
+  state        String?   @db.VarChar(100)
+  airportType  String?   @map("airport_type") @db.VarChar(10)
+  cityCode     String?   @map("city_code") @db.VarChar(5)
+  county       String?   @db.VarChar(100)
+  isActive     Boolean?  @default(true) @map("is_active")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  // Relations to new tables
+  originFlights      FlightRoute[] @relation("OriginAirport")
+  destinationFlights FlightRoute[] @relation("DestinationAirport")
+  destinations       Destination[]
+
+  @@index([country], map: "idx_airports_country")
+  @@map("airports")
+}
+
+// ============================================================================
+// FLIGHT ROUTING TABLES (Replace Cassandra flight_routes)
+// ============================================================================
+
+model FlightRoute {
+  id                        String   @id @default(uuid())
+  originAirportCode         String   @map("origin_airport_code") @db.VarChar(3)
+  destinationAirportCode    String   @map("destination_airport_code") @db.VarChar(3)
+  estimatedDurationHours    Int      @map("estimated_duration_hours")
+  estimatedDurationMinutes  Int      @map("estimated_duration_minutes")
+  totalDurationMinutes      Int      @map("total_duration_minutes")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  originAirport      Airport @relation("OriginAirport", fields: [originAirportCode], references: [iataCode])
+  destinationAirport Airport @relation("DestinationAirport", fields: [destinationAirportCode], references: [iataCode])
+
+  @@unique([originAirportCode, destinationAirportCode])
+  @@index([originAirportCode])
+  @@index([destinationAirportCode])
+  @@index([totalDurationMinutes])
+  @@map("flight_routes")
+}
+
+// ============================================================================
+// DESTINATION METADATA MODELS (JSONB for flexible data)
+// ============================================================================
+
+model Destination {
+  id               String   @id @default(uuid())
+  airportCode      String   @unique @map("airport_code") @db.VarChar(3)
+  cityName         String   @map("city_name") @db.VarChar(100)
+  countryName      String   @map("country_name") @db.VarChar(100)
+  countryCode      String?  @map("country_code") @db.VarChar(2)
+  description      String?
+  imageUrl         String?  @map("image_url")
+  activities       Json?    // Array of activity objects
+  popularityScore  Decimal? @map("popularity_score") @db.Decimal(3, 1)
+  climateInfo      Json?    @map("climate_info") // Climate data object
+  bestTimeToVisit  Json?    @map("best_time_to_visit") // Array of months/seasons
+  budgetInfo       Json?    @map("budget_info") // Budget ranges object
+  timezone         String?
+  language         Json?    // Array of languages
+  currency         String?  @db.VarChar(3)
+  visaRequired     Boolean? @map("visa_required")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  airport              Airport              @relation(fields: [airportCode], references: [iataCode])
+  themeDestinations    ThemeDestination[]
+  destinationExploreRequests DestinationExploreRequest[]
+  pois                 POI[]
+
+  @@index([airportCode])
+  @@index([countryName])
+  @@index([popularityScore])
+  @@map("destinations")
+}
+
+model ThemeDestination {
+  id            String      @id @default(uuid())
+  theme         String      @db.VarChar(50)
+  airportCode   String      @map("airport_code") @db.VarChar(3)
+  themeScore    Decimal?    @map("theme_score") @db.Decimal(3, 1)
+  flightTimeRange String?   @map("flight_time_range") @db.VarChar(20)
+  originAirport String?     @map("origin_airport") @db.VarChar(3)
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  destination   Destination @relation(fields: [airportCode], references: [airportCode])
+  reels         Reel[]
+
+  @@unique([theme, airportCode, originAirport])
+  @@index([theme])
+  @@index([airportCode])
+  @@index([originAirport])
+  @@map("theme_destinations")
+}
+
+model DestinationExploreRequest {
+  id                       String   @id @default(uuid())
+  originAirportCode        String   @map("origin_airport_code") @db.VarChar(3)
+  minFlightDurationHours   Int      @map("min_flight_duration_hours")
+  maxFlightDurationHours   Int      @map("max_flight_duration_hours")
+  preferredActivities      Json     @map("preferred_activities") // Array of activity types
+  budgetLevel              BudgetLevel @map("budget_level")
+  travelDates              Json?    @map("travel_dates") // Date range object
+  maxResults               Int      @default(50) @map("max_results")
+  includeVisaRequired      Boolean  @default(true) @map("include_visa_required")
+  createdAt                DateTime @default(now()) @map("created_at")
+
+  // Relations
+  destination              Destination @relation(fields: [originAirportCode], references: [airportCode])
+
+  @@index([originAirportCode])
+  @@index([minFlightDurationHours, maxFlightDurationHours])
+  @@map("destination_explore_requests")
+}
+
+// ============================================================================
+// USER MANAGEMENT MODELS (migrate from user_service_db)
+// ============================================================================
+
+model User {
+  id                   String              @id @default(uuid())
+  email                String              @unique @db.VarChar(255)
+  username             String?             @unique @db.VarChar(100)
+  passwordHash         String              @map("password_hash")
+  firstName            String?             @map("first_name") @db.VarChar(100)
+  lastName             String?             @map("last_name") @db.VarChar(100)
+  role                 UserRole            @default(user)
+  isEmailVerified      Boolean             @default(false) @map("is_email_verified")
+  profileImageUrl      String?             @map("profile_image_url")
+  preferences          Json?               // User preference object
+  lastLoginAt          DateTime?           @map("last_login_at")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  sessions             UserSession[]
+  searchHistory        SearchHistory[]
+  priceAlerts          PriceAlert[]
+  userContent          UserContent[]
+  creatorProfile       CreatorProfile?
+  notifications        Notification[]
+
+  @@index([email])
+  @@index([role])
+  @@map("users")
+}
+
+model UserSession {
+  id           String    @id @default(uuid())
+  userId       String    @map("user_id")
+  sessionToken String    @unique @map("session_token")
+  ipAddress    String?   @map("ip_address") @db.VarChar(45)
+  userAgent    String?   @map("user_agent")
+  expiresAt    DateTime  @map("expires_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+// ============================================================================
+// CACHE TABLES (flight offers, videos, price history)
+// ============================================================================
+
+model FlightOfferCache {
+  id               String   @id @default(uuid())
+  cacheKey         String   @unique @map("cache_key")
+  origin           String   @db.VarChar(3)
+  destination      String   @db.VarChar(3)
+  departureDate    DateTime @map("departure_date")
+  returnDate       DateTime? @map("return_date")
+  passengerCount   Int      @map("passenger_count")
+  offerData        Json     @map("offer_data") // Complete flight offer object
+  priceEur         Decimal  @map("price_eur") @db.Decimal(10, 2)
+  currency         String   @db.VarChar(3)
+  validUntil       DateTime @map("valid_until")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([origin, destination, departureDate])
+  @@index([validUntil])
+  @@index([priceEur])
+  @@map("flight_offer_cache")
+}
+
+model VideoCache {
+  id               String   @id @default(uuid())
+  cacheKey         String   @unique @map("cache_key")
+  cityName         String   @map("city_name") @db.VarChar(100)
+  theme            String   @db.VarChar(50)
+  activity         String?  @db.VarChar(100)
+  videoData        Json     @map("video_data") // Complete video metadata
+  youtubeId        String?  @map("youtube_id") @db.VarChar(20)
+  duration         Int?     // Duration in seconds
+  viewCount        Int?     @map("view_count")
+  publishedAt      DateTime? @map("published_at")
+  qualityScore     Decimal? @map("quality_score") @db.Decimal(3, 1)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@index([cityName, theme])
+  @@index([qualityScore])
+  @@map("video_cache")
+}
+
+model PriceHistory {
+  id               String           @id @default(uuid())
+  origin           String           @db.VarChar(3)
+  destination      String           @db.VarChar(3)
+  departureDate    DateTime         @map("departure_date")
+  priceEur         Decimal          @map("price_eur") @db.Decimal(10, 2)
+  currency         String           @db.VarChar(3)
+  airline          String?          @db.VarChar(3)
+  trend            PriceTrendEnum?
+  recordedAt       DateTime         @default(now()) @map("recorded_at")
+
+  @@index([origin, destination, departureDate])
+  @@index([recordedAt])
+  @@map("price_history")
+}
+
+// ============================================================================
+// UGC TABLES (user content, creator program, rewards)
+// ============================================================================
+
+model UserContent {
+  id               String      @id @default(uuid())
+  userId           String      @map("user_id")
+  contentType      String      @map("content_type") @db.VarChar(50) // 'video', 'photo', 'review', 'tip'
+  title            String      @db.VarChar(255)
+  description      String?
+  mediaUrl         String?     @map("media_url")
+  locationCode     String?     @map("location_code") @db.VarChar(3)
+  theme            String?     @db.VarChar(50)
+  activityType     ActivityType? @map("activity_type")
+  isPublic         Boolean     @default(true) @map("is_public")
+  moderationStatus String      @default("pending") @map("moderation_status") @db.VarChar(20)
+  viewCount        Int         @default(0) @map("view_count")
+  likeCount        Int         @default(0) @map("like_count")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([locationCode])
+  @@index([theme])
+  @@index([moderationStatus])
+  @@map("user_content")
+}
+
+model CreatorProfile {
+  id               String      @id @default(uuid())
+  userId           String      @unique @map("user_id")
+  tier             CreatorTier @default(explorer)
+  totalEarnings    Decimal     @default(0) @map("total_earnings") @db.Decimal(10, 2)
+  contentCount     Int         @default(0) @map("content_count")
+  averageRating    Decimal?    @map("average_rating") @db.Decimal(3, 2)
+  bio              String?
+  portfolioUrl     String?     @map("portfolio_url")
+  isVerified       Boolean     @default(false) @map("is_verified")
+  joinedAt         DateTime    @default(now()) @map("joined_at")
+  lastActiveAt     DateTime?   @map("last_active_at")
+
+  // Relations
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tier])
+  @@index([isVerified])
+  @@map("creator_profiles")
+}
+
+// ============================================================================
+// ANALYTICS TABLES (search tracking, performance metrics)
+// ============================================================================
+
+model SearchHistory {
+  id               String   @id @default(uuid())
+  userId           String?  @map("user_id")
+  sessionId        String?  @map("session_id")
+  searchQuery      String   @map("search_query")
+  origin           String?  @db.VarChar(3)
+  theme            String?  @db.VarChar(50)
+  flightTimeRange  String?  @map("flight_time_range") @db.VarChar(20)
+  resultCount      Int      @map("result_count")
+  clickedResult    String?  @map("clicked_result") @db.VarChar(3)
+  conversionType   String?  @map("conversion_type") @db.VarChar(50)
+  searchedAt       DateTime @default(now()) @map("searched_at")
+
+  // Relations
+  user             User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([origin])
+  @@index([theme])
+  @@index([searchedAt])
+  @@map("search_history")
+}
+
+model PerformanceMetrics {
+  id               String   @id @default(uuid())
+  metricName       String   @map("metric_name") @db.VarChar(100)
+  metricValue      Decimal  @map("metric_value") @db.Decimal(10, 4)
+  metricUnit       String?  @map("metric_unit") @db.VarChar(20)
+  tags             Json?    // Additional metric tags/dimensions
+  recordedAt       DateTime @default(now()) @map("recorded_at")
+
+  @@index([metricName, recordedAt])
+  @@map("performance_metrics")
+}
+
+model PriceAlert {
+  id               String   @id @default(uuid())
+  userId           String   @map("user_id")
+  origin           String   @db.VarChar(3)
+  destination      String   @db.VarChar(3)
+  maxPrice         Decimal  @map("max_price") @db.Decimal(10, 2)
+  currency         String   @db.VarChar(3)
+  isActive         Boolean  @default(true) @map("is_active")
+  lastTriggered    DateTime? @map("last_triggered")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([origin, destination])
+  @@index([isActive])
+  @@map("price_alerts")
+}
+
+// ============================================================================
+// ADDITIONAL FEATURES (POI, Media, Notifications)
+// ============================================================================
+
+model POI {
+  id               String      @id @default(uuid())
+  destinationId    String      @map("destination_id")
+  name             String      @db.VarChar(255)
+  description      String?
+  category         ActivityType
+  latitude         Decimal     @db.Decimal(10, 8)
+  longitude        Decimal     @db.Decimal(11, 8)
+  rating           Decimal?    @db.Decimal(3, 2)
+  priceLevel       BudgetLevel? @map("price_level")
+  website          String?
+  imageUrl         String?     @map("image_url")
+  openingHours     Json?       @map("opening_hours") // Operating hours object
+  isActive         Boolean     @default(true) @map("is_active")
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  destination      Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([destinationId])
+  @@index([category])
+  @@index([rating])
+  @@map("pois")
 }
 
 model ReelMedia {
-  id         Int        @id @default(autoincrement())
-  reelId     Int
-  kind       MediaKind
-  sourceUrl  String
-  providerId String?
-  aspect     AspectRatio @default(NINE_SIXTEEN)
-  durationMs Int?
-  width      Int?
-  height     Int?
-  altText    String?
-  credit     String?
-  license    String?
-  sortOrder  Int        @default(0)
-  isActive   Boolean    @default(true)
-  reel       Reel       @relation(fields: [reelId], references: [id], onDelete: Cascade)
+  id               String      @id @default(uuid())
+  kind             MediaKind
+  url              String
+  aspectRatio      AspectRatio @map("aspect_ratio")
+  durationSeconds  Int?        @map("duration_seconds")
+  fileSize         Int?        @map("file_size")
+  createdAt        DateTime    @default(now()) @map("created_at")
 
-  @@index([reelId, isActive])
+  // Relations
+  reels            Reel[]
+
+  @@map("reel_media")
 }
 
-model SearchAnalytics {
-  id          Int      @id @default(autoincrement())
-  query       String   @unique @db.VarChar(255)
-  searchCount Int      @default(1) @map("search_count")
-  resultCount Int      @default(0) @map("result_count")
-  searchDate  DateTime @default(now()) @map("search_date")
-  lastSearched DateTime @default(now()) @map("last_searched")
-  createdAt   DateTime @default(now()) @map("created_at")
+model Reel {
+  id                     String            @id @default(uuid())
+  themeDestinationId     String            @map("theme_destination_id")
+  mediaId                String            @map("media_id")
+  overlayContent         Json?             @map("overlay_content") // Text overlays, CTAs, etc.
+  isActive               Boolean           @default(true) @map("is_active")
+  createdAt              DateTime          @default(now()) @map("created_at")
+  updatedAt              DateTime          @updatedAt @map("updated_at")
 
-  @@index([query])
-  @@index([searchCount(sort: Desc)])
-  @@index([lastSearched(sort: Desc)])
-  @@map("search_analytics")
+  // Relations
+  themeDestination       ThemeDestination  @relation(fields: [themeDestinationId], references: [id], onDelete: Cascade)
+  media                  ReelMedia         @relation(fields: [mediaId], references: [id])
+
+  @@index([themeDestinationId])
+  @@index([isActive])
+  @@map("reels")
+}
+
+model Notification {
+  id               String              @id @default(uuid())
+  userId           String              @map("user_id")
+  type             NotificationType
+  title            String              @db.VarChar(255)
+  message          String
+  data             Json?               // Additional notification data
+  isRead           Boolean             @default(false) @map("is_read")
+  createdAt        DateTime            @default(now()) @map("created_at")
+
+  // Relations
+  user             User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ============================================================================
+// ANALYTICS VIEWS AND TABLES
+// ============================================================================
+
+model PopularSearch {
+  id               String   @id @default(uuid())
+  searchTerm       String   @map("search_term")
+  searchCount      Int      @map("search_count")
+  period           String   @db.VarChar(20) // 'daily', 'weekly', 'monthly'
+  periodStart      DateTime @map("period_start")
+  periodEnd        DateTime @map("period_end")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@unique([searchTerm, period, periodStart])
+  @@index([period, periodStart])
+  @@map("popular_searches")
+}
+
+model ConversionTracking {
+  id               String   @id @default(uuid())
+  sessionId        String   @map("session_id")
+  userId           String?  @map("user_id")
+  searchQuery      String   @map("search_query")
+  clickedAirport   String?  @map("clicked_airport") @db.VarChar(3)
+  conversionType   String   @map("conversion_type") @db.VarChar(50) // 'booking_click', 'email_signup', etc.
+  conversionValue  Decimal? @map("conversion_value") @db.Decimal(10, 2)
+  referrerUrl      String?  @map("referrer_url")
+  convertedAt      DateTime @default(now()) @map("converted_at")
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([conversionType])
+  @@index([convertedAt])
+  @@map("conversion_tracking")
+}
+
+model ContentView {
+  id               String   @id @default(uuid())
+  viewerId         String   @default("anonymous") @map("viewer_id")
+  contentType      String   @map("content_type") @db.VarChar(50)
+  contentId        String   @map("content_id")
+  sessionId        String?  @map("session_id")
+  referrerUrl      String?  @map("referrer_url")
+  deviceType       String?  @map("device_type") @db.VarChar(20)
+  viewDuration     Int?     @map("view_duration") // Duration in seconds
+  viewedAt         DateTime @default(now()) @map("viewed_at")
+
+  @@index([contentType, contentId])
+  @@index([viewerId])
+  @@index([viewedAt])
+  @@map("content_views")
 }

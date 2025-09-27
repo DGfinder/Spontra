@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { neon } from '@neondatabase/serverless'
+import { prisma } from '@/lib/prisma'
 import { getAirportHubInfo, calculateHubScore, getContextualSuggestions } from '@/lib/airlineHubs'
-
-// Simple, clean connection - no more dynamic imports!
-const sql = neon(process.env.DATABASE_URL!)
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -239,11 +236,13 @@ export async function GET(req: NextRequest) {
   
   console.log(`🔍 Airport search: "${query}", limit=${limit}`)
 
-  // Early validation
-  if (!process.env.DATABASE_URL) {
+  // Early validation - test Prisma connection
+  try {
+    await prisma.$queryRaw`SELECT 1`
+  } catch (error) {
     return NextResponse.json({
       ok: false,
-      error: 'Database not configured'
+      error: 'Database not accessible'
     }, { status: 503 })
   }
 
@@ -253,27 +252,42 @@ export async function GET(req: NextRequest) {
     if (!query || query.length < 1) {
       // Return popular airports when no query
       console.log('🏆 Returning popular airports')
-      const rows = await sql`
-        SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-        FROM airports 
-        WHERE is_active = true 
-          AND iata_code = ANY(${['LHR', 'CDG', 'FRA', 'AMS', 'JFK', 'LAX', 'ORD', 'ATL', 'DXB', 'SIN']})
-        ORDER BY 
-          CASE iata_code 
-            WHEN 'LHR' THEN 1 WHEN 'CDG' THEN 2 WHEN 'FRA' THEN 3 
-            WHEN 'AMS' THEN 4 WHEN 'JFK' THEN 5 WHEN 'LAX' THEN 6
-            WHEN 'ORD' THEN 7 WHEN 'ATL' THEN 8 WHEN 'DXB' THEN 9 WHEN 'SIN' THEN 10
-          END
-      `
+      const popularCodes = ['LHR', 'CDG', 'FRA', 'AMS', 'JFK', 'LAX', 'ORD', 'ATL', 'DXB', 'SIN']
       
-      airports = rows.map((row: any) => ({
-        code: row.iata_code,
-        icao_code: row.icao_code || '',
+      const rows = await prisma.airport.findMany({
+        where: {
+          isActive: true,
+          iataCode: { in: popularCodes }
+        },
+        select: {
+          iataCode: true,
+          icaoCode: true,
+          name: true,
+          city: true,
+          country: true,
+          latitude: true,
+          longitude: true,
+          timezone: true
+        },
+        orderBy: [
+          // Custom ordering to match the original CASE statement
+          { iataCode: 'asc' }
+        ]
+      })
+      
+      // Sort by predefined order
+      const orderedRows = popularCodes
+        .map(code => rows.find(row => row.iataCode === code))
+        .filter(Boolean)
+      
+      airports = orderedRows.map((row: any) => ({
+        code: row.iataCode,
+        icao_code: row.icaoCode || '',
         name: row.name,
         city: row.city,
         country: row.country,
-        latitude: row.latitude ? parseFloat(row.latitude) : undefined,
-        longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+        latitude: row.latitude ? parseFloat(row.latitude.toString()) : undefined,
+        longitude: row.longitude ? parseFloat(row.longitude.toString()) : undefined,
         timezone: row.timezone || '',
         type: 'AIRPORT' as const,
         importance_score: 100,
@@ -286,33 +300,45 @@ export async function GET(req: NextRequest) {
       if (cityCodeMatch) {
         console.log(`🏙️ City code detected: ${query.toUpperCase()}`)
         
-        const rows = await sql`
-          SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-          FROM airports
-          WHERE is_active = true AND iata_code = ANY(${cityCodeMatch.airports})
-          ORDER BY 
-            CASE iata_code 
-              ${cityCodeMatch.airports.map((code, i) => `WHEN '${code}' THEN ${i}`).join(' ')}
-            END
-        `
+        const rows = await prisma.airport.findMany({
+          where: {
+            isActive: true,
+            iataCode: { in: cityCodeMatch.airports }
+          },
+          select: {
+            iataCode: true,
+            icaoCode: true,
+            name: true,
+            city: true,
+            country: true,
+            latitude: true,
+            longitude: true,
+            timezone: true
+          }
+        })
 
-        airports = rows.map((row: any) => {
+        // Sort by predefined order from city code mapping
+        const orderedRows = cityCodeMatch.airports
+          .map(code => rows.find(row => row.iataCode === code))
+          .filter(Boolean)
+
+        airports = orderedRows.map((row: any) => {
           const airport: Airport = {
-            code: row.iata_code,
-            icao_code: row.icao_code || '',
+            code: row.iataCode,
+            icao_code: row.icaoCode || '',
             name: row.name,
             city: row.city,
             country: row.country,
-            latitude: row.latitude ? parseFloat(row.latitude) : undefined,
-            longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+            latitude: row.latitude ? parseFloat(row.latitude.toString()) : undefined,
+            longitude: row.longitude ? parseFloat(row.longitude.toString()) : undefined,
             timezone: row.timezone || '',
             type: 'AIRPORT' as const,
-            importance_score: AIRPORT_IMPORTANCE[row.iata_code] || 50,
+            importance_score: AIRPORT_IMPORTANCE[row.iataCode] || 50,
             search_score: 1000
           }
           
           // Add hub info if available
-          const hubInfo = getAirportHubInfo(row.iata_code)
+          const hubInfo = getAirportHubInfo(row.iataCode)
           if (hubInfo.length > 0) {
             airport.hub_info = {
               airlines: hubInfo.map(hub => ({
@@ -323,7 +349,7 @@ export async function GET(req: NextRequest) {
                 routes: hub.routes
               })),
               isHub: true,
-              hubScore: calculateHubScore(row.iata_code)
+              hubScore: calculateHubScore(row.iataCode)
             }
           }
           
@@ -349,37 +375,39 @@ export async function GET(req: NextRequest) {
       // Search airports by query
       console.log(`🔍 Searching for: "${query}"`)
       
-      const searchQuery = `%${query.toLowerCase()}%`
-      const rows = await sql`
-        SELECT iata_code, icao_code, name, city, country, latitude, longitude, timezone
-        FROM airports
-        WHERE is_active = true
-          AND (
-            LOWER(name) LIKE ${searchQuery} OR
-            LOWER(city) LIKE ${searchQuery} OR
-            LOWER(iata_code) LIKE ${searchQuery} OR
-            LOWER(country) LIKE ${searchQuery}
-          )
-        ORDER BY 
-          CASE 
-            WHEN LOWER(iata_code) = ${query.toLowerCase()} THEN 1
-            WHEN LOWER(name) LIKE ${query.toLowerCase() + '%'} THEN 2
-            WHEN LOWER(city) LIKE ${query.toLowerCase() + '%'} THEN 3
-            ELSE 4
-          END,
-          name
-        LIMIT ${limit}
-      `
+      const lowerQuery = query.toLowerCase()
+      const rows = await prisma.airport.findMany({
+        where: {
+          isActive: true,
+          OR: [
+            { name: { contains: lowerQuery, mode: 'insensitive' } },
+            { city: { contains: lowerQuery, mode: 'insensitive' } },
+            { iataCode: { contains: lowerQuery, mode: 'insensitive' } },
+            { country: { contains: lowerQuery, mode: 'insensitive' } }
+          ]
+        },
+        select: {
+          iataCode: true,
+          icaoCode: true,
+          name: true,
+          city: true,
+          country: true,
+          latitude: true,
+          longitude: true,
+          timezone: true
+        },
+        take: limit
+      })
 
       airports = rows.map((row: any) => {
         const airport: Airport = {
-          code: row.iata_code,
-          icao_code: row.icao_code || '',
+          code: row.iataCode,
+          icao_code: row.icaoCode || '',
           name: row.name,
           city: row.city,
           country: row.country,
-          latitude: row.latitude ? parseFloat(row.latitude) : undefined,
-          longitude: row.longitude ? parseFloat(row.longitude) : undefined,
+          latitude: row.latitude ? parseFloat(row.latitude.toString()) : undefined,
+          longitude: row.longitude ? parseFloat(row.longitude.toString()) : undefined,
           timezone: row.timezone || '',
           type: 'AIRPORT' as const,
           importance_score: 75,
@@ -387,7 +415,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Add hub info if available
-        const hubInfo = getAirportHubInfo(row.iata_code)
+        const hubInfo = getAirportHubInfo(row.iataCode)
         if (hubInfo.length > 0) {
           airport.hub_info = {
             airlines: hubInfo.map(hub => ({
@@ -398,7 +426,7 @@ export async function GET(req: NextRequest) {
               routes: hub.routes
             })),
             isHub: true,
-            hubScore: calculateHubScore(row.iata_code)
+            hubScore: calculateHubScore(row.iataCode)
           }
         }
 

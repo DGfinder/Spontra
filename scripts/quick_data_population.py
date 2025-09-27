@@ -12,7 +12,10 @@ from datetime import datetime, timedelta
 def populate_airline_data():
     """Populate enhanced airline data with logos and info"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     airlines_data = [
         {
@@ -67,7 +70,10 @@ def populate_airline_data():
         }
     ]
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', os.getenv('DATABASE_URL'))
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     conn = psycopg2.connect(database_url)
     
     try:
@@ -105,7 +111,10 @@ def populate_airline_data():
 def populate_airport_facilities():
     """Populate basic airport facilities for major airports"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     facilities_data = [
         # London Heathrow
@@ -129,7 +138,10 @@ def populate_airport_facilities():
         {'airport': 'AMS', 'type': 'service', 'name': 'Schiphol Library', 'terminal': 'All', 'rating': 4.6},
     ]
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', os.getenv('DATABASE_URL'))
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     conn = psycopg2.connect(database_url)
     
     try:
@@ -157,7 +169,10 @@ def populate_airport_facilities():
 def populate_sample_videos():
     """Populate sample destination videos without API calls"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     sample_videos = [
         {
@@ -182,7 +197,10 @@ def populate_sample_videos():
         }
     ]
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', os.getenv('DATABASE_URL'))
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     conn = psycopg2.connect(database_url)
     
     try:

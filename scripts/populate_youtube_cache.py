@@ -16,7 +16,7 @@ from typing import List, Dict, Any, Optional
 class YouTubeVideoCache:
     def __init__(self):
         self.api_key = os.getenv('YOUTUBE_API_KEY')
-        self.database_url = os.getenv('SEARCH_DATABASE_URL', os.getenv('DATABASE_URL'))
+        self.database_url = os.getenv('DATABASE_URL')
         
         if not all([self.api_key, self.database_url]):
             raise ValueError("Missing required environment variables: YOUTUBE_API_KEY, DATABASE_URL")

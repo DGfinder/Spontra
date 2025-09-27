@@ -102,7 +102,10 @@ def get_destination_characteristics(city: str, country: str) -> dict:
 def populate_theme_destination_cache():
     """Populate theme-destination cache with correct themes and no scoring"""
     
-    database_url = os.getenv('SEARCH_DATABASE_URL', 'postgres://spontra:development@localhost:15432/search_service_db?sslmode=disable')
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        print("❌ DATABASE_URL environment variable not set")
+        return
     
     # Correct themes from the codebase
     themes = ['vibe', 'adventure', 'discover', 'indulge', 'nature']

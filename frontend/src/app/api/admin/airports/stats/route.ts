@@ -37,14 +37,14 @@ export async function GET(req: NextRequest) {
         (SELECT COUNT(DISTINCT a.iata_code) 
          FROM airports a 
          WHERE EXISTS (
-           SELECT 1 FROM flight_durations fd 
-           WHERE fd.origin_airport = a.iata_code OR fd.destination_airport = a.iata_code
+           SELECT 1 FROM flight_routes fr 
+           WHERE fr.origin_airport_code = a.iata_code OR fr.destination_airport_code = a.iata_code
          )) as airports_with_flights,
         (SELECT COUNT(DISTINCT a.iata_code) 
          FROM airports a 
          WHERE NOT EXISTS (
-           SELECT 1 FROM flight_durations fd 
-           WHERE fd.origin_airport = a.iata_code OR fd.destination_airport = a.iata_code
+           SELECT 1 FROM flight_routes fr 
+           WHERE fr.origin_airport_code = a.iata_code OR fr.destination_airport_code = a.iata_code
          )) as airports_without_flights
     `)
 

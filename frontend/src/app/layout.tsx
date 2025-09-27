@@ -2,6 +2,7 @@
 
 import { Inter, Mulish } from 'next/font/google'
 import { ErrorBoundary } from '../components/ErrorBoundary'
+import { UserAuthProvider } from '@/contexts/UserAuthContext'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -34,7 +35,9 @@ export default function RootLayout({
             }
           }}
         >
-          {children}
+          <UserAuthProvider>
+            {children}
+          </UserAuthProvider>
         </ErrorBoundary>
       </body>
     </html>
