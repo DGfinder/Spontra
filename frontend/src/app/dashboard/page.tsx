@@ -78,7 +78,7 @@ function DashboardContent() {
             Welcome back, {user?.firstName || user?.username || 'Explorer'}!
           </h2>
           <p className="text-white/60">
-            Ready to discover your next adventure? Let's find some amazing destinations.
+            Ready to discover your next adventure? Let&apos;s find some amazing destinations.
           </p>
         </div>
 
