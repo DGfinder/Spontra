@@ -75,7 +75,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response
 }
 
-// Protect /api/admin routes with JWT verification
+// Protect /api/admin routes with database session verification
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   
@@ -108,7 +108,12 @@ export async function middleware(req: NextRequest) {
   // Apply security headers to all responses
   let response: NextResponse
   
-  if (!pathname.startsWith('/api/admin')) {
+  // Skip admin auth for login and logout endpoints
+  const isAdminAuthEndpoint = pathname === '/api/admin/auth/login' || 
+                             pathname === '/api/admin/auth/logout' ||
+                             pathname === '/api/admin/auth/refresh'
+  
+  if (!pathname.startsWith('/api/admin') || isAdminAuthEndpoint) {
     response = NextResponse.next()
     
     // Add rate limit headers for successful requests
@@ -122,65 +127,68 @@ export async function middleware(req: NextRequest) {
     return addSecurityHeaders(response)
   }
 
-  const auth = req.headers.get('authorization') || req.headers.get('Authorization')
-  if (!auth || !auth.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const token = auth.substring(7)
-  const secret = process.env.ADMIN_JWT_SECRET || ''
-
-  if (!secret) {
-    // If no secret configured, allow in development but block in production
-    if (process.env.NODE_ENV !== 'development') {
-      return NextResponse.json({ error: 'Admin auth not configured' }, { status: 503 })
-    }
-    return NextResponse.next()
-  }
-
+  // For /api/admin routes (except auth endpoints), verify admin session
   try {
-    const [header, payload, signature] = token.split('.')
-    if (!header || !payload || !signature) throw new Error('Malformed token')
-    const enc = new TextEncoder()
+    // Import adminRepository dynamically to avoid circular dependencies
+    const { adminRepository } = await import('./lib/adminRepository')
+    const { ADMIN_SESSION_COOKIE } = await import('./lib/adminAuth')
+    
+    // Get session token from cookie or Authorization header
+    const cookieToken = req.cookies.get(ADMIN_SESSION_COOKIE)?.value
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
+    const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+    const sessionToken = cookieToken || headerToken
 
-    const data = `${header}.${payload}`
-    const sig = base64UrlToUint8Array(signature)
-    const key = await crypto.subtle.importKey(
-      'raw',
-      enc.encode(secret),
-      { name: 'HMAC', hash: 'SHA-256' },
-      false,
-      ['verify']
-    )
-
-    const ok = await crypto.subtle.verify('HMAC', key, sig as unknown as ArrayBuffer, enc.encode(data))
-    if (!ok) throw new Error('Invalid signature')
-
-    // Claims validation
-    const json = JSON.parse(new TextDecoder().decode(base64UrlToUint8Array(payload)))
-    const now = Math.floor(Date.now() / 1000)
-    if (json.exp && now >= json.exp) throw new Error('Token expired')
-    if (json.nbf && now < json.nbf) throw new Error('Token not yet valid')
-    const iss = process.env.ADMIN_JWT_ISSUER
-    const aud = process.env.ADMIN_JWT_AUDIENCE
-    if (iss && json.iss && json.iss !== iss) throw new Error('Invalid issuer')
-    if (aud && json.aud && json.aud !== aud) throw new Error('Invalid audience')
-
-    // Simple RBAC: admin required for cache management
-    const roles: string[] = Array.isArray(json.roles) ? json.roles : (typeof json.role === 'string' ? [json.role] : [])
-    const requiresAdmin = pathname.startsWith('/api/admin/cache')
-    if (requiresAdmin && !roles.includes('admin')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!sessionToken) {
+      const errorResponse = NextResponse.json({ error: 'Admin authentication required' }, { status: 401 })
+      return addSecurityHeaders(errorResponse)
     }
+
+    // Verify session exists and is valid in database
+    const session = await adminRepository.findAdminSession(sessionToken)
+    
+    if (!session) {
+      const errorResponse = NextResponse.json({ error: 'Invalid or expired admin session' }, { status: 401 })
+      return addSecurityHeaders(errorResponse)
+    }
+
+    // Get admin user to verify they still have admin privileges
+    const adminUser = await adminRepository.findAdminById(session.userId)
+    
+    if (!adminUser || !['admin', 'moderator'].includes(adminUser.role)) {
+      const errorResponse = NextResponse.json({ error: 'Admin privileges required' }, { status: 403 })
+      return addSecurityHeaders(errorResponse)
+    }
+
+    // Update session activity
+    await adminRepository.updateSessionActivity(sessionToken)
+
+    // Role-based access control
+    const requiresSuperAdmin = pathname.startsWith('/api/admin/system') || 
+                              pathname.startsWith('/api/admin/cache')
+    if (requiresSuperAdmin && adminUser.role !== 'admin') {
+      const errorResponse = NextResponse.json({ error: 'Super admin privileges required' }, { status: 403 })
+      return addSecurityHeaders(errorResponse)
+    }
+
+    // Add admin user info to request headers for use in API routes
+    const requestHeaders = new Headers(req.headers)
+    requestHeaders.set('x-admin-user-id', adminUser.id)
+    requestHeaders.set('x-admin-user-email', adminUser.email)
+    requestHeaders.set('x-admin-user-role', adminUser.role)
+    requestHeaders.set('x-admin-session-id', session.id)
 
     response = NextResponse.next({
       request: {
-        headers: req.headers
+        headers: requestHeaders
       }
     })
+    
     return addSecurityHeaders(response)
-  } catch {
-    const errorResponse = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    
+  } catch (error) {
+    console.error('Admin auth middleware error:', error)
+    const errorResponse = NextResponse.json({ error: 'Admin authentication failed' }, { status: 500 })
     return addSecurityHeaders(errorResponse)
   }
 }
