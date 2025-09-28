@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cacheGet } from '@/lib/cacheServer'
 import { telemetry } from '@/lib/serverActionsTelemetry'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 interface DashboardMetrics {
   // Core Web Vitals
