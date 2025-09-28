@@ -18,10 +18,10 @@ const postBodySchema = z.object({
   urls: z.array(z.string()).min(1),
 })
 
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id } = paramsSchema.parse(params)
+    const { id } = paramsSchema.parse(await params)
     const reelId = Number(id)
     if (Number.isNaN(reelId)) {
       return NextResponse.json({ error: 'Invalid reel id' }, { status: 400 })

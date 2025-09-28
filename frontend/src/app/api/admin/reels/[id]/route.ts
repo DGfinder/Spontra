@@ -20,10 +20,10 @@ const patchBodySchema = z.object({
   sortOrder: z.number().int().min(0).max(1000).optional(),
 })
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id } = paramsSchema.parse(params)
+    const { id } = paramsSchema.parse(await params)
     const reelId = Number(id)
     if (Number.isNaN(reelId)) {
       return NextResponse.json({ error: 'Invalid reel id' }, { status: 400 })

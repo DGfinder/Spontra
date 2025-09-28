@@ -68,10 +68,10 @@ function mapReelRow(row: any) {
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string; theme: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id, theme } = paramsSchema.parse(params)
+    const { id, theme } = paramsSchema.parse(await params)
     const iata = id.toUpperCase()
     const themeSlug = theme
 
@@ -152,10 +152,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { id: string; theme: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id, theme } = paramsSchema.parse(params)
+    const { id, theme } = paramsSchema.parse(await params)
     const body = postBodySchema.parse(await request.json())
     const iata = id.toUpperCase()
     const themeSlug = theme

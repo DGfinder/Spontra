@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 // PATCH /api/admin/themes/definitions/[key]
-export async function PATCH(req: NextRequest, { params }: { params: { key: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
   try {
     const body = await req.json()
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
-    const res = await fetch(`${base}/api/v1/themes/definitions/${params.key}`, {
+    const resolvedParams = await params
+    const res = await fetch(`${base}/api/v1/themes/definitions/${resolvedParams.key}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -23,10 +24,11 @@ export async function PATCH(req: NextRequest, { params }: { params: { key: strin
 }
 
 // DELETE /api/admin/themes/definitions/[key]
-export async function DELETE(_req: NextRequest, { params }: { params: { key: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
   try {
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
-    const res = await fetch(`${base}/api/v1/themes/definitions/${params.key}`, {
+    const resolvedParams = await params
+    const res = await fetch(`${base}/api/v1/themes/definitions/${resolvedParams.key}`, {
       method: 'DELETE',
     })
     const data = await res.json()

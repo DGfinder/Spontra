@@ -15,13 +15,14 @@ function adminBase(): string | null {
   return base ? base.replace(/\/$/, '') : null
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)
   if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
 
-  const id = (params?.id || '').toUpperCase()
+  const resolvedParams = await params
+  const id = (resolvedParams?.id || '').toUpperCase()
   const upstream = new URL(`${base}/destinations/${id}/pois`)
   const qs = new URL(req.url).searchParams
   qs.forEach((v, k) => upstream.searchParams.set(k, v))
@@ -31,12 +32,13 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)
   if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  const id = (params?.id || '').toUpperCase()
+  const resolvedParams = await params
+  const id = (resolvedParams?.id || '').toUpperCase()
   const body = await req.text()
   const res = await fetch(`${base}/destinations/${id}/pois`, {
     method: 'POST',
@@ -47,12 +49,13 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)
   if (!token) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  const id = (params?.id || '').toUpperCase()
+  const resolvedParams = await params
+  const id = (resolvedParams?.id || '').toUpperCase()
   const body = await req.text()
   const res = await fetch(`${base}/destinations/${id}/pois`, {
     method: 'PUT',

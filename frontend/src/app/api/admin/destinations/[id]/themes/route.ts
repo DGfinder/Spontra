@@ -22,10 +22,10 @@ const themeRowSchema = z.object({
   is_ready: z.boolean().nullable(),
 })
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id } = paramsSchema.parse(params)
+    const { id } = paramsSchema.parse(await params)
     const iata = id.toUpperCase()
 
     const rateKey = `themes:list:${admin.userId ?? admin.email ?? admin.role}`

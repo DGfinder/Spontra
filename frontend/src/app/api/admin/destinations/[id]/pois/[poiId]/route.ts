@@ -217,7 +217,7 @@ function deletePOI(poiId: string): boolean {
 // GET /api/admin/destinations/[id]/pois/[poiId] - Get specific POI
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; poiId: string } }
+  { params }: { params: Promise<{ id: string; poiId: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -228,7 +228,7 @@ export async function GET(
       )
     }
 
-    const { id: destinationId, poiId } = params
+    const { id: destinationId, poiId } = await params
 
     // Find POI
     const poi = findPOI(destinationId, poiId)
@@ -278,7 +278,7 @@ export async function GET(
 // PUT /api/admin/destinations/[id]/pois/[poiId] - Update specific POI
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; poiId: string } }
+  { params }: { params: Promise<{ id: string; poiId: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -289,7 +289,7 @@ export async function PUT(
       )
     }
 
-    const { id: destinationId, poiId } = params
+    const { id: destinationId, poiId } = await params
     const updateRequest: UpdatePOIRequest = await request.json()
 
     // Validate that POI exists
@@ -371,7 +371,7 @@ export async function PUT(
 // PATCH /api/admin/destinations/[id]/pois/[poiId] - Partial update specific POI
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; poiId: string } }
+  { params }: { params: Promise<{ id: string; poiId: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -382,7 +382,7 @@ export async function PATCH(
       )
     }
 
-    const { id: destinationId, poiId } = params
+    const { id: destinationId, poiId } = await params
     const partialUpdate = await request.json()
 
     // Validate that POI exists
@@ -449,7 +449,7 @@ export async function PATCH(
 // DELETE /api/admin/destinations/[id]/pois/[poiId] - Delete specific POI
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; poiId: string } }
+  { params }: { params: Promise<{ id: string; poiId: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -460,7 +460,7 @@ export async function DELETE(
       )
     }
 
-    const { id: destinationId, poiId } = params
+    const { id: destinationId, poiId } = await params
 
     // Validate that POI exists
     const existingPOI = findPOI(destinationId, poiId)

@@ -244,7 +244,7 @@ function validateBulkOperation(operation: BulkPOIOperation): { isValid: boolean;
 // POST /api/admin/destinations/[id]/pois/bulk - Perform bulk operations on POIs
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -255,7 +255,8 @@ export async function POST(
       )
     }
 
-    const destinationId = params.id
+    const resolvedParams = await params
+    const destinationId = resolvedParams.id
     const operation: BulkPOIOperation = await request.json()
 
     // Validate bulk operation
@@ -378,7 +379,7 @@ export async function POST(
 // GET /api/admin/destinations/[id]/pois/bulk?operation=validate - Validate bulk operation without executing
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Validate admin authentication
@@ -389,7 +390,8 @@ export async function GET(
       )
     }
 
-    const destinationId = params.id
+    const resolvedParams = await params
+    const destinationId = resolvedParams.id
     const { searchParams } = new URL(request.url)
     const operation = searchParams.get('operation')
 

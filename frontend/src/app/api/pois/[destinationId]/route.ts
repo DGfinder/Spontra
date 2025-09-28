@@ -8,9 +8,10 @@ function isIata(code: string) {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { destinationId: string } }
+  { params }: { params: Promise<{ destinationId: string }> }
 ) {
-  const destinationId = (params?.destinationId || '').toUpperCase()
+  const resolvedParams = await params
+  const destinationId = (resolvedParams?.destinationId || '').toUpperCase()
   const { searchParams } = new URL(req.url)
   const theme = (searchParams.get('theme') || '').toLowerCase()
   const limit = Math.min(parseInt(searchParams.get('limit') || '12', 10), 50)

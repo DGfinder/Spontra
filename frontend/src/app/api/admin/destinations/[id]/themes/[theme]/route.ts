@@ -27,10 +27,10 @@ const bodySchema = z
     message: 'Payload must include at least one field to update',
   })
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string; theme: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
   try {
     const admin = await requireAdminContext(request)
-    const { id, theme } = paramsSchema.parse(params)
+    const { id, theme } = paramsSchema.parse(await params)
     const body = bodySchema.parse(await request.json())
     const iata = id.toUpperCase()
     const themeSlug = theme as DestinationThemeSlug
