@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   ci: {
     collect: {
       // URLs to test - adjust based on your deployment
