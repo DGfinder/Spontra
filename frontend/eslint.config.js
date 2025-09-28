@@ -1,6 +1,8 @@
 import { FlatCompat } from '@eslint/eslintrc'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import typescriptEslint from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -30,13 +32,18 @@ export default [
   // Main configuration for TypeScript and JavaScript files
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+    },
     languageOptions: {
+      parser: typescriptParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
         },
+        project: './tsconfig.json',
       },
     },
     rules: {

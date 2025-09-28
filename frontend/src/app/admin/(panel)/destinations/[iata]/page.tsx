@@ -77,10 +77,11 @@ const normaliseTextarea = (text: string) =>
     .filter(Boolean)
 
 interface PageProps {
-  params: { iata: string }
+  params: Promise<{ iata: string }>
 }
 
-export default function DestinationDetailPage({ params }: PageProps) {
+export default async function DestinationDetailPage({ params }: PageProps) {
+  const { iata } = await params
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addToast } = useToast()
@@ -126,7 +127,7 @@ export default function DestinationDetailPage({ params }: PageProps) {
       if (withLoader) setLoading(true)
       setError(null)
       try {
-        const response = await fetch(`/api/admin/destinations/${encodeURIComponent(params.iata)}`, {
+        const response = await fetch(`/api/admin/destinations/${encodeURIComponent(iata)}`, {
           cache: 'no-store',
         })
         if (!response.ok) {
@@ -152,7 +153,7 @@ export default function DestinationDetailPage({ params }: PageProps) {
         if (withLoader) setLoading(false)
       }
     },
-    [params.iata],
+    [iata],
   )
 
   useEffect(() => {
@@ -169,7 +170,7 @@ export default function DestinationDetailPage({ params }: PageProps) {
       paramsCopy.delete('theme')
       setFocusTheme(null)
     }
-    router.replace(`/admin/destinations/${params.iata}?${paramsCopy.toString()}`, { scroll: false })
+    router.replace(`/admin/destinations/${iata}?${paramsCopy.toString()}`, { scroll: false })
   }
 
   const handleSaveOverview = async () => {
