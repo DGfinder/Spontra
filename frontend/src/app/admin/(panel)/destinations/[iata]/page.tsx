@@ -76,7 +76,11 @@ const normaliseTextarea = (text: string) =>
     .map((line) => line.trim())
     .filter(Boolean)
 
-export default function DestinationDetailPage({ params }: { params: { iata: string } }) {
+interface PageProps {
+  params: { iata: string }
+}
+
+export default function DestinationDetailPage({ params }: PageProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addToast } = useToast()
