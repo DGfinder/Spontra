@@ -519,6 +519,10 @@ async function main() {
   console.log('HYGIENE_STATS:', JSON.stringify(stats));
 }
 
-if (require.main === module) {
+// Export for potential module usage
+export { runDataHygiene, generateHygieneReport };
+
+// Run if script is executed directly (tsx only)
+if (typeof process !== 'undefined' && process.argv && process.argv[1]?.endsWith('data-hygiene.ts')) {
   main().catch(console.error);
 }

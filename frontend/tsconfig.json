@@ -34,6 +34,9 @@
                                           "@/lib/*":  [
                                                           "./src/lib/*"
                                                       ],
+                                          "@/server/*":  [
+                                                             "./src/server/*"
+                                                         ],
                                           "@/types/*":  [
                                                             "./src/types/*"
                                                         ],

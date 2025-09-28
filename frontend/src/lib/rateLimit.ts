@@ -81,37 +81,32 @@ export async function checkRateLimit(
   }
 
   try {
-    // Sliding window with KV sorted sets
-    const pipeline = kv.pipeline();
+    // Simplified rate limiting using hash-based counters (KV doesn't support sorted sets)
+    // Use a per-minute bucket approach instead of sliding window
+    const minuteBucket = Math.floor(now / 60000); // Current minute
+    const bucketKey = `${key}:${minuteBucket}`;
     
-    // Remove old entries outside the window
-    pipeline.zremrangebyscore(key, 0, windowStart);
+    // Get current count for this minute bucket
+    const currentCount = await kv.get<number>(bucketKey) || 0;
     
-    // Add current request
-    pipeline.zadd(key, now, `${now}-${Math.random()}`);
-    
-    // Count requests in current window
-    pipeline.zcard(key);
-    
-    // Set TTL to cleanup old keys
-    pipeline.expire(key, Math.ceil(config.windowMs / 1000) + 10);
-    
-    const results = await pipeline.exec();
-    
-    if (!results || !Array.isArray(results)) {
-      throw new Error('Pipeline execution failed');
+    if (currentCount >= config.maxRequests) {
+      return {
+        allowed: false,
+        remaining: 0,
+        resetTime: (minuteBucket + 1) * 60000,
+        total: currentCount
+      };
     }
-
-    const requestCount = (results[2]?.[1] as number) || 0;
-    const allowed = requestCount <= config.maxRequests;
-    const remaining = Math.max(0, config.maxRequests - requestCount);
-    const resetTime = now + config.windowMs;
-
+    
+    // Increment counter and set expiry
+    const newCount = currentCount + 1;
+    await kv.set(bucketKey, newCount, { ex: 120 }); // 2 minutes TTL for cleanup
+    
     return {
-      allowed,
-      remaining,
-      resetTime,
-      total: requestCount
+      allowed: true,
+      remaining: config.maxRequests - newCount,
+      resetTime: (minuteBucket + 1) * 60000,
+      total: newCount
     };
 
   } catch (error) {

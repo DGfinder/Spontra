@@ -23,7 +23,7 @@ interface AlertPayload {
   attachments?: any[];
 }
 
-type AlertType = 
+export type AlertType = 
   | 'EPC_DROP' 
   | 'PRICE_INSTABILITY' 
   | 'SYNTHETIC_FAILURE' 
