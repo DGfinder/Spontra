@@ -42,7 +42,7 @@ jobs:
         go tool cover -html=coverage.out -o coverage.html
     
     - name: Upload coverage
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.service }}
         path: ./services/${{ matrix.service }}/coverage.html
@@ -60,7 +60,7 @@ jobs:
         go-version: ${{ env.GO_VERSION }}
     
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v4
       with:
         version: latest
         working-directory: ./services
@@ -92,9 +92,25 @@ jobs:
       working-directory: ./frontend
       run: npm run type-check
     
-    - name: Run tests
+    - name: Run unit tests
       working-directory: ./frontend
-      run: npm test -- --coverage --watchAll=false
+      run: npm run test:coverage
+    
+    - name: Run integration tests
+      working-directory: ./frontend
+      run: npm run test:integration
+    
+    - name: Run API contract tests
+      working-directory: ./frontend
+      run: npm run test:contracts
+    
+    - name: Run performance tests
+      working-directory: ./frontend
+      run: npm run test:performance
+    
+    - name: Generate API documentation
+      working-directory: ./frontend
+      run: npm run docs:api
     
     - name: Build application
       working-directory: ./frontend
@@ -117,20 +133,68 @@ jobs:
         echo "✅ Bundle size within limits"
     
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: frontend-build
         path: frontend/.next
         
     - name: Upload bundle analysis
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: bundle-analysis
         path: frontend/analyze/
+        
+    - name: Upload test coverage
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-coverage
+        path: frontend/coverage/
+        
+    - name: Upload API documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: frontend/docs/api/generated/
+        
+    - name: Comment test coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          try {
+            const coverage = JSON.parse(fs.readFileSync('frontend/coverage/coverage-summary.json', 'utf8'));
+            const { lines, functions, branches, statements } = coverage.total;
+            
+            const comment = `## 📊 Test Coverage Report
+            
+            | Metric | Coverage | Status |
+            |--------|----------|--------|
+            | Lines | ${lines.pct}% | ${lines.pct >= 70 ? '✅' : '❌'} |
+            | Functions | ${functions.pct}% | ${functions.pct >= 70 ? '✅' : '❌'} |
+            | Branches | ${branches.pct}% | ${branches.pct >= 70 ? '✅' : '❌'} |
+            | Statements | ${statements.pct}% | ${statements.pct >= 70 ? '✅' : '❌'} |
+            
+            ${lines.pct >= 70 ? '🎉 Coverage targets met!' : '⚠️ Coverage below target (70%)'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } catch (error) {
+            console.log('Could not read coverage report:', error.message);
+          }
 
   # Security scanning
   security-scan:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     
     steps:
     - uses: actions/checkout@v4
@@ -144,7 +208,7 @@ jobs:
         output: 'trivy-results.sarif'
     
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: 'trivy-results.sarif'
 
@@ -170,7 +234,7 @@ jobs:
     
     - name: Terraform Validate
       working-directory: ./infrastructure
-      run: terraform validate
+      run: terraform validate -no-color
     
     - name: Run tflint
       uses: terraform-linters/setup-tflint@v3

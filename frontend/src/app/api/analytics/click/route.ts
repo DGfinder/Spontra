@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { validateApiRequest, clickEventApiSchema } from '@/lib/validations'
 import { ClickEvent } from '@/services/affiliateService'
 import { cacheGet, cacheSet } from '@/lib/cacheServer'
+import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, metrics } from '@/lib/telemetry'
+import { sentryHelpers } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
 
@@ -23,57 +25,278 @@ async function writeEvents(events: ClickEvent[]): Promise<void> {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json()
-    const validation = validateApiRequest(clickEventApiSchema, body)
-    if (!validation.success) {
-      return NextResponse.json({ success: false, error: 'Invalid click event data', details: validation.errors }, { status: 400 })
+  return trackAnalyticsOperation(
+    'click',
+    async (span) => {
+      try {
+        const body = await req.json()
+        const validation = validateApiRequest(clickEventApiSchema, body)
+        
+        if (!validation.success) {
+          span.setAttributes({
+            'error.type': 'validation',
+            'error.validation_issues': validation.errors?.length || 0
+          })
+          
+          metrics.recordCounter('clicks.validation_errors', 1, {
+            endpoint: 'POST /api/analytics/click'
+          })
+          
+          return NextResponse.json({ 
+            success: false, 
+            error: 'Invalid click event data', 
+            details: validation.errors 
+          }, { status: 400 })
+        }
+
+        const clickEvent = validation.data
+        
+        // Add analytics parameters to span
+        span.setAttributes({
+          'analytics.click_id': clickEvent.id,
+          'analytics.partner_id': clickEvent.partnerId,
+          'analytics.flight_id': clickEvent.flightId,
+          'analytics.booking_value': clickEvent.bookingValue,
+          'analytics.device_type': clickEvent.deviceType
+        })
+
+        // Generate correlation IDs
+        const requestId = req.headers.get('x-request-id') || crypto.randomUUID()
+        addCorrelationIds(span, { requestId })
+
+        // Add request metadata to span
+        const userAgent = req.headers.get('user-agent')
+        const ipAddress = req.headers.get('x-forwarded-for') || 
+                         req.headers.get('x-real-ip') || 
+                         'unknown'
+        
+        span.setAttributes({
+          'http.user_agent': userAgent,
+          'http.client_ip': ipAddress
+        })
+
+        console.log('Click tracking event received:', {
+          clickId: clickEvent.id,
+          partnerId: clickEvent.partnerId,
+          flightId: clickEvent.flightId,
+          bookingValue: clickEvent.bookingValue,
+          timestamp: clickEvent.timestamp,
+          traceId: getTraceContext().traceId
+        })
+
+        const completeClickEvent: ClickEvent = {
+          ...clickEvent,
+          timestamp: clickEvent.timestamp || new Date().toISOString()
+        }
+
+        // Track cache operations with telemetry
+        const current = await sentryHelpers.monitorDatabaseOperation(
+          'read',
+          'click_events_cache',
+          () => readEvents()
+        )
+        
+        current.push(completeClickEvent)
+        
+        await sentryHelpers.monitorDatabaseOperation(
+          'write',
+          'click_events_cache',
+          () => writeEvents(current)
+        )
+
+        // Record custom metrics
+        metrics.recordCounter('clicks.total', 1, {
+          partner: clickEvent.partnerId,
+          device_type: clickEvent.deviceType
+        })
+
+        metrics.recordHistogram('clicks.booking_value', clickEvent.bookingValue, {
+          partner: clickEvent.partnerId,
+          currency: 'USD' // Assuming USD, could be made dynamic
+        })
+
+        // Track partner-specific metrics
+        metrics.recordCounter(`clicks.by_partner.${clickEvent.partnerId}`, 1)
+
+        // Add success attributes to span
+        span.setAttributes({
+          'analytics.click_recorded': true,
+          'analytics.cache_updated': true
+        })
+
+        // Add trace context to response
+        const traceContext = getTraceContext()
+        const response = NextResponse.json({ 
+          success: true, 
+          clickId: clickEvent.id, 
+          message: 'Click event tracked successfully',
+          timestamp: completeClickEvent.timestamp
+        })
+
+        // Add trace headers
+        if (traceContext.traceId) {
+          response.headers.set('x-trace-id', traceContext.traceId)
+        }
+        if (traceContext.spanId) {
+          response.headers.set('x-span-id', traceContext.spanId)
+        }
+
+        return response
+
+      } catch (error) {
+        // Error handling with telemetry
+        span.recordException(error as Error)
+        
+        // Log error with trace context
+        const traceContext = getTraceContext()
+        sentryHelpers.captureError(error as Error, 'error', {
+          trace: traceContext,
+          endpoint: 'POST /api/analytics/click'
+        })
+
+        span.setAttributes({
+          'error.type': 'internal',
+          'error.message': (error as Error).message
+        })
+
+        // Record general error metric
+        metrics.recordCounter('clicks.errors', 1, {
+          error_type: 'internal'
+        })
+
+        console.error('Click tracking error:', error, 'traceId:', traceContext.traceId)
+        
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Failed to track click event',
+          requestId: req.headers.get('x-request-id')
+        }, { status: 500 })
+      }
+    },
+    {
+      // Initial analytics parameters (will be updated from validated data)
+      provider: undefined,
+      amount: undefined
     }
-
-    const clickEvent = validation.data
-    console.log('Click tracking event received:', {
-      clickId: clickEvent.id,
-      partnerId: clickEvent.partnerId,
-      flightId: clickEvent.flightId,
-      bookingValue: clickEvent.bookingValue,
-      timestamp: clickEvent.timestamp
-    })
-
-    const completeClickEvent: ClickEvent = {
-      ...clickEvent,
-      timestamp: clickEvent.timestamp || new Date().toISOString()
-    }
-
-    const current = await readEvents()
-    current.push(completeClickEvent)
-    await writeEvents(current)
-
-    return NextResponse.json({ success: true, clickId: clickEvent.id, message: 'Click event tracked successfully' })
-  } catch (error) {
-    console.error('Click tracking error:', error)
-    return NextResponse.json({ success: false, error: 'Failed to track click event' }, { status: 500 })
-  }
+  )
 }
 
 export async function GET(req: NextRequest) {
-  try {
-    const url = new URL(req.url)
-    const partnerId = url.searchParams.get('partner')
-    const timeframe = url.searchParams.get('timeframe') || '24h'
+  return trackAnalyticsOperation(
+    'metrics',
+    async (span) => {
+      try {
+        const url = new URL(req.url)
+        const partnerId = url.searchParams.get('partner')
+        const timeframe = url.searchParams.get('timeframe') || '24h'
 
-    const now = new Date()
-    const timeWindow = getTimeWindow(timeframe)
-    const since = new Date(now.getTime() - timeWindow)
+        // Add query parameters to span
+        span.setAttributes({
+          'analytics.query.partner_id': partnerId,
+          'analytics.query.timeframe': timeframe
+        })
 
-    let filteredEvents = (await readEvents()).filter(e => new Date(e.timestamp) >= since)
-    if (partnerId) filteredEvents = filteredEvents.filter(e => e.partnerId === partnerId)
+        // Generate correlation IDs
+        const requestId = req.headers.get('x-request-id') || crypto.randomUUID()
+        addCorrelationIds(span, { requestId })
 
-    const metrics = calculateMetrics(filteredEvents)
-    return NextResponse.json({ success: true, timeframe, partnerId, metrics, eventCount: filteredEvents.length })
-  } catch (error) {
-    console.error('Analytics fetch error:', error)
-    return NextResponse.json({ success: false, error: 'Failed to fetch analytics' }, { status: 500 })
-  }
+        const now = new Date()
+        const timeWindow = getTimeWindow(timeframe)
+        const since = new Date(now.getTime() - timeWindow)
+
+        // Track cache read operation with telemetry
+        const allEvents = await sentryHelpers.monitorDatabaseOperation(
+          'read',
+          'click_events_cache',
+          () => readEvents()
+        )
+
+        let filteredEvents = allEvents.filter(e => new Date(e.timestamp) >= since)
+        if (partnerId) {
+          filteredEvents = filteredEvents.filter(e => e.partnerId === partnerId)
+        }
+
+        // Add metrics to span
+        span.setAttributes({
+          'analytics.events.total': allEvents.length,
+          'analytics.events.filtered': filteredEvents.length,
+          'analytics.time_window_ms': timeWindow
+        })
+
+        const calculatedMetrics = calculateMetrics(filteredEvents)
+        
+        // Add calculated metrics to span
+        span.setAttributes({
+          'analytics.metrics.total_clicks': calculatedMetrics.totalClicks,
+          'analytics.metrics.total_value': calculatedMetrics.totalValue,
+          'analytics.metrics.average_value': calculatedMetrics.averageValue,
+          'analytics.metrics.top_partner': calculatedMetrics.topPartner
+        })
+
+        // Record query performance metric
+        metrics.recordHistogram('analytics.query_duration', 100, { // Placeholder duration
+          timeframe,
+          partner: partnerId || 'all'
+        })
+
+        // Record query counter
+        metrics.recordCounter('analytics.queries', 1, {
+          timeframe,
+          partner: partnerId || 'all'
+        })
+
+        // Add trace context to response
+        const traceContext = getTraceContext()
+        const response = NextResponse.json({ 
+          success: true, 
+          timeframe, 
+          partnerId, 
+          metrics: calculatedMetrics, 
+          eventCount: filteredEvents.length,
+          generatedAt: new Date().toISOString()
+        })
+
+        // Add trace headers
+        if (traceContext.traceId) {
+          response.headers.set('x-trace-id', traceContext.traceId)
+        }
+        if (traceContext.spanId) {
+          response.headers.set('x-span-id', traceContext.spanId)
+        }
+
+        return response
+
+      } catch (error) {
+        // Error handling with telemetry
+        span.recordException(error as Error)
+        
+        // Log error with trace context
+        const traceContext = getTraceContext()
+        sentryHelpers.captureError(error as Error, 'error', {
+          trace: traceContext,
+          endpoint: 'GET /api/analytics/click'
+        })
+
+        span.setAttributes({
+          'error.type': 'internal',
+          'error.message': (error as Error).message
+        })
+
+        // Record error metric
+        metrics.recordCounter('analytics.query_errors', 1, {
+          error_type: 'internal'
+        })
+
+        console.error('Analytics fetch error:', error, 'traceId:', traceContext.traceId)
+        
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Failed to fetch analytics',
+          requestId: req.headers.get('x-request-id')
+        }, { status: 500 })
+      }
+    }
+  )
 }
 
 function getTimeWindow(timeframe: string): number {

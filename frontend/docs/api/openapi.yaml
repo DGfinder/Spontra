@@ -1,0 +1,1282 @@
+openapi: 3.0.3
+info:
+  title: Spontra API
+  description: |
+    Spontra Travel Discovery Platform API
+    
+    A revolutionary travel discovery platform that transforms how people find destinations by prioritizing spontaneous exploration over traditional flight search.
+    
+    ## Features
+    - **Time-First Search**: Search by flight duration instead of destination
+    - **Activity-Driven Discovery**: Find destinations based on interests and activities
+    - **Real-time Price Comparison**: Compare prices across multiple providers
+    - **Analytics & Tracking**: Comprehensive click and conversion tracking
+    - **Admin Panel**: Full administrative interface for content management
+    
+    ## Authentication
+    - **Public Endpoints**: No authentication required for search and discovery
+    - **Admin Endpoints**: Require admin session token or API key
+    - **Rate Limiting**: All endpoints are rate-limited based on IP and user type
+    
+  version: 1.0.0
+  contact:
+    name: Spontra API Support
+    email: api@spontra.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.spontra.com
+    description: Production server
+  - url: https://staging-api.spontra.com
+    description: Staging server
+  - url: http://localhost:3000
+    description: Development server
+
+security:
+  - ApiKeyAuth: []
+  - AdminSession: []
+
+paths:
+  # ============================================================================
+  # SEARCH ENDPOINTS
+  # ============================================================================
+  
+  /api/search/session:
+    post:
+      tags:
+        - Search
+      summary: Create search session
+      description: Initialize a new search session for flight discovery
+      operationId: createSearchSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchSessionRequest'
+            examples:
+              basic_search:
+                summary: Basic round-trip search
+                value:
+                  origin: "LHR"
+                  destination: "CDG"
+                  departureDate: "2024-12-25"
+                  returnDate: "2024-12-30"
+                  passengers: 2
+              one_way_search:
+                summary: One-way search
+                value:
+                  origin: "NYC"
+                  destination: "BCN"
+                  departureDate: "2024-12-25"
+                  passengers: 1
+      responses:
+        '200':
+          description: Search session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchSessionResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/search/flights:
+    get:
+      tags:
+        - Search
+      summary: Search for flights
+      description: Search for available flights based on session parameters
+      operationId: searchFlights
+      parameters:
+        - name: sessionId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search session ID
+        - name: origin
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}$'
+          description: Origin airport IATA code
+        - name: destination
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z]{3}$'
+          description: Destination airport IATA code
+        - name: departureDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Departure date (YYYY-MM-DD)
+        - name: returnDate
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: Return date (YYYY-MM-DD) for round-trip
+        - name: passengers
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 9
+          description: Number of passengers
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [price, duration, departure, arrival]
+            default: price
+          description: Sort order for results
+        - name: maxResults
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of results to return
+      responses:
+        '200':
+          description: Flight search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightSearchResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ============================================================================
+  # ANALYTICS ENDPOINTS
+  # ============================================================================
+  
+  /api/analytics/click:
+    post:
+      tags:
+        - Analytics
+      summary: Track click event
+      description: Record a click event when user selects a flight offer
+      operationId: trackClick
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClickEventRequest'
+      responses:
+        '200':
+          description: Click tracked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClickEventResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/analytics/metrics:
+    get:
+      tags:
+        - Analytics
+      summary: Get analytics metrics
+      description: Retrieve analytics metrics for specified time period
+      operationId: getMetrics
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: period
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [1h, 24h, 7d, 30d]
+            default: 24h
+          description: Time period for metrics
+        - name: provider
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by specific provider
+        - name: market
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by market/country code
+      responses:
+        '200':
+          description: Analytics metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ============================================================================
+  # ADMIN ENDPOINTS
+  # ============================================================================
+  
+  /api/admin/auth/login:
+    post:
+      tags:
+        - Admin Authentication
+      summary: Admin login
+      description: Authenticate admin user and create session
+      operationId: adminLogin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminLoginResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/dashboards/daily-ops:
+    get:
+      tags:
+        - Admin Dashboards
+      summary: Daily operations dashboard
+      description: Get comprehensive daily operations metrics and health status
+      operationId: getDailyOps
+      security:
+        - ApiKeyAuth: []
+        - AdminSession: []
+      responses:
+        '200':
+          description: Daily operations data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyOpsResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /api/admin/destinations:
+    get:
+      tags:
+        - Admin Destinations
+      summary: List destinations
+      description: Get paginated list of destinations with filtering options
+      operationId: getDestinations
+      security:
+        - AdminSession: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by destination name or IATA code
+        - name: enabled
+          in: query
+          schema:
+            type: boolean
+          description: Filter by enabled status
+        - name: country
+          in: query
+          schema:
+            type: string
+          description: Filter by country code
+      responses:
+        '200':
+          description: Destinations list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DestinationsResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+    post:
+      tags:
+        - Admin Destinations
+      summary: Create destination
+      description: Create a new destination
+      operationId: createDestination
+      security:
+        - AdminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDestinationRequest'
+      responses:
+        '201':
+          description: Destination created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DestinationResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Destination already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  # ============================================================================
+  # HEALTH ENDPOINTS
+  # ============================================================================
+  
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: System health check
+      description: Check overall system health and status
+      operationId: getHealth
+      responses:
+        '200':
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/redirect/flight:
+    get:
+      tags:
+        - Redirects
+      summary: Flight booking redirect
+      description: Generate tracking redirect to external booking provider
+      operationId: redirectToBooking
+      parameters:
+        - name: clickId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Click event ID for tracking
+        - name: provider
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Booking provider identifier
+        - name: offerId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Flight offer ID
+      responses:
+        '302':
+          description: Redirect to booking provider
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+              description: Booking provider URL
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          description: Click or offer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for admin endpoints
+    
+    AdminSession:
+      type: apiKey
+      in: cookie
+      name: admin_session
+      description: Admin session cookie
+
+  schemas:
+    # ========================================================================
+    # REQUEST SCHEMAS
+    # ========================================================================
+    
+    SearchSessionRequest:
+      type: object
+      required:
+        - origin
+        - destination
+        - departureDate
+        - passengers
+      properties:
+        origin:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Origin airport IATA code
+          example: "LHR"
+        destination:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Destination airport IATA code
+          example: "CDG"
+        departureDate:
+          type: string
+          format: date
+          description: Departure date
+          example: "2024-12-25"
+        returnDate:
+          type: string
+          format: date
+          description: Return date for round-trip
+          example: "2024-12-30"
+        passengers:
+          type: integer
+          minimum: 1
+          maximum: 9
+          description: Number of passengers
+          example: 2
+        preferences:
+          type: object
+          properties:
+            activities:
+              type: array
+              items:
+                type: string
+                enum: [adventure, culture, nightlife, shopping, restaurants, nature, beaches, sightseeing, relaxation]
+              description: Preferred activity types
+            budgetLevel:
+              type: string
+              enum: [budget, mid_range, luxury, any]
+              description: Budget preference
+            maxFlightDuration:
+              type: integer
+              description: Maximum flight duration in hours
+              minimum: 1
+              maximum: 24
+
+    ClickEventRequest:
+      type: object
+      required:
+        - sessionId
+        - offerId
+        - provider
+        - price
+        - currency
+        - destination
+      properties:
+        sessionId:
+          type: string
+          description: Search session ID
+        offerId:
+          type: string
+          description: Flight offer ID
+        provider:
+          type: string
+          description: Provider identifier
+          example: "amadeus"
+        price:
+          type: number
+          format: float
+          minimum: 0
+          description: Offer price
+          example: 450.00
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Price currency code
+          example: "EUR"
+        destination:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Destination airport code
+          example: "CDG"
+        userId:
+          type: string
+          description: User ID if authenticated
+        metadata:
+          type: object
+          description: Additional tracking metadata
+
+    AdminLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: Admin email address
+        password:
+          type: string
+          minLength: 8
+          description: Admin password
+        mfaCode:
+          type: string
+          pattern: '^[0-9]{6}$'
+          description: MFA verification code
+
+    CreateDestinationRequest:
+      type: object
+      required:
+        - name
+        - iataCode
+        - city
+        - country
+        - countryCode
+        - latitude
+        - longitude
+        - timezone
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Destination name
+        iataCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          description: Airport IATA code
+        city:
+          type: string
+          maxLength: 100
+          description: City name
+        country:
+          type: string
+          maxLength: 100
+          description: Country name
+        countryCode:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: ISO country code
+        latitude:
+          type: number
+          minimum: -90
+          maximum: 90
+          description: Latitude coordinate
+        longitude:
+          type: number
+          minimum: -180
+          maximum: 180
+          description: Longitude coordinate
+        timezone:
+          type: string
+          description: IANA timezone identifier
+        themes:
+          type: array
+          items:
+            type: string
+            enum: [adventure, culture, nightlife, shopping, restaurants, nature, beaches, sightseeing, relaxation]
+          description: Available activity themes
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 1000
+          default: 100
+          description: Search priority ranking
+        enabled:
+          type: boolean
+          default: true
+          description: Whether destination is active
+
+    # ========================================================================
+    # RESPONSE SCHEMAS
+    # ========================================================================
+    
+    SearchSessionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        sessionId:
+          type: string
+          description: Unique session identifier
+        expiresAt:
+          type: string
+          format: date-time
+          description: Session expiration timestamp
+        message:
+          type: string
+          description: Success message
+
+    FlightSearchResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlightOffer'
+        searchMeta:
+          type: object
+          properties:
+            sessionId:
+              type: string
+            origin:
+              type: string
+            destination:
+              type: string
+            departureDate:
+              type: string
+              format: date
+            returnDate:
+              type: string
+              format: date
+            passengers:
+              type: integer
+            totalResults:
+              type: integer
+            searchTime:
+              type: number
+              description: Search time in milliseconds
+            timestamp:
+              type: string
+              format: date-time
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    FlightOffer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique offer identifier
+        price:
+          type: object
+          properties:
+            total:
+              type: string
+              description: Total price as string
+            currency:
+              type: string
+              pattern: '^[A-Z]{3}$'
+            breakdown:
+              type: object
+              properties:
+                base:
+                  type: string
+                taxes:
+                  type: string
+                fees:
+                  type: string
+        itineraries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Itinerary'
+        travelerPricings:
+          type: array
+          items:
+            type: object
+            properties:
+              price:
+                type: object
+                properties:
+                  total:
+                    type: string
+              travelerType:
+                type: string
+                enum: [ADULT, CHILD, INFANT]
+        provider:
+          type: string
+          description: Provider identifier
+        validUntil:
+          type: string
+          format: date-time
+          description: Offer expiration time
+        bookingClass:
+          type: string
+          enum: [ECONOMY, PREMIUM_ECONOMY, BUSINESS, FIRST]
+        amenities:
+          type: array
+          items:
+            type: string
+        restrictions:
+          type: object
+          properties:
+            refundable:
+              type: boolean
+            changeable:
+              type: boolean
+            checkedBagsIncluded:
+              type: integer
+
+    Itinerary:
+      type: object
+      properties:
+        duration:
+          type: string
+          description: Total journey duration (ISO 8601)
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlightSegment'
+
+    FlightSegment:
+      type: object
+      properties:
+        departure:
+          $ref: '#/components/schemas/Airport'
+        arrival:
+          $ref: '#/components/schemas/Airport'
+        carrierCode:
+          type: string
+          description: Airline IATA code
+        number:
+          type: string
+          description: Flight number
+        aircraft:
+          type: object
+          properties:
+            code:
+              type: string
+            name:
+              type: string
+        duration:
+          type: string
+          description: Segment duration (ISO 8601)
+        stops:
+          type: integer
+          minimum: 0
+          description: Number of stops
+
+    Airport:
+      type: object
+      properties:
+        iataCode:
+          type: string
+          pattern: '^[A-Z]{3}$'
+        terminal:
+          type: string
+        at:
+          type: string
+          format: date-time
+          description: Departure/arrival time
+
+    ClickEventResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        clickId:
+          type: string
+          description: Unique click identifier
+        timestamp:
+          type: string
+          format: date-time
+        trackingUrl:
+          type: string
+          format: uri
+          description: URL for conversion tracking
+
+    MetricsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        metrics:
+          type: object
+          properties:
+            totalClicks:
+              type: integer
+            totalConversions:
+              type: integer
+            totalRevenue:
+              type: number
+              format: float
+            averageEPC:
+              type: number
+              format: float
+              description: Earnings per click
+            conversionRate:
+              type: number
+              format: float
+              description: Conversion rate as percentage
+            topProviders:
+              type: array
+              items:
+                type: object
+                properties:
+                  provider:
+                    type: string
+                  clicks:
+                    type: integer
+                  revenue:
+                    type: number
+                  epc:
+                    type: number
+            topRoutes:
+              type: array
+              items:
+                type: object
+                properties:
+                  route:
+                    type: string
+                  clicks:
+                    type: integer
+                  conversions:
+                    type: integer
+                  revenue:
+                    type: number
+        period:
+          type: string
+          description: Requested time period
+        generatedAt:
+          type: string
+          format: date-time
+
+    AdminLoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        requiresMFA:
+          type: boolean
+          description: Whether MFA verification is required
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            email:
+              type: string
+              format: email
+            role:
+              type: string
+              enum: [admin, moderator]
+            lastLogin:
+              type: string
+              format: date-time
+        sessionToken:
+          type: string
+          description: Session token (only if MFA not required)
+        tempToken:
+          type: string
+          description: Temporary token for MFA (only if MFA required)
+        expiresAt:
+          type: string
+          format: date-time
+        backupCodesAvailable:
+          type: boolean
+          description: Whether backup codes are available for MFA
+
+    DailyOpsResponse:
+      type: object
+      properties:
+        epcByProviderMarket:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+              market:
+                type: string
+              clicks:
+                type: integer
+              revenue:
+                type: number
+              epc:
+                type: number
+              changePctVs7d:
+                type: number
+              status:
+                type: string
+                enum: [HEALTHY, WARNING, CRITICAL]
+              action:
+                type: string
+        priceChangeRates:
+          type: array
+          items:
+            type: object
+            properties:
+              route:
+                type: string
+              avgPriceToday:
+                type: number
+              avgPrice7d:
+                type: number
+              changePct:
+                type: number
+              sampleSize:
+                type: integer
+              status:
+                type: string
+                enum: [HEALTHY, WARNING, CRITICAL]
+        syntheticFailures15m:
+          type: array
+          items:
+            type: object
+            properties:
+              endpoint:
+                type: string
+              failureRate:
+                type: number
+              avgResponseTime:
+                type: number
+              lastFailure:
+                type: string
+                format: date-time
+              status:
+                type: string
+                enum: [HEALTHY, WARNING, CRITICAL]
+        landingRatesByRoute:
+          type: array
+          items:
+            type: object
+            properties:
+              route:
+                type: string
+              landingRate:
+                type: number
+              expectedRate:
+                type: number
+              sampleSize:
+                type: integer
+              status:
+                type: string
+                enum: [HEALTHY, WARNING, CRITICAL]
+        summary:
+          type: object
+          properties:
+            overallHealth:
+              type: number
+              description: Overall health percentage
+            criticalIssues:
+              type: array
+              items:
+                type: string
+            warningIssues:
+              type: array
+              items:
+                type: string
+            totalProviders:
+              type: integer
+            totalRoutes:
+              type: integer
+        generatedAt:
+          type: string
+          format: date-time
+
+    DestinationsResponse:
+      type: object
+      properties:
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/DestinationResponse'
+        pagination:
+          $ref: '#/components/schemas/PaginationMeta'
+
+    DestinationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        iataCode:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        countryCode:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        timezone:
+          type: string
+        themes:
+          type: array
+          items:
+            type: string
+        priority:
+          type: integer
+        enabled:
+          type: boolean
+        mediaCount:
+          type: integer
+          description: Number of associated media items
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        version:
+          type: string
+        uptime:
+          type: number
+          description: Uptime in seconds
+        checks:
+          type: object
+          properties:
+            database:
+              $ref: '#/components/schemas/HealthCheck'
+            cache:
+              $ref: '#/components/schemas/HealthCheck'
+            externalAPIs:
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/HealthCheck'
+
+    HealthCheck:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        responseTime:
+          type: number
+          description: Response time in milliseconds
+        message:
+          type: string
+        details:
+          type: object
+
+    PaginationMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        totalPages:
+          type: integer
+          minimum: 0
+        hasMore:
+          type: boolean
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code for programmatic handling
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+        requestId:
+          type: string
+          description: Request ID for debugging
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Validation failed"
+            code: "VALIDATION_ERROR"
+            details:
+              field: "origin"
+              message: "Invalid IATA code format"
+            timestamp: "2024-12-20T10:30:00Z"
+            requestId: "req_123456"
+
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Authentication required"
+            code: "AUTHENTICATION_REQUIRED"
+            timestamp: "2024-12-20T10:30:00Z"
+
+    ForbiddenError:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Insufficient permissions"
+            code: "FORBIDDEN"
+            timestamp: "2024-12-20T10:30:00Z"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per time window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Remaining requests in current window
+        X-RateLimit-Reset:
+          schema:
+            type: string
+            format: date-time
+          description: Time when rate limit resets
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Rate limit exceeded"
+            code: "RATE_LIMIT_EXCEEDED"
+            retryAfter: 60
+            timestamp: "2024-12-20T10:30:00Z"
+
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "Internal server error"
+            code: "INTERNAL_ERROR"
+            timestamp: "2024-12-20T10:30:00Z"
+            requestId: "req_123456"
+
+tags:
+  - name: Search
+    description: Flight search and discovery endpoints
+  - name: Analytics
+    description: Click tracking and metrics endpoints
+  - name: Admin Authentication
+    description: Admin user authentication
+  - name: Admin Dashboards
+    description: Administrative dashboard endpoints
+  - name: Admin Destinations
+    description: Destination management endpoints
+  - name: Health
+    description: System health and status endpoints
+  - name: Redirects
+    description: Booking redirect endpoints
