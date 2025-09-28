@@ -13,8 +13,7 @@ const nextConfig: NextConfig = {
     } : false,
   },
   
-  // Performance optimizations
-  swcMinify: true,
+  // Performance optimizations - swcMinify is now default in Next.js 15
   
   // Image optimization with aggressive caching
   images: {
@@ -93,22 +92,24 @@ const nextConfig: NextConfig = {
     ]
   },
   
-  experimental: {
-    // Turbopack is now stable in Next.js 15 for development
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  // Server components external packages (moved from experimental in Next.js 15)
+  serverExternalPackages: [
+    'cassandra-driver', 
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/exporter-metrics-otlp-http'
+  ],
+
+  // Turbopack configuration (moved from experimental.turbo in Next.js 15)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
-    // Server components external packages
-    serverComponentsExternalPackages: [
-      'cassandra-driver', 
-      '@opentelemetry/exporter-trace-otlp-http',
-      '@opentelemetry/exporter-metrics-otlp-http'
-    ],
+  },
+
+  experimental: {
     // Modern bundling optimizations
     optimizePackageImports: [
       '@heroicons/react',
@@ -231,13 +232,7 @@ const nextConfig: NextConfig = {
         sideEffects: false,
       }
 
-      // React 19 specific optimizations
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        // Optimize React imports
-        'react/jsx-runtime': 'react/jsx-runtime.js',
-        'react/jsx-dev-runtime': 'react/jsx-dev-runtime.js',
-      }
+      // React 19 specific optimizations - JSX runtime handled automatically by Next.js 15
     }
     
     return config
