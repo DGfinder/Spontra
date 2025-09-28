@@ -70,6 +70,9 @@
         "docs:api:markdown": "tsx scripts/generate-api-docs.ts --format markdown",
         "docs:validate": "tsx scripts/generate-api-docs.ts --no-validate"
     },
+    "prisma": {
+        "seed": "tsx prisma/seed.ts"
+    },
     "dependencies": {
         "@headlessui/react": "^1.7.17",
         "@heroicons/react": "^2.0.18",
