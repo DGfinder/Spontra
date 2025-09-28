@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { enableMockFallbacks, getErrorMessage } from '@/lib/environment'
+import { getErrorMessage } from '@/lib/environment'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
 import { CountryConstellation } from './CountryConstellation'
@@ -13,6 +13,7 @@ import { FlightResults } from './FlightResults'
 import { BookingConfirmation } from './BookingConfirmation'
 import { BreadcrumbNavigation } from './BreadcrumbNavigation'
 import { SearchFormErrorBoundary, FlightResultsErrorBoundary, BookingFlowErrorBoundary } from './ErrorBoundary'
+import { NetworkStatus } from './NetworkStatus'
 import { useDestinationExplore } from '@/hooks/useDestinationExplore'
 import { useFormData, useSearchState, useSearchActions, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
@@ -33,16 +34,6 @@ interface FormData {
   minFlightTime?: number
   maxFlightTimeRange?: number
   cabinClass?: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST'
-}
-
-interface CountryResult {
-  name: string
-  code: string
-  flag: string
-  cities: string[]
-  averageFlightTime: number
-  priceRange: string
-  description: string
 }
 
 const THEMES = [
@@ -78,7 +69,6 @@ const THEMES = [
   }
 ]
 
-
 const BLURBS: Record<ThemeKey, { title: string; description: string }> = {
   adventure: {
     title: 'Thrilling Adventures Await',
@@ -106,64 +96,6 @@ const BLURBS: Record<ThemeKey, { title: string; description: string }> = {
       'Museums, local markets, and authentic culinary experiences. Explore places that inspire curiosity and expand your cultural horizons.'
   }
 }
-
-
-const MOCK_COUNTRIES: CountryResult[] = [
-  {
-    name: "France",
-    code: "FR",
-    flag: "🇫🇷",
-    cities: ["Paris", "Lyon", "Nice", "Marseille"],
-    averageFlightTime: 2.5,
-    priceRange: "€180-450",
-    description: "Culture, cuisine, and romance"
-  },
-  {
-    name: "Italy", 
-    code: "IT",
-    flag: "🇮🇹",
-    cities: ["Rome", "Milan", "Venice", "Florence"],
-    averageFlightTime: 3,
-    priceRange: "€220-380",
-    description: "Art, history, and amazing food"
-  },
-  {
-    name: "Spain",
-    code: "ES", 
-    flag: "🇪🇸",
-    cities: ["Barcelona", "Madrid", "Seville", "Valencia"],
-    averageFlightTime: 2,
-    priceRange: "€160-320",
-    description: "Vibrant culture and beautiful beaches"
-  },
-  {
-    name: "Germany",
-    code: "DE",
-    flag: "🇩🇪", 
-    cities: ["Berlin", "Munich", "Hamburg", "Frankfurt"],
-    averageFlightTime: 1.5,
-    priceRange: "€120-280",
-    description: "Rich history and modern cities"
-  },
-  {
-    name: "Netherlands",
-    code: "NL",
-    flag: "🇳🇱",
-    cities: ["Amsterdam", "Rotterdam", "The Hague"],
-    averageFlightTime: 1,
-    priceRange: "€90-240",
-    description: "Canals, tulips, and friendly locals"
-  },
-  {
-    name: "Portugal",
-    code: "PT",
-    flag: "🇵🇹",
-    cities: ["Lisbon", "Porto", "Faro"],
-    averageFlightTime: 2.5,
-    priceRange: "€140-300",
-    description: "Coastal beauty and historic charm"
-  }
-]
 
 export function LandingPageForm() {
   // Get state from Zustand store
@@ -231,77 +163,11 @@ export function LandingPageForm() {
     } catch (error) {
       console.error('Destination exploration failed:', error)
       
-      if (enableMockFallbacks) {
-        // Fallback to mock data on API failure (development only)
-        console.log('Falling back to mock data...')
-        // Get max flight time from range or fallback
-        const maxFlightTime = data.flightTimeRange?.[1] ?? data.maxFlightTimeRange ?? data.maxFlightTime ?? 8
-        
-        const filteredCountries = MOCK_COUNTRIES.filter(
-          country => country.averageFlightTime <= maxFlightTime
-        )
-        
-        // Convert mock data to API format for consistency  
-        const mockResults: DestinationRecommendation[] = filteredCountries.map(country => ({
-          destination: {
-            id: country.code,
-            airport_code: country.code,
-            city_name: country.cities[0] || country.name,
-            country_name: country.name,
-            country_code: country.code,
-            description: country.description,
-            image_url: '',
-            activities: [],
-            popularity_score: 75,
-            climate_info: {
-              average_temperature: '15-25°C',
-              rainy_months: [],
-              sunny_months: [],
-              climate_type: 'Temperate'
-            },
-            best_time_to_visit: [],
-            budget: {
-              level: 'mid-range',
-              daily_budget_range: country.priceRange,
-              currency: 'EUR'
-            },
-            timezone: 'Europe/London',
-            language: ['English'],
-            currency: 'EUR',
-            visa_required: false,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          flight_route: {
-            id: `${data.departureAirport}-${country.code}`,
-            origin_airport_code: data.departureAirport,
-            destination_airport_code: country.code,
-            estimated_duration_hours: Math.floor(country.averageFlightTime),
-            estimated_duration_minutes: Math.round((country.averageFlightTime % 1) * 60),
-            total_duration_minutes: country.averageFlightTime * 60,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          },
-          match_score: 85,
-          activity_matches: [data.selectedTheme] as any,
-          reason_for_recommendation: `Perfect for ${data.selectedTheme} activities`,
-          estimated_flight_price: country.priceRange
-        }))
-        
-        // Update store with mock results to maintain consistent state
-        setResults(mockResults)
-        setShowResults(true)
-        console.log(`Mock fallback successful: ${mockResults.length} destinations loaded`)
-        
-        // Navigate to results step
-        navigateToStep('results')
-      } else {
-        // Production: Show honest error, no fake data
-        const errorInfo = getErrorMessage(error, 'Destination search')
-        console.error('Production error - no fallback:', errorInfo.userMessage)
-        // Re-throw to let the UI handle the error state
-        throw new Error(errorInfo.userMessage)
-      }
+      // Show honest error, no fake data
+      const errorInfo = getErrorMessage(error, 'Destination search')
+      console.error('Error - no fallback available:', errorInfo.userMessage)
+      // Re-throw to let the UI handle the error state
+      throw new Error(errorInfo.userMessage)
     }
   }
   
@@ -405,6 +271,12 @@ export function LandingPageForm() {
     setSelectedFlight(null)
   }
 
+  const handleRetrySearch = () => {
+    if (formData) {
+      handleSubmit(formData)
+    }
+  }
+
   return (
     <div 
       className="h-screen w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
@@ -416,6 +288,8 @@ export function LandingPageForm() {
         width: '100vw'
       }}
     >
+      {/* Network Status Monitor */}
+      <NetworkStatus onRetry={handleRetrySearch} />
       {/* Header - Mobile Responsive */}
       <div className="absolute top-0 left-0 right-0 z-30 p-3 md:p-4 lg:p-6">
         <div className="flex items-center justify-between">

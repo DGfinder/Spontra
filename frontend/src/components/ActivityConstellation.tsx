@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Clock, DollarSign, Users, Calendar, Play, Video, Upload, Plus } from 'lucide-react'
+import { ArrowLeft, Clock, DollarSign, Users, Calendar, Play, Video, Plus } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { VideoModal } from './VideoModal'
-import { UGCUpload } from './UGCUpload'
 import { youtubeService, YouTubeVideo } from '../services/youtubeService'
 import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 import { DestinationRecommendation } from '@/services/apiClient'
@@ -38,10 +37,9 @@ interface ActivityCircleProps {
   position: { x: number; y: number }
   onClick?: () => void
   onVideoClick?: () => void
-  onUploadClick?: () => void
 }
 
-function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadClick }: ActivityCircleProps) {
+function ActivityCircle({ activity, position, onClick, onVideoClick }: ActivityCircleProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [showMobileDetails, setShowMobileDetails] = useState(false)
 
@@ -200,17 +198,6 @@ function ActivityCircle({ activity, position, onClick, onVideoClick, onUploadCli
                   </button>
                 )}
                 
-                {/* UGC Upload Button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onUploadClick?.()
-                  }}
-                  className="w-full bg-gradient-to-r from-yellow-400/20 to-orange-500/20 hover:from-yellow-400/30 hover:to-orange-500/30 text-yellow-300 border border-yellow-400/30 rounded px-3 py-1.5 text-xs font-medium transition-all duration-200 flex items-center justify-center space-x-1"
-                >
-                  <Plus size={10} />
-                  <span>Share Your Video</span>
-                </button>
               </div>
             </div>
 
@@ -246,8 +233,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
   const [selectedActivityForVideo, setSelectedActivityForVideo] = useState<ActivityOption | null>(null)
   const [isLoadingVideos, setIsLoadingVideos] = useState(false)
-  const [isUGCUploadOpen, setIsUGCUploadOpen] = useState(false)
-  const [selectedActivityForUpload, setSelectedActivityForUpload] = useState<ActivityOption | null>(null)
 
   // Sample activity data - in real implementation, this would come from the recommendation
   const baseActivities: ActivityOption[] = [
@@ -368,23 +353,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
     }
   }
 
-  const handleUGCUploadClick = (activity: ActivityOption) => {
-    setSelectedActivityForUpload(activity)
-    setIsUGCUploadOpen(true)
-  }
-
-  const handleCloseUGCUpload = () => {
-    setIsUGCUploadOpen(false)
-    setSelectedActivityForUpload(null)
-  }
-
-  const handleUploadComplete = (contentId: string) => {
-    console.log('UGC upload completed:', contentId)
-    // Refresh videos for the activity to include new UGC
-    if (selectedActivityForUpload) {
-      fetchVideosForActivities()
-    }
-  }
 
   // Calculate positions for activities in constellation pattern
   const getConstellationPositions = (count: number) => {
@@ -468,13 +436,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
           </div>
           
           <div className="flex space-x-2 sm:space-x-3">
-            <button 
-              onClick={() => setIsUGCUploadOpen(true)}
-              className="hidden sm:flex bg-white/10 hover:bg-white/20 text-white font-medium px-4 py-2 rounded-lg transition-all duration-300 items-center space-x-2"
-            >
-              <Upload size={16} />
-              <span>Share Experience</span>
-            </button>
             
             <button 
               onClick={() => onBookFlight?.(recommendation)}
@@ -510,7 +471,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
               position={positions[index]}
               onClick={() => onActivitySelect?.(activity)}
               onVideoClick={() => handleVideoClick(activity)}
-              onUploadClick={() => handleUGCUploadClick(activity)}
             />
           ))}
 
@@ -551,15 +511,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
         />
       )}
 
-      {/* UGC Upload Modal */}
-      <UGCUpload
-        isOpen={isUGCUploadOpen}
-        onClose={handleCloseUGCUpload}
-        activityId={selectedActivityForUpload?.id || ''}
-        destinationCode={recommendation.destination.airport_code}
-        destinationName={`${recommendation.destination.city_name}, ${recommendation.destination.country_name}`}
-        onUploadComplete={handleUploadComplete}
-      />
     </div>
   )
 }
