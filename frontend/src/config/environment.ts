@@ -470,4 +470,5 @@ export function getSecretOrThrow(key: keyof Environment): string {
   return value || ''
 }
 
-export default env
+// Note: Default export is environmentService (line 415), not env
+// Use named export for env: import { env } from './environment'

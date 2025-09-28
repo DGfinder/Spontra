@@ -134,6 +134,5 @@ export async function PUT(): Promise<NextResponse> {
 }
 
 export async function DELETE(): Promise<NextResponse> {
-  return NextResponse> {
   return NextResponse.json({ error: 'Method not allowed' }, { status: 405 })
 }
