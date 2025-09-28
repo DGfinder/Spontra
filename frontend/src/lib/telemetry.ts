@@ -8,7 +8,7 @@ import { NodeSDK } from '@opentelemetry/sdk-node'
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
 import { Resource } from '@opentelemetry/resources'
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions'
-import { JaegerExporter } from '@opentelemetry/exporter-jaeger'
+import { OTLPTraceExporter } from '@opentelemetry/exporter-otlp-http'
 import { ConsoleSpanExporter, BatchSpanProcessor } from '@opentelemetry/sdk-trace-node'
 import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics'
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
@@ -17,7 +17,7 @@ import { PrometheusExporter } from '@opentelemetry/exporter-prometheus'
 const isProduction = process.env.NODE_ENV === 'production'
 const serviceName = process.env.OTEL_SERVICE_NAME || 'spontra-frontend'
 const serviceVersion = process.env.OTEL_SERVICE_VERSION || '1.0.0'
-const jaegerEndpoint = process.env.JAEGER_ENDPOINT || 'http://localhost:14268/api/traces'
+const otlpEndpoint = process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || 'http://localhost:4318/v1/traces'
 const environment = process.env.ENVIRONMENT || 'development'
 
 // Custom span attributes
@@ -76,10 +76,10 @@ export function initializeTelemetry(): NodeSDK | null {
       // Configure span exporters
       spanProcessor: new BatchSpanProcessor(
         isProduction
-          ? new JaegerExporter({
-              endpoint: jaegerEndpoint,
+          ? new OTLPTraceExporter({
+              url: otlpEndpoint,
               headers: {
-                'Authorization': process.env.JAEGER_AUTH_TOKEN || ''
+                'Authorization': process.env.OTEL_EXPORTER_OTLP_HEADERS_AUTHORIZATION || ''
               }
             })
           : new ConsoleSpanExporter()

@@ -94,7 +94,7 @@ const nextConfig = {
   },
   
   experimental: {
-    serverComponentsExternalPackages: ['cassandra-driver'],
+    serverComponentsExternalPackages: ['cassandra-driver', '@opentelemetry/exporter-otlp-http'],
     // Modern bundling optimizations
     optimizePackageImports: [
       '@heroicons/react',
@@ -125,6 +125,10 @@ const nextConfig = {
         ...config.resolve.fallback,
         'cassandra-driver': false,
         uuid: false,
+        'ansi-color': false,
+        'bufrw': false,
+        'thriftrw': false,
+        'jaeger-client': false,
       }
     }
     
