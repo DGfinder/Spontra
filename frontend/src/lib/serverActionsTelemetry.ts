@@ -1,3 +1,4 @@
+import 'server-only'
 import { trace, context, SpanStatusCode } from '@opentelemetry/api'
 import { cacheSet, cacheGet } from './cacheServer'
 

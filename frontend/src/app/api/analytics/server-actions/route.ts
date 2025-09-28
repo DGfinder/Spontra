@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { telemetry } from '@/lib/serverActionsTelemetry'
 
-export const runtime = 'edge'
+export const runtime = 'nodejs'
 
 interface ServerActionMetrics {
   name: string
