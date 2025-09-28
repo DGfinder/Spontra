@@ -560,3 +560,146 @@ model ContentView {
   @@index([viewedAt])
   @@map("content_views")
 }
+
+// ============================================================================
+// METASEARCH CORE TABLES (Professional Metasearch Architecture)
+// ============================================================================
+
+model Provider {
+  id                String   @id @default(cuid())
+  providerId        String   // 'expedia' | 'kayak' | 'QF' | 'BA' | ...
+  market            String   // 'AU', 'NZ', 'SG' etc
+  network           String   // 'impact' | 'cj' | 'awin' | 'partnerize'
+  reliabilityScore  Float    @default(0.8) // 0..1
+  expectedEPC       Float    @default(0.0)
+  supportsInfants   Boolean  @default(true)
+  allowedAirlines   String?  // CSV of IATA codes or '*'
+  currencyModes     String?  // e.g. 'NATIVE,CONVERT'
+  isActive          Boolean  @default(true)
+
+  template          LinkTemplate?
+  clicks            Click[]
+  conversions       Conversion[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([providerId, market])
+  @@index([market, isActive])
+  @@index([expectedEPC])
+  @@map("providers")
+}
+
+model LinkTemplate {
+  id            String   @id @default(cuid())
+  providerIdRef String   @unique
+  provider      Provider @relation(fields: [providerIdRef], references: [id], onDelete: Cascade)
+  template      String   // e.g. 'https://...from={orig}&to={dest}&dd={depDate}...&aff_click_id={clickId}'
+  requiredTokens String  // JSON string array of tokens, e.g. '["orig","dest","depDate","adt","clickId"]'
+  notes         String?  // freeform docs
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("link_templates")
+}
+
+model Click {
+  id           String   @id @default(cuid())
+  clickId      String   @unique
+  providerRef  String   // References Provider.id
+  providerId   String   // Store the providerId for queries
+  offerId      String
+  queryHash    String
+  priceShown   Decimal  @db.Decimal(18,2)
+  currency     String
+  market       String
+  sessionId    String?
+  userAgent    String?
+  ipHash       String?   // store a hash, not the IP
+  landed200    Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+
+  provider     Provider      @relation(fields: [providerRef], references: [id], map: "click_provider_fkey")
+  conversions  Conversion[]
+  
+  @@index([providerId, market, createdAt])
+  @@index([sessionId])
+  @@index([clickId])
+  @@map("clicks")
+}
+
+model Conversion {
+  id          String   @id @default(cuid())
+  clickId     String
+  status      String   // 'APPROVED'|'PENDING'|'REJECTED'
+  commission  Decimal  @db.Decimal(18,2)
+  saleAmount  Decimal? @db.Decimal(18,2)
+  currency    String
+  providerRef String   // References Provider.id
+  providerId  String   // Store the providerId for queries
+  rawPayload  String?  // JSON blob for audits
+  createdAt   DateTime @default(now())
+
+  click       Click    @relation(fields: [clickId], references: [clickId], onDelete: Cascade)
+  provider    Provider @relation(fields: [providerRef], references: [id], map: "conversion_provider_fkey")
+
+  @@index([providerId, createdAt])
+  @@index([status, createdAt])
+  @@map("conversions")
+}
+
+// Offer caching with deduplication support
+model OfferCache {
+  id            String   @id @default(cuid())
+  queryHash     String   @db.VarChar(64)
+  market        String   @db.VarChar(2)
+  query         Json     // NormalizedQuery
+  offers        Json     // FlightOffer[]
+  offerCount    Int      @default(0)
+  dataSource    String   @default("amadeus")
+  isStale       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  
+  @@index([queryHash])
+  @@index([market, createdAt])
+  @@index([expiresAt, isStale])
+  @@map("offer_cache")
+}
+
+// Provider monitoring and synthetic testing
+model SyntheticCheck {
+  id              String   @id @default(cuid())
+  providerId      String
+  market          String
+  testQuery       Json     // test query parameters
+  statusCode      Int?
+  responseTimeMs  Int?
+  finalHost       String?
+  titleHash       String?  // hash of landing page title for consistency
+  errorMessage    String?
+  isHealthy       Boolean  @default(true)
+  checkedAt       DateTime @default(now())
+  
+  @@index([providerId, market, checkedAt])
+  @@index([isHealthy, checkedAt])
+  @@map("synthetic_checks")
+}
+
+// Price accuracy tracking
+model PriceAccuracy {
+  id                String   @id @default(cuid())
+  providerId        String
+  offerId           String
+  originalPrice     Decimal  @db.Decimal(18,2)
+  repricedPrice     Decimal? @db.Decimal(18,2)
+  currency          String
+  priceChanged      Boolean  @default(false)
+  percentageChange  Decimal? @db.Decimal(5,2)
+  checkType         String   // 'on_select' | 'scheduled'
+  checkedAt         DateTime @default(now())
+  
+  @@index([providerId, checkedAt])
+  @@index([priceChanged, checkedAt])
+  @@map("price_accuracy")
+}
