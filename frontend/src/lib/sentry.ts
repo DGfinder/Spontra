@@ -249,8 +249,10 @@ export function withSentryErrorBoundary<T extends React.ComponentType<any>>(
     showDialog?: boolean
   }
 ): T {
+  const fallbackComponent = options?.fallback || (() => React.createElement('div', null, 'Something went wrong'))
+  
   return Sentry.withErrorBoundary(Component, {
-    fallback: options?.fallback || (() => <div>Something went wrong</div>),
+    fallback: fallbackComponent,
     showDialog: options?.showDialog || false,
   }) as T
 }

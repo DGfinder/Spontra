@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { cacheSet, cacheGet } from '@/lib/cacheServer'
+import { cacheSet, cacheGet } from '@/lib/cacheEdge'
 
 export const runtime = 'edge'
 
