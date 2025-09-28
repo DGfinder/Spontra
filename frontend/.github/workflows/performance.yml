@@ -1,0 +1,268 @@
+name: Performance Testing
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.*'
+      - 'tailwind.config.*'
+      - '.github/workflows/performance.yml'
+  push:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  lighthouse-ci:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          # Production-like environment variables
+          NODE_ENV: production
+          NEXT_TELEMETRY_DISABLED: 1
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          # Add any required environment variables for your app
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: lighthouse-reports/
+          retention-days: 30
+
+  bundle-analysis:
+    name: Bundle Size Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for analysis
+        run: |
+          npm run build
+          npm run analyze:bundle
+        env:
+          NODE_ENV: production
+          ANALYZE: true
+
+      - name: Check bundle sizes
+        run: npm run perf:budget
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-analysis
+          path: |
+            .next/analyze/
+            bundlesize-report.json
+          retention-days: 30
+
+      - name: Comment bundle size
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            
+            try {
+              // Read bundle analysis results
+              const analysisPath = '.next/analyze/client.html';
+              const bundlesizePath = 'bundlesize-report.json';
+              
+              let comment = '## 📦 Bundle Size Analysis\n\n';
+              
+              // Check if bundlesize passed
+              if (fs.existsSync(bundlesizePath)) {
+                const bundleReport = JSON.parse(fs.readFileSync(bundlesizePath, 'utf8'));
+                
+                comment += '### Bundle Size Check\n';
+                if (bundleReport.pass) {
+                  comment += '✅ All bundles are within size limits\n\n';
+                } else {
+                  comment += '❌ Some bundles exceed size limits:\n\n';
+                  bundleReport.results?.forEach(result => {
+                    if (!result.pass) {
+                      comment += `- \`${result.path}\`: ${result.size} (limit: ${result.maxSize})\n`;
+                    }
+                  });
+                  comment += '\n';
+                }
+              }
+              
+              comment += '### Bundle Analysis Report\n';
+              comment += `View detailed bundle analysis in the [artifacts](${context.payload.pull_request.html_url}/checks).\n\n`;
+              
+              comment += '---\n';
+              comment += '*This comment will be updated on each push.*';
+              
+              // Post or update comment
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+              });
+              
+              const existingComment = comments.find(
+                comment => comment.user.type === 'Bot' && comment.body.includes('Bundle Size Analysis')
+              );
+              
+              if (existingComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existingComment.id,
+                  body: comment,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment,
+                });
+              }
+            } catch (error) {
+              console.error('Error creating bundle size comment:', error);
+            }
+
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and start server
+        run: |
+          npm run build
+          npm start &
+          sleep 10
+        env:
+          NODE_ENV: production
+
+      - name: Run performance audit
+        run: |
+          npm install -g lighthouse@12.x
+          npm run perf:audit
+          
+          # Extract key metrics
+          node -e "
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('lighthouse-results.json'));
+            const metrics = {
+              lcp: report.audits['largest-contentful-paint'].numericValue,
+              cls: report.audits['cumulative-layout-shift'].numericValue,
+              tbt: report.audits['total-blocking-time'].numericValue,
+              fcp: report.audits['first-contentful-paint'].numericValue,
+              speedIndex: report.audits['speed-index'].numericValue
+            };
+            fs.writeFileSync('metrics.json', JSON.stringify(metrics, null, 2));
+            console.log('Performance metrics:', metrics);
+          "
+
+      - name: Comment performance results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              const metrics = JSON.parse(fs.readFileSync('metrics.json', 'utf8'));
+              
+              // Define thresholds (good/needs improvement/poor)
+              const thresholds = {
+                lcp: { good: 2500, poor: 4000 },
+                cls: { good: 0.1, poor: 0.25 },
+                tbt: { good: 200, poor: 600 },
+                fcp: { good: 1800, poor: 3000 },
+                speedIndex: { good: 3400, poor: 5800 }
+              };
+              
+              let comment = '## ⚡ Performance Audit Results\n\n';
+              comment += '| Metric | Value | Rating |\n';
+              comment += '|--------|-------|--------|\n';
+              
+              Object.entries(metrics).forEach(([key, value]) => {
+                const threshold = thresholds[key];
+                let rating = '🟢 Good';
+                
+                if (value > threshold.poor) {
+                  rating = '🔴 Poor';
+                } else if (value > threshold.good) {
+                  rating = '🟡 Needs Improvement';
+                }
+                
+                const unit = key === 'cls' ? '' : 'ms';
+                comment += `| ${key.toUpperCase()} | ${Math.round(value)}${unit} | ${rating} |\n`;
+              });
+              
+              comment += '\n### Thresholds\n';
+              comment += '- 🟢 Good: Core Web Vitals pass\n';
+              comment += '- 🟡 Needs Improvement: Some optimization needed\n';
+              comment += '- 🔴 Poor: Significant performance issues\n\n';
+              
+              comment += '---\n';
+              comment += '*Run `npm run perf:audit` locally for detailed analysis.*';
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment,
+              });
+            } catch (error) {
+              console.error('Error creating performance comment:', error);
+            }

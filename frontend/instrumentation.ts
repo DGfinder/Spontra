@@ -1,21 +1,21 @@
 /**
- * Next.js Instrumentation File
+ * Next.js 15 Instrumentation Hook (Stable)
  * Automatically initializes OpenTelemetry when the application starts
- * This file is automatically loaded by Next.js in both server and edge environments
+ * This instrumentation hook is now stable in Next.js 15
  */
 
-import { initializeTelemetry } from './src/lib/telemetry'
-
 export async function register() {
-  // Only initialize in Node.js environment (not in browser or edge runtime)
-  if (typeof window === 'undefined' && process.env.EDGE_RUNTIME !== 'edge') {
-    console.log('🔧 Initializing OpenTelemetry instrumentation...')
+  // Only initialize in Node.js runtime (Next.js 15 check)
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    console.log('🔧 Initializing OpenTelemetry instrumentation via Next.js 15 hook...')
     
     try {
+      // Dynamic import to prevent bundling issues
+      const { initializeTelemetry } = await import('./src/lib/telemetry')
       const sdk = initializeTelemetry()
       
       if (sdk) {
-        console.log('✅ OpenTelemetry instrumentation initialized successfully')
+        console.log('✅ OpenTelemetry instrumentation initialized successfully with Next.js 15')
         
         // Add process-level event handlers for graceful shutdown
         process.on('SIGTERM', async () => {
