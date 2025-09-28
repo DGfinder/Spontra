@@ -4,6 +4,8 @@ import { trackAnalyticsOperation, addCorrelationIds, getTraceContext } from '@/l
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
+export const runtime = 'nodejs'
+
 const metricsQuerySchema = z.object({
   period: z.enum(['1h', '24h', '7d', '30d']).default('24h'),
   provider: z.string().optional(),
@@ -18,7 +20,7 @@ const metricsQuerySchema = z.object({
   ])).default(['conversion', 'provider', 'route', 'revenue'])
 })
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   return trackAnalyticsOperation(
     'business_metrics',
     async (span) => {
@@ -244,7 +246,7 @@ export async function GET(request: NextRequest) {
 }
 
 // POST endpoint for real-time metric calculations (heavy operations)
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   return trackAnalyticsOperation(
     'business_metrics_realtime',
     async (span) => {
