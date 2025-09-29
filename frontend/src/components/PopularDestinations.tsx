@@ -81,11 +81,11 @@ export function PopularDestinations() {
                 </div>
                 
                 <div className="p-0">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
                     {destination.city}
                   </h3>
                   <p className="text-gray-600 mb-2">{destination.country}</p>
-                  <p className="text-primary-600 font-semibold">{destination.price}</p>
+                  <p className="text-blue-600 font-semibold">{destination.price}</p>
                 </div>
               </div>
             </Link>

@@ -82,8 +82,6 @@ export async function register() {
             return event
           },
           
-          captureUnhandledRejections: true,
-          
           initialScope: {
             tags: {
               component: 'server',
