@@ -432,9 +432,11 @@ Examples:
 }
 
 // Export for programmatic use
-export { generateApiDocs, GenerateOptions }
+export { generateApiDocs }
+export type { GenerateOptions }
 
 // Run CLI if called directly
 if (require.main === module) {
   main().catch(console.error)
 }
+
