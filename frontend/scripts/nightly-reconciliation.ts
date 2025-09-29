@@ -6,6 +6,24 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const providerRefCache = new Map<string, string | null>();
+
+async function resolveProviderRef(providerId: string) {
+  const key = providerId.trim();
+  if (!key) return null;
+  if (providerRefCache.has(key)) {
+    return providerRefCache.get(key) ?? null;
+  }
+  const provider = await prisma.provider.findFirst({ where: { providerId: key } });
+  if (!provider) {
+    console.warn(`[reconcile] Unknown providerId "${key}"; skipping conversion.`);
+    providerRefCache.set(key, null);
+    return null;
+  }
+  providerRefCache.set(key, provider.id);
+  return provider.id;
+}
+
 /**
  * Supports two modes per network:
  * 1) CSV file paths via env (offline export)
@@ -92,6 +110,8 @@ async function upsertConversion(
   rawPayload: any
 ) {
   if (!clickId) return 0;
+  const providerRef = await resolveProviderRef(providerId);
+  if (!providerRef) return 0;
   try {
     await prisma.conversion.create({
       data: {
@@ -100,12 +120,13 @@ async function upsertConversion(
         commission: amount,
         currency,
         providerId,
+        providerRef,
         rawPayload: JSON.stringify(rawPayload).slice(0, 8000),
       },
     });
     return 1;
   } catch {
-    // duplicate or constraint – ignore
+    // duplicate or constraint violation - ignore
     return 0;
   }
 }
