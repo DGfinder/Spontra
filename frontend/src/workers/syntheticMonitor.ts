@@ -182,7 +182,7 @@ class SyntheticMonitor {
             data: {
               providerId: provider.providerId,
               market: provider.market,
-              testQuery: TEST_QUERIES[testType],
+              testQuery: TEST_QUERIES[testType] as any,
               statusCode: result.statusCode,
               responseTimeMs: result.responseTimeMs,
               finalHost: result.finalHost,

@@ -415,7 +415,11 @@ async function validateClickDeduplication() {
         clickId: `click-1-${Date.now()}`,
         sessionId: testSessionId,
         offerId: testOfferId,
+        providerRef: testProviderId,
         providerId: testProviderId,
+        queryHash: 'test-query-hash',
+        priceShown: 100.00,
+        currency: 'GBP',
         market: 'GB',
         ipHash: 'test-ip-hash',
         userAgent: 'test-agent'
@@ -429,7 +433,11 @@ async function validateClickDeduplication() {
           clickId: `click-2-${Date.now()}`,
           sessionId: testSessionId,
           offerId: testOfferId,
+          providerRef: testProviderId,
           providerId: testProviderId,
+          queryHash: 'test-query-hash',
+          priceShown: 100.00,
+          currency: 'GBP',
           market: 'GB',
           ipHash: 'test-ip-hash',
           userAgent: 'test-agent'

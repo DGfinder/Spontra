@@ -1,4 +1,4 @@
-import { withSentryConfig } from '@sentry/nextjs'
+﻿import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
@@ -302,3 +302,4 @@ const sentryConfig = {
 export default process.env.NEXT_PUBLIC_SENTRY_DSN
   ? withSentryConfig(nextConfig, sentryConfig)
   : nextConfig
+

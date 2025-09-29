@@ -283,7 +283,7 @@ async function runSyntheticMonitoring(): Promise<void> {
         data: {
           providerId: result.providerId,
           market: result.market,
-          testQuery: TEST_QUERIES[result.market],
+          testQuery: TEST_QUERIES[result.market] as any,
           statusCode: result.statusCode,
           responseTimeMs: result.responseTimeMs,
           finalHost: result.finalHost,

@@ -232,9 +232,6 @@ const config: Config = {
   future: {
     hoverOnlyWhenSupported: true,
   },
-  experimental: {
-    optimizeUniversalDefaults: true,
-  },
 }
 
 export default config
