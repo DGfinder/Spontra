@@ -13,7 +13,7 @@
 
 import { PrismaClient } from '@prisma/client';
 import { runValidationSuite } from './go-live-validation';
-import { runSyntheticMonitoring } from './synthetic-worker';
+import { runSyntheticMonitoring } from './synthetic-monitor-cron';
 
 const prisma = new PrismaClient();
 
