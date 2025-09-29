@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger'
 
 export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   return trackExternalAPI(
     'health_check',
     'detailed_health',
