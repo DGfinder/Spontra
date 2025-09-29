@@ -97,7 +97,7 @@ export async function exploreDestinationsAction(
     if (!validation.success) {
       return {
         success: false,
-        error: 'Invalid destination search parameters: ' + (validation.errors || []).join(', ')
+        error: 'Invalid destination search parameters: ' + Object.values(validation.errors || {}).join(', ')
       }
     }
 
