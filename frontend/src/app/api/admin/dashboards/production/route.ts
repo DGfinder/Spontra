@@ -345,7 +345,11 @@ async function getSecurityDashboard(timeRange: string) {
       success: false
     },
     _count: true,
-    orderBy: { _count: 'desc' },
+    orderBy: {
+      _count: {
+        _all: 'desc'
+      }
+    },
     take: 20
   });
 
@@ -370,7 +374,11 @@ async function getSecurityDashboard(timeRange: string) {
     by: ['ipAddress', 'endpoint'],
     where: { createdAt: { gte: since } },
     _count: true,
-    orderBy: { _count: 'desc' },
+    orderBy: {
+      _count: {
+        _all: 'desc'
+      }
+    },
     take: 20
   });
 
