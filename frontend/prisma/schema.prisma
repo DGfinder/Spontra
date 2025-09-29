@@ -902,3 +902,77 @@ model PriceAccuracy {
   @@index([priceChanged, checkedAt])
   @@map("price_accuracy")
 }
+
+// ============================================================================
+// SECURITY AND MONITORING MODELS (For Production Dashboard)
+// ============================================================================
+
+// Authentication failure logging
+model AuthLog {
+  id          String   @id @default(cuid())
+  ipAddress   String
+  reason      String   // 'invalid_password' | 'user_not_found' | 'account_locked' | 'mfa_failed'
+  success     Boolean  @default(false)
+  userAgent   String?
+  sessionId   String?
+  userId      String?
+  createdAt   DateTime @default(now())
+  
+  @@index([ipAddress, success])
+  @@index([createdAt])
+  @@index([success, createdAt])
+  @@map("auth_logs")
+}
+
+// Postback verification logging  
+model PostbackLog {
+  id          String   @id @default(cuid())
+  network     String   // 'impact' | 'cj' | 'awin' | 'partnerize'
+  ipAddress   String
+  verified    Boolean  @default(false)
+  reason      String?  // verification failure reason
+  signature   String?  // partial signature for debugging
+  payload     String?  // partial payload for debugging
+  createdAt   DateTime @default(now())
+  
+  @@index([network, verified])
+  @@index([ipAddress, verified])
+  @@index([createdAt])
+  @@index([verified, createdAt])
+  @@map("postback_logs")
+}
+
+// Rate limiting violations
+model RateLimitLog {
+  id          String   @id @default(cuid())
+  ipAddress   String
+  endpoint    String
+  violations  Int      @default(1)
+  userAgent   String?
+  sessionId   String?
+  createdAt   DateTime @default(now())
+  
+  @@index([ipAddress, endpoint])
+  @@index([endpoint, createdAt])
+  @@index([createdAt])
+  @@map("rate_limit_logs")
+}
+
+// API endpoint monitoring
+model ApiLog {
+  id               String   @id @default(cuid())
+  endpoint         String
+  method           String   // GET, POST, PUT, DELETE
+  statusCode       Int
+  responseTimeMs   Int?
+  userAgent        String?
+  ipAddress        String?
+  userId           String?
+  createdAt        DateTime @default(now())
+  
+  @@index([endpoint, statusCode])
+  @@index([statusCode, createdAt])
+  @@index([createdAt])
+  @@index([endpoint, createdAt])
+  @@map("api_logs")
+}

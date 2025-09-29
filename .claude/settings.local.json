@@ -67,7 +67,9 @@
       "Bash(npx prisma:*)",
       "Bash(DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" DIRECT_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npx prisma validate)",
       "Bash(export DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\")",
-      "Bash(export DIRECT_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\")"
+      "Bash(export DIRECT_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\")",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate deploy)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx tsc --noEmit --skipLibCheck src/app/api/admin/dashboards/production/route.ts src/app/api/admin/dashboards/daily-ops/route.ts)"
     ],
     "deny": []
   }

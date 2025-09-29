@@ -133,10 +133,10 @@ export async function GET(req: NextRequest): Promise<Response> {
   const synthRows = await prisma.$queryRaw<Row[]>`
     SELECT "providerId","market",
            COUNT(*) AS checks,
-           COUNT(*) FILTER (WHERE ok = false) AS failures,
-           ROUND(100.0 * COUNT(*) FILTER (WHERE ok=false) / NULLIF(COUNT(*),0),1) AS pct_fail
-    FROM "SyntheticCheck"
-    WHERE "createdAt" >= NOW() - INTERVAL '15 minutes'
+           COUNT(*) FILTER (WHERE "isHealthy" = false) AS failures,
+           ROUND(100.0 * COUNT(*) FILTER (WHERE "isHealthy"=false) / NULLIF(COUNT(*),0),1) AS pct_fail
+    FROM "synthetic_checks"
+    WHERE "checkedAt" >= NOW() - INTERVAL '15 minutes'
     GROUP BY 1,2 ORDER BY pct_fail DESC;
   `.catch(() => []);
 
