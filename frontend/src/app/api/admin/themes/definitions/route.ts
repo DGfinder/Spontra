@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 // GET /api/admin/themes/definitions -> proxy to data-ingestion service
-export async function GET() {
+export async function GET(): Promise<Response> {
   try {
     // The apiClient base points at data-ingestion (8081) per config
     const res = await fetch(`${process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'}/api/v1/themes/definitions`, { cache: 'no-store' })
@@ -19,7 +19,7 @@ export async function GET() {
 }
 
 // POST /api/admin/themes/definitions -> create/update
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json()
     const res = await fetch(`${process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'}/api/v1/themes/definitions`, {

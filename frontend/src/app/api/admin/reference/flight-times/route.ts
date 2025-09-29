@@ -6,7 +6,7 @@ export const revalidate = 0
 
 const base = process.env.NEXT_PUBLIC_SEARCH_SERVICE_URL || 'http://localhost:8084'
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url)
     const origin = searchParams.get('origin') || ''

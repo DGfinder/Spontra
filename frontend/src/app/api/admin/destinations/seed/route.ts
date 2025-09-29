@@ -40,7 +40,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function POST() {
+export async function POST(): Promise<Response> {
   const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL || 'postgres://spontra:development@localhost/spontra?sslmode=disable'
   const cassHosts = (process.env.CASSANDRA_HOSTS || 'localhost:9042').split(',')
   const origin = (process.env.SEED_ORIGIN || 'LHR').toUpperCase()

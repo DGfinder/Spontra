@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -80,8 +80,12 @@ interface PageProps {
   params: Promise<{ iata: string }>
 }
 
-export default async function DestinationDetailPage({ params }: PageProps) {
-  const { iata } = await params
+export default function DestinationDetailPage({ params }: PageProps) {
+  const [iata, setIata] = useState<string>('')
+  
+  useEffect(() => {
+    params.then(p => setIata(p.iata))
+  }, [params])
   const router = useRouter()
   const searchParams = useSearchParams()
   const { addToast } = useToast()
@@ -321,6 +325,15 @@ export default async function DestinationDetailPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  // Show loading until we have the iata parameter
+  if (!iata) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader className="h-8 w-8 animate-spin" />
       </div>
     )
   }

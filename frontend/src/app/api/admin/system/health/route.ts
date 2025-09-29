@@ -4,8 +4,9 @@ import { AdminAuthError, requireAdminContext } from '@/lib/adminAuth'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
+export const runtime = 'nodejs'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     await requireAdminContext(request)
 

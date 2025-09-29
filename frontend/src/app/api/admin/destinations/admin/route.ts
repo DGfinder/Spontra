@@ -7,7 +7,7 @@ export const revalidate = 0
 
 // GET /api/admin/destinations/admin
 // Aggregates destinations from backend (same logic as earlier route)
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url)
     const country = searchParams.get('country') || undefined

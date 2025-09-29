@@ -26,7 +26,7 @@ function buildAdminUserResponse(dbUser: any): AdminUser {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     // Get session token from cookie or Authorization header
     const cookieToken = request.cookies.get(ADMIN_SESSION_COOKIE)?.value

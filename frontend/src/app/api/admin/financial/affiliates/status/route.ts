@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { adminAuthService } from '@/services/adminAuthService'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     // Verify admin authentication
     const authHeader = request.headers.get('authorization')

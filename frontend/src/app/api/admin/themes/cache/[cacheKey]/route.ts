@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 // DELETE /api/admin/themes/cache/[cacheKey]
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ cacheKey: string }> }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ cacheKey: string }> }): Promise<Response> {
   try {
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
     const resolvedParams = await params

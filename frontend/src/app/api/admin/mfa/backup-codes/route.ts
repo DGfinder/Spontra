@@ -14,7 +14,7 @@ const regenerateSchema = z.object({
   action: z.literal('regenerate')
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     const adminContext = await requireAdminContext(request)
     const body = regenerateSchema.parse(await request.json())

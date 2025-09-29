@@ -14,7 +14,7 @@ function key(dest: string, activity: string) {
   return `admin:media:videos:${dest}:${activity || 'all'}`
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url)
     const destination = (searchParams.get('destination') || '').toUpperCase()
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     if (!requireAdmin(req)) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     const payload = await req.json()

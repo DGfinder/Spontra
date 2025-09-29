@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
+export const runtime = 'nodejs'
 
 import { requireAdminContext, AdminAuthError } from '@/lib/adminAuth'
 import { getAdminDbClient } from '@/lib/dbAdmin'
@@ -21,7 +21,7 @@ const patchBodySchema = z.object({
   license: z.string().max(200).nullable().optional(),
 })
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   try {
     const admin = await requireAdminContext(request)
     const { id } = paramsSchema.parse(await params)

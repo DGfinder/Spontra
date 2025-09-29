@@ -12,7 +12,7 @@ const circuitBreakerActionSchema = z.object({
   reason: z.string().optional()
 })
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   return trackAdminOperation(
     'circuit_breaker_status',
     async (span) => {
@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
   )
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   return trackAdminOperation(
     'circuit_breaker_action',
     async (span) => {

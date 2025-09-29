@@ -18,7 +18,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url)
   const q = (searchParams.get('q') || '').trim()
   const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10) || 20, 50)

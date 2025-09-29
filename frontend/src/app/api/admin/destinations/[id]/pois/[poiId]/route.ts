@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { 
   PointOfInterest, 
   UpdatePOIRequest,
@@ -218,7 +221,7 @@ function deletePOI(poiId: string): boolean {
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; poiId: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {
@@ -279,7 +282,7 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; poiId: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {
@@ -372,7 +375,7 @@ export async function PUT(
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; poiId: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {
@@ -450,7 +453,7 @@ export async function PATCH(
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string; poiId: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {

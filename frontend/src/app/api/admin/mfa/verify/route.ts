@@ -14,7 +14,7 @@ const verifySchema = z.object({
   code: z.string().min(6, 'Code must be at least 6 characters').max(8, 'Code must be at most 8 characters')
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     const adminContext = await requireAdminContext(request)
     const body = verifySchema.parse(await request.json())

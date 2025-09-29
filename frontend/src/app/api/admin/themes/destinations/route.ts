@@ -8,7 +8,7 @@ const base = process.env.NEXT_PUBLIC_DATA_INGESTION_URL || process.env.API_BASE_
 
 // POST /api/admin/themes/destinations
 // Body: { origin: string, theme: string, maxFlightTime?: number, minScore?: number, limit?: number }
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body = await req.json()
     const payload = {

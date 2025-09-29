@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
+export const runtime = 'nodejs'
 
 import { requireAdminContext, AdminAuthError } from '@/lib/adminAuth'
 import { getAdminDbClient } from '@/lib/dbAdmin'
@@ -68,7 +68,7 @@ function mapReelRow(row: any) {
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }): Promise<Response> {
   try {
     const admin = await requireAdminContext(request)
     const { id, theme } = paramsSchema.parse(await params)
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }): Promise<Response> {
   try {
     const admin = await requireAdminContext(request)
     const { id, theme } = paramsSchema.parse(await params)

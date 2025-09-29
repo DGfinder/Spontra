@@ -26,7 +26,7 @@ interface PopularSearch {
   recency_category: string
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10) || 20, 100)
 

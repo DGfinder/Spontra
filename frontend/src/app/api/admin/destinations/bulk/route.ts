@@ -13,7 +13,7 @@ interface BulkUpdateRequest {
 
 // POST /api/admin/destinations/bulk
 // Handle bulk operations on destinations
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     const body: BulkUpdateRequest = await req.json()
     const { action, destinationIds, updates = {} } = body

@@ -9,7 +9,7 @@ import { ADMIN_SESSION_COOKIE } from '@/lib/adminAuth'
 import { adminRepository } from '@/lib/adminRepository'
 import { trackError } from '@/lib/monitoring'
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     // Get session token from cookie
     const sessionToken = request.cookies.get(ADMIN_SESSION_COOKIE)?.value

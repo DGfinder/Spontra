@@ -9,7 +9,7 @@ import { requireAdminContext } from '@/lib/adminAuth'
 import { adminRepository } from '@/lib/adminRepository'
 import { trackError } from '@/lib/monitoring'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     const adminContext = await requireAdminContext(request)
 

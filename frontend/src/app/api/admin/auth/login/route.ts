@@ -77,7 +77,7 @@ function buildAdminUserResponse(dbUser: any): AdminUser {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     const body = bodySchema.parse(await request.json())
     

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 // PATCH /api/admin/themes/definitions/[key]
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ key: string }> }): Promise<Response> {
   try {
     const body = await req.json()
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ ke
 }
 
 // DELETE /api/admin/themes/definitions/[key]
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ key: string }> }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ key: string }> }): Promise<Response> {
   try {
     const base = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8081'
     const resolvedParams = await params

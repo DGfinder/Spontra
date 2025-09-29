@@ -15,7 +15,7 @@ function adminBase(): string | null {
   return base ? base.replace(/\/$/, '') : null
 }
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   const base = adminBase()
   if (!base) return NextResponse.json({ success: false, error: 'POI admin service unavailable' }, { status: 503 })
   const token = requireAuth(req)

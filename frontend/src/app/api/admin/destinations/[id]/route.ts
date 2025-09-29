@@ -21,7 +21,7 @@ const themeRowSchema = z.object({
   is_ready: z.boolean().nullable(),
 })
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<Response> {
   try {
     await requireAdminContext(request)
     const { id } = paramsSchema.parse(await params)

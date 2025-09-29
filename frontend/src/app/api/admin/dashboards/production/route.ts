@@ -11,9 +11,11 @@ import { getProviderHealthSummary } from '@/lib/syntheticMonitorPro';
 import { getPriceAccuracyDashboard } from '@/lib/priceAccuracyThrottling';
 import { getRolloutDashboard } from '@/lib/rolloutConfiguration';
 
+export const runtime = 'nodejs';
+
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   const startTime = Date.now();
   
   try {

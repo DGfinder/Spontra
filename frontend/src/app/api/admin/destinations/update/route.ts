@@ -20,7 +20,7 @@ const updateSchema = z.object({
   hero_image: z.string().url().optional(),
 })
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     const admin = await requireAdminContext(req)
     const payload = updateSchema.parse(await req.json())

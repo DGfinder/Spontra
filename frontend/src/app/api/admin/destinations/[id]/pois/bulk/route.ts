@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { 
   PointOfInterest,
   BulkPOIOperation,
@@ -245,7 +248,7 @@ function validateBulkOperation(operation: BulkPOIOperation): { isValid: boolean;
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {
@@ -380,7 +383,7 @@ export async function POST(
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
-) {
+): Promise<Response> {
   try {
     // Validate admin authentication
     if (!(await validateAdminAuth(request))) {

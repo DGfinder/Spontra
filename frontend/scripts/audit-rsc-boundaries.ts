@@ -128,8 +128,14 @@ function analyzeFile(filePath: string, content: string): ImportIssue[] {
     // Check for client-only imports in server components
     if (componentType === 'server' || filePath.includes('/app/')) {
       // React hooks usage
-      const hookMatches = line.match(HOOK_PATTERNS)
-      if (hookMatches) {
+      const hookMatches: string[] = []
+      HOOK_PATTERNS.forEach(pattern => {
+        const matches = line.match(pattern)
+        if (matches) {
+          hookMatches.push(...matches)
+        }
+      })
+      if (hookMatches.length > 0) {
         hookMatches.forEach(hook => {
           issues.push({
             file: filePath,

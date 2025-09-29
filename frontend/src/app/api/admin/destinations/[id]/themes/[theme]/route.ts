@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
-
+export const runtime = 'nodejs'
 
 import { requireAdminContext, AdminAuthError } from '@/lib/adminAuth'
 import { getAdminDbClient } from '@/lib/dbAdmin'
@@ -27,7 +27,7 @@ const bodySchema = z
     message: 'Payload must include at least one field to update',
   })
 
-export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string; theme: string }> }): Promise<Response> {
   try {
     const admin = await requireAdminContext(request)
     const { id, theme } = paramsSchema.parse(await params)

@@ -15,7 +15,7 @@ const setupSchema = z.object({
   verificationCode: z.string().optional()
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     const adminContext = await requireAdminContext(request)
     const body = setupSchema.parse(await request.json())

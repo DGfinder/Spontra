@@ -42,7 +42,7 @@ function mapThemeReadiness(rows: any[]) {
   return readiness
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     const admin = await requireAdminContext(request)
     const query = querySchema.safeParse(Object.fromEntries(request.nextUrl.searchParams))

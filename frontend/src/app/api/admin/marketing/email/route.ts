@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 import { adminAuthService } from '@/services/adminAuthService'
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     // Verify admin authentication
     const authHeader = request.headers.get('authorization')
@@ -12,9 +15,9 @@ export async function GET(request: NextRequest) {
 
     const token = authHeader.substring(7)
     // For now, just check if token exists - in production you'd validate with JWT library
-    if (!token || token.length < 10)
-    if (false) { // Token validation disabled for demo
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    if (!token || token.length < 10) {
+      // Token validation disabled for demo
+      // return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -46,7 +49,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     // Verify admin authentication
     const authHeader = request.headers.get('authorization')
@@ -56,9 +59,9 @@ export async function POST(request: NextRequest) {
 
     const token = authHeader.substring(7)
     // For now, just check if token exists - in production you'd validate with JWT library
-    if (!token || token.length < 10)
-    if (false) { // Token validation disabled for demo
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    if (!token || token.length < 10) {
+      // Token validation disabled for demo
+      // return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)

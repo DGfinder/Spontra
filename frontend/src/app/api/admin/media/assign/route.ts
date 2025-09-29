@@ -15,7 +15,7 @@ function key(dest: string) {
 }
 
 // GET /api/admin/media/assign?destination=XXX
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url)
     const destination = (searchParams.get('destination') || '').toUpperCase()
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 }
 
 // POST /api/admin/media/assign  body: { destination: IATA, assignments: Record<poiId, Record<theme, VideoItem[]>> }
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     if (!requireAdmin(req)) return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     const body = await req.json()

@@ -18,7 +18,7 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<Response> {
   const pgUrl = process.env.SEARCH_DATABASE_URL || process.env.DATABASE_URL
   if (!pgUrl) {
     return NextResponse.json({ ok: false, error: 'Database URL not configured' }, { status: 503 })

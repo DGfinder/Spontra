@@ -3,6 +3,8 @@ import { prisma } from "@/server/db";
 import { sendBatchAlerts, AlertType } from "@/lib/alerts";
 import { checkRateLimit } from "@/lib/rateLimit";
 
+export const runtime = 'nodejs';
+
 type Row = Record<string, any>;
 const toNum = (v: any) => (v == null ? 0 : Number(v));
 
@@ -21,7 +23,7 @@ function unauthorized(msg = "UNAUTHORIZED") {
  * 
  * SECURED: Requires ADMIN_API_KEY header and optional IP filtering
  */
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   // Authentication: API key required
   const key = req.headers.get("x-api-key");
   if (process.env.ADMIN_API_KEY && key !== process.env.ADMIN_API_KEY) {

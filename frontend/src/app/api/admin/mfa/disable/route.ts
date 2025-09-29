@@ -15,7 +15,7 @@ const disableSchema = z.object({
   targetUserId: z.string().optional() // For super admins to disable MFA for other admins
 })
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     const adminContext = await requireAdminContext(request)
     const body = disableSchema.parse(await request.json())

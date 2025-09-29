@@ -16,7 +16,7 @@ interface AnalyticsRequest {
 
 // GET /api/admin/destinations/analytics
 // Get destination analytics and performance metrics
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
     const { searchParams } = new URL(req.url)
     const timeRange = (searchParams.get('timeRange') as '24h' | '7d' | '30d' | '90d') || '30d'
