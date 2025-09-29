@@ -13,6 +13,9 @@ const compat = new FlatCompat({
 
 export default [
   ...compat.extends('next/core-web-vitals'),
+  ...compat.config({
+    extends: ['next'],
+  }),
   
   // Global ignores
   {

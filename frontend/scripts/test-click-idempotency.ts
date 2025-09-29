@@ -203,7 +203,9 @@ async function testClickIdempotency(config: ClickTestConfig) {
     console.log('   ❌ Constraint violation test FAILED - duplicate was allowed');
     
   } catch (error) {
-    if (error.code === 'P2002') { // Prisma unique constraint violation
+    // Type-safe error handling for Prisma errors
+    const prismaError = error as { code?: string }
+    if (prismaError.code === 'P2002') { // Prisma unique constraint violation
       console.log('   ✅ Constraint violation test PASSED - duplicate rejected');
     } else {
       console.log('   ❌ Constraint violation test FAILED - unexpected error:', error);
