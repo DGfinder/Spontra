@@ -6,6 +6,8 @@ import { circuitBreakerRegistry } from '@/lib/circuitBreaker'
 import { slaMonitoring } from '@/lib/slaMonitoring'
 import { logger } from '@/lib/logger'
 
+export const runtime = 'nodejs'
+
 export interface HealthCheckResult {
   service: string
   status: 'healthy' | 'unhealthy'

@@ -9,6 +9,8 @@ import {
 } from "@/lib/postbackSecurity";
 import { verifyHmacBase64 } from "@/server/affiliates/hmac";
 
+export const runtime = 'nodejs';
+
 /**
  * Impact Radius postback handler
  * Typical URL: ?subId=<clickId>&status=approved|rejected|pending&amount=12.34&currency=AUD&campaignId=...&advId=...

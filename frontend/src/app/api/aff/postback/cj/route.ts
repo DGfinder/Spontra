@@ -9,6 +9,8 @@ import {
 } from "@/lib/postbackSecurity";
 import { verifyHmacBase64 } from "@/server/affiliates/hmac";
 
+export const runtime = 'nodejs';
+
 /**
  * Commission Junction (CJ Affiliate) postback handler
  * Typical URL: ?sid=<clickId>&actionStatus=new|modify|void&commissionAmount=12.34&currency=AUD&cid=...&actionId=...

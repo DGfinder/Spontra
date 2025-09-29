@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { checkRateLimit, getClientFingerprint } from '@/lib/productionRateLimits';
 
+export const runtime = 'nodejs';
+
 const prisma = new PrismaClient();
 
 // Beacon rate limiting - very permissive for user experience
@@ -18,7 +20,7 @@ const BEACON_RATE_LIMIT = {
   burst: 50         // Allow bursts for page loads
 };
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const startTime = Date.now();
   
   try {
@@ -133,7 +135,7 @@ export async function GET(request: NextRequest) {
 /**
  * POST endpoint for enhanced beacon data (optional)
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json();
     const { clickId, providerId, performance, viewport, connection } = body;
@@ -260,8 +262,9 @@ function hashIP(ip: string): string {
 
 /**
  * Generate beacon tracking URL for embedding in redirects
+ * Note: Moved to a separate utility file to avoid invalid route exports
  */
-export function generateBeaconUrl(params: {
+function generateBeaconUrl(params: {
   clickId: string;
   providerId: string;
   market?: string;
@@ -281,8 +284,9 @@ export function generateBeaconUrl(params: {
 
 /**
  * JavaScript beacon code for embedding in provider pages (if possible)
+ * Note: Moved to a separate utility file to avoid invalid route exports
  */
-export const BEACON_SCRIPT_TEMPLATE = `
+const BEACON_SCRIPT_TEMPLATE = `
 <!-- Spontra Landing Beacon -->
 <script>
 (function() {

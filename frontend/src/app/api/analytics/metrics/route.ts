@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { captureException } from '@sentry/nextjs'
 import { isProduction } from '@/config/environment'
 
+export const runtime = 'nodejs'
+
 interface BusinessMetric {
   name: string
   value: number

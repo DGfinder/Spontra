@@ -4,6 +4,8 @@ import { trackAdminOperation, addCorrelationIds, getTraceContext } from '@/lib/t
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
+export const runtime = 'nodejs'
+
 const circuitBreakerActionSchema = z.object({
   action: z.enum(['reset', 'trip', 'status']),
   service: z.string().optional(),

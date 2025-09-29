@@ -9,6 +9,8 @@ import { circuitBreakerRegistry } from '@/lib/circuitBreaker'
 import { slaMonitoring } from '@/lib/slaMonitoring'
 import { logger } from '@/lib/logger'
 
+export const runtime = 'nodejs'
+
 export async function GET(request: NextRequest) {
   return trackExternalAPI(
     'health_check',

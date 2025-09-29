@@ -4,6 +4,8 @@ import { z } from 'zod'
 import { trackSearchOperation, addCorrelationIds, getTraceContext } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
+export const runtime = 'nodejs'
+
 const searchSessionSchema = z.object({
   origin: z.string().min(3).max(3).regex(/^[A-Z]{3}$/),
   destination: z.string().min(3).max(3).regex(/^[A-Z]{3}$/),
