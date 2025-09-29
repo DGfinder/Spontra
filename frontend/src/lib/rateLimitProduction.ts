@@ -8,6 +8,9 @@ import { captureException } from '@sentry/nextjs'
 import { trackError } from './monitoring'
 import { env, isProduction } from '../config/environment'
 
+// This module imports environment config which uses process.exit
+export const runtime = 'nodejs'
+
 export interface RateLimitConfig {
   windowMs: number
   maxRequests: number

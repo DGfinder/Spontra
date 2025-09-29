@@ -3,8 +3,21 @@
  * Handles TOTP (Time-based One-Time Password) authentication for admin users
  */
 
-import { randomBytes, createHash } from 'crypto'
 import { captureException } from '@sentry/nextjs'
+
+// This module uses Node.js-only dependencies (crypto)
+export const runtime = 'nodejs'
+
+// Runtime check to prevent crypto import in edge runtime
+let crypto: typeof import('crypto') | null = null
+try {
+  // Only import crypto if we're in a Node.js environment
+  if (typeof process !== 'undefined' && process.versions?.node) {
+    crypto = require('crypto')
+  }
+} catch (error) {
+  console.warn('Crypto module not available in this runtime')
+}
 
 // We'll need to install these packages
 // npm install otplib qrcode
@@ -95,7 +108,10 @@ class MfaService {
    * Generate a base32-encoded secret
    */
   private generateBase32Secret(): string {
-    const buffer = randomBytes(20) // 160 bits
+    if (!crypto) {
+      throw new Error('Crypto module not available in this runtime')
+    }
+    const buffer = crypto.randomBytes(20) // 160 bits
     return this.base32Encode(buffer)
   }
 
@@ -103,10 +119,13 @@ class MfaService {
    * Generate backup codes (10 codes, 8 characters each)
    */
   private generateBackupCodes(): string[] {
+    if (!crypto) {
+      throw new Error('Crypto module not available in this runtime')
+    }
     const codes: string[] = []
     for (let i = 0; i < 10; i++) {
       // Generate 8-character alphanumeric code
-      const code = randomBytes(4).toString('hex').toUpperCase()
+      const code = crypto.randomBytes(4).toString('hex').toUpperCase()
       codes.push(code.substring(0, 4) + '-' + code.substring(4, 8))
     }
     return codes
@@ -116,8 +135,11 @@ class MfaService {
    * Hash backup codes for storage
    */
   hashBackupCodes(codes: string[]): string[] {
+    if (!crypto) {
+      throw new Error('Crypto module not available in this runtime')
+    }
     return codes.map(code => 
-      createHash('sha256').update(code.replace('-', '')).digest('hex')
+      crypto!.createHash('sha256').update(code.replace('-', '')).digest('hex')
     )
   }
 
@@ -219,8 +241,11 @@ class MfaService {
     inputCode: string, 
     hashedCodes: string[]
   ): { isValid: boolean; usedCode?: string } {
+    if (!crypto) {
+      throw new Error('Crypto module not available in this runtime')
+    }
     const cleanCode = inputCode.replace(/[^A-F0-9]/gi, '').toUpperCase()
-    const hashedInput = createHash('sha256').update(cleanCode).digest('hex')
+    const hashedInput = crypto.createHash('sha256').update(cleanCode).digest('hex')
 
     for (const hashedCode of hashedCodes) {
       if (this.constantTimeCompare(hashedInput, hashedCode)) {

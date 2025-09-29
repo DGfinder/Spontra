@@ -10,6 +10,9 @@ import { mfaService } from './mfaService'
 import type { User, UserRole } from '@prisma/client'
 import { captureException } from '@sentry/nextjs'
 
+// This module uses Node.js-only dependencies (bcryptjs, crypto)
+export const runtime = 'nodejs'
+
 export interface AdminUser extends UserWithoutPassword {
   role: 'admin' | 'moderator'
 }

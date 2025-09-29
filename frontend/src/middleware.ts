@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAPIRateLimit } from './lib/rateLimitProduction'
+import { 
+  checkEdgeRateLimit, 
+  isAdminAuthEndpoint,
+  createUnauthorizedResponse,
+  createRateLimitResponse,
+  isValidTokenFormat,
+  getClientIP
+} from './lib/middlewareUtils'
 
 // Security headers to apply to all responses
 function addSecurityHeaders(response: NextResponse): NextResponse {
@@ -109,19 +116,21 @@ export async function middleware(req: NextRequest) {
   let response: NextResponse
   
   // Skip admin auth for login and logout endpoints
-  const isAdminAuthEndpoint = pathname === '/api/admin/auth/login' || 
-                             pathname === '/api/admin/auth/logout' ||
-                             pathname === '/api/admin/auth/refresh'
+  const isAuthEndpoint = isAdminAuthEndpoint(pathname)
   
-  if (!pathname.startsWith('/api/admin') || isAdminAuthEndpoint) {
+  if (!pathname.startsWith('/api/admin') || isAuthEndpoint) {
     response = NextResponse.next()
     
     // Add rate limit headers for successful requests
     if (pathname.startsWith('/api/')) {
-      const rateLimitResult = await checkAPIRateLimit(req)
+      const rateLimitResult = checkEdgeRateLimit(req)
       response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString())
       response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
       response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toISOString())
+      
+      if (!rateLimitResult.allowed) {
+        return addSecurityHeaders(createRateLimitResponse(60000))
+      }
     }
     
     return addSecurityHeaders(response)
@@ -129,54 +138,24 @@ export async function middleware(req: NextRequest) {
 
   // For /api/admin routes (except auth endpoints), verify admin session
   try {
-    // Import adminRepository dynamically to avoid circular dependencies
-    const { adminRepository } = await import('./lib/adminRepository')
-    const { ADMIN_SESSION_COOKIE } = await import('./lib/adminAuth')
-    
     // Get session token from cookie or Authorization header
-    const cookieToken = req.cookies.get(ADMIN_SESSION_COOKIE)?.value
+    const cookieToken = req.cookies.get('admin-session')?.value
     const authHeader = req.headers.get('authorization') || req.headers.get('Authorization')
     const headerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
     const sessionToken = cookieToken || headerToken
 
-    if (!sessionToken) {
-      const errorResponse = NextResponse.json({ error: 'Admin authentication required' }, { status: 401 })
-      return addSecurityHeaders(errorResponse)
+    if (!sessionToken || !isValidTokenFormat(sessionToken)) {
+      return addSecurityHeaders(createUnauthorizedResponse())
     }
 
-    // Verify session exists and is valid in database
-    const session = await adminRepository.findAdminSession(sessionToken)
-    
-    if (!session) {
-      const errorResponse = NextResponse.json({ error: 'Invalid or expired admin session' }, { status: 401 })
-      return addSecurityHeaders(errorResponse)
-    }
+    // In edge runtime, we can only do basic token format validation
+    // Full database verification will happen in the actual API route
+    // This allows the request to proceed to the API route where proper auth is handled
 
-    // Get admin user to verify they still have admin privileges
-    const adminUser = await adminRepository.findAdminById(session.userId)
-    
-    if (!adminUser || !['admin', 'moderator'].includes(adminUser.role)) {
-      const errorResponse = NextResponse.json({ error: 'Admin privileges required' }, { status: 403 })
-      return addSecurityHeaders(errorResponse)
-    }
-
-    // Update session activity
-    await adminRepository.updateSessionActivity(sessionToken)
-
-    // Role-based access control
-    const requiresSuperAdmin = pathname.startsWith('/api/admin/system') || 
-                              pathname.startsWith('/api/admin/cache')
-    if (requiresSuperAdmin && adminUser.role !== 'admin') {
-      const errorResponse = NextResponse.json({ error: 'Super admin privileges required' }, { status: 403 })
-      return addSecurityHeaders(errorResponse)
-    }
-
-    // Add admin user info to request headers for use in API routes
+    // Add session token to request headers for API routes to handle validation
     const requestHeaders = new Headers(req.headers)
-    requestHeaders.set('x-admin-user-id', adminUser.id)
-    requestHeaders.set('x-admin-user-email', adminUser.email)
-    requestHeaders.set('x-admin-user-role', adminUser.role)
-    requestHeaders.set('x-admin-session-id', session.id)
+    requestHeaders.set('x-admin-token', sessionToken)
+    requestHeaders.set('x-middleware-check', 'passed')
 
     response = NextResponse.next({
       request: {
@@ -191,14 +170,6 @@ export async function middleware(req: NextRequest) {
     const errorResponse = NextResponse.json({ error: 'Admin authentication failed' }, { status: 500 })
     return addSecurityHeaders(errorResponse)
   }
-}
-
-function base64UrlToUint8Array(base64Url: string): Uint8Array {
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (base64Url.length % 4)) % 4)
-  const str = atob(base64)
-  const bytes = new Uint8Array(str.length)
-  for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i)
-  return bytes
 }
 
 export const config = {

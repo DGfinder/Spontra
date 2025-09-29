@@ -153,7 +153,7 @@ export function validateEnvironment(): Environment | ProductionEnvironment {
       
       if (isProduction) {
         console.error('\n🚨 Production deployment cannot continue with missing/invalid environment variables.')
-        process.exit(1)
+        throw new Error('Environment validation failed: Missing/invalid environment variables in production')
       } else {
         console.warn('\n⚠️ Development mode: continuing with warning.')
         // Return minimal config for development

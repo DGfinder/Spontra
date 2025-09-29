@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { checkRateLimit, getClientFingerprint } from '@/lib/productionRateLimits';
+import { generateBeaconUrl } from '@/lib/beaconUtils';
 
 export const runtime = 'nodejs';
 
@@ -260,70 +261,4 @@ function hashIP(ip: string): string {
   return Buffer.from(ip).toString('base64').slice(0, 12);
 }
 
-/**
- * Generate beacon tracking URL for embedding in redirects
- * Note: Moved to a separate utility file to avoid invalid route exports
- */
-function generateBeaconUrl(params: {
-  clickId: string;
-  providerId: string;
-  market?: string;
-  baseUrl?: string;
-}): string {
-  const base = params.baseUrl || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const url = new URL('/api/beacon/landed', base);
-  
-  url.searchParams.set('clickId', params.clickId);
-  url.searchParams.set('providerId', params.providerId);
-  if (params.market) {
-    url.searchParams.set('market', params.market);
-  }
-  
-  return url.toString();
-}
 
-/**
- * JavaScript beacon code for embedding in provider pages (if possible)
- * Note: Moved to a separate utility file to avoid invalid route exports
- */
-const BEACON_SCRIPT_TEMPLATE = `
-<!-- Spontra Landing Beacon -->
-<script>
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var clickId = params.get('spontra_click') || params.get('click_id');
-  var providerId = '{{PROVIDER_ID}}';
-  
-  if (clickId) {
-    var beacon = new Image();
-    beacon.src = '{{BEACON_URL}}?clickId=' + clickId + '&providerId=' + providerId + 
-                 '&finalUrl=' + encodeURIComponent(window.location.href) +
-                 '&responseTime=' + (Date.now() - performance.navigationStart);
-                 
-    // Enhanced performance data (optional)
-    setTimeout(function() {
-      var perf = performance.getEntriesByType('navigation')[0];
-      if (perf && navigator.sendBeacon) {
-        navigator.sendBeacon('{{BEACON_URL}}', JSON.stringify({
-          clickId: clickId,
-          providerId: providerId,
-          performance: {
-            loadTime: perf.loadEventEnd - perf.loadEventStart,
-            domReady: perf.domContentLoadedEventEnd - perf.navigationStart,
-            ttfb: perf.responseStart - perf.requestStart
-          },
-          viewport: {
-            width: window.innerWidth,
-            height: window.innerHeight
-          },
-          connection: navigator.connection ? {
-            effectiveType: navigator.connection.effectiveType,
-            downlink: navigator.connection.downlink
-          } : null
-        }));
-      }
-    }, 1000);
-  }
-})();
-</script>
-`;

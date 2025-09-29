@@ -508,7 +508,7 @@ async function validateLandingBeacon() {
   
   try {
     // Test beacon URL generation
-    const { generateBeaconUrl } = await import('../src/app/api/beacon/landed/route');
+    const { generateBeaconUrl } = await import('../src/lib/beaconUtils');
     
     const beaconUrl = generateBeaconUrl({
       clickId: 'test-click-123',
