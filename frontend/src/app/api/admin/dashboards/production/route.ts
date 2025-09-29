@@ -15,6 +15,45 @@ export const runtime = 'nodejs';
 
 const prisma = new PrismaClient();
 
+// TypeScript interfaces for query results
+interface HourlyRevenueRow {
+  hour: Date;
+  clicks: number;
+  conversions: number;
+  revenue: number;
+}
+
+interface EpcTrendRow {
+  hour: Date;
+  epc: number;
+}
+
+interface ErrorRateRow {
+  endpoint: string;
+  total_requests: number;
+  errors: number;
+  error_rate: number;
+}
+
+interface ResponseTimeStatsRow {
+  endpoint: string;
+  avg_response_time: number;
+  p50: number;
+  p95: number;
+  p99: number;
+}
+
+interface RolloutMetricsRow {
+  market: string;
+  clicks: number;
+  conversions: number;
+  revenue: number;
+}
+
+interface CurrentEpcRow {
+  epc: number;
+}
+
 export async function GET(request: NextRequest): Promise<Response> {
   const startTime = Date.now();
   
@@ -162,7 +201,15 @@ async function getRevenueDashboard(timeRange: string) {
     WHERE c.createdAt >= ${since}
     GROUP BY c.providerId, c.market
     ORDER BY revenue DESC
-  `;
+  ` as Array<{
+    providerId: string;
+    market: string;
+    clicks: number;
+    conversions: number;
+    revenue: number;
+    epc: number;
+    conversion_rate: number;
+  }>;
 
   // Hourly revenue trend
   const hourlyRevenue = await prisma.$queryRaw`
@@ -176,7 +223,7 @@ async function getRevenueDashboard(timeRange: string) {
     WHERE c.createdAt >= ${since}
     GROUP BY hour
     ORDER BY hour
-  `;
+  ` as HourlyRevenueRow[];
 
   // EPC trend (last 24 hours)
   const epcTrend = await prisma.$queryRaw`
@@ -188,7 +235,7 @@ async function getRevenueDashboard(timeRange: string) {
     WHERE c.createdAt >= NOW() - INTERVAL '24 hours'
     GROUP BY hour
     ORDER BY hour
-  `;
+  ` as EpcTrendRow[];
 
   // Revenue alerts
   const alerts = await checkRevenueAlerts(since);
@@ -231,7 +278,7 @@ async function getHealthDashboard(timeRange: string) {
     WHERE created_at >= ${since}
     GROUP BY endpoint
     ORDER BY error_rate DESC
-  `;
+  ` as ErrorRateRow[];
 
   // Response time percentiles
   const responseTimeStats = await prisma.$queryRaw`
@@ -245,7 +292,7 @@ async function getHealthDashboard(timeRange: string) {
     WHERE created_at >= ${since} AND response_time_ms IS NOT NULL
     GROUP BY endpoint
     ORDER BY avg_response_time DESC
-  `;
+  ` as ResponseTimeStatsRow[];
 
   // Health alerts
   const healthAlerts = await checkHealthAlerts();
@@ -351,7 +398,7 @@ async function getRolloutStatusDashboard() {
   const rolloutStatus = getRolloutDashboard();
   
   // Get rollout performance metrics
-  const rolloutMetrics = rolloutStatus.currentWave ? await prisma.$queryRaw`
+  const rolloutMetrics: RolloutMetricsRow[] = rolloutStatus.currentWave ? await prisma.$queryRaw`
     SELECT 
       market,
       COUNT(*) as clicks,
@@ -363,7 +410,7 @@ async function getRolloutStatusDashboard() {
       AND c.providerId = ANY(${rolloutStatus.allowedProviders})
       AND c.createdAt >= CURRENT_DATE
     GROUP BY market
-  ` : [];
+  ` as RolloutMetricsRow[] : [];
 
   return {
     ...rolloutStatus,
@@ -409,7 +456,7 @@ async function checkRevenueAlerts(since: Date) {
     FROM clicks c
     LEFT JOIN conversions conv ON conv.clickId = c.clickId
     WHERE c.createdAt >= ${since}
-  `;
+  ` as CurrentEpcRow[];
   
   // Add EPC comparison logic here
   return alerts;
