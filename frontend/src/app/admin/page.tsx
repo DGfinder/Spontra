@@ -6,7 +6,7 @@ import { getSessionFromCookies } from '@/lib/adminAuth'
 export const dynamic = 'force-dynamic'
 
 export default async function AdminIndex() {
-  const session = await getSessionFromCookies(cookies())
+  const session = await getSessionFromCookies(await cookies())
   if (!session) {
     redirect('/admin/login')
   }

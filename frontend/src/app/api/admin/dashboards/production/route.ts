@@ -79,16 +79,16 @@ async function getOverviewDashboard(timeRange: string) {
     Promise.resolve(0) // Will calculate below
   ]);
 
-  const revenue = totalRevenue._sum.commission || 0;
+  const revenue = Number(totalRevenue._sum.commission || 0);
   const avgEPC = totalClicks > 0 ? revenue / totalClicks : 0;
-  const convRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0;
+  const convRate = totalClicks > 0 ? (Number(totalConversions) / Number(totalClicks)) * 100 : 0;
 
   // Market breakdown
   const marketStats = await prisma.click.groupBy({
     by: ['market'],
     where: { createdAt: { gte: since } },
     _count: { _all: true },
-    orderBy: { _count: { _all: 'desc' } }
+    orderBy: { _count: { market: 'desc' } }
   });
 
   // Provider performance
@@ -96,7 +96,7 @@ async function getOverviewDashboard(timeRange: string) {
     by: ['providerId'],
     where: { createdAt: { gte: since } },
     _count: { _all: true },
-    orderBy: { _count: { _all: 'desc' } },
+    orderBy: { _count: { providerId: 'desc' } },
     take: 10
   });
 

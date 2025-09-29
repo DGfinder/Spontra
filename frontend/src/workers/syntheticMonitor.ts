@@ -11,6 +11,7 @@ interface TestQuery {
   cabin: "ECONOMY"|"PREMIUM_ECONOMY"|"BUSINESS"|"FIRST";
   market: string;
   currency: string;
+  [key: string]: unknown;
 }
 
 // Pre-defined test queries for different route types

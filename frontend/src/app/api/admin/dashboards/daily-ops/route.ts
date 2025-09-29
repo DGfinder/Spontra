@@ -32,7 +32,7 @@ export async function GET(req: NextRequest): Promise<Response> {
 
   // Optional IP allowlist (production only)
   const forwarded = req.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0]?.trim() || req.ip || "unknown";
+  const ip = forwarded?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "unknown";
   
   if (process.env.NODE_ENV === "production" && process.env.ADMIN_IP_GUARD === "true") {
     if (ip !== "unknown" && !ALLOWED_NETS.includes(ip)) {

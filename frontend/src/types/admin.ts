@@ -28,7 +28,7 @@ export interface AdminSession {
 }
 
 
-export type AdminRole = 'admin'
+export type AdminRole = 'admin' | 'moderator'
 
 export type AdminPermission = string;
 

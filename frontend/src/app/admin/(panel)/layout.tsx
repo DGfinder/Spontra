@@ -6,7 +6,7 @@ import { getSessionFromCookies } from '@/lib/adminAuth'
 import AdminClientProviders from './AdminClientProviders'
 
 export default async function AdminPanelLayout({ children }: { children: ReactNode }) {
-  const session = await getSessionFromCookies(cookies())
+  const session = await getSessionFromCookies(await cookies())
 
   if (!session) {
     redirect('/admin/login')

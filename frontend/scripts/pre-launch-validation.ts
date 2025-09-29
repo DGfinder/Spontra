@@ -233,7 +233,7 @@ async function validateDatabase() {
           SELECT FROM information_schema.tables 
           WHERE table_name = ${table}
         )
-      `;
+      ` as { exists: boolean }[];
       if (!result[0]?.exists) {
         results.push({
           check,

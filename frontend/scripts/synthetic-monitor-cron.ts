@@ -9,7 +9,7 @@
  * 3. Final landing hosts match expectations
  * 4. No excessive redirects (>5 hops)
  * 
- * Run via cron: */15 * * * * /path/to/synthetic-monitor-cron.ts
+ * Run via cron: every 15 minutes - crontab pattern: star/15 star star star star
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -39,6 +39,7 @@ interface TestQuery {
   cabin: 'ECONOMY' | 'PREMIUM_ECONOMY' | 'BUSINESS' | 'FIRST';
   market: string;
   currency: string;
+  [key: string]: unknown;
 }
 
 // Standard test queries for different markets
