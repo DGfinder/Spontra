@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { getAirportHubInfo, calculateHubScore, getContextualSuggestions } from '@/lib/airlineHubs'
 
 export const runtime = 'nodejs'

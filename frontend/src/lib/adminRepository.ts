@@ -3,7 +3,7 @@
  * Database operations specific to admin users and management
  */
 
-import { prisma } from './prisma'
+import { prisma } from '@/server/db'
 import { hashPassword, verifyPassword } from './password'
 import { UserWithoutPassword, userRepository } from './userRepository'
 import { mfaService } from './mfaService'

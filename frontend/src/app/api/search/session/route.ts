@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/db'
+import { prisma } from '@/server/db'
 import { z } from 'zod'
 import { trackSearchOperation, addCorrelationIds, getTraceContext } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'

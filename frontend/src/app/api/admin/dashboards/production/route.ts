@@ -347,7 +347,7 @@ async function getSecurityDashboard(timeRange: string) {
     _count: true,
     orderBy: {
       _count: {
-        _all: 'desc'
+        ipAddress: 'desc'
       }
     },
     take: 20
@@ -376,7 +376,7 @@ async function getSecurityDashboard(timeRange: string) {
     _count: true,
     orderBy: {
       _count: {
-        _all: 'desc'
+        ipAddress: 'desc'
       }
     },
     take: 20

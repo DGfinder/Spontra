@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { prisma } from '@/server/db'
 import { hashPassword, verifyPassword } from './password'
 import type { User } from '@prisma/client'
 

@@ -9,7 +9,7 @@ import { POST as signupPOST } from '@/app/api/auth/signup/route'
 import { POST as loginPOST } from '@/app/api/auth/login/route'
 import { POST as logoutPOST } from '@/app/api/auth/logout/route'
 import { GET as mePOST } from '@/app/api/auth/me/route'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/server/db'
 import { verifyPassword } from '@/lib/password'
 
 describe('Authentication API Integration Tests', () => {

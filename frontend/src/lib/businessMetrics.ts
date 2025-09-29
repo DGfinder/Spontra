@@ -3,7 +3,7 @@
  * Provides comprehensive analytics for conversion rates, revenue tracking, and performance metrics
  */
 
-import { prisma } from '@/lib/db'
+import { prisma } from '@/server/db'
 import { trackDatabaseOperation, metrics } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
