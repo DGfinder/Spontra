@@ -6,8 +6,15 @@ export interface SpanAttributes {
 
 const tracer = trace.getTracer("spontra-frontend")
 
-export function initializeTelemetry() {
-  return null
+export function initializeTelemetry(): { shutdown(): Promise<void> } | null {
+  // Return a mock SDK object with shutdown method to satisfy type requirements
+  // TODO: Implement proper OpenTelemetry SDK initialization when needed
+  return {
+    async shutdown() {
+      console.log('Mock telemetry SDK shutdown called')
+      return Promise.resolve()
+    }
+  }
 }
 
 export function createSpan(

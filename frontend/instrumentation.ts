@@ -113,7 +113,9 @@ export async function register() {
         process.on('SIGTERM', async () => {
           console.log('🛑 SIGTERM received, shutting down OpenTelemetry...')
           try {
-            await sdk.shutdown()
+            if (sdk && typeof sdk.shutdown === 'function') {
+              await sdk.shutdown()
+            }
             console.log('✅ OpenTelemetry shutdown complete')
           } catch (error) {
             console.error('❌ Error during OpenTelemetry shutdown:', error)
@@ -123,7 +125,9 @@ export async function register() {
         process.on('SIGINT', async () => {
           console.log('🛑 SIGINT received, shutting down OpenTelemetry...')
           try {
-            await sdk.shutdown()
+            if (sdk && typeof sdk.shutdown === 'function') {
+              await sdk.shutdown()
+            }
             console.log('✅ OpenTelemetry shutdown complete')
           } catch (error) {
             console.error('❌ Error during OpenTelemetry shutdown:', error)
