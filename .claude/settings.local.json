@@ -63,7 +63,11 @@
       "Bash(npx prisma generate:*)",
       "Bash(python3:*)",
       "Bash(pip3 install:*)",
-      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate dev --name \"metasearch_core_tables\")"
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate dev --name \"metasearch_core_tables\")",
+      "Bash(npx prisma:*)",
+      "Bash(DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" DIRECT_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\" npx prisma validate)",
+      "Bash(export DATABASE_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\")",
+      "Bash(export DIRECT_URL=\"postgresql://dummy:dummy@localhost:5432/dummy\")"
     ],
     "deny": []
   }
