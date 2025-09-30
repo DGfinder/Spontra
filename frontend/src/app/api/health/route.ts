@@ -71,7 +71,6 @@ async function performHealthCheck(
 export async function GET(request: NextRequest): Promise<NextResponse<SystemHealthResponse>> {
   return trackExternalAPI(
     'health_check',
-    'system_health',
     async (span: Span) => {
       const startTime = Date.now()
       const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID()
