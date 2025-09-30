@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { trackExternalAPI, addCorrelationIds } from '@/lib/telemetry'
+import { trackExternalAPI, addCorrelationIds, type Span } from '@/lib/telemetry'
 import { circuitBreakerRegistry } from '@/lib/circuitBreaker'
 import { slaMonitoring } from '@/lib/slaMonitoring'
 import { logger } from '@/lib/logger'
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest): Promise<Response> {
   return trackExternalAPI(
     'health_check',
     'detailed_health',
-    async (span) => {
+    async (span: Span) => {
       const startTime = Date.now()
       const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID()
       

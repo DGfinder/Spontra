@@ -214,34 +214,24 @@ export async function POST(req: NextRequest) {
       nonStop,
     }
 
-    if (!amadeusClient) {
-      console.error(`${LOG_PREFIX} amadeus client not configured`)
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Flight search service temporarily unavailable. Please try again later.',
-          fallback: true,
-        },
-        { status: 503 },
-      )
-    }
+    // Use failover strategy for reliable flight search
+    const { searchFlightsWithFailover } = await import('@/lib/amadeusFailover')
 
-    const offers = await amadeusClient.searchFlights({
+    const result = await searchFlightsWithFailover({
       origin,
       destination,
       departureDate,
       returnDate,
-      adults: passengers,
+      passengers,
       travelClass,
-      nonStop,
-      max: 20,
+      nonStop
     })
 
-    const flights = (offers || [])
+    const flights = (result.offers || [])
       .slice(0, 12)
       .map((offer: AmadeusFlightOffer, index: number) => mapOfferToLite(offer, index, params))
 
-    console.log(`${LOG_PREFIX} returning ${flights.length} offers`)
+    console.log(`${LOG_PREFIX} returning ${flights.length} offers from ${result.source}`)
 
     return NextResponse.json({
       ok: true,
@@ -249,7 +239,10 @@ export async function POST(req: NextRequest) {
       meta: {
         totalResults: flights.length,
         searchTimestamp: new Date().toISOString(),
-        dataSource: 'amadeus-real-time',
+        dataSource: result.source,
+        cached: result.source !== 'amadeus',
+        cachedAt: result.cachedAt,
+        expiresAt: result.expiresAt
       },
     })
   } catch (error) {

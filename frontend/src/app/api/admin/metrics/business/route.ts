@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessMetricsService } from '@/lib/businessMetrics'
-import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
+import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, safeSetAttributes, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
@@ -23,7 +23,7 @@ const metricsQuerySchema = z.object({
 export async function GET(request: NextRequest): Promise<Response> {
   return trackAnalyticsOperation(
     'business_metrics',
-    async (span) => {
+    async (span: Span) => {
       try {
         // Validate query parameters
         const { searchParams } = new URL(request.url)
@@ -249,7 +249,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 export async function POST(request: NextRequest): Promise<Response> {
   return trackAnalyticsOperation(
     'business_metrics_realtime',
-    async (span) => {
+    async (span: Span) => {
       try {
         const body = await request.json()
         

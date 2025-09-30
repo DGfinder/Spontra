@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { validateApiRequest, clickEventApiSchema } from '@/lib/validations'
 import { ClickEvent } from '@/services/affiliateService'
 import { cacheGet, cacheSet } from '@/lib/cacheServer'
-import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, metrics, safeSetAttributes } from '@/lib/telemetry'
+import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, metrics, safeSetAttributes, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
@@ -27,7 +27,7 @@ async function writeEvents(events: ClickEvent[]): Promise<void> {
 export async function POST(req: NextRequest) {
   return trackAnalyticsOperation(
     'click',
-    async (span) => {
+    async (span: Span) => {
       try {
         const body = await req.json()
         const validation = validateApiRequest(clickEventApiSchema, body)
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   return trackAnalyticsOperation(
     'metrics',
-    async (span) => {
+    async (span: Span) => {
       try {
         const url = new URL(req.url)
         const partnerId = url.searchParams.get('partner')

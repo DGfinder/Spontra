@@ -202,7 +202,38 @@ const detectDevice = (userAgent: string | null): 'desktop' | 'mobile' | 'tablet'
   return 'desktop'
 }
 
-const chooseProvider = (payload: RedirectContext): ProviderResult | null => {
+const chooseProvider = async (payload: RedirectContext): Promise<ProviderResult | null> => {
+  // Try to get optimal provider from EPC-based optimizer
+  try {
+    const { getOptimalProvider } = await import('@/lib/metasearch/providerOptimizer')
+    const optimalProvider = await getOptimalProvider({
+      market: 'AU', // TODO: Detect from user location or payload
+      route: `${payload.origin}-${payload.destination}`,
+      cabinClass: payload.cabinClass
+    })
+
+    if (optimalProvider) {
+      // Build link for optimal provider
+      const providerMap: Record<string, (p: RedirectContext) => ProviderResult | null> = {
+        'kayak': buildKayakLink,
+        'skyscanner': buildSkyscannerLink,
+        'travelpayouts': buildTravelpayoutsLink
+      }
+
+      const builder = providerMap[optimalProvider.providerId]
+      if (builder) {
+        const result = builder(payload)
+        if (result) {
+          console.log('[ProviderOptimizer] Selected', optimalProvider.providerId, 'EPC:', optimalProvider.epc)
+          return result
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('[ProviderOptimizer] Optimization failed, falling back to default:', error)
+  }
+
+  // Fallback: Try direct airline link first
   const carrier = payload.carrierCode?.toUpperCase()
   if (carrier && airlineBuilders[carrier]) {
     const directUrl = airlineBuilders[carrier](payload)
@@ -210,6 +241,8 @@ const chooseProvider = (payload: RedirectContext): ProviderResult | null => {
       return { provider: `airline-${carrier}`, url: directUrl }
     }
   }
+
+  // Final fallback: Aggregator
   return buildAggregatorLink(payload)
 }
 
@@ -268,7 +301,7 @@ export async function POST(req: NextRequest) {
     }
 
     const context = validation.data
-    const providerResult = chooseProvider(context)
+    const providerResult = await chooseProvider(context)
 
     if (!providerResult) {
       return NextResponse.json(

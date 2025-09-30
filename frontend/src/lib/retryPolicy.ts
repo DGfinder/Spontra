@@ -3,7 +3,7 @@
  * Provides intelligent retry mechanisms for external API calls and database operations
  */
 
-import { trackExternalAPI, addCorrelationIds, metrics } from '@/lib/telemetry'
+import { trackExternalAPI, addCorrelationIds, metrics, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export interface RetryConfig {
@@ -178,7 +178,7 @@ export class RetryPolicy {
     return trackExternalAPI(
       this.operationType,
       context.operationName,
-      async (span) => {
+      async (span: Span) => {
         const startTime = Date.now()
         let lastError: Error | undefined
         const retriedErrors: Array<{ attempt: number; error: Error; delay: number }> = []

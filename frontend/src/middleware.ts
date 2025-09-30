@@ -86,28 +86,39 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   
-  // Apply rate limiting to all API routes
+  // Apply rate limiting to all API routes using Vercel KV
   if (pathname.startsWith('/api/')) {
-    const rateLimitResult = await checkAPIRateLimit(req)
-    
+    const { checkRateLimit } = await import('@/lib/rateLimit')
+    const clientIP = getClientIP(req)
+
+    // Determine rate limit type based on endpoint
+    let rateLimitType: 'api' | 'admin' | 'search' | 'postback' = 'api'
+    if (pathname.startsWith('/api/admin')) {
+      rateLimitType = 'admin'
+    } else if (pathname.startsWith('/api/amadeus/flights') || pathname.startsWith('/api/search')) {
+      rateLimitType = 'search'
+    } else if (pathname.startsWith('/api/webhooks')) {
+      rateLimitType = 'postback'
+    }
+
+    const rateLimitResult = await checkRateLimit(clientIP, rateLimitType)
+
     if (!rateLimitResult.allowed) {
       const response = NextResponse.json(
-        { 
+        {
           error: 'Rate limit exceeded',
-          retryAfter: rateLimitResult.retryAfter || 60
+          limit: rateLimitResult.total,
+          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
         },
         { status: 429 }
       )
-      
+
       // Add rate limit headers
-      response.headers.set('X-RateLimit-Limit', rateLimitResult.limit.toString())
+      response.headers.set('X-RateLimit-Limit', rateLimitResult.total.toString())
       response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
-      response.headers.set('X-RateLimit-Reset', rateLimitResult.resetTime.toISOString())
-      
-      if (rateLimitResult.retryAfter) {
-        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
-      }
-      
+      response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString())
+      response.headers.set('Retry-After', Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString())
+
       return addSecurityHeaders(response)
     }
   }

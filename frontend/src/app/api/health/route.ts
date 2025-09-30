@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkDatabaseConnection } from '@/lib/db'
 import { checkKVHealth } from '@/lib/cache'
-import { trackExternalAPI, addCorrelationIds } from '@/lib/telemetry'
+import { trackExternalAPI, addCorrelationIds, type Span } from '@/lib/telemetry'
 import { circuitBreakerRegistry } from '@/lib/circuitBreaker'
 import { slaMonitoring } from '@/lib/slaMonitoring'
 import { logger } from '@/lib/logger'
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest): Promise<NextResponse<SystemHeal
   return trackExternalAPI(
     'health_check',
     'system_health',
-    async (span) => {
+    async (span: Span) => {
       const startTime = Date.now()
       const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID()
       

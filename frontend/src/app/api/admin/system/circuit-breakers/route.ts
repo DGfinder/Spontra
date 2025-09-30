@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { circuitBreakerRegistry, CircuitState } from '@/lib/circuitBreaker'
-import { trackAdminOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
+import { trackAdminOperation, addCorrelationIds, getTraceContext, safeSetAttributes, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
@@ -15,7 +15,7 @@ const circuitBreakerActionSchema = z.object({
 export async function GET(request: NextRequest): Promise<Response> {
   return trackAdminOperation(
     'circuit_breaker_status',
-    async (span) => {
+    async (span: Span) => {
       try {
         // Check admin authentication
         const adminUserId = request.headers.get('x-admin-user-id')
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 export async function POST(request: NextRequest): Promise<Response> {
   return trackAdminOperation(
     'circuit_breaker_action',
-    async (span) => {
+    async (span: Span) => {
       try {
         // Check admin authentication (require admin role for modifications)
         const adminUserId = request.headers.get('x-admin-user-id')

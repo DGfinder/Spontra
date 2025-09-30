@@ -1,8 +1,10 @@
-﻿import { context, propagation, trace, SpanKind, SpanStatusCode } from "@opentelemetry/api"
+﻿import { context, propagation, trace, SpanKind, SpanStatusCode, Span } from "@opentelemetry/api"
 
 export interface SpanAttributes {
   [key: string]: string | number | boolean | undefined
 }
+
+export type { Span }
 
 const tracer = trace.getTracer("spontra-frontend")
 

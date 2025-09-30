@@ -25,13 +25,29 @@ async function writeConversions(events: ConversionEvent[]): Promise<void> {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const partnerSignature = req.headers.get('x-partner-signature')
-    const partnerId = req.headers.get('x-partner-id')
+    const partnerId = req.headers.get('x-partner-id') as 'impact' | 'cj' | 'awin' | 'partnerize' | null
 
-    console.log('Conversion webhook received:', { partnerId, hasSignature: !!partnerSignature })
+    console.log('Conversion webhook received:', { partnerId, hasBody: !!body })
 
-    if (!partnerSignature) {
-      return NextResponse.json({ success: false, error: 'Missing webhook signature' }, { status: 401 })
+    // Verify webhook signature
+    if (process.env.FEATURE_POSTBACK_ENFORCE_SIGNATURE === 'true') {
+      if (!partnerId) {
+        return NextResponse.json({ success: false, error: 'Missing partner ID' }, { status: 401 })
+      }
+
+      const { verifyPostback, logVerificationAttempt } = await import('@/lib/metasearch/postbackVerifier')
+      const verification = verifyPostback(req, partnerId, body)
+
+      const ipAddress = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+      await logVerificationAttempt(partnerId, verification, ipAddress)
+
+      if (!verification.valid) {
+        console.error('Postback signature verification failed:', verification.reason)
+        return NextResponse.json(
+          { success: false, error: 'Signature verification failed', reason: verification.reason },
+          { status: 401 }
+        )
+      }
     }
 
     const validation = validateApiRequest(webhookConversionSchema, body)
@@ -131,8 +147,42 @@ async function parseConversionData(partnerId: string | null, data: any): Promise
 }
 
 async function verifyAttribution(clickId: string): Promise<boolean> {
-  // In production, validate against click store with attribution window
-  return Boolean(clickId)
+  try {
+    const { db } = await import('@/server/db')
+
+    // Check if click exists and is within attribution window (30 days default)
+    const attributionWindowDays = 30
+    const attributionWindowStart = new Date(Date.now() - attributionWindowDays * 24 * 60 * 60 * 1000)
+
+    const click = await db.click.findUnique({
+      where: { clickId },
+      select: {
+        id: true,
+        createdAt: true,
+        landed200: true
+      }
+    })
+
+    if (!click) {
+      console.warn('[Attribution] Click not found:', clickId)
+      return false
+    }
+
+    if (click.createdAt < attributionWindowStart) {
+      console.warn('[Attribution] Click outside attribution window:', clickId)
+      return false
+    }
+
+    if (!click.landed200) {
+      console.warn('[Attribution] User never landed on provider:', clickId)
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('[Attribution] Verification error:', error)
+    return false
+  }
 }
 
 async function processConversion(_conversion: ConversionEvent): Promise<void> {

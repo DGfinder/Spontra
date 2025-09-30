@@ -3,7 +3,7 @@
  * Prevents cascading failures and provides graceful degradation
  */
 
-import { trackExternalAPI, addCorrelationIds, metrics } from '@/lib/telemetry'
+import { trackExternalAPI, addCorrelationIds, metrics, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export enum CircuitState {
@@ -120,7 +120,7 @@ export class CircuitBreaker {
     return trackExternalAPI(
       this.serviceName,
       context.operationName || 'api_call',
-      async (span) => {
+      async (span: Span) => {
         const startTime = Date.now()
         this.totalRequests++
 

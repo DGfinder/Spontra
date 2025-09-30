@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/server/db'
 import { z } from 'zod'
-import { trackSearchOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
+import { trackSearchOperation, addCorrelationIds, getTraceContext, safeSetAttributes, type Span } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
@@ -22,7 +22,7 @@ const searchSessionSchema = z.object({
 export async function POST(request: NextRequest) {
   return trackSearchOperation(
     'session_create',
-    async (span) => {
+    async (span: Span) => {
       try {
         // Parse and validate request body
         const body = await request.json()
