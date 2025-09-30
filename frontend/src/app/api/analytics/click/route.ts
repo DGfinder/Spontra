@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { validateApiRequest, clickEventApiSchema } from '@/lib/validations'
 import { ClickEvent } from '@/services/affiliateService'
 import { cacheGet, cacheSet } from '@/lib/cacheServer'
-import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, metrics } from '@/lib/telemetry'
+import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, metrics, safeSetAttributes } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
         const validation = validateApiRequest(clickEventApiSchema, body)
         
         if (!validation.success) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'validation',
             'error.validation_issues': validation.errors?.length || 0
           })
@@ -50,9 +50,9 @@ export async function POST(req: NextRequest) {
         }
 
         const clickEvent = validation.data
-        
+
         // Add analytics parameters to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.click_id': clickEvent.id,
           'analytics.partner_id': clickEvent.partnerId,
           'analytics.flight_id': clickEvent.flightId,
@@ -66,11 +66,11 @@ export async function POST(req: NextRequest) {
 
         // Add request metadata to span
         const userAgent = req.headers.get('user-agent')
-        const ipAddress = req.headers.get('x-forwarded-for') || 
-                         req.headers.get('x-real-ip') || 
+        const ipAddress = req.headers.get('x-forwarded-for') ||
+                         req.headers.get('x-real-ip') ||
                          'unknown'
-        
-        span.setAttributes({
+
+        safeSetAttributes(span, {
           'http.user_agent': userAgent,
           'http.client_ip': ipAddress
         })
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
         metrics.recordCounter(`clicks.by_partner.${clickEvent.partnerId}`, 1)
 
         // Add success attributes to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.click_recorded': true,
           'analytics.cache_updated': true
         })
@@ -154,7 +154,7 @@ export async function POST(req: NextRequest) {
           endpoint: 'POST /api/analytics/click'
         })
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'error.type': 'internal',
           'error.message': (error as Error).message
         })
@@ -191,7 +191,7 @@ export async function GET(req: NextRequest) {
         const timeframe = url.searchParams.get('timeframe') || '24h'
 
         // Add query parameters to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.query.partner_id': partnerId,
           'analytics.query.timeframe': timeframe
         })
@@ -217,16 +217,16 @@ export async function GET(req: NextRequest) {
         }
 
         // Add metrics to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.events.total': allEvents.length,
           'analytics.events.filtered': filteredEvents.length,
           'analytics.time_window_ms': timeWindow
         })
 
         const calculatedMetrics = calculateMetrics(filteredEvents)
-        
+
         // Add calculated metrics to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.metrics.total_clicks': calculatedMetrics.totalClicks,
           'analytics.metrics.total_value': calculatedMetrics.totalValue,
           'analytics.metrics.average_value': calculatedMetrics.averageValue,
@@ -277,7 +277,7 @@ export async function GET(req: NextRequest) {
           endpoint: 'GET /api/analytics/click'
         })
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'error.type': 'internal',
           'error.message': (error as Error).message
         })

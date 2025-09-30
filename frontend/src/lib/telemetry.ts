@@ -172,7 +172,7 @@ export function telemetryMiddleware(handler: any) {
     return withSpan(
       `${req.method} ${route}`,
       async span => {
-        span.setAttributes({
+        safeSetAttributes(span, {
           "http.method": req.method,
           "http.url": req.url,
           "http.route": route,
@@ -212,7 +212,7 @@ export const metrics = {
   },
 }
 
-function sanitizeAttributes(attributes: SpanAttributes) {
+export function sanitizeAttributes(attributes: SpanAttributes) {
   const result: Record<string, string | number | boolean> = {}
   Object.entries(attributes).forEach(([key, value]) => {
     if (value === undefined || value === null) return
@@ -233,6 +233,20 @@ function prefixAttributes(prefix: string, attributes: SpanAttributes) {
     }
   })
   return result
+}
+
+/**
+ * Safe wrapper for span.setAttributes() that filters out null/undefined values
+ * Use this instead of calling span.setAttributes() directly to avoid TypeScript errors
+ */
+export function safeSetAttributes(
+  span: ReturnType<typeof createSpan>,
+  attributes: Record<string, string | number | boolean | null | undefined>
+) {
+  const sanitized = sanitizeAttributes(attributes)
+  if (Object.keys(sanitized).length > 0) {
+    span.setAttributes(sanitized)
+  }
 }
 
 export default {

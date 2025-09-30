@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/server/db'
 import { z } from 'zod'
-import { trackSearchOperation, addCorrelationIds, getTraceContext } from '@/lib/telemetry'
+import { trackSearchOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 
 export const runtime = 'nodejs'
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
         const validatedData = searchSessionSchema.parse(body)
 
         // Add search parameters to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'search.origin': validatedData.origin,
           'search.destination': validatedData.destination,
           'search.departure_date': validatedData.departureDate,
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         )
 
         // Add session details to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'search.session_created': true,
           'search.session_expires_at': session.expires_at?.toISOString()
         })
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
         span.recordException(error as Error)
         
         if (error instanceof z.ZodError) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'validation',
             'error.validation_issues': error.issues.length
           })
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           requestBody: body
         })
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'error.type': 'internal',
           'error.message': (error as Error).message
         })

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { circuitBreakerRegistry, CircuitState } from '@/lib/circuitBreaker'
-import { trackAdminOperation, addCorrelationIds, getTraceContext } from '@/lib/telemetry'
+import { trackAdminOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
@@ -22,12 +22,12 @@ export async function GET(request: NextRequest): Promise<Response> {
         const adminRole = request.headers.get('x-admin-user-role')
         
         if (!adminUserId || !['admin', 'moderator'].includes(adminRole || '')) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'authentication',
             'auth.admin_user_id': adminUserId,
             'auth.admin_role': adminRole
           })
-          
+
           return NextResponse.json({
             success: false,
             error: 'Admin authentication required',
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         }
 
         // Add admin context to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'admin.user_id': adminUserId,
           'admin.role': adminRole,
           'admin.operation': 'circuit_breaker_status'
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         }))
 
         // Add metrics to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'circuit_breaker.total_services': totalBreakers,
           'circuit_breaker.healthy_services': healthyBreakers,
           'circuit_breaker.overall_health': overallHealth,
@@ -167,12 +167,12 @@ export async function POST(request: NextRequest): Promise<Response> {
         const adminRole = request.headers.get('x-admin-user-role')
         
         if (!adminUserId || adminRole !== 'admin') {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'authorization',
             'auth.admin_user_id': adminUserId,
             'auth.admin_role': adminRole
           })
-          
+
           return NextResponse.json({
             success: false,
             error: 'Admin privileges required for circuit breaker operations',
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         const validatedData = circuitBreakerActionSchema.parse(body)
 
         // Add operation details to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'admin.user_id': adminUserId,
           'admin.role': adminRole,
           'admin.operation': 'circuit_breaker_action',
@@ -299,7 +299,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
 
         // Add result metrics to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'circuit_breaker.action_successful': true,
           'circuit_breaker.affected_services': result.affectedServices?.length || 1
         })
@@ -317,7 +317,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         span.recordException(error as Error)
         
         if (error instanceof z.ZodError) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'validation',
             'error.validation_issues': error.issues.length
           })

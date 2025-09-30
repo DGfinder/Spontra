@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessMetricsService } from '@/lib/businessMetrics'
-import { trackAnalyticsOperation, addCorrelationIds, getTraceContext } from '@/lib/telemetry'
+import { trackAnalyticsOperation, addCorrelationIds, getTraceContext, safeSetAttributes } from '@/lib/telemetry'
 import { sentryHelpers } from '@/lib/sentry'
 import { z } from 'zod'
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         const validatedQuery = metricsQuerySchema.parse(queryData)
 
         // Add query parameters to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.business.period': validatedQuery.period,
           'analytics.business.provider': validatedQuery.provider,
           'analytics.business.route': validatedQuery.route,
@@ -55,12 +55,12 @@ export async function GET(request: NextRequest): Promise<Response> {
         const adminRole = request.headers.get('x-admin-user-role')
         
         if (!adminUserId || !['admin', 'moderator'].includes(adminRole || '')) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'authentication',
             'auth.admin_user_id': adminUserId,
             'auth.admin_role': adminRole
           })
-          
+
           return NextResponse.json({
             success: false,
             error: 'Admin authentication required',
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest): Promise<Response> {
           }, { status: 401 })
         }
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'auth.admin_user_id': adminUserId,
           'auth.admin_role': adminRole
         })
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         })
 
         // Add performance metrics to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.business.query_duration_ms': queryDuration,
           'analytics.business.metrics_count': metricResults.length,
           'analytics.business.total_revenue': response.revenue?.totalRevenue || 0,
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest): Promise<Response> {
         span.recordException(error as Error)
         
         if (error instanceof z.ZodError) {
-          span.setAttributes({
+          safeSetAttributes(span, {
             'error.type': 'validation',
             'error.validation_issues': error.issues.length
           })
@@ -223,7 +223,7 @@ export async function GET(request: NextRequest): Promise<Response> {
           endpoint: 'GET /api/admin/metrics/business'
         })
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'error.type': 'internal',
           'error.message': (error as Error).message
         })
@@ -262,7 +262,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         const validatedRequest = requestSchema.parse(body)
 
         // Add operation details to span
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.realtime.operation': validatedRequest.operation,
           'analytics.realtime.priority': validatedRequest.priority,
           'analytics.realtime.params_count': Object.keys(validatedRequest.parameters).length
@@ -309,7 +309,7 @@ export async function POST(request: NextRequest): Promise<Response> {
             break
         }
 
-        span.setAttributes({
+        safeSetAttributes(span, {
           'analytics.realtime.initiated': true,
           'analytics.realtime.estimated_duration_ms': 300000 // 5 minutes
         })
