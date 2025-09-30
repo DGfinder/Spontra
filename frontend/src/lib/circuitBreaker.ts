@@ -119,7 +119,6 @@ export class CircuitBreaker {
   ): Promise<CallResult<T>> {
     return trackExternalAPI(
       this.serviceName,
-      context.operationName || 'api_call',
       async (span: Span) => {
         const startTime = Date.now()
         this.totalRequests++
@@ -127,6 +126,7 @@ export class CircuitBreaker {
         // Add circuit breaker context to span
         span.setAttributes({
           'circuit_breaker.service': this.serviceName,
+          'circuit_breaker.operation': context.operationName || 'api_call',
           'circuit_breaker.state': this.state,
           'circuit_breaker.failure_count': this.failureCount,
           'circuit_breaker.total_requests': this.totalRequests

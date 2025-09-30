@@ -177,7 +177,6 @@ export class RetryPolicy {
   ): Promise<RetryResult<T>> {
     return trackExternalAPI(
       this.operationType,
-      context.operationName,
       async (span: Span) => {
         const startTime = Date.now()
         let lastError: Error | undefined
