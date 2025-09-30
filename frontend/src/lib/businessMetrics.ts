@@ -77,7 +77,6 @@ export class BusinessMetricsService {
   ): Promise<ConversionMetrics> {
     return trackDatabaseOperation(
       'conversion_metrics',
-      'analytics',
       async () => {
         const timeFilter = this.getTimeFilter(period)
         
@@ -155,7 +154,6 @@ export class BusinessMetricsService {
   ): Promise<ProviderMetrics[]> {
     return trackDatabaseOperation(
       'provider_metrics',
-      'analytics',
       async () => {
         const timeFilter = this.getTimeFilter(period)
         const previousTimeFilter = this.getPreviousTimeFilter(period)
@@ -256,7 +254,6 @@ export class BusinessMetricsService {
   ): Promise<RouteMetrics[]> {
     return trackDatabaseOperation(
       'route_metrics',
-      'analytics',
       async () => {
         const timeFilter = this.getTimeFilter(period)
         const previousTimeFilter = this.getPreviousTimeFilter(period)
@@ -355,7 +352,6 @@ export class BusinessMetricsService {
   ): Promise<RevenueBreakdown> {
     return trackDatabaseOperation(
       'revenue_breakdown',
-      'analytics',
       async () => {
         const timeFilter = this.getTimeFilter(period)
 
@@ -449,7 +445,6 @@ export class BusinessMetricsService {
   ): Promise<PerformanceMetrics> {
     return trackDatabaseOperation(
       'performance_metrics',
-      'analytics',
       async () => {
         const timeFilter = this.getTimeFilter(period)
 
