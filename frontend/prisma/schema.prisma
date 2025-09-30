@@ -501,7 +501,8 @@ model User {
   achievements      UserAchievement[]
   moderationActions ContentModeration[]
   adminAuditLogs    AdminAuditLog[]
-  
+  passwordResetTokens PasswordResetToken[]
+
   @@index([email])
   @@map("users")
 }
@@ -1096,4 +1097,38 @@ model AlertLog {
   @@index([category])
   @@index([createdAt])
   @@map("alert_logs")
+}
+
+// Enhanced beacon data - performance metrics from client
+model BeaconData {
+  id                   String   @id @default(cuid())
+  clickId              String
+  providerId           String
+  performanceMetrics   String?  // JSON string
+  viewportInfo         String?  // JSON string
+  connectionInfo       String?  // JSON string
+  timestamp            DateTime @default(now())
+
+  @@index([clickId])
+  @@index([providerId])
+  @@index([timestamp])
+  @@map("beacon_data")
+}
+
+// Password reset tokens for user authentication
+model PasswordResetToken {
+  id          String   @id @default(cuid())
+  userId      String
+  token       String   @unique
+  expiresAt   DateTime
+  used        Boolean  @default(false)
+  usedAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
 }
