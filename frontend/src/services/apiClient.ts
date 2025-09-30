@@ -11,9 +11,9 @@ import {
 const API_BASE_URL =
   process.env.API_BASE_URL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  'http://localhost:8081'
+  'http://localhost:3000/api'
 
-// Types from the Go backend
+// Types for API responses
 export interface DestinationExploreRequest {
   id?: string
   origin_airport_code: string

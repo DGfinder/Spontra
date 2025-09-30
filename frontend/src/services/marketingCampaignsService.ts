@@ -91,7 +91,7 @@ class MarketingCampaignsService {
 
   constructor(config?: Partial<MarketingCampaignsServiceConfig>) {
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_MARKETING_API_URL || 'http://localhost:8083',
+      baseUrl: process.env.NEXT_PUBLIC_MARKETING_API_URL || 'http://localhost:3000/api/admin/marketing/campaigns',
       timeout: 30000,
       ...config
     }

@@ -74,7 +74,7 @@ class SEOService {
 
   constructor(config?: Partial<SEOServiceConfig>) {
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_SEO_API_URL || 'http://localhost:8084',
+      baseUrl: process.env.NEXT_PUBLIC_SEO_API_URL || 'http://localhost:3000/api/admin/marketing/seo',
       timeout: 30000,
       ...config
     }

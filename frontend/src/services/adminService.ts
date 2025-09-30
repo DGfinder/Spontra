@@ -20,9 +20,9 @@ class AdminService {
   private config: AdminServiceConfig
 
   constructor(config?: Partial<AdminServiceConfig>) {
-    const localBase = (typeof window !== 'undefined') 
+    const localBase = (typeof window !== 'undefined')
       ? `${window.location.origin}/api/admin`
-      : (process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:8082')
+      : (process.env.NEXT_PUBLIC_ADMIN_API_URL || 'http://localhost:3000/api/admin')
 
     this.config = {
       baseUrl: localBase,

@@ -97,54 +97,6 @@ services:
       timeout: 10s
       retries: 10
 
-  # search-service
-  search-service:
-    build:
-      context: ../services/search-service
-      dockerfile: Dockerfile
-    environment:
-      PORT: "8084"
-      DATABASE_URL: "postgres://spontra:development@postgres/search_service_db?sslmode=disable"
-      REDIS_URL: "redis://redis:6379"
-      ELASTICSEARCH_URL: "http://elasticsearch:9200"
-      DATA_INGESTION_SERVICE_URL: "http://data-ingestion-service:8081"
-      ENVIRONMENT: "development"
-    depends_on:
-      - postgres
-      - redis
-      - elasticsearch
-    ports:
-      - "8084:8084"
-    # Built image runs compiled binary; no bind mount needed
-    networks:
-      - default
-
-  # data-ingestion-service
-  data-ingestion-service:
-    build:
-      context: ../services/data-ingestion-service
-      dockerfile: Dockerfile
-    environment:
-      PORT: "8081"
-      ENVIRONMENT: "development"
-      CASSANDRA_HOSTS: "cassandra:9042"
-      CASSANDRA_KEYSPACE: "spontra_destinations"
-      KAFKA_BROKERS: "kafka:9092"
-      ELASTICSEARCH_URLS: "http://elasticsearch:9200"
-      AMADEUS_CLIENT_ID: "dev"
-      AMADEUS_CLIENT_SECRET: "dev"
-      SEARCH_SERVICE_URL: "http://search-service:8084"
-      REDIS_URL: "redis://redis:6379"
-    depends_on:
-      - cassandra
-      - kafka
-      - elasticsearch
-    ports:
-      - "8081:8081"
-    # Built image runs compiled binary; no bind mount needed
-    networks:
-      - default
-
   # Prometheus (monitoring)
   prometheus:
     image: prom/prometheus:latest

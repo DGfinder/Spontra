@@ -94,7 +94,7 @@ class SocialMediaService {
 
   constructor(config?: Partial<SocialMediaServiceConfig>) {
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_SOCIAL_API_URL || 'http://localhost:8086',
+      baseUrl: process.env.NEXT_PUBLIC_SOCIAL_API_URL || 'http://localhost:3000/api/admin/marketing/social',
       timeout: 30000,
       ...config
     }

@@ -29,22 +29,20 @@
 - **Data Fetching**: @tanstack/react-query
 - **UI Components**: @headlessui/react, @heroicons/react, lucide-react
 
-### Backend
-- **Microservices**: Go 1.21+ services
-  - user-service: Authentication and user management
-  - search-service: Flight search orchestration
-  - pricing-service: Price comparison and tracking
-  - data-ingestion-service: External API integration
-- **API Gateway**: Envoy Proxy for routing
+### Backend (Next.js Integrated)
+- **API Routes**: Next.js App Router API routes (`frontend/src/app/api/`)
+- **Server Actions**: React Server Actions for data mutations (`frontend/src/actions/`)
+- **Database**: Neon PostgreSQL with Prisma ORM (48 models)
+- **Architecture**: Serverless functions deployed to Vercel Edge Network
 
 ### Database & Caching
 - **Primary Database**: PostgreSQL (via Neon serverless @neondatabase/serverless)
-- **ORM**: Prisma 6.16+ with 48 models
+- **ORM**: Prisma 6.16+ with 48 models (full schema in `frontend/prisma/schema.prisma`)
 - **Caching**:
   - Redis (via @vercel/kv and ioredis)
   - In-app OfferCache table for flight offers
-  - Multi-tier caching strategy (see frontend/CACHE_STRATEGY.md)
-- **Cassandra**: cassandra-driver (legacy, being phased out)
+  - Multi-tier caching strategy
+- **Cassandra**: cassandra-driver (legacy, may be phased out)
 
 ### External APIs
 - **Flight Data**: Amadeus Self-Service API
@@ -65,9 +63,9 @@
 - **Mocking**: MSW (Mock Service Worker)
 
 ### Deployment
-- **Frontend**: Vercel (inferred from @vercel packages)
-- **Infrastructure**: Kubernetes (k8s/) + Terraform (infrastructure/)
-- **Containerization**: Docker configurations
+- **Frontend & API**: Vercel Edge Network (automatic deployments)
+- **Infrastructure**: Terraform IaC for cloud resources (infrastructure/)
+- **Development**: Docker Compose for local infrastructure services (docker/)
 
 ---
 

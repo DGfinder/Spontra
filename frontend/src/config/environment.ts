@@ -45,8 +45,8 @@ const envSchema = z.object({
   // Application URLs
   NEXT_PUBLIC_APP_URL: z.string().url('NEXT_PUBLIC_APP_URL must be a valid URL').default('http://localhost:3000'),
   
-  // Backend API Configuration
-  NEXT_PUBLIC_BACKEND_API_URL: z.string().url().default('http://localhost:8081'),
+  // Backend API Configuration (Next.js API Routes)
+  NEXT_PUBLIC_BACKEND_API_URL: z.string().url().default('http://localhost:3000'),
   NEXT_PUBLIC_API_BASE_URL: z.string().url().optional(),
   YOUTUBE_API_KEY: z.string().optional(),
   
@@ -161,7 +161,7 @@ export function validateEnvironment(): Environment | ProductionEnvironment {
           NODE_ENV: 'development',
           DATABASE_URL: 'postgres://localhost:5432/spontra_dev',
           NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-          NEXT_PUBLIC_BACKEND_API_URL: 'http://localhost:8081',
+          NEXT_PUBLIC_BACKEND_API_URL: 'http://localhost:3000',
           AMADEUS_ENVIRONMENT: 'test'
         })
       }
@@ -220,7 +220,7 @@ try {
     NODE_ENV: 'development',
     DATABASE_URL: 'postgres://localhost:5432/spontra_dev',
     NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-    NEXT_PUBLIC_BACKEND_API_URL: 'http://localhost:8081',
+    NEXT_PUBLIC_BACKEND_API_URL: 'http://localhost:3000',
     AMADEUS_ENVIRONMENT: 'test',
     RATE_LIMIT_MAX_REQUESTS: 100,
     RATE_LIMIT_WINDOW_MS: 60000

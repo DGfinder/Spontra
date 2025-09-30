@@ -20,30 +20,29 @@ A revolutionary travel discovery platform that transforms how people find destin
 
 ## Architecture Overview
 
-Spontra uses a cloud-native, microservices-based architecture designed for high availability, scalability, and performance:
+Spontra uses a modern, serverless architecture designed for high availability, scalability, and performance:
 
-- **Frontend**: Next.js with React for server-side rendering and optimal performance
-- **Backend**: Go microservices with API Gateway (Envoy Proxy)
-- **Databases**: PostgreSQL + Cassandra + Redis for different data patterns
-- **Search**: Elasticsearch for real-time flight search
-- **Streaming**: Apache Kafka for real-time data processing
-- **Analytics**: Apache Spark + BigQuery for data analytics and ML
-- **Infrastructure**: Kubernetes on GCP with Terraform IaC
+- **Frontend**: Next.js 15+ with React 19 for server-side rendering and optimal performance
+- **Backend**: Next.js API Routes and Server Actions
+- **Database**: PostgreSQL (Neon serverless) with Prisma ORM
+- **Caching**: Redis (Vercel KV) + in-app offer caching
+- **Search**: Elasticsearch for destination discovery
+- **Streaming**: Apache Kafka for event processing
+- **Infrastructure**: Vercel for frontend deployment, Terraform IaC for cloud resources
 
 ## Project Structure
 
 ```
 spontra/
-├── services/              # Go microservices
-│   ├── user-service/      # Authentication and user management
-│   ├── search-service/    # Flight search orchestration
-│   ├── pricing-service/   # Price comparison and tracking
-│   └── data-ingestion-service/  # External API integration
-├── frontend/              # Next.js React application
+├── frontend/              # Next.js 15+ application
+│   ├── src/app/          # App Router pages and API routes
+│   ├── src/actions/      # Server Actions for data mutations
+│   ├── src/lib/          # Shared utilities and services
+│   ├── prisma/           # Prisma schema and migrations
+│   └── tests/            # Test suites
 ├── infrastructure/        # Terraform infrastructure as code
-├── docker/               # Docker configurations
-├── k8s/                  # Kubernetes manifests
-├── scripts/              # Development and deployment scripts
+├── docker/               # Docker configurations for infrastructure services
+├── scripts/              # Data management and deployment scripts
 └── docs/                 # Technical documentation
 ```
 
@@ -51,11 +50,9 @@ spontra/
 
 ### Prerequisites
 
-- Docker & Docker Compose
-- Go 1.21+
+- Docker & Docker Compose (for infrastructure services)
 - Node.js 18+
-- kubectl (for Kubernetes deployment)
-- Terraform (for infrastructure)
+- Terraform (for cloud infrastructure deployment)
 
 ### Development Setup
 
@@ -65,31 +62,42 @@ git clone <repository-url>
 cd spontra
 ```
 
-2. Start the development environment:
+2. Set up environment variables:
 ```bash
-make dev-up
+cp frontend/.env.example frontend/.env
+# Edit .env with your credentials
 ```
 
-3. Run the frontend:
+3. Start infrastructure services (optional, for local development):
 ```bash
-cd frontend && npm run dev
+cd docker
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
-## Services
+4. Run the frontend:
+```bash
+cd frontend
+npm install
+npx prisma generate
+npm run dev
+```
 
-### Core Microservices
+## Key Technologies
 
-- **User Service**: Handles authentication, user profiles, and preferences
-- **Search Service**: Orchestrates flight searches and manages caching
-- **Pricing Service**: Compares prices across providers and tracks changes
-- **Data Ingestion Service**: Integrates with external flight data APIs
+### Application Layer
 
-### Supporting Infrastructure
+- **Next.js 15+**: App Router, React Server Components, Server Actions
+- **TypeScript**: Strict mode for type safety
+- **Prisma 6+**: Type-safe database ORM with 48 models
+- **Neon PostgreSQL**: Serverless PostgreSQL database
+- **Vercel KV**: Redis for caching and sessions
 
-- **API Gateway**: Routes requests and handles cross-cutting concerns
-- **Message Queue**: Kafka for asynchronous processing
-- **Databases**: Multi-store approach for optimal data patterns
-- **Monitoring**: Prometheus, Grafana, and distributed tracing
+### Infrastructure Services
+
+- **Elasticsearch**: Destination search and discovery
+- **Kafka**: Event streaming for analytics
+- **Redis**: Distributed caching
+- **Cassandra**: Historical flight data (legacy)
 
 ## Data Management
 
@@ -132,18 +140,19 @@ python populate_flight_durations.py
 - **search_sessions**: User search history and preferences
 - **search_history**: Detailed search analytics
 
-## Development
-
-See [Development Guide](docs/development.md) for detailed setup instructions.
-
-## Deployment
-
-See [Deployment Guide](docs/deployment.md) for production deployment instructions.
-
-## Contributing
-
-See [Contributing Guide](docs/contributing.md) for development guidelines and best practices.
 ## Admin Panel Resources
 - Quickstart: [docs/ADMIN_PANEL_QUICKSTART.md](docs/ADMIN_PANEL_QUICKSTART.md)
 - Cheat Sheet: [docs/ADMIN_PANEL_CHEATSHEET.md](docs/ADMIN_PANEL_CHEATSHEET.md)
 - Production Checklist: [docs/ADMIN_PRODUCTION_CHECKLIST.md](docs/ADMIN_PRODUCTION_CHECKLIST.md)
+
+## Deployment
+
+The frontend is deployed to Vercel with automatic deployments from the main branch. Infrastructure services run on cloud providers managed via Terraform.
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+- TypeScript strict mode compliance
+- Prisma migrations for database changes
+- Test coverage for new features
+- Documentation updates

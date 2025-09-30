@@ -13,8 +13,7 @@ export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest): Promise<Response> {
   return trackExternalAPI(
-    'health_check',
-    'detailed_health',
+    'health_check_detailed',
     async (span: Span) => {
       const startTime = Date.now()
       const correlationId = request.headers.get('x-correlation-id') || crypto.randomUUID()

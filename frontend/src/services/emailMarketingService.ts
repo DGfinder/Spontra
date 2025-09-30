@@ -103,7 +103,7 @@ class EmailMarketingService {
 
   constructor(config?: Partial<EmailMarketingServiceConfig>) {
     this.config = {
-      baseUrl: process.env.NEXT_PUBLIC_EMAIL_API_URL || 'http://localhost:8085',
+      baseUrl: process.env.NEXT_PUBLIC_EMAIL_API_URL || 'http://localhost:3000/api/admin/marketing/email',
       timeout: 30000,
       ...config
     }
