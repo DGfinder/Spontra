@@ -838,6 +838,7 @@ model Conversion {
   commission  Decimal  @db.Decimal(18,2)
   saleAmount  Decimal? @db.Decimal(18,2)
   currency    String
+  market      String?  // Denormalized from Click for easier querying
   providerRef String   // References Provider.id
   providerId  String   // Store the providerId for queries
   rawPayload  String?  // JSON blob for audits
@@ -847,6 +848,7 @@ model Conversion {
   provider    Provider @relation(fields: [providerRef], references: [id], map: "conversion_provider_fkey")
 
   @@index([providerId, createdAt])
+  @@index([providerId, market, createdAt])
   @@index([status, createdAt])
   @@map("conversions")
 }
