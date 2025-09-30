@@ -80,7 +80,7 @@ export async function GET(request: NextRequest): Promise<Response> {
           lastFailureTime: stats.lastFailureTime?.toISOString(),
           lastSuccessTime: stats.lastSuccessTime?.toISOString(),
           resetTime: stats.resetTime?.toISOString(),
-          healthStatus: this.getHealthStatus(stats),
+          healthStatus: getHealthStatus(stats),
           isHealthy: stats.state === CircuitState.CLOSED && stats.uptime >= 95
         }))
 
@@ -112,9 +112,9 @@ export async function GET(request: NextRequest): Promise<Response> {
             uptime: stats.uptime,
             failureCount: stats.failureCount,
             lastFailureTime: stats.lastFailureTime?.toISOString(),
-            issue: this.getIssueDescription(stats)
+            issue: getIssueDescription(stats)
           })),
-          recommendations: this.generateRecommendations(serviceMetrics),
+          recommendations: generateRecommendations(serviceMetrics),
           generatedAt: new Date().toISOString()
         }
 
@@ -292,8 +292,8 @@ export async function POST(request: NextRequest): Promise<Response> {
             result = {
               service: validatedData.service,
               stats,
-              healthStatus: this.getHealthStatus(stats),
-              recommendations: this.getServiceRecommendations(validatedData.service, stats)
+              healthStatus: getHealthStatus(stats),
+              recommendations: getServiceRecommendations(validatedData.service, stats)
             }
             break
         }
