@@ -815,11 +815,14 @@ model Click {
   userAgent    String?
   ipHash       String?   // store a hash, not the IP
   landed200    Boolean   @default(false)
+  hasLanded    Boolean   @default(false)
+  landedAt     DateTime?
+  finalUrl     String?
   createdAt    DateTime  @default(now())
 
   provider     Provider      @relation(fields: [providerRef], references: [id], map: "click_provider_fkey")
   conversions  Conversion[]
-  
+
   @@index([providerId, market, createdAt])
   @@index([sessionId])
   @@index([clickId])
@@ -969,10 +972,128 @@ model ApiLog {
   ipAddress        String?
   userId           String?
   createdAt        DateTime @default(now())
-  
+
   @@index([endpoint, statusCode])
   @@index([statusCode, createdAt])
   @@index([createdAt])
   @@index([endpoint, createdAt])
   @@map("api_logs")
+}
+
+// Landing page tracking - when users land on provider sites
+model Landing {
+  id               String   @id @default(cuid())
+  clickId          String
+  providerId       String
+  market           String
+  finalUrl         String
+  responseTimeMs   Int?
+  referrer         String?
+  userAgent        String?
+  ipHash           String?
+  isValidReferrer  Boolean  @default(true)
+  landedAt         DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  @@index([clickId])
+  @@index([providerId, market])
+  @@index([landedAt])
+  @@map("landings")
+}
+
+// Click events for analytics and metrics
+model ClickEvent {
+  id            String   @id @default(cuid())
+  clickId       String   @unique
+  providerId    String
+  offerId       String
+  origin        String?
+  destination   String?
+  price         Decimal  @db.Decimal(18,2)
+  currency      String
+  market        String
+  sessionId     String?
+  userAgent     String?
+  timestamp     DateTime @default(now())
+
+  conversions   ConversionEvent[]
+
+  @@index([providerId, market])
+  @@index([sessionId])
+  @@index([timestamp])
+  @@map("click_events")
+}
+
+// Conversion events for analytics and metrics
+model ConversionEvent {
+  id              String      @id @default(cuid())
+  clickEventId    String      @map("click_event_id")
+  conversionId    String      @unique @map("conversion_id")
+  providerId      String      @map("provider_id")
+  totalPrice      Decimal     @map("total_price") @db.Decimal(18,2)
+  commission      Decimal     @db.Decimal(18,2)
+  currency        String
+  status          String      // APPROVED, PENDING, REJECTED
+  timestamp       DateTime    @default(now())
+
+  clickEvent      ClickEvent  @relation(fields: [clickEventId], references: [id])
+
+  @@index([providerId])
+  @@index([status])
+  @@index([timestamp])
+  @@map("conversion_events")
+}
+
+// Search session tracking
+model SearchSession {
+  id                      String    @id @default(cuid())
+  origin_airport          String?
+  destination_airport     String?
+  departure_date          DateTime?
+  return_date             DateTime?
+  passengers              Int       @default(1)
+  preferences             String?   // JSON string
+  status                  String    @default("active")
+  expires_at              DateTime?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime  @default(now())
+
+  @@index([status])
+  @@index([created_at])
+  @@index([expires_at])
+  @@map("search_sessions")
+}
+
+// Provider infants capability tracking
+model ProviderInfantsCapability {
+  id              String   @id @default(cuid())
+  providerId      String   @unique
+  supportsInfants Boolean  @default(false)
+  maxInfants      Int      @default(0)
+  requiresLapInfant Boolean @default(true)
+  notes           String?
+  lastChecked     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([providerId])
+  @@map("provider_infants_capabilities")
+}
+
+// System alerts and monitoring logs
+model AlertLog {
+  id          String   @id @default(cuid())
+  alertType   String   // CRITICAL, WARNING, INFO
+  category    String   // performance, revenue, conversion, etc
+  message     String
+  severity    String   // HIGH, MEDIUM, LOW
+  metadata    String?  // JSON string
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([alertType, resolved])
+  @@index([category])
+  @@index([createdAt])
+  @@map("alert_logs")
 }
