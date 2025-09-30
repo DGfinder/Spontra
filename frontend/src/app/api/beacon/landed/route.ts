@@ -61,10 +61,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     // Find the original click
     const click = await prisma.click.findUnique({
-      where: { clickId },
-      include: {
-        searchQuery: true
-      }
+      where: { clickId }
     });
 
     if (!click) {
