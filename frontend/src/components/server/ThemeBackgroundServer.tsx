@@ -70,34 +70,34 @@ export async function ThemeBackgroundServer() {
 
 // Export theme data for client components
 export const THEMES_DATA = [
-  { 
-    id: 'adventure', 
-    label: 'Adventure', 
+  {
+    id: 'adventure',
+    label: 'Adventure',
     background: '/adventure-background.jpg',
     color: 'adventure'
   },
-  { 
-    id: 'nature', 
-    label: 'Nature', 
+  {
+    id: 'nature',
+    label: 'Nature',
     background: '/nature-background.jpg',
     color: 'nature'
   },
-  { 
-    id: 'indulge', 
-    label: 'Indulge', 
+  {
+    id: 'indulge',
+    label: 'Indulge',
     background: '/indulge-background.jpg',
     color: 'indulge'
   },
-  { 
-    id: 'vibe', 
-    label: 'Vibe', 
+  {
+    id: 'vibe',
+    label: 'Vibe',
     background: '/vibe-background.jpg',
     color: 'vibe'
   },
-  { 
-    id: 'discover', 
-    label: 'Discover', 
+  {
+    id: 'discover',
+    label: 'Discover',
     background: '/discover-background.jpg',
     color: 'discover'
   }
-] as const
+]
