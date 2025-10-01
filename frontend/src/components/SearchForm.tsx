@@ -4,8 +4,7 @@ import { WorldClassAirportSearch } from './WorldClassAirportSearch'
 import { FlightTimeSlider } from './FlightTimeSlider'
 import { TripTypeToggle } from './TripTypeToggle'
 import { FormField, FormInput } from './ui/FormField'
-import { useOptimizedSearch } from '@/hooks/useOptimizedSearch'
-import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
+// Hooks removed in ultra-minimal MVP - functionality simplified
 import { cn } from '@/lib/utils'
 import {
   getThemeColor,

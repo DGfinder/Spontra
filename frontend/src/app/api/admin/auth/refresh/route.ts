@@ -6,7 +6,7 @@ export const revalidate = 0
 
 import { ADMIN_SESSION_COOKIE, ADMIN_SESSION_MAX_AGE, createAdminSessionToken } from '@/lib/adminAuth'
 import { adminRepository } from '@/lib/adminRepository'
-import { trackError } from '@/lib/monitoring'
+import { trackError } from '@/lib/stubs'
 import type { AdminPermission, AdminUser } from '@/types/admin'
 
 function buildAdminUserResponse(dbUser: any): AdminUser {

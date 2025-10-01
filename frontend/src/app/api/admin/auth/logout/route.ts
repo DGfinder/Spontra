@@ -6,7 +6,7 @@ export const revalidate = 0
 
 import { ADMIN_SESSION_COOKIE } from '@/lib/adminAuth'
 import { adminRepository } from '@/lib/adminRepository'
-import { trackError } from '@/lib/monitoring'
+import { trackError } from '@/lib/stubs'
 
 export async function POST(request: NextRequest): Promise<Response> {
   try {

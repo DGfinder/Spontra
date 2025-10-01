@@ -2,11 +2,15 @@
 
 import { Inter, Mulish } from 'next/font/google'
 import { ErrorBoundary } from '../components/ErrorBoundary'
-import { UserAuthProvider } from '@/contexts/UserAuthContext'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import AffiliateDisclosure from '@/components/AffiliateDisclosure'
 import './globals.css'
+
+// Simple auth context stub for MVP
+const SimpleAuthProvider = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>
+}
 
 const inter = Inter({ subsets: ['latin'] })
 const mulish = Mulish({ 
@@ -38,9 +42,9 @@ export default function RootLayout({
             }
           }}
         >
-          <UserAuthProvider>
+          <SimpleAuthProvider>
             {children}
-          </UserAuthProvider>
+          </SimpleAuthProvider>
         </ErrorBoundary>
         <AffiliateDisclosure 
           showOnPages={['/', '/flights', '/search']}

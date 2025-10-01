@@ -7,8 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { checkRateLimit, getClientFingerprint } from '@/lib/productionRateLimits';
-import { generateBeaconUrl } from '@/lib/beaconUtils';
+import { checkRateLimit, getClientFingerprint, generateBeaconUrl } from '@/lib/stubs';
 
 export const runtime = 'nodejs';
 
