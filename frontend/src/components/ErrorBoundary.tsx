@@ -97,3 +97,84 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return this.props.children
   }
 }
+
+// Specialized error boundaries for different app sections
+export const SearchFormErrorBoundary = ({ children }: { children: React.ReactNode }) => (
+  <ErrorBoundary
+    fallback={(error, errorInfo, resetError) => (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 m-4">
+        <div className="flex items-center gap-2 text-red-700 mb-2">
+          <AlertTriangle className="h-5 w-5" />
+          <h3 className="font-medium">Search Form Error</h3>
+        </div>
+        <p className="text-red-600 text-sm mb-3">
+          There was an error with the search form. Please try refreshing the page.
+        </p>
+        <button
+          onClick={resetError}
+          className="bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1 rounded text-sm font-medium"
+        >
+          Try Again
+        </button>
+      </div>
+    )}
+  >
+    {children}
+  </ErrorBoundary>
+)
+
+export const FlightResultsErrorBoundary = ({ children }: { children: React.ReactNode }) => (
+  <ErrorBoundary
+    fallback={(error, errorInfo, resetError) => (
+      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 m-4">
+        <div className="flex items-center gap-2 text-orange-700 mb-2">
+          <AlertTriangle className="h-5 w-5" />
+          <h3 className="font-medium">Flight Results Error</h3>
+        </div>
+        <p className="text-orange-600 text-sm mb-3">
+          Unable to load flight results. This might be due to API issues or network problems.
+        </p>
+        <button
+          onClick={resetError}
+          className="bg-orange-100 hover:bg-orange-200 text-orange-700 px-3 py-1 rounded text-sm font-medium"
+        >
+          Retry Search
+        </button>
+      </div>
+    )}
+  >
+    {children}
+  </ErrorBoundary>
+)
+
+export const BookingFlowErrorBoundary = ({ children }: { children: React.ReactNode }) => (
+  <ErrorBoundary
+    fallback={(error, errorInfo, resetError) => (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 m-4">
+        <div className="flex items-center gap-2 text-blue-700 mb-2">
+          <AlertTriangle className="h-5 w-5" />
+          <h3 className="font-medium">Booking Flow Error</h3>
+        </div>
+        <p className="text-blue-600 text-sm mb-3">
+          There was an error in the booking process. Your search results are still available.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={resetError}
+            className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded text-sm font-medium"
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm font-medium"
+          >
+            Start Over
+          </button>
+        </div>
+      </div>
+    )}
+  >
+    {children}
+  </ErrorBoundary>
+)
