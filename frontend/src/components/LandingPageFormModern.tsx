@@ -89,9 +89,6 @@ export function LandingPageFormModern({ initialData }: LandingPageFormModernProp
   } = useDestinationExploreModern()
   
   const router = useRouter()
-  
-  // Get user authentication state
-  const { user, isAuthenticated, logout } = useUserAuth()
 
   const currentTheme = THEMES_DATA.find(t => t.id === formData.selectedTheme) || THEMES_DATA[0]
 

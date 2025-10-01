@@ -428,16 +428,6 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
             />
           ))}
 
-          {/* Loading Indicator for Videos */}
-          {isLoadingVideos && (
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 mt-20">
-              <div className="bg-black/40 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
-                <div className="animate-spin w-4 h-4 border-2 border-yellow-400 border-t-transparent rounded-full"></div>
-                <span>Loading activity videos...</span>
-              </div>
-            </div>
-          )}
-
           {/* Flight Info Summary */}
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
             <div className="bg-black/40 backdrop-blur-sm text-white px-8 py-3 rounded-full text-sm tracking-wide font-medium border border-white/20">
