@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, Clock, DollarSign, Users, Calendar, Play, Video, Plus } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { VideoModal } from './VideoModal'
-import { youtubeService, YouTubeVideo } from '../services/youtubeService'
+import { YouTubeVideo } from '../services/youtubeService'
 import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 import { DestinationRecommendation } from '@/services/apiClient'
 
@@ -232,109 +232,63 @@ export function ActivityConstellation({ recommendation, originAirport, onBack, o
   const [activities, setActivities] = useState<ActivityOption[]>([])
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
   const [selectedActivityForVideo, setSelectedActivityForVideo] = useState<ActivityOption | null>(null)
-  const [isLoadingVideos, setIsLoadingVideos] = useState(false)
 
-  // Sample activity data - in real implementation, this would come from the recommendation
-  const baseActivities: ActivityOption[] = [
-    {
-      id: 'hiking',
-      name: 'Mountain Hiking',
-      description: 'Explore breathtaking mountain trails with stunning panoramic views and fresh alpine air.',
-      image: '/activities/hiking.jpg',
-      duration: '4-6 hours',
-      priceRange: '€25-45',
-      difficulty: 'Moderate',
-      bestTime: 'Apr-Oct',
-      groupSize: '2-12 people',
-      category: 'adventure'
-    },
-    {
-      id: 'food-tour',
-      name: 'Culinary Tour',
-      description: 'Discover local flavors and traditional dishes with expert guides through historic markets.',
-      image: '/activities/food-tour.jpg',
-      duration: '3-4 hours',
-      priceRange: '€35-60',
-      difficulty: 'Easy',
-      bestTime: 'Year-round',
-      groupSize: '4-15 people',
-      category: 'food'
-    },
-    {
-      id: 'cultural-walk',
-      name: 'Historic City Walk',
-      description: 'Journey through centuries of history visiting iconic landmarks and hidden cultural gems.',
-      image: '/activities/cultural-walk.jpg',
-      duration: '2-3 hours',
-      priceRange: '€15-30',
-      difficulty: 'Easy',
-      bestTime: 'Year-round',
-      groupSize: '5-20 people',
-      category: 'culture'
-    },
-    {
-      id: 'nightlife',
-      name: 'Evening Entertainment',
-      description: 'Experience the vibrant nightlife scene with local bars, live music, and cultural performances.',
-      image: '/activities/nightlife.jpg',
-      duration: '4-6 hours',
-      priceRange: '€20-50',
-      difficulty: 'Easy',
-      bestTime: 'Year-round',
-      groupSize: '2-8 people',
-      category: 'nightlife'
-    },
-    {
-      id: 'nature-park',
-      name: 'Nature Reserve',
-      description: 'Discover local wildlife and pristine natural landscapes in protected conservation areas.',
-      image: '/activities/nature.jpg',
-      duration: '3-5 hours',
-      priceRange: '€10-25',
-      difficulty: 'Easy',
-      bestTime: 'Mar-Nov',
-      groupSize: '2-15 people',
-      category: 'nature'
-    }
-  ]
-
-  // Fetch videos for activities
-  const fetchVideosForActivities = async () => {
-    setIsLoadingVideos(true)
-    
-    const activitiesWithVideos = await Promise.all(
-      baseActivities.map(async (activity) => {
-        try {
-          const videos = await youtubeService.searchActivityVideos({
-            destination: recommendation.destination.city_name,
-            activity: activity.id,
-            maxResults: 3
-          })
-          
-          return {
-            ...activity,
-            videos,
-            hasVideo: videos.length > 0
-          }
-        } catch (error) {
-          console.error(`Error fetching videos for ${activity.name}:`, error)
-          return {
-            ...activity,
-            videos: [],
-            hasVideo: false
-          }
-        }
-      })
-    )
-    
-    setActivities(activitiesWithVideos)
-    setIsLoadingVideos(false)
-  }
-
-  // Fetch videos on component mount
+  // Parse activities from destination.activities JSON based on current theme
   useEffect(() => {
-    fetchVideosForActivities()
-  }, [recommendation.destination.city_name])
+    async function loadActivities() {
+      try {
+        const { db } = await import('@/server/db')
+
+        // Fetch full destination with activities
+        const destination = await db.destination.findUnique({
+          where: {
+            airportCode: recommendation.destination.airport_code
+          }
+        })
+
+        if (!destination || !destination.activities) {
+          setActivities([])
+          return
+        }
+
+        // Parse activities JSON - expected format: { "adventure": [...], "culture": [...], etc }
+        const activitiesData = destination.activities as any
+        const themeActivities = activitiesData[themeKey] || []
+
+        // Transform to ActivityOption format
+        const parsedActivities: ActivityOption[] = themeActivities.map((poi: any) => ({
+          id: poi.name || poi.id || Math.random().toString(),
+          name: poi.name,
+          description: poi.description || '',
+          image: poi.imageUrl || poi.image || '',
+          duration: poi.duration || '2-3 hours',
+          priceRange: poi.priceRange || poi.price || '€20-40',
+          difficulty: poi.difficulty || 'Easy',
+          bestTime: poi.bestTime || 'Year-round',
+          groupSize: poi.groupSize || '2-10 people',
+          category: themeKey,
+          videos: poi.youtubeId ? [{
+            id: { videoId: poi.youtubeId },
+            snippet: {
+              title: poi.name,
+              description: poi.description,
+              thumbnails: {
+                high: { url: poi.imageUrl || '' }
+              }
+            }
+          }] : [],
+          hasVideo: !!poi.youtubeId
+        }))
+
+        setActivities(parsedActivities)
+      } catch (error) {
+        console.error('Failed to load activities:', error)
+        setActivities([])
+      }
+    }
+
+    loadActivities()
+  }, [recommendation.destination.airport_code, themeKey])
 
   const handleVideoClick = (activity: ActivityOption) => {
     setSelectedActivityForVideo(activity)

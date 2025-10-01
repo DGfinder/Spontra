@@ -4,8 +4,6 @@ import { useState, useEffect } from 'react'
 import { ArrowLeft, MapPin, Plane, Users, Star, Map } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { DestinationRecommendation } from '@/services/apiClient'
-import { themeDestinationService } from '@/services/themeDestinationService'
-import { EnhancedDestinationRecommendation } from '@/types/destinations'
 import { getThemeColor, getThemeHoverColor, type ThemeKey } from '@/lib/theme'
 
 interface CityOption {
@@ -307,131 +305,56 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
     let active = true
     setLoading(true)
     setError(null)
-    
+
     const loadCityData = async () => {
       try {
-        console.log(`🏙️ Loading cities for ${country.name} with theme ${selectedTheme}`)
-        
-        // Try enhanced backend service first
-        const isBackendHealthy = await themeDestinationService.healthCheck()
-        
-        if (isBackendHealthy && selectedTheme) {
-          // Use backend theme destination service
-          const destinations = await themeDestinationService.getDestinationsByCountryAndTheme(
-            getCountryCode(country.name), 
-            selectedTheme, 
-            originAirport
-          )
-          
-          if (!active) return
-          
-          // Transform backend destinations to CityOption format
-          const transformedCities: CityOption[] = destinations.map((dest: EnhancedDestinationRecommendation) => ({
-            id: dest.destination.id,
-            name: dest.destination.city_name,
-            airport_code: dest.destination.airport_code,
-            population: 1000000, // Default population
-            flight_frequency: Math.round(dest.averageFlightTime ? 50 / dest.averageFlightTime : 7),
-            primary_theme: getPrimaryTheme(dest.themeScores || {}, selectedTheme),
-            secondary_themes: getSecondaryThemes(dest.themeScores || {}),
-            is_hidden_gem: (dest.destination.popularity_score || 0) < 70,
-            estimated_price: dest.estimated_flight_price || '€200-400',
-            flight_duration: dest.averageFlightTime || 2,
-            description: dest.destination.description,
-            themeScores: dest.themeScores,
-            highlights: dest.highlights,
-            bestMonths: dest.bestMonths,
-            countryName: dest.destination.country_name,
-            countryCode: dest.destination.country_code
-          }))
-          
-          setCities(transformedCities)
-        } else {
-          // Fallback to legacy API
-          const response = await fetch('/api/amadeus/cities', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ countryName: country.name, origin: originAirport })
-          })
-          
-          if (!active) return
-          
-          const json = await response.json()
-          if (!json.ok) throw new Error(json.error || 'Failed to load cities')
-          setCities(json.data as CityOption[])
-        }
+        console.log(`🏙️ Loading cities for ${country.name}`)
+
+        // Simple DB query - fetch cities from this country
+        const { db } = await import('@/server/db')
+
+        const destinations = await db.destination.findMany({
+          where: {
+            countryName: country.name
+          },
+          include: {
+            airport: true
+          }
+        })
+
+        if (!active) return
+
+        // Transform to CityOption with simple defaults
+        const cityOptions: CityOption[] = destinations.map(dest => ({
+          id: dest.id,
+          name: dest.cityName,
+          airport_code: dest.airportCode,
+          population: 1000000, // Default
+          flight_frequency: 50, // Default
+          primary_theme: (selectedTheme as any) || 'adventure',
+          secondary_themes: [],
+          is_hidden_gem: false,
+          estimated_price: '€200-400', // Default
+          flight_duration: 2, // Default
+          description: dest.description || 'Beautiful destination',
+          countryName: dest.countryName,
+          countryCode: dest.countryCode
+        }))
+
+        setCities(cityOptions)
       } catch (e: any) {
         if (active) {
           console.error('City loading failed:', e)
-          setError(e.message)
+          setError(e.message || 'Failed to load cities')
         }
       } finally {
         if (active) setLoading(false)
       }
     }
-    
+
     loadCityData()
     return () => { active = false }
-  }, [country?.name, originAirport, selectedTheme])
-  
-  // Helper function to get country code from name (basic mapping)
-  const getCountryCode = (countryName: string): string => {
-    const countryMap: Record<string, string> = {
-      'Spain': 'ES',
-      'France': 'FR', 
-      'Italy': 'IT',
-      'Germany': 'DE',
-      'United Kingdom': 'GB',
-      'Portugal': 'PT',
-      'Netherlands': 'NL',
-      'Greece': 'GR',
-      'Czech Republic': 'CZ',
-      'Austria': 'AT',
-      'Poland': 'PL',
-      'Hungary': 'HU',
-      'Croatia': 'HR',
-      'Switzerland': 'CH',
-      'Belgium': 'BE'
-    }
-    return countryMap[countryName] || countryName.slice(0, 2).toUpperCase()
-  }
-  
-  // Helper to determine primary theme from scores
-  const getPrimaryTheme = (scores: any, selectedTheme: string): 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife' => {
-    const validThemes: Array<'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'> = 
-      ['vibe', 'adventure', 'discover', 'indulge', 'nature', 'culture', 'food', 'nightlife']
-    
-    if (scores && Object.keys(scores).length > 0) {
-      const maxScore = Math.max(...Object.values(scores) as number[])
-      const primary = Object.keys(scores).find(key => scores[key] === maxScore)
-      if (primary && validThemes.includes(primary as any)) {
-        return primary as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
-      }
-    }
-    
-    const defaultTheme = selectedTheme && validThemes.includes(selectedTheme as any) 
-      ? selectedTheme as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'
-      : 'adventure'
-    
-    return defaultTheme
-  }
-  
-  // Helper to get secondary themes from scores
-  const getSecondaryThemes = (scores: any): Array<{theme: 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife', strength: number}> => {
-    if (!scores) return []
-    
-    const validThemes: Array<'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife'> = 
-      ['vibe', 'adventure', 'discover', 'indulge', 'nature', 'culture', 'food', 'nightlife']
-    
-    return Object.entries(scores)
-      .map(([theme, score]) => ({ 
-        theme: theme as 'vibe' | 'adventure' | 'discover' | 'indulge' | 'nature' | 'culture' | 'food' | 'nightlife', 
-        strength: (score as number) / 100 
-      }))
-      .filter(({theme, strength}) => validThemes.includes(theme) && strength >= 0.3)
-      .sort((a, b) => b.strength - a.strength)
-      .slice(1, 4) // Skip primary, take next 3
-  }
+  }, [country?.name, selectedTheme])
 
   // Sort cities by importance: population + flight frequency, with hidden gems getting slight boost
   const sortedCities = [...cities].sort((a, b) => {
