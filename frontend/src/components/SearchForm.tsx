@@ -2,15 +2,13 @@
 
 import { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
-import { AirportSearch } from './AirportSearch'
-import { ThemeSelector } from './ThemeSelector'
 import { Button } from './ui/Button'
 
-export function SearchForm() {
+export function SearchForm(): JSX.Element {
   const { filters, updateFilter, setCurrentStep, setLoading, setDestinations, setError } = useSearchStore()
-  const [isSearching, setIsSearching] = useState(false)
+  const [isSearching, setIsSearching] = useState<boolean>(false)
 
-  const handleSearch = async () => {
+  const handleSearch = async (): Promise<void> => {
     if (!filters.departureAirport || !filters.theme) {
       setError('Please select a departure airport and theme')
       return
@@ -21,7 +19,7 @@ export function SearchForm() {
     setError(null)
 
     try {
-      const response = await fetch('/api/destinations/search', {
+      const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -32,7 +30,7 @@ export function SearchForm() {
         })
       })
 
-      const data = await response.json()
+      const data: { success: boolean; destinations: any[]; error?: string } = await response.json()
 
       if (data.success) {
         setDestinations(data.destinations)
@@ -40,13 +38,21 @@ export function SearchForm() {
       } else {
         setError(data.error || 'Search failed')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('Network error occurred')
     } finally {
       setIsSearching(false)
       setLoading(false)
     }
   }
+
+  const themes: Array<{ value: string; label: string }> = [
+    { value: 'adventure', label: '🏔️ Adventure' },
+    { value: 'beach', label: '🏖️ Beach' },
+    { value: 'city', label: '🏙️ City Break' },
+    { value: 'culture', label: '🏛️ Culture' },
+    { value: 'nature', label: '🌲 Nature' }
+  ]
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
@@ -69,10 +75,12 @@ export function SearchForm() {
               <label className="block text-white text-sm font-medium mb-3">
                 Where are you flying from?
               </label>
-              <AirportSearch
+              <input
+                type="text"
                 value={filters.departureAirport}
-                onChange={(value) => updateFilter('departureAirport', value)}
-                placeholder="Search airports..."
+                onChange={(e) => updateFilter('departureAirport', e.target.value)}
+                placeholder="e.g. LAX, JFK, LHR"
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-white/50 border border-white/30 focus:border-white/60 focus:outline-none"
               />
             </div>
 
@@ -80,10 +88,18 @@ export function SearchForm() {
               <label className="block text-white text-sm font-medium mb-3">
                 What type of adventure?
               </label>
-              <ThemeSelector
+              <select
                 value={filters.theme}
-                onChange={(value) => updateFilter('theme', value)}
-              />
+                onChange={(e) => updateFilter('theme', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/20 text-white border border-white/30 focus:border-white/60 focus:outline-none"
+              >
+                <option value="">Select a theme</option>
+                {themes.map((theme) => (
+                  <option key={theme.value} value={theme.value} className="text-black">
+                    {theme.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div>
