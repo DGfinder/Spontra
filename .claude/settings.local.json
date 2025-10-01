@@ -5,7 +5,9 @@
       "Bash(grep:*)",
       "Bash(npm run build:*)",
       "Bash(rm:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(find:*)",
+      "Bash(true)"
     ],
     "deny": [],
     "ask": []
