@@ -23,9 +23,10 @@ export async function POST(request: NextRequest) {
   return trackSearchOperation(
     'session_create',
     async (span: Span) => {
+      let body: any = undefined
       try {
         // Parse and validate request body
-        const body = await request.json()
+        body = await request.json()
         const validatedData = searchSessionSchema.parse(body)
 
         // Add search parameters to span
