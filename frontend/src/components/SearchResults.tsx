@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react'
-import { DestinationRecommendation } from '@/lib/stubs'
+import { type DestinationRecommendation } from '@/lib/searchState'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { CacheIndicator } from './CacheIndicator'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
-import { useFormData } from '@/lib/stubs'
+import { useFormData } from '@/lib/searchState'
 import { CountryConstellation } from './CountryConstellation'
-import { usePerformanceMonitoring } from '@/lib/stubs'
+// Performance monitoring removed for ultra-minimal MVP
 import { getThemeColor, type ThemeKey } from '@/lib/theme'
 
 interface SearchResultsProps {

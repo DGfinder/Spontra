@@ -15,7 +15,8 @@ import { SearchFormErrorBoundary, FlightResultsErrorBoundary, BookingFlowErrorBo
 import { NetworkStatus } from './NetworkStatus'
 import { LandingLayoutServer } from './server/LandingLayoutServer'
 import { THEMES_DATA } from './server/ThemeBackgroundServer'
-import { useDestinationExploreModern, useFormData, useSearchState, useNavigationState, useNavigationActions, DestinationRecommendation } from '@/lib/stubs'
+import { useDestinationExploreModern } from '@/hooks/useDestinationSearch'
+import { useFormData, useSearchState, useNavigationState, useNavigationActions, type DestinationRecommendation } from '@/lib/searchState'
 import { type ThemeKey } from '@/lib/theme'
 
 interface FormData {

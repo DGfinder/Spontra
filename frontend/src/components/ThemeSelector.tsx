@@ -1,62 +1,74 @@
-import { Mountain, Trees, Sparkles, Music, BookOpen } from 'lucide-react'
+'use client'
 
-interface Theme {
-  id: string
-  label: string
-  background: string
-  color: string
-}
+import { Mountain, Trees, Music, Sparkles, Users, ShoppingBag } from 'lucide-react'
 
 interface ThemeSelectorProps {
-  themes: Theme[]
-  selectedTheme: string
-  onThemeSelect: (themeId: string) => void
+  value: string
+  onChange: (value: 'adventure' | 'culture' | 'nightlife' | 'relaxation' | 'shopping' | 'nature') => void
 }
 
-export function ThemeSelector({ themes, selectedTheme, onThemeSelect }: ThemeSelectorProps) {
-  const getThemeIcon = (themeId: string, isSelected: boolean) => {
-    const iconProps = {
-      size: 18,
-      color: isSelected ? '#000000' : '#ffffff',
-      strokeWidth: 2
-    }
-    
-    switch (themeId) {
-      case 'adventure': return <Mountain {...iconProps} />
-      case 'nature': return <Trees {...iconProps} />
-      case 'indulge': return <Sparkles {...iconProps} />
-      case 'vibe': return <Music {...iconProps} />
-      case 'discover': return <BookOpen {...iconProps} />
-      default: return <></>  // Return empty fragment instead of null
-    }
+const themes = [
+  {
+    id: 'adventure' as const,
+    label: 'Adventure',
+    icon: Mountain,
+    description: 'Thrills & outdoor activities'
+  },
+  {
+    id: 'culture' as const,
+    label: 'Culture',
+    icon: Users,
+    description: 'Museums, art & history'
+  },
+  {
+    id: 'nightlife' as const,
+    label: 'Nightlife',
+    icon: Music,
+    description: 'Bars, clubs & entertainment'
+  },
+  {
+    id: 'relaxation' as const,
+    label: 'Relaxation',
+    icon: Sparkles,
+    description: 'Spas, beaches & wellness'
+  },
+  {
+    id: 'shopping' as const,
+    label: 'Shopping',
+    icon: ShoppingBag,
+    description: 'Markets, malls & boutiques'
+  },
+  {
+    id: 'nature' as const,
+    label: 'Nature',
+    icon: Trees,
+    description: 'Parks, wildlife & landscapes'
   }
+]
+
+export function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
   return (
-    <div className="mb-4 md:mb-6">
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-1 md:gap-2">
-        {themes.map((theme) => {
-          const isSelected = selectedTheme === theme.id
-          return (
-            <button
-              key={theme.id}
-              type="button"
-              onClick={() => onThemeSelect(theme.id)}
-              className={`p-2 md:p-3 rounded text-xs transition-all duration-200 ${
-                isSelected
-                  ? 'bg-white text-black'
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
-              aria-label={`Select ${theme.label} theme`}
-            >
-              <div className="text-center">
-                <div className="text-sm md:text-lg mb-1 flex justify-center">
-                  {getThemeIcon(theme.id, isSelected)}
-                </div>
-                <div className="text-xs font-medium hidden md:block">{theme.label}</div>
-              </div>
-            </button>
-          )
-        })}
-      </div>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {themes.map((theme) => {
+        const Icon = theme.icon
+        const isSelected = value === theme.id
+        
+        return (
+          <button
+            key={theme.id}
+            onClick={() => onChange(theme.id)}
+            className={`p-4 rounded-lg border transition-all ${
+              isSelected
+                ? 'bg-white/30 border-white/50 text-white'
+                : 'bg-white/10 border-white/20 text-white/80 hover:bg-white/20'
+            }`}
+          >
+            <Icon className="w-6 h-6 mx-auto mb-2" />
+            <div className="text-sm font-medium">{theme.label}</div>
+            <div className="text-xs opacity-75 mt-1">{theme.description}</div>
+          </button>
+        )
+      })}
     </div>
   )
 }

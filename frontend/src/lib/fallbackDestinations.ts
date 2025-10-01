@@ -1,4 +1,4 @@
-import type { DestinationRecommendation } from '@/lib/stubs'
+import type { DestinationRecommendation } from '@/lib/searchState'
 
 type ActivityType = 'adventure' | 'culture' | 'nightlife' | 'shopping' | 'relaxation'
 

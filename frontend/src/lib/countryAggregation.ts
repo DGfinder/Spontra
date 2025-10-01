@@ -1,6 +1,6 @@
 // Country aggregation utilities for destination results (ASCII-safe)
 
-import { DestinationRecommendation } from '@/lib/stubs'
+import { type DestinationRecommendation } from '@/lib/searchState'
 
 export interface CountryAggregation {
   country: {
