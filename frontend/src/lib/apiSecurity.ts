@@ -126,7 +126,7 @@ class APISecurityValidator {
     const protocol = req.headers.get('x-forwarded-proto') || 'http'
     
     if (protocol !== 'https') {
-      trackError({
+      trackError(new Error('Insecure request'), {
         errorType: 'api',
         errorCode: 'insecure_request',
         endpoint: new URL(req.url).pathname,
@@ -167,7 +167,7 @@ class APISecurityValidator {
     const origin = req.headers.get('origin')
     
     if (origin && !allowedOrigins.includes(origin)) {
-      trackError({
+      trackError(new Error('Invalid origin'), {
         errorType: 'api',
         errorCode: 'invalid_origin',
         endpoint: new URL(req.url).pathname,
@@ -265,7 +265,7 @@ class APISecurityValidator {
     // Block known bots and scrapers (except authorized ones)
     for (const blocked of this.blockedUserAgents) {
       if (userAgent.includes(blocked) && !this.isAuthorizedBot(userAgent)) {
-        trackError({
+        trackError(new Error('Blocked user agent'), {
           errorType: 'api',
           errorCode: 'blocked_user_agent',
           endpoint: new URL(req.url).pathname,
@@ -306,7 +306,7 @@ class APISecurityValidator {
     for (const header of suspiciousHeaders) {
       const value = req.headers.get(header)
       if (value && this.containsSuspiciousPattern(value)) {
-        trackError({
+        trackError(new Error('Suspicious header'), {
           errorType: 'api',
           errorCode: 'suspicious_header',
           endpoint: new URL(req.url).pathname,
@@ -334,7 +334,7 @@ class APISecurityValidator {
 
     // Check for suspicious patterns in URL
     if (this.containsSuspiciousPattern(fullPath)) {
-      trackError({
+      trackError(new Error('Suspicious URL'), {
         errorType: 'api',
         errorCode: 'suspicious_url',
         endpoint: url.pathname,

@@ -154,12 +154,13 @@ export const sentryHelpers = {
 
   /**
    * Start a transaction for performance monitoring
+   * Note: startTransaction is deprecated in Sentry 8.x, use startSpan instead
    */
   startTransaction(name: string, operation?: string) {
-    return Sentry.startTransaction({
+    return Sentry.startSpan({
       name,
       op: operation || 'function',
-    })
+    }, (span) => span)
   },
 
   /**
@@ -249,10 +250,10 @@ export function withSentryErrorBoundary<T extends React.ComponentType<any>>(
     showDialog?: boolean
   }
 ): T {
-  const fallbackComponent = options?.fallback || (() => React.createElement('div', null, 'Something went wrong'))
+  const fallbackComponent = options?.fallback || React.createElement('div', null, 'Something went wrong')
   
   return Sentry.withErrorBoundary(Component, {
-    fallback: fallbackComponent,
+    fallback: fallbackComponent as React.ComponentType<Sentry.ErrorBoundaryFallbackProps>,
     showDialog: options?.showDialog || false,
   }) as T
 }

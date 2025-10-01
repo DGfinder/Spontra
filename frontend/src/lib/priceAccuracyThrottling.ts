@@ -64,7 +64,7 @@ export async function calculatePriceAccuracy(
   // Calculate average price change percentage for changed prices only
   const changedChecks = checks.filter(c => c.priceChanged && c.percentageChange !== null);
   const avgChangePercent = changedChecks.length > 0
-    ? changedChecks.reduce((sum, c) => sum + Math.abs(c.percentageChange!), 0) / changedChecks.length
+    ? changedChecks.reduce((sum, c) => sum + Math.abs(Number(c.percentageChange!)), 0) / changedChecks.length
     : 0;
 
   // Get current provider reliability score

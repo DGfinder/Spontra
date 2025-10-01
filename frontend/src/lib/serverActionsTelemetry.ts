@@ -34,7 +34,7 @@ class ServerActionsTelemetry {
   
   async wrapAction<T extends any[], R>(
     actionName: string,
-    action: (...args: T) => Promise<R>,
+    action: () => Promise<R>,
     metadata?: {
       userId?: string
       route?: string

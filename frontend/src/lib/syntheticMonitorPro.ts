@@ -324,7 +324,7 @@ export async function runSyntheticMonitoringPro(): Promise<{
             data: {
               providerId: result.providerId,
               market: result.market,
-              testQuery: route,
+              testQuery: route as any,
               statusCode: result.statusCode,
               responseTimeMs: result.responseTimeMs,
               finalHost: result.finalHost,

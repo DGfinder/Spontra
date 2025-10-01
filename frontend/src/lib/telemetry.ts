@@ -214,7 +214,7 @@ export const metrics = {
   },
 }
 
-export function sanitizeAttributes(attributes: SpanAttributes) {
+export function sanitizeAttributes(attributes: Record<string, string | number | boolean | null | undefined>) {
   const result: Record<string, string | number | boolean> = {}
   Object.entries(attributes).forEach(([key, value]) => {
     if (value === undefined || value === null) return

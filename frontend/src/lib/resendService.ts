@@ -66,7 +66,7 @@ export class ResendEmailService {
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://spontra.com'}/auth/reset-password?token=${resetToken}`
     
     try {
-      const emailHtml = render(PasswordResetEmail({ 
+      const emailHtml = await render(PasswordResetEmail({ 
         resetUrl, 
         firstName 
       }))
@@ -99,7 +99,7 @@ export class ResendEmailService {
 
   async sendWelcomeEmail(email: string, firstName: string): Promise<EmailResponse> {
     try {
-      const emailHtml = render(WelcomeEmail({ 
+      const emailHtml = await render(WelcomeEmail({ 
         firstName,
         appUrl: process.env.NEXT_PUBLIC_APP_URL || 'https://spontra.com'
       }))
@@ -132,7 +132,7 @@ export class ResendEmailService {
 
   async sendPasswordChangeNotification(email: string, firstName: string): Promise<EmailResponse> {
     try {
-      const emailHtml = render(PasswordChangedEmail({ 
+      const emailHtml = await render(PasswordChangedEmail({ 
         firstName,
         changeDate: new Date()
       }))
