@@ -78,7 +78,7 @@ export function checkEdgeRateLimit(req: NextRequest): {
   remaining: number
   resetTime: Date
 } {
-  const ip = req.ip || req.headers.get('x-forwarded-for') || 'unknown'
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown'
   const pathname = new URL(req.url).pathname
   
   // Different limits for different endpoint types
@@ -123,7 +123,6 @@ export function createRateLimitResponse(retryAfter: number): NextResponse {
  */
 export function getClientIP(req: NextRequest): string {
   return (
-    req.ip ||
     req.headers.get('x-forwarded-for')?.split(',')[0] ||
     req.headers.get('x-real-ip') ||
     req.headers.get('cf-connecting-ip') || // Cloudflare

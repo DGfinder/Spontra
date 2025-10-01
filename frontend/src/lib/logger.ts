@@ -420,7 +420,7 @@ export const httpLogger = (req: any, res: any, responseTime: number) => {
       sessionId: req.session?.id,
       metadata: {
         userAgent: req.headers['user-agent'],
-        ip: req.ip || req.connection.remoteAddress,
+        ip: req.ip || req.connection?.remoteAddress || req.headers?.['x-forwarded-for'] || 'unknown',
         referer: req.headers.referer
       }
     }

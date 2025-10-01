@@ -112,7 +112,7 @@ export function getSessionFromCookies(cookieStore: ReadonlyRequestCookies): Prom
 
 export async function getCurrentUser(): Promise<UserSessionPayload | null> {
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const token = cookieStore.get(SESSION_COOKIE_NAME)?.value
     return await verifyUserSessionToken(token)
   } catch {

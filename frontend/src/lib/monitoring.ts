@@ -67,6 +67,10 @@ export function trackErrorMetrics(metrics: ErrorMetrics): void {
   // Disabled for MVP
 }
 
+export function trackError(error: Error, context?: any): void {
+  // Disabled for MVP
+}
+
 export function trackAPICall(endpoint: string, duration: number, success: boolean): void {
   // Disabled for MVP
 }
@@ -80,6 +84,7 @@ export default {
   trackSearchMetrics,
   trackBookingMetrics,
   trackErrorMetrics,
+  trackError,
   trackAPICall,
   trackUserAction,
 }
