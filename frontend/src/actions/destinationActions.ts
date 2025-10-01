@@ -6,7 +6,7 @@ import { validateApiRequest, destinationSearchApiSchema } from '@/lib/validation
 import { cacheGet, cacheSet } from '@/lib/cacheServer'
 import { apiClient } from '@/services/apiClient'
 import { amadeusService } from '@/services/amadeusService'
-import { telemetry } from '@/lib/serverActionsTelemetry'
+// import { telemetry } from '@/lib/serverActionsTelemetry' // Removed for MVP
 import type { DestinationRecommendation, ActivityType } from '@/services/apiClient'
 
 export interface ExploreDestinationsResult {
@@ -55,7 +55,8 @@ function mapThemeToActivityMatches(theme?: string, fallback?: ActivityType[]): A
 export async function exploreDestinationsAction(
   formData: FormDataInput
 ): Promise<ExploreDestinationsResult> {
-  return telemetry.wrapAction('exploreDestinations', async () => {
+  // return telemetry.wrapAction('exploreDestinations', async () => {
+  try {
     // DIRECT SEARCH MODE: Both airports specified
     if (formData.destinationAirport && formData.departureAirport && 
         formData.destinationAirport !== formData.departureAirport) {
@@ -109,7 +110,7 @@ export async function exploreDestinationsAction(
     // Check cache first
     const cached = await cacheGet(cacheKey).catch(() => null)
     if (cached) {
-      telemetry.trackCacheHit('exploreDestinations', true)
+      // telemetry.trackCacheHit('exploreDestinations', true)
       const cachedData = JSON.parse(cached)
       return {
         success: true,
@@ -119,7 +120,7 @@ export async function exploreDestinationsAction(
         requestId: cachedData.requestId
       }
     }
-    telemetry.trackCacheHit('exploreDestinations', false)
+    // telemetry.trackCacheHit('exploreDestinations', false)
 
     // Get cache TTL settings
     const settingsRaw = await cacheGet('admin:settings:general').catch(() => null)
@@ -237,10 +238,13 @@ export async function exploreDestinationsAction(
     revalidatePath('/search-results')
     
     return result
-
-  }, {
-    route: 'destinations-search'
-  })
+  } catch (error) {
+    console.error('Error in exploreDestinationsAction:', error)
+    return {
+      success: false,
+      error: 'Failed to explore destinations'
+    }
+  }
 }
 
 // Server Action for updating user preferences

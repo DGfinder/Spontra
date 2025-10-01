@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { captureException } from '@sentry/nextjs'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -38,9 +37,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     return response
   } catch (error) {
     console.error('Admin logout failed:', error)
-    captureException(error, {
-      tags: { component: 'admin_auth', endpoint: 'logout' }
-    })
+    console.error('Admin logout error:', error)
 
     trackError(new Error('Admin logout failed'), {
       errorType: 'api',

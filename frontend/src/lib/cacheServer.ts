@@ -1,125 +1,118 @@
 import 'server-only'
-import Redis from 'ioredis'
+import { kv } from '@vercel/kv'
 
 // =============================================================================
-// SERVER-SIDE CACHE (Redis + Memory Fallback)
+// SERVER-SIDE CACHE (Vercel KV)
 // =============================================================================
-// Used by API routes for cross-instance caching with Redis as primary store
+// Simplified caching using Vercel KV for MVP
 
 export interface CacheOptions {
   ttlSeconds?: number
   keyPrefix?: string
 }
 
-let redis: Redis | null = null
-
-function getRedis(): Redis | null {
-  if (redis !== null) return redis
-  const url = process.env.REDIS_URL || process.env.NEXT_PUBLIC_REDIS_URL
-  if (!url) return null
-  try {
-    redis = new Redis(url, { maxRetriesPerRequest: 3, lazyConnect: true })
-    return redis
-  } catch {
-    return null
-  }
-}
-
+// Simple in-memory fallback for development
 class MemoryLRU<V> {
   private map = new Map<string, { v: V; at: number }>()
   constructor(private limit = 500) {}
-  get(k: string) {
-    const it = this.map.get(k)
-    if (!it) return undefined
-    this.map.delete(k)
-    this.map.set(k, it)
-    return it.v
-  }
-  set(k: string, v: V) {
-    if (this.map.has(k)) this.map.delete(k)
-    this.map.set(k, { v, at: Date.now() })
-    if (this.map.size > this.limit) {
-      const oldest = this.map.keys().next().value as string | undefined
-      if (oldest !== undefined) this.map.delete(oldest)
+
+  set(key: string, value: V): void {
+    if (this.map.size >= this.limit) {
+      const first = this.map.keys().next().value
+      if (first) this.map.delete(first)
     }
+    this.map.set(key, { v: value, at: Date.now() })
+  }
+
+  get(key: string): V | undefined {
+    const entry = this.map.get(key)
+    if (!entry) return undefined
+    // Simple 5 minute expiry for memory cache
+    if (Date.now() - entry.at > 5 * 60 * 1000) {
+      this.map.delete(key)
+      return undefined
+    }
+    return entry.v
+  }
+
+  delete(key: string): void {
+    this.map.delete(key)
+  }
+
+  clear(): void {
+    this.map.clear()
   }
 }
 
-const mem = new MemoryLRU<string>(800)
+const memoryCache = new MemoryLRU<string>(500)
 
-export async function cacheGet(key: string): Promise<string | null> {
-  const r = getRedis()
-  if (r) {
-    try {
-      return (await r.get(key))
-    } catch {
-      // fall through to memory
+export async function cacheGet(key: string, options?: CacheOptions): Promise<string | null> {
+  const prefixedKey = options?.keyPrefix ? `${options.keyPrefix}:${key}` : key
+  
+  try {
+    // Try Vercel KV first
+    if (process.env.KV_URL) {
+      const result = await kv.get<string>(prefixedKey)
+      return result || null
     }
+  } catch (error) {
+    console.warn('KV cache get failed, falling back to memory:', error)
   }
-  return mem.get(key) || null
+
+  // Fallback to memory cache
+  return memoryCache.get(prefixedKey) || null
 }
 
-export async function cacheSet(key: string, value: string, opts?: CacheOptions): Promise<void> {
-  const ttl = opts?.ttlSeconds ?? 120
-  const r = getRedis()
-  if (r) {
-    try {
-      await r.set(key, value, 'EX', ttl)
+export async function cacheSet(
+  key: string,
+  value: string,
+  options?: CacheOptions
+): Promise<void> {
+  const prefixedKey = options?.keyPrefix ? `${options.keyPrefix}:${key}` : key
+  const ttl = options?.ttlSeconds || 300 // 5 minutes default
+
+  try {
+    // Try Vercel KV first
+    if (process.env.KV_URL) {
+      await kv.setex(prefixedKey, ttl, value)
       return
-    } catch {
-      // fall back
     }
+  } catch (error) {
+    console.warn('KV cache set failed, falling back to memory:', error)
   }
-  mem.set(key, value)
+
+  // Fallback to memory cache
+  memoryCache.set(prefixedKey, value)
 }
 
-// Admin helpers
-export async function cacheDel(key: string): Promise<void> {
-  const r = getRedis()
-  if (r) {
-    try { await r.del(key); } catch {}
-  }
-  // remove from memory LRU if present
-  // @ts-ignore access internal map for administrative delete
-  if (mem && mem.map && typeof mem.map.delete === 'function') {
-    // @ts-ignore
-    mem.map.delete(key)
-  }
-}
+export async function cacheDel(key: string, options?: CacheOptions): Promise<void> {
+  const prefixedKey = options?.keyPrefix ? `${options.keyPrefix}:${key}` : key
 
-export async function cacheKeys(prefix: string): Promise<string[]> {
-  const r = getRedis()
-  const keys: string[] = []
-  if (r) {
-    try {
-      let cursor = '0'
-      do {
-        // @ts-ignore
-        const res = await r.scan(cursor, 'MATCH', `${prefix}*`, 'COUNT', 100)
-        cursor = res[0]
-        const batch = res[1] as string[]
-        keys.push(...batch)
-      } while (cursor !== '0')
-    } catch {}
-  }
-  // add memory entries
-  // @ts-ignore
-  if (mem && mem.map) {
-    // @ts-ignore
-    for (const k of mem.map.keys()) {
-      if (k.startsWith(prefix)) keys.push(k)
+  try {
+    // Try Vercel KV first
+    if (process.env.KV_URL) {
+      await kv.del(prefixedKey)
+      return
     }
+  } catch (error) {
+    console.warn('KV cache delete failed, falling back to memory:', error)
   }
-  return Array.from(new Set(keys))
+
+  // Fallback to memory cache
+  memoryCache.delete(prefixedKey)
 }
 
-export async function cacheTTL(key: string): Promise<number | null> {
-  const r = getRedis()
-  if (r) {
-    try {
-      const ttl = await r.ttl(key)
-      return ttl
-    } catch { return null }
+export async function cacheFlush(): Promise<void> {
+  try {
+    // Clear Vercel KV (Note: This clears the entire KV store)
+    if (process.env.KV_URL) {
+      await kv.flushall()
+      return
+    }
+  } catch (error) {
+    console.warn('KV cache flush failed, falling back to memory:', error)
   }
-  return null
+
+  // Clear memory cache
+  memoryCache.clear()
 }

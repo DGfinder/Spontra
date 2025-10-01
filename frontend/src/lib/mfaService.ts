@@ -3,7 +3,6 @@
  * Handles TOTP (Time-based One-Time Password) authentication for admin users
  */
 
-import { captureException } from '@sentry/nextjs'
 
 // This module uses Node.js-only dependencies (crypto)
 export const runtime = 'nodejs'
@@ -65,7 +64,7 @@ class MfaService {
       }
     } catch (error) {
       console.error('Failed to generate MFA setup:', error)
-      captureException(error)
+      console.error("MFA Error:", error)
       throw new Error('Failed to generate MFA setup')
     }
   }
@@ -99,7 +98,7 @@ class MfaService {
       return { isValid: false, type: 'invalid' }
     } catch (error) {
       console.error('Failed to verify MFA code:', error)
-      captureException(error)
+      console.error("MFA Error:", error)
       return { isValid: false, type: 'invalid' }
     }
   }

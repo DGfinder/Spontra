@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { captureException } from '@sentry/nextjs'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -120,9 +119,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   } catch (error) {
     console.error('Admin token refresh failed:', error)
-    captureException(error, {
-      tags: { component: 'admin_auth', endpoint: 'refresh' }
-    })
+    console.error('Admin refresh error:', error)
 
     trackError(new Error("Monitoring error"), {
       errorType: 'api',

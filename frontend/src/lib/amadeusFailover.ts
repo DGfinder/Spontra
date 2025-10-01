@@ -11,7 +11,6 @@
 import { AmadeusFlightOffer } from '@/types/amadeus'
 import { db } from '@/server/db'
 import { kv } from '@vercel/kv'
-import * as Sentry from '@sentry/nextjs'
 import crypto from 'crypto'
 
 export interface FlightSearchRequest {

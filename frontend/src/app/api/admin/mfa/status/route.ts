@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { captureException } from '@sentry/nextjs'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'

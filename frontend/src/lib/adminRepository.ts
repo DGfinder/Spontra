@@ -8,7 +8,6 @@ import { hashPassword, verifyPassword } from './password'
 import { UserWithoutPassword, userRepository } from './userRepository'
 import { mfaService } from './mfaService'
 import type { User, UserRole } from '@prisma/client'
-import { captureException } from '@sentry/nextjs'
 
 // This module uses Node.js-only dependencies (bcryptjs, crypto)
 export const runtime = 'nodejs'
@@ -91,7 +90,7 @@ class AdminRepository {
       return userWithoutPassword as AdminUser
     } catch (error) {
       console.error('Failed to find admin by email:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -114,7 +113,7 @@ class AdminRepository {
       return userWithoutPassword as AdminUser
     } catch (error) {
       console.error('Failed to find admin by ID:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -168,7 +167,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to verify admin credentials:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -204,7 +203,7 @@ class AdminRepository {
       return userWithoutPassword as AdminUser
     } catch (error) {
       console.error('Failed to create admin:', error)
-      captureException(error)
+      console.error("Error:", error)
       throw error
     }
   }
@@ -242,7 +241,7 @@ class AdminRepository {
       return userWithoutPassword as AdminUser
     } catch (error) {
       console.error('Failed to update admin:', error)
-      captureException(error)
+      console.error("Error:", error)
       throw error
     }
   }
@@ -265,7 +264,7 @@ class AdminRepository {
       })
     } catch (error) {
       console.error('Failed to list admins:', error)
-      captureException(error)
+      console.error("Error:", error)
       return []
     }
   }
@@ -314,7 +313,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to create admin session:', error)
-      captureException(error)
+      console.error("Error:", error)
       throw error
     }
   }
@@ -351,7 +350,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to find admin session:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -367,7 +366,7 @@ class AdminRepository {
       })
     } catch (error) {
       console.error('Failed to update session activity:', error)
-      captureException(error)
+      console.error("Error:", error)
     }
   }
 
@@ -395,7 +394,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to invalidate admin session:', error)
-      captureException(error)
+      console.error("Error:", error)
     }
   }
 
@@ -416,7 +415,7 @@ class AdminRepository {
       })
     } catch (error) {
       console.error('Failed to invalidate all admin sessions:', error)
-      captureException(error)
+      console.error("Error:", error)
     }
   }
 
@@ -446,7 +445,7 @@ class AdminRepository {
       }))
     } catch (error) {
       console.error('Failed to get admin sessions:', error)
-      captureException(error)
+      console.error("Error:", error)
       return []
     }
   }
@@ -462,7 +461,7 @@ class AdminRepository {
       })
     } catch (error) {
       console.error('Failed to update admin last login:', error)
-      captureException(error)
+      console.error("Error:", error)
     }
   }
 
@@ -516,20 +515,11 @@ class AdminRepository {
         timestamp: logEntry.createdAt.toISOString()
       })
 
-      // Send to Sentry for monitoring
-      captureException(new Error('Admin Activity Log'), {
-        level: 'info',
-        tags: { 
-          component: 'admin_audit',
-          action: activity.action 
-        },
-        extra: {
-          auditLogId: logEntry.id,
-          adminId: activity.adminId,
-          action: activity.action,
-          targetType: activity.targetType,
-          targetId: activity.targetId
-        }
+      // Log audit entry for monitoring
+      console.log('Admin audit logged:', {
+        auditLogId: logEntry.id,
+        adminId: activity.adminId,
+        action: activity.action
       })
 
       return logEntry
@@ -598,7 +588,7 @@ class AdminRepository {
       return setupData
     } catch (error) {
       console.error('Failed to setup MFA:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -661,7 +651,7 @@ class AdminRepository {
       return true
     } catch (error) {
       console.error('Failed to complete MFA setup:', error)
-      captureException(error)
+      console.error("Error:", error)
       return false
     }
   }
@@ -756,7 +746,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to verify MFA code:', error)
-      captureException(error)
+      console.error("Error:", error)
       return { isValid: false }
     }
   }
@@ -791,7 +781,7 @@ class AdminRepository {
       return true
     } catch (error) {
       console.error('Failed to disable MFA:', error)
-      captureException(error)
+      console.error("Error:", error)
       return false
     }
   }
@@ -826,7 +816,7 @@ class AdminRepository {
       return newCodes
     } catch (error) {
       console.error('Failed to generate new backup codes:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -865,7 +855,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to get MFA status:', error)
-      captureException(error)
+      console.error("Error:", error)
       return null
     }
   }
@@ -944,7 +934,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to get admin audit logs:', error)
-      captureException(error)
+      console.error("Error:", error)
       return { logs: [], total: 0 }
     }
   }
@@ -1007,7 +997,7 @@ class AdminRepository {
       }
     } catch (error) {
       console.error('Failed to get audit log stats:', error)
-      captureException(error)
+      console.error("Error:", error)
       return {
         totalLogs: 0,
         recentActivity: 0,
@@ -1035,7 +1025,7 @@ class AdminRepository {
       return result.count
     } catch (error) {
       console.error('Failed to cleanup old audit logs:', error)
-      captureException(error)
+      console.error("Error:", error)
       return 0
     }
   }
