@@ -1,191 +1,17 @@
-/* eslint-disable no-console */
 import { PrismaClient } from '@prisma/client'
-import { hashPassword } from '../src/lib/password'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
-/**
- * Conservative, partner-safe templates:
- * - Impact network partners: use ?subId={clickId}
- * - CJ partners:           use ?sid={clickId}
- * NOTE: final partner URLs will differ per contract; these are placeholders to validate your architecture.
- */
-const T = {
-  // OTAs (Impact style)
-  EXPEDIA_AU:
-    "https://www.expedia.com.au/Flights-Search?trip={trip}&leg1=from:{orig},to:{dest},departure:{depDate}&" +
-    "leg2=from:{dest},to:{orig},departure:{retDate}&passengers=adults:{adt},children:{chd},infantinlap:{infLap},infantinseat:{infSeat}&" +
-    "cabinclass={cabin}&currency={currency}&langid={locale}&subId={clickId}",
-  TRIP_COM_SG:
-    "https://sg.trip.com/flights/{orig}-{dest}/?dc={depDate}&rc={retDate}&adult={adt}&child={chd}&infant={infLap}&" +
-    "cabin={cabin}&currency={currency}&locale={locale}&subId={clickId}",
-  KAYAK_AU:
-    "https://www.kayak.com.au/flights/{orig}-{dest}/{depDate}/{retDate}?adults={adt}&children={chd}&c={cabin}&" +
-    "currency={currency}&locale={locale}&subId={clickId}",
-  SKYSCANNER_NZ:
-    "https://www.skyscanner.net/transport/flights/{orig}/{dest}/{depDate}/{retDate}/?adultsv2={adt}&childrenv2={chd}&" +
-    "cabinclass={cabin}&currency={currency}&locale={locale}&subId={clickId}",
-
-  // Airlines (CJ style, sid param)
-  QANTAS_AU:
-    "https://www.qantas.com/flight-search/book?a=1&from={orig}&to={dest}&dd={depDate}&rd={retDate}&ad={adt}&ch={chd}&" +
-    "inLap={infLap}&inSeat={infSeat}&cabin={cabin}&currency={currency}&locale={locale}&sid={clickId}",
-  VIRGIN_AU:
-    "https://www.virginaustralia.com/au/en/bookings/flights/?from={orig}&to={dest}&dd={depDate}&rd={retDate}&adults={adt}&children={chd}&" +
-    "infants={infLap}&cabin={cabin}&currency={currency}&sid={clickId}",
-  AIRNZ_NZ:
-    "https://www.airnewzealand.co.nz/book/flights?from={orig}&to={dest}&dd={depDate}&rd={retDate}&adults={adt}&children={chd}&" +
-    "infants={infLap}&cabinclass={cabin}&currency={currency}&sid={clickId}",
-  SIA_SG:
-    "https://www.singaporeair.com/booking?org={orig}&dest={dest}&dd={depDate}&rd={retDate}&adt={adt}&chd={chd}&inf={infLap}&" +
-    "cabin={cabin}&currency={currency}&sid={clickId}",
-  BA_GB:
-    "https://www.britishairways.com/travel/book/public/en_gb?eId=111083&from={orig}&to={dest}&depDate={depDate}&retDate={retDate}&" +
-    "ad={adt}&ch={chd}&in={infLap}&cabin={cabin}&currency={currency}&sid={clickId}",
-};
-
-type SeedProvider = {
-  providerId: string;
-  market: "AU" | "NZ" | "GB" | "SG" | "JP";
-  network: "impact" | "cj";
-  reliabilityScore: number;
-  expectedEPC: number;
-  supportsInfants: boolean;
-  allowedAirlines?: string; // CSV IATA or '*'
-  currencyModes?: string;
-  template: string;
-  requiredTokens: string[];
-  notes?: string;
-};
-
-const providers: SeedProvider[] = [
-  // ── AU ─────────────────────────────────────────────
-  {
-    providerId: "Expedia",
-    market: "AU",
-    network: "impact",
-    reliabilityScore: 0.9,
-    expectedEPC: 0.45,
-    supportsInfants: true,
-    currencyModes: "NATIVE",
-    template: T.EXPEDIA_AU,
-    requiredTokens: ["trip","orig","dest","depDate","retDate","adt","chd","infLap","infSeat","cabin","currency","locale","clickId"],
-    notes: "Impact AU program; uses subId for attribution",
-  },
-  {
-    providerId: "KAYAK",
-    market: "AU",
-    network: "impact",
-    reliabilityScore: 0.88,
-    expectedEPC: 0.38,
-    supportsInfants: true,
-    currencyModes: "NATIVE",
-    template: T.KAYAK_AU,
-    requiredTokens: ["trip","orig","dest","depDate","retDate","adt","chd","cabin","currency","locale","clickId"],
-  },
-  {
-    providerId: "Qantas",
-    market: "AU",
-    network: "cj",
-    reliabilityScore: 0.92,
-    expectedEPC: 0.52,
-    supportsInfants: true,
-    allowedAirlines: "QF",
-    currencyModes: "NATIVE",
-    template: T.QANTAS_AU,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","infSeat","cabin","currency","locale","clickId"],
-  },
-  {
-    providerId: "VirginAustralia",
-    market: "AU",
-    network: "cj",
-    reliabilityScore: 0.87,
-    expectedEPC: 0.40,
-    supportsInfants: true,
-    allowedAirlines: "VA",
-    currencyModes: "NATIVE",
-    template: T.VIRGIN_AU,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","cabin","currency","clickId"],
-  },
-
-  // ── NZ ─────────────────────────────────────────────
-  {
-    providerId: "Skyscanner",
-    market: "NZ",
-    network: "impact",
-    reliabilityScore: 0.9,
-    expectedEPC: 0.42,
-    supportsInfants: true,
-    template: T.SKYSCANNER_NZ,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","cabin","currency","locale","clickId","trip"],
-  },
-  {
-    providerId: "AirNewZealand",
-    market: "NZ",
-    network: "cj",
-    reliabilityScore: 0.93,
-    expectedEPC: 0.55,
-    supportsInfants: true,
-    allowedAirlines: "NZ",
-    template: T.AIRNZ_NZ,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","cabin","currency","clickId"],
-  },
-
-  // ── GB (Europe hub) ────────────────────────────────
-  {
-    providerId: "BritishAirways",
-    market: "GB",
-    network: "cj",
-    reliabilityScore: 0.9,
-    expectedEPC: 0.5,
-    supportsInfants: true,
-    allowedAirlines: "BA",
-    template: T.BA_GB,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","cabin","currency","clickId"],
-  },
-
-  // ── SG (Asia hub) ──────────────────────────────────
-  {
-    providerId: "TripCom",
-    market: "SG",
-    network: "impact",
-    reliabilityScore: 0.88,
-    expectedEPC: 0.40,
-    supportsInfants: true,
-    template: T.TRIP_COM_SG,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","cabin","currency","locale","clickId","trip"],
-  },
-  {
-    providerId: "SingaporeAirlines",
-    market: "SG",
-    network: "cj",
-    reliabilityScore: 0.92,
-    expectedEPC: 0.48,
-    supportsInfants: true,
-    allowedAirlines: "SQ",
-    template: T.SIA_SG,
-    requiredTokens: ["orig","dest","depDate","retDate","adt","chd","infLap","cabin","currency","clickId"],
-  },
-
-  // ── JP (Asia) — keep one OTA for coverage ─────────
-  {
-    providerId: "KAYAK",
-    market: "JP",
-    network: "impact",
-    reliabilityScore: 0.86,
-    expectedEPC: 0.36,
-    supportsInfants: true,
-    template: T.KAYAK_AU.replace("kayak.com.au","kayak.co.jp"),
-    requiredTokens: ["trip","orig","dest","depDate","retDate","adt","chd","cabin","currency","locale","clickId"],
-    notes: "Re-uses KAYAK template, localized host",
-  },
-];
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, 10)
+}
 
 async function main() {
-  console.log('🌱 Starting comprehensive database seed...')
+  console.log('🌱 Starting ultra-minimal MVP seed...')
 
-  // 1. Create users (existing functionality)
-  console.log('\n👥 Creating users...')
+  // Create admin user
+  console.log('👤 Creating admin user...')
   const adminEmail = 'admin@spontra.com'
   const adminPassword = await hashPassword('Admin123!')
 
@@ -202,112 +28,92 @@ async function main() {
 
   console.log('✅ Created admin user:', adminUser.email)
 
-  const testEmail = 'test@spontra.com'
-  const testPassword = await hashPassword('Test123!')
+  // Create sample airports
+  console.log('✈️ Creating sample airports...')
+  
+  const airports = [
+    { iataCode: 'LAX', name: 'Los Angeles International Airport', city: 'Los Angeles', country: 'United States' },
+    { iataCode: 'JFK', name: 'John F. Kennedy International Airport', city: 'New York', country: 'United States' },
+    { iataCode: 'LHR', name: 'London Heathrow Airport', city: 'London', country: 'United Kingdom' },
+    { iataCode: 'CDG', name: 'Charles de Gaulle Airport', city: 'Paris', country: 'France' },
+    { iataCode: 'NRT', name: 'Narita International Airport', city: 'Tokyo', country: 'Japan' },
+    { iataCode: 'SYD', name: 'Sydney Kingsford Smith Airport', city: 'Sydney', country: 'Australia' },
+    { iataCode: 'DXB', name: 'Dubai International Airport', city: 'Dubai', country: 'United Arab Emirates' },
+    { iataCode: 'SIN', name: 'Singapore Changi Airport', city: 'Singapore', country: 'Singapore' }
+  ]
 
-  const testUser = await prisma.user.upsert({
-    where: { email: testEmail },
-    update: {},
-    create: {
-      email: testEmail,
-      passwordHash: testPassword,
-      firstName: 'Test',
-      lastName: 'User',
-      username: 'testuser',
-      role: 'user',
-      isEmailVerified: true,
-      preferences: JSON.stringify({
-        preferredCabinClass: 'ECONOMY',
-        currency: 'USD',
-        language: 'en',
-        newsletter: true
-      })
-    }
-  })
-
-  console.log('✅ Created test user:', testUser.email)
-
-  // 2. Seed metasearch providers (new functionality)
-  console.log('\n🌐 Seeding metasearch providers for AU/NZ/GB/SG/JP markets...')
-
-  for (const p of providers) {
-    console.log(`Seeding ${p.providerId} (${p.market}) - ${p.network} network`)
-    
-    const up = await prisma.provider.upsert({
-      where: { providerId_market: { providerId: p.providerId, market: p.market } },
-      update: {
-        network: p.network,
-        reliabilityScore: p.reliabilityScore,
-        expectedEPC: p.expectedEPC,
-        supportsInfants: p.supportsInfants,
-        allowedAirlines: p.allowedAirlines,
-        currencyModes: p.currencyModes,
-        isActive: true,
-      },
-      create: {
-        providerId: p.providerId,
-        market: p.market,
-        network: p.network,
-        reliabilityScore: p.reliabilityScore,
-        expectedEPC: p.expectedEPC,
-        supportsInfants: p.supportsInfants,
-        allowedAirlines: p.allowedAirlines,
-        currencyModes: p.currencyModes,
-        isActive: true,
-      },
-      include: { template: true },
-    });
-
-    await prisma.linkTemplate.upsert({
-      where: { providerIdRef: up.id },
-      update: {
-        template: p.template,
-        requiredTokens: JSON.stringify(p.requiredTokens),
-        notes: p.notes,
-      },
-      create: {
-        providerIdRef: up.id,
-        template: p.template,
-        requiredTokens: JSON.stringify(p.requiredTokens),
-        notes: p.notes,
-      },
-    });
-
-    console.log(`  ✅ ${p.providerId}/${p.market} - EPC: ${p.expectedEPC}, Reliability: ${(p.reliabilityScore * 100).toFixed(1)}%`);
+  for (const airport of airports) {
+    await prisma.airport.upsert({
+      where: { iataCode: airport.iataCode },
+      update: {},
+      create: airport
+    })
   }
 
-  // 3. Clean up expired sessions
-  console.log('\n🧹 Cleaning up expired sessions...')
-  const deletedSessions = await prisma.userSession.deleteMany({
-    where: {
-      expiresAt: {
-        lt: new Date()
-      }
-    }
-  })
+  console.log(`✅ Created ${airports.length} airports`)
 
-  console.log(`✅ Cleaned up ${deletedSessions.count} expired sessions`)
+  // Create sample destinations
+  console.log('🏙️ Creating sample destinations...')
+  
+  const destinations = [
+    { airportCode: 'LAX', cityName: 'Los Angeles', countryName: 'United States', description: 'City of Angels with beaches and Hollywood glamour', popularityScore: 9.5 },
+    { airportCode: 'JFK', cityName: 'New York', countryName: 'United States', description: 'The Big Apple - city that never sleeps', popularityScore: 10.0 },
+    { airportCode: 'LHR', cityName: 'London', countryName: 'United Kingdom', description: 'Historic capital with royal palaces and cultural treasures', popularityScore: 9.8 },
+    { airportCode: 'CDG', cityName: 'Paris', countryName: 'France', description: 'City of Light with romantic charm and world-class cuisine', popularityScore: 9.7 },
+    { airportCode: 'NRT', cityName: 'Tokyo', countryName: 'Japan', description: 'Modern metropolis blending tradition with cutting-edge technology', popularityScore: 9.3 },
+    { airportCode: 'SYD', cityName: 'Sydney', countryName: 'Australia', description: 'Harbor city with iconic Opera House and beautiful beaches', popularityScore: 9.0 },
+    { airportCode: 'DXB', cityName: 'Dubai', countryName: 'United Arab Emirates', description: 'Futuristic city with luxury shopping and desert adventures', popularityScore: 8.5 },
+    { airportCode: 'SIN', cityName: 'Singapore', countryName: 'Singapore', description: 'Garden city with amazing food and modern architecture', popularityScore: 8.8 }
+  ]
 
-  // 4. Summary
-  console.log(`\n🎉 Successfully seeded database with ${providers.length} metasearch providers!`)
-  console.log('\n📊 Market Coverage:')
-  console.log('  🇦🇺 AU: 4 providers (2 OTAs, 2 Airlines)')
-  console.log('  🇳🇿 NZ: 2 providers (1 OTA, 1 Airline)')
-  console.log('  🇬🇧 GB: 1 provider (1 Airline)')
-  console.log('  🇸🇬 SG: 2 providers (1 OTA, 1 Airline)')
-  console.log('  🇯🇵 JP: 1 provider (1 OTA)')
-  console.log('\n🔗 Network Distribution:')
-  console.log(`  Impact Radius: ${providers.filter(p => p.network === 'impact').length} providers`)
-  console.log(`  Commission Junction: ${providers.filter(p => p.network === 'cj').length} providers`)
-  console.log('\n🚀 Ready for go-live testing!')
+  for (const destination of destinations) {
+    await prisma.destination.upsert({
+      where: { airportCode: destination.airportCode },
+      update: {},
+      create: destination
+    })
+  }
+
+  console.log(`✅ Created ${destinations.length} destinations`)
+
+  // Create sample flight routes
+  console.log('🛫 Creating sample flight routes...')
+  
+  const routes = [
+    { originAirportCode: 'LAX', destinationAirportCode: 'JFK', totalDurationMinutes: 320 }, // 5h 20m
+    { originAirportCode: 'LAX', destinationAirportCode: 'LHR', totalDurationMinutes: 650 }, // 10h 50m
+    { originAirportCode: 'LAX', destinationAirportCode: 'NRT', totalDurationMinutes: 720 }, // 12h
+    { originAirportCode: 'JFK', destinationAirportCode: 'LHR', totalDurationMinutes: 420 }, // 7h
+    { originAirportCode: 'JFK', destinationAirportCode: 'CDG', totalDurationMinutes: 450 }, // 7h 30m
+    { originAirportCode: 'LHR', destinationAirportCode: 'CDG', totalDurationMinutes: 75 },  // 1h 15m
+    { originAirportCode: 'LHR', destinationAirportCode: 'DXB', totalDurationMinutes: 420 }, // 7h
+    { originAirportCode: 'SIN', destinationAirportCode: 'SYD', totalDurationMinutes: 480 }, // 8h
+  ]
+
+  for (const route of routes) {
+    await prisma.flightRoute.upsert({
+      where: { 
+        originAirportCode_destinationAirportCode: {
+          originAirportCode: route.originAirportCode,
+          destinationAirportCode: route.destinationAirportCode
+        }
+      },
+      update: {},
+      create: route
+    })
+  }
+
+  console.log(`✅ Created ${routes.length} flight routes`)
+
+  console.log('\n🎉 Ultra-minimal MVP seed completed successfully!')
+  console.log('🔑 Admin login: admin@spontra.com / Admin123!')
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
-  .catch(async (e) => {
-    console.error('❌ Seeding failed:', e)
-    await prisma.$disconnect()
+  .catch((e) => {
+    console.error('❌ Seed failed:', e)
     process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
   })
