@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react'
-import { DestinationRecommendation } from '@/services/apiClient'
+import { DestinationRecommendation } from '@/lib/stubs'
 import { LoadingSkeleton } from './LoadingSkeleton'
 import { CacheIndicator } from './CacheIndicator'
 import { aggregateDestinationsByCountry, getCountryStats } from '@/lib/countryAggregation'
-import { useFormData, useSearchStore } from '@/store/searchStore'
+import { useFormData } from '@/lib/stubs'
 import { CountryConstellation } from './CountryConstellation'
-import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring'
+import { usePerformanceMonitoring } from '@/lib/stubs'
 import { getThemeColor, type ThemeKey } from '@/lib/theme'
 
 interface SearchResultsProps {

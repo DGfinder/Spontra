@@ -1,6 +1,6 @@
 // Country aggregation utilities for destination results (ASCII-safe)
 
-import { DestinationRecommendation } from '@/services/apiClient'
+import { DestinationRecommendation } from '@/lib/stubs'
 
 export interface CountryAggregation {
   country: {

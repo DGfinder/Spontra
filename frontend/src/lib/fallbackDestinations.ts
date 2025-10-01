@@ -1,4 +1,6 @@
-import type { DestinationRecommendation, ActivityType } from '@/services/apiClient'
+import type { DestinationRecommendation } from '@/lib/stubs'
+
+type ActivityType = 'adventure' | 'culture' | 'nightlife' | 'shopping' | 'relaxation'
 
 type FallbackDestinationSeed = {
   code: string
