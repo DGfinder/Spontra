@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Plane, ArrowLeft, ExternalLink, Loader2 } from 'lucide-react'
 import { SearchForm } from '@/components/SearchForm'
-import { THEMES_DATA } from '@/components/server/ThemeBackgroundServer'
 
 interface FlightOffer {
   id: string
@@ -186,11 +185,7 @@ function DirectFlightSearchContent() {
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Search Form */}
         <div className="mb-8">
-          <SearchForm
-            themes={THEMES_DATA}
-            onSubmit={handleFormSubmit}
-            isLoading={isSearching}
-          />
+          <SearchForm />
         </div>
 
         {/* Loading State */}

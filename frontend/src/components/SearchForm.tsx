@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { AirportSearch } from './AirportSearch'
 import { ThemeSelector } from './ThemeSelector'
-import { FlightTimeSlider } from './FlightTimeSlider'
 import { Button } from './ui/Button'
 
 export function SearchForm() {
@@ -91,12 +90,32 @@ export function SearchForm() {
               <label className="block text-white text-sm font-medium mb-3">
                 Flight time: {filters.minFlightTime}h - {filters.maxFlightTime}h
               </label>
-              <FlightTimeSlider
-                minValue={filters.minFlightTime}
-                maxValue={filters.maxFlightTime}
-                onMinChange={(value) => updateFilter('minFlightTime', value)}
-                onMaxChange={(value) => updateFilter('maxFlightTime', value)}
-              />
+              <div className="space-y-2">
+                <div className="flex space-x-4">
+                  <div className="flex-1">
+                    <label className="block text-white/70 text-xs mb-1">Min hours</label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={filters.minFlightTime}
+                      onChange={(e) => updateFilter('minFlightTime', parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-white/70 text-xs mb-1">Max hours</label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={filters.maxFlightTime}
+                      onChange={(e) => updateFilter('maxFlightTime', parseInt(e.target.value))}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <Button

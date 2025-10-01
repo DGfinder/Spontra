@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getPopularDestinations } from '@/lib/destinationSearch'
+import { db } from '@/server/db'
 
 export async function GET() {
   try {
-    const destinations = await getPopularDestinations(10)
+    const destinations = await db.destination.findMany({
+      take: 10,
+      orderBy: {
+        popularityScore: 'desc'
+      }
+    })
 
     return NextResponse.json({
       success: true,
