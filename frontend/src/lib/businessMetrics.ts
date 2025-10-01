@@ -116,10 +116,10 @@ export class BusinessMetricsService {
 
         const totalClicks = clickStats._count.id || 0
         const totalConversions = conversionStats._count.id || 0
-        const totalRevenue = conversionStats._sum.commission || 0
+        const totalRevenue = Number(conversionStats._sum.commission || 0)
         const conversionRate = totalClicks > 0 ? (totalConversions / totalClicks) * 100 : 0
         const averageEPC = totalClicks > 0 ? totalRevenue / totalClicks : 0
-        const averageOrderValue = totalConversions > 0 ? (conversionStats._sum.total_price || 0) / totalConversions : 0
+        const averageOrderValue = totalConversions > 0 ? Number(conversionStats._sum.total_price || 0) / totalConversions : 0
 
         // Record metrics
         metrics.recordGauge('business.conversion_rate', conversionRate, {
@@ -361,9 +361,9 @@ export class BusinessMetricsService {
           _sum: { total_price: true, commission: true }
         })
 
-        const totalRevenue = totalStats._sum.commission || 0
-        const commission = totalStats._sum.commission || 0
-        const totalBookingValue = totalStats._sum.total_price || 0
+        const totalRevenue = Number(totalStats._sum.commission || 0)
+        const commission = Number(totalStats._sum.commission || 0)
+        const totalBookingValue = Number(totalStats._sum.total_price || 0)
         const commissionRate = totalBookingValue > 0 ? (commission / totalBookingValue) * 100 : 0
 
         // Revenue by provider
