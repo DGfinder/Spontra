@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { Clock, MapPin, Coffee, Wifi, ShoppingBag, Utensils, Car, Plane } from 'lucide-react'
 
 export interface LayoverInfo {
