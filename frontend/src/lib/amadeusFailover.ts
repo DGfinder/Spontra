@@ -110,13 +110,13 @@ async function getCachedOffersDB(
       },
       select: {
         offers: true,
-        cachedAt: true
+        createdAt: true
       }
     })
 
     if (cached) {
       console.log('[AmadeusFailover] Cache hit (Database)', queryHash.substring(0, 20))
-      return cached.offers as AmadeusFlightOffer[]
+      return cached.offers as unknown as AmadeusFlightOffer[]
     }
   } catch (error) {
     console.error('[AmadeusFailover] Database cache error:', error)
@@ -140,18 +140,18 @@ async function getStaleOffersDB(
       where: { queryHash },
       select: {
         offers: true,
-        cachedAt: true,
+        createdAt: true,
         expiresAt: true
       },
-      orderBy: { cachedAt: 'desc' }
+      orderBy: { createdAt: 'desc' }
     })
 
     if (cached) {
       console.warn('[AmadeusFailover] Using stale cache', {
-        age: Date.now() - new Date(cached.cachedAt).getTime(),
+        age: Date.now() - new Date(cached.createdAt).getTime(),
         expired: new Date(cached.expiresAt)
       })
-      return cached.offers as AmadeusFlightOffer[]
+      return cached.offers as unknown as AmadeusFlightOffer[]
     }
   } catch (error) {
     console.error('[AmadeusFailover] Stale cache error:', error)
@@ -177,19 +177,20 @@ async function cacheOffers(
 
     // Store in Database (slower, longer-term)
     await db.offerCache.upsert({
-      where: { queryHash },
+      where: { id: queryHash },
       create: {
+        id: queryHash,
         queryHash,
         market: 'AU', // TODO: Get from request context
-        query: request,
-        offers,
+        query: request as any,
+        offers: offers as any,
         offerCount: offers.length,
         dataSource: 'amadeus',
         isStale: false,
         expiresAt: new Date(Date.now() + ttlMinutes * 60 * 1000)
       },
       update: {
-        offers,
+        offers: offers as any,
         offerCount: offers.length,
         isStale: false,
         expiresAt: new Date(Date.now() + ttlMinutes * 60 * 1000),
