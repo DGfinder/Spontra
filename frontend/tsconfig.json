@@ -64,6 +64,7 @@
                     "src/app/api/test-error/**",
                     "src/app/api/debug/**", 
                     "src/app/api/debugEnv/**",
+                    "src/components/PerformanceTracker.tsx",
                     "src/lib/healthChecks.ts",
                     "src/lib/monitoring.ts",
                     "src/lib/slaMonitoring.ts",
