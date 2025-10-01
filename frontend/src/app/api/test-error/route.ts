@@ -31,12 +31,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       
       case 'performance':
         // Test performance monitoring
-        const transaction = sentryHelpers.startTransaction('test-operation', 'test')
+        const result = sentryHelpers.startTransaction('test-operation', 'test')
         
         // Simulate slow operation
         await new Promise(resolve => setTimeout(resolve, 1000))
         
-        transaction.finish()
+        // Note: Sentry 8.x handles span completion automatically
         return NextResponse.json({ message: 'Performance test completed' })
       
       case 'breadcrumb':
