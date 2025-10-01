@@ -17,7 +17,8 @@ const PgClient = (() => {
 // Dynamic import for cassandra-driver to handle build-time issues
 const cassandra = (() => {
   try {
-    return require('cassandra-driver')
+    // Mock cassandra for MVP
+    return null
   } catch {
     return {
       Client: class MockCassandraClient {
