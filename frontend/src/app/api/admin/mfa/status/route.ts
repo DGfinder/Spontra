@@ -33,7 +33,7 @@ export async function GET(request: NextRequest): Promise<Response> {
       tags: { component: 'admin_mfa', endpoint: 'status' }
     })
 
-    trackError({
+    trackError(new Error("Monitoring error"), {
       errorType: 'api',
       errorCode: 'admin_mfa_status_failed',
       endpoint: '/api/admin/mfa/status',

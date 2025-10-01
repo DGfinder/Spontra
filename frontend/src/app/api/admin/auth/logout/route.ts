@@ -42,7 +42,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       tags: { component: 'admin_auth', endpoint: 'logout' }
     })
 
-    trackError({
+    trackError(new Error('Admin logout failed'), {
       errorType: 'api',
       errorCode: 'admin_logout_failed',
       endpoint: '/api/admin/auth/logout',

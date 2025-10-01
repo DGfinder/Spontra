@@ -87,7 +87,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       tags: { component: 'admin_mfa', endpoint: 'setup' }
     })
 
-    trackError({
+    trackError(new Error("Monitoring error"), {
       errorType: 'api',
       errorCode: 'admin_mfa_setup_failed',
       endpoint: '/api/admin/mfa/setup',

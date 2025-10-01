@@ -124,7 +124,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       tags: { component: 'admin_auth', endpoint: 'refresh' }
     })
 
-    trackError({
+    trackError(new Error("Monitoring error"), {
       errorType: 'api',
       errorCode: 'admin_refresh_failed',
       endpoint: '/api/admin/auth/refresh',

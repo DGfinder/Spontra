@@ -89,7 +89,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     // Check rate limiting
     const rateLimit = checkRateLimit(body.email, ip)
     if (!rateLimit.allowed) {
-      trackError({
+      trackError(new Error('Admin login rate limited'), {
         errorType: 'api',
         errorCode: 'admin_login_rate_limited',
         endpoint: '/api/admin/auth/login',
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       // Record failed attempt
       recordFailedAttempt(body.email, ip)
       
-      trackError({
+      trackError(new Error('Admin login failed'), {
         errorType: 'api',
         errorCode: 'admin_login_failed',
         endpoint: '/api/admin/auth/login',

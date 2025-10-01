@@ -88,7 +88,7 @@ class CircuitBreaker {
       
       console.warn(`🔴 Circuit breaker OPEN for ${this.serviceName}`)
       
-      trackError({
+      trackError(new Error("Monitoring error"), {
         errorType: 'external_service',
         errorCode: 'circuit_breaker_open',
         endpoint: this.serviceName,
@@ -444,7 +444,7 @@ class HealthCheckManager {
       })
 
       // Track error in monitoring
-      trackError({
+      trackError(new Error("Monitoring error"), {
         errorType: 'external_service',
         errorCode: 'health_check_failed',
         endpoint: service,

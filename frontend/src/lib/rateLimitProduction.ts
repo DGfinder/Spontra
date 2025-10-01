@@ -168,7 +168,7 @@ class ProductionRateLimiter {
     if (!mainResult.allowed) {
       this.trackSuspiciousActivity(key)
       
-      trackError({
+      trackError(new Error("Monitoring error"), {
         errorType: 'api',
         errorCode: 'rate_limit_exceeded',
         endpoint: tier,
@@ -253,7 +253,7 @@ class ProductionRateLimiter {
       this.blockedIPs.add(key)
       console.warn(`🚫 Blocked suspicious IP: ${key}`)
       
-      trackError({
+      trackError(new Error("Monitoring error"), {
         errorType: 'api',
         errorCode: 'ip_blocked',
         endpoint: 'rate_limiter',

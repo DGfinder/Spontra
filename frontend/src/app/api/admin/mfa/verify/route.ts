@@ -54,7 +54,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       tags: { component: 'admin_mfa', endpoint: 'verify' }
     })
 
-    trackError({
+    trackError(new Error("Monitoring error"), {
       errorType: 'api',
       errorCode: 'admin_mfa_verify_failed',
       endpoint: '/api/admin/mfa/verify',
