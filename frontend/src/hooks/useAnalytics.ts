@@ -1,41 +1,40 @@
 import { useEffect, useCallback } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { Analytics, AnalyticsEventName } from '@/lib/analytics'
 
 /**
- * Hook for tracking analytics events
+ * Hook for tracking analytics events - DISABLED (Non-MVP)
  */
 export function useAnalytics() {
-  const trackEvent = useCallback((name: AnalyticsEventName | string, properties?: Record<string, any>) => {
-    Analytics.trackEvent(name, properties)
+  const trackEvent = useCallback((name: string, properties?: Record<string, any>) => {
+    // Analytics disabled for MVP
   }, [])
 
   const trackSearch = useCallback((
     type: 'initiated' | 'completed' | 'failed',
-    searchParams: Parameters<typeof Analytics.trackSearch>[1]
+    searchParams: any
   ) => {
-    Analytics.trackSearch(type, searchParams)
+    // Analytics disabled for MVP
   }, [])
 
   const trackBooking = useCallback((
     stage: 'started' | 'completed' | 'failed' | 'abandoned',
-    bookingData: Parameters<typeof Analytics.trackBooking>[1]
+    bookingData: any
   ) => {
-    Analytics.trackBooking(stage, bookingData)
+    // Analytics disabled for MVP
   }, [])
 
   const trackAuth = useCallback((
     action: 'registered' | 'logged_in' | 'logged_out',
-    userData?: Parameters<typeof Analytics.trackAuth>[1]
+    userData?: any
   ) => {
-    Analytics.trackAuth(action, userData)
+    // Analytics disabled for MVP
   }, [])
 
   const trackError = useCallback((
     error: Error,
-    context?: Parameters<typeof Analytics.trackError>[1]
+    context?: any
   ) => {
-    Analytics.trackError(error, context)
+    // Analytics disabled for MVP
   }, [])
 
   const trackFeature = useCallback((
@@ -43,7 +42,7 @@ export function useAnalytics() {
     action: string,
     properties?: Record<string, any>
   ) => {
-    Analytics.trackFeature(featureName, action, properties)
+    // Analytics disabled for MVP
   }, [])
 
   return {
@@ -57,124 +56,43 @@ export function useAnalytics() {
 }
 
 /**
- * Hook for automatic page view tracking
+ * Hook for automatic page view tracking - DISABLED (Non-MVP)
  */
 export function usePageTracking() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    const startTime = performance.now()
-
-    // Track page view
-    Analytics.trackPageView(pathname, {
-      referrer: document.referrer,
-      searchParams: Object.fromEntries(searchParams.entries()),
-    })
-
-    // Track load time when page is fully loaded
-    const handleLoad = () => {
-      const loadTime = performance.now() - startTime
-      Analytics.trackPerformance('load_time', loadTime, { page: pathname })
-    }
-
-    if (document.readyState === 'complete') {
-      handleLoad()
-    } else {
-      window.addEventListener('load', handleLoad)
-      return () => window.removeEventListener('load', handleLoad)
-    }
-  }, [pathname, searchParams])
+  // Analytics disabled for MVP
 }
 
 /**
- * Hook for tracking performance metrics
+ * Hook for tracking performance metrics - DISABLED (Non-MVP)
  */
 export function usePerformanceTracking() {
-  useEffect(() => {
-    // Track Core Web Vitals
-    if ('web-vital' in window) {
-      return
-    }
-
-    // CLS (Cumulative Layout Shift)
-    let clsValue = 0
-    let clsEntries: PerformanceEntry[] = []
-
-    const observer = new PerformanceObserver((list) => {
-      for (const entry of list.getEntries()) {
-        if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value
-          clsEntries.push(entry)
-        }
-      }
-    })
-
-    try {
-      observer.observe({ type: 'layout-shift', buffered: true })
-    } catch {
-      // Layout shift API not supported
-    }
-
-    // Report CLS when page becomes hidden
-    const reportCLS = () => {
-      if (clsValue > 0) {
-        Analytics.trackPerformance('cls', clsValue, { page: window.location.pathname })
-      }
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        reportCLS()
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('beforeunload', reportCLS)
-
-    return () => {
-      observer.disconnect()
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('beforeunload', reportCLS)
-    }
-  }, [])
+  // Analytics disabled for MVP
 }
 
 /**
- * Hook for tracking user interactions
+ * Hook for tracking user interactions - DISABLED (Non-MVP)
  */
 export function useInteractionTracking() {
-  const { trackEvent } = useAnalytics()
-
   const trackClick = useCallback((
     element: string,
     properties?: Record<string, any>
   ) => {
-    trackEvent('element_clicked', {
-      element,
-      ...properties,
-    })
-  }, [trackEvent])
+    // Analytics disabled for MVP
+  }, [])
 
   const trackFormSubmit = useCallback((
     formName: string,
     properties?: Record<string, any>
   ) => {
-    trackEvent('form_submitted', {
-      form: formName,
-      ...properties,
-    })
-  }, [trackEvent])
+    // Analytics disabled for MVP
+  }, [])
 
   const trackExternalLink = useCallback((
     url: string,
     context?: string
   ) => {
-    trackEvent('external_link_clicked', {
-      url,
-      context,
-    })
-  }, [trackEvent])
+    // Analytics disabled for MVP
+  }, [])
 
   return {
     trackClick,
@@ -184,26 +102,24 @@ export function useInteractionTracking() {
 }
 
 /**
- * Hook for tracking errors in components
+ * Hook for tracking errors in components - DISABLED (Non-MVP)
  */
 export function useErrorTracking() {
-  const { trackError } = useAnalytics()
-
   const trackComponentError = useCallback((
     error: Error,
     component: string,
     action?: string
   ) => {
-    trackError(error, { component, action })
-  }, [trackError])
+    // Analytics disabled for MVP
+  }, [])
 
   const trackAPIError = useCallback((
     error: Error,
     endpoint: string,
     method?: string
   ) => {
-    trackError(error, { component: 'api', action: `${method} ${endpoint}` })
-  }, [trackError])
+    // Analytics disabled for MVP
+  }, [])
 
   return {
     trackComponentError,
