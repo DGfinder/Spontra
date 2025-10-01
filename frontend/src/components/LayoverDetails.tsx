@@ -38,8 +38,8 @@ export function LayoverDetails({ layovers, className = '', compact = false }: La
     return { status: 'long', color: 'text-blue-400', label: 'Extended layover' }
   }
 
-  const getFacilityIcon = (facility: string) => {
-    const icons: Record<string, JSX.Element> = {
+  const getFacilityIcon = (facility: string): React.ReactElement => {
+    const icons: Record<string, React.ReactElement> = {
       'wifi': <Wifi size={12} />,
       'restaurant': <Utensils size={12} />,
       'shopping': <ShoppingBag size={12} />,

@@ -325,7 +325,7 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
         if (!active) return
 
         // Transform to CityOption with simple defaults
-        const cityOptions: CityOption[] = destinations.map(dest => ({
+        const cityOptions: CityOption[] = destinations.map((dest: any) => ({
           id: dest.id,
           name: dest.cityName,
           airport_code: dest.airportCode,

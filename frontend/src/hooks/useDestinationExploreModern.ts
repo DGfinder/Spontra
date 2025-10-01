@@ -125,50 +125,58 @@ export function useDestinationExploreModern() {
     // Optimistic update - immediately show loading state
     addOptimistic({ type: 'start' })
 
-    return new Promise((resolve) => {
-      startTransition(async () => {
-        try {
-          // Dispatch the Server Action
-          const result = await dispatchAction(formData)
+    // Dispatch the Server Action (dispatch returns void, we get result from actionState)
+    dispatchAction(formData)
 
-          if (result.redirectTo) {
-            // Handle direct flight search redirect
-            router.push(result.redirectTo)
-            resolve(result)
-            return
+    // Call the action directly to get the result
+    try {
+      const result = await exploreDestinationsAction(formData)
+
+      if (result.redirectTo) {
+        // Handle direct flight search redirect
+        router.push(result.redirectTo)
+        return result
+      }
+
+      if (result.success && result.data) {
+        // Update Zustand store
+        setResults(result.data)
+        addToHistory({
+          formData,
+          resultCount: result.totalResults || 0,
+          searchDuration: 0
+        })
+        addRecentAirport(formData.departureAirport)
+        addPreferredTheme(formData.selectedTheme)
+
+        // Optimistic update with success
+        addOptimistic({
+          type: 'success',
+          payload: {
+            data: result.data,
+            totalResults: result.totalResults,
+            source: result.source
           }
+        })
+      } else {
+        // Optimistic update with error
+        addOptimistic({
+          type: 'error',
+          payload: { error: result.error }
+        })
+      }
 
-          if (result.success && result.data) {
-            // Optimistic update with success
-            addOptimistic({
-              type: 'success',
-              payload: {
-                data: result.data,
-                totalResults: result.totalResults,
-                source: result.source
-              }
-            })
-          } else {
-            // Optimistic update with error
-            addOptimistic({
-              type: 'error',
-              payload: { error: result.error }
-            })
-          }
-
-          resolve(result)
-        } catch (error) {
-          // Optimistic update with error
-          const errorMessage = error instanceof Error ? error.message : 'Failed to explore destinations'
-          addOptimistic({
-            type: 'error',
-            payload: { error: errorMessage }
-          })
-
-          resolve(undefined)
-        }
+      return result
+    } catch (error) {
+      // Optimistic update with error
+      const errorMessage = error instanceof Error ? error.message : 'Failed to explore destinations'
+      addOptimistic({
+        type: 'error',
+        payload: { error: errorMessage }
       })
-    })
+
+      return undefined
+    }
   }
 
   const retry = async (formData: FormData) => {

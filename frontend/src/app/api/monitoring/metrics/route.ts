@@ -176,8 +176,8 @@ async function getCacheMetrics(): Promise<string[]> {
     }
 
     // Cache hit rate
-    const hits = cacheOps.find(op => op.operation === 'hit')?._count || 0
-    const misses = cacheOps.find(op => op.operation === 'miss')?._count || 0
+    const hits = cacheOps.find((op: any) => op.operation === 'hit')?._count || 0
+    const misses = cacheOps.find((op: any) => op.operation === 'miss')?._count || 0
     const total = hits + misses
     const hitRate = total > 0 ? (hits / total) * 100 : 0
 

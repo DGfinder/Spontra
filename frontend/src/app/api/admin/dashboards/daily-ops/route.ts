@@ -147,7 +147,7 @@ export async function GET(req: NextRequest): Promise<Response> {
   `;
 
   // Normalize numbers for JSON (Decimal -> number) and add triage status
-  const epcByProviderMarket = epcRows.map(r => {
+  const epcByProviderMarket = epcRows.map((r: any) => {
     const epc24h = toNum(r.epc_24h);
     const epc7d = toNum(r.epc_7d);
     const changePctVs7d = epc7d > 0 ? Math.round(((epc24h - epc7d) / epc7d) * 1000) / 10 : 0;
@@ -183,7 +183,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     };
   });
 
-  const priceChangeRates = priceRows.map(r => {
+  const priceChangeRates = priceRows.map((r: any) => {
     const pctChanged = toNum(r.pct_changed);
     let status = 'HEALTHY';
     let action = 'NONE';
@@ -206,7 +206,7 @@ export async function GET(req: NextRequest): Promise<Response> {
     };
   });
 
-  const syntheticFailures15m = synthRows.map(r => {
+  const syntheticFailures15m = synthRows.map((r: any) => {
     const pctFail = toNum(r.pct_fail);
     let status = 'HEALTHY';
     let action = 'NONE';
@@ -303,14 +303,14 @@ export async function GET(req: NextRequest): Promise<Response> {
   // Summary for quick triage
   const summary = {
     criticalIssues: [
-      ...epcByProviderMarket.filter(e => e.status === 'CRITICAL').map(e => `EPC drop: ${e.providerId}/${e.market} (${e.changePctVs7d}%)`),
-      ...priceChangeRates.filter(p => p.status === 'CRITICAL').map(p => `Price instability: ${p.providerId} (${p.pctChanged}%)`),
-      ...syntheticFailures15m.filter(s => s.status === 'CRITICAL').map(s => `Synthetic failure: ${s.providerId}/${s.market} (${s.pctFail}%)`)
+      ...epcByProviderMarket.filter((e: any) => e.status === 'CRITICAL').map((e: any) => `EPC drop: ${e.providerId}/${e.market} (${e.changePctVs7d}%)`),
+      ...priceChangeRates.filter((p: any) => p.status === 'CRITICAL').map((p: any) => `Price instability: ${p.providerId} (${p.pctChanged}%)`),
+      ...syntheticFailures15m.filter((s: any) => s.status === 'CRITICAL').map((s: any) => `Synthetic failure: ${s.providerId}/${s.market} (${s.pctFail}%)`)
     ],
-    overallHealth: Math.max(0, 100 - 
-      (epcByProviderMarket.filter(e => e.status === 'CRITICAL').length * 30) -
-      (priceChangeRates.filter(p => p.status === 'CRITICAL').length * 20) -
-      (syntheticFailures15m.filter(s => s.status === 'CRITICAL').length * 25)
+    overallHealth: Math.max(0, 100 -
+      (epcByProviderMarket.filter((e: any) => e.status === 'CRITICAL').length * 30) -
+      (priceChangeRates.filter((p: any) => p.status === 'CRITICAL').length * 20) -
+      (syntheticFailures15m.filter((s: any) => s.status === 'CRITICAL').length * 25)
     ),
     alertsSent: criticalAlerts.length
   };

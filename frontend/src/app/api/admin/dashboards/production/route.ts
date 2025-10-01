@@ -160,15 +160,15 @@ async function getOverviewDashboard(timeRange: string) {
       conversionRate: convRate,
       timeRange
     },
-    markets: marketStats.map(m => ({
+    markets: marketStats.map((m: any) => ({
       market: m.market,
       clicks: m._count._all
     })),
-    topProviders: providerStats.map(p => ({
+    topProviders: providerStats.map((p: any) => ({
       providerId: p.providerId,
       clicks: p._count._all
     })),
-    recentActivity: recentActivity.map(a => ({
+    recentActivity: recentActivity.map((a: any) => ({
       clickId: a.clickId,
       provider: a.providerId,
       market: a.market,
@@ -272,8 +272,8 @@ async function getHealthDashboard(timeRange: string) {
       createdAt: { gte: since }
     },
     _count: true
-  }).then(results => 
-    results.map(r => ({
+  }).then((results: any) =>
+    results.map((r: any) => ({
       endpoint: r.endpoint,
       total_requests: r._count,
       errors: 0, // Would need separate query for errors >= 400
@@ -292,8 +292,8 @@ async function getHealthDashboard(timeRange: string) {
       responseTimeMs: true
     },
     _count: { _all: true }
-  }).then(results => 
-    results.map(r => ({
+  }).then((results: any) =>
+    results.map((r: any) => ({
       endpoint: r.endpoint,
       avg_response_time: Math.round(r._avg.responseTimeMs || 0),
       p50: Math.round(r._avg.responseTimeMs || 0), // Simplified - would need proper percentile calculation
@@ -306,7 +306,7 @@ async function getHealthDashboard(timeRange: string) {
   const healthAlerts = await checkHealthAlerts();
 
   return {
-    providerHealth: providerHealth.map(p => ({
+    providerHealth: providerHealth.map((p: any) => ({
       provider: p.providerId,
       market: p.market,
       healthScore: 100 - (p.failureRate * 100),
@@ -315,7 +315,7 @@ async function getHealthDashboard(timeRange: string) {
       lastCheck: p.lastCheck,
       status: p.shouldDisable ? 'CRITICAL' : p.failureRate > 0.05 ? 'WARNING' : 'HEALTHY'
     })),
-    priceAccuracy: priceAccuracy.map(p => ({
+    priceAccuracy: priceAccuracy.map((p: any) => ({
       provider: p.providerId,
       market: p.market,
       accuracyScore: 100 - (p.changeRate * 100),
@@ -386,18 +386,18 @@ async function getSecurityDashboard(timeRange: string) {
   const securityAlerts = await checkSecurityAlerts(since);
 
   return {
-    authFailures: authFailures.map(f => ({
+    authFailures: authFailures.map((f: any) => ({
       ip: f.ipAddress,
       reason: f.reason,
       attempts: f._count
     })),
-    postbackFailures: postbackFailures.map(p => ({
+    postbackFailures: postbackFailures.map((p: any) => ({
       network: p.network,
       ip: p.ipAddress,
       reason: p.reason,
       timestamp: p.createdAt
     })),
-    rateLimitViolations: rateLimitViolations.map(r => ({
+    rateLimitViolations: rateLimitViolations.map((r: any) => ({
       ip: r.ipAddress,
       endpoint: r.endpoint,
       violations: r._count

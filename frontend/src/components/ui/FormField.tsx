@@ -27,7 +27,8 @@ export function FormField({
   const hasError = Boolean(error)
   const focus = getThemeFocusRing(theme)
 
-  const clonedChild = React.cloneElement(children as React.ReactElement, {
+  const childElement = children as React.ReactElement<any>
+  const clonedChild = React.cloneElement(childElement, {
     'aria-describedby': hasError ? errorId : undefined,
     'aria-invalid': hasError,
     className: cn(
@@ -37,10 +38,10 @@ export function FormField({
       FORM_DESIGN_TOKENS.transition,
       focus.className,
       hasError ? 'border-red-400 bg-red-900/20 focus:ring-red-400' : '',
-      (children as React.ReactElement).props.className,
+      childElement.props.className,
     ),
     style: {
-      ...(children as React.ReactElement).props.style,
+      ...childElement.props.style,
       ...(hasError ? {} : { ['--ring-color' as '--ring-color']: focus.ringColor }),
     },
   })

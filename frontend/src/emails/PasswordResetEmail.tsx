@@ -45,7 +45,7 @@ export const PasswordResetEmail = ({
             </Text>
             
             <Section style={buttonContainer}>
-              <Button pX={20} pY={12} style={button} href={resetUrl}>
+              <Button style={button} href={resetUrl}>
                 Reset Password
               </Button>
             </Section>

@@ -277,7 +277,7 @@ export async function GET(req: NextRequest) {
       
       // Sort by predefined order
       const orderedRows = popularCodes
-        .map(code => rows.find(row => row.iataCode === code))
+        .map(code => rows.find((row: any) => row.iataCode === code))
         .filter(Boolean)
       
       airports = orderedRows.map((row: any) => ({
@@ -319,7 +319,7 @@ export async function GET(req: NextRequest) {
 
         // Sort by predefined order from city code mapping
         const orderedRows = cityCodeMatch.airports
-          .map(code => rows.find(row => row.iataCode === code))
+          .map(code => rows.find((row: any) => row.iataCode === code))
           .filter(Boolean)
 
         airports = orderedRows.map((row: any) => {

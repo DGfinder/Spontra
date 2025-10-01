@@ -405,7 +405,7 @@ export const ValidatedAirportSearch = React.memo<ValidatedAirportSearchProps>(({
             const indexMap = new Map(suggestions.map((s, i) => [`${s.type}:${s.code}`, i]))
             const cities = suggestions.filter(s => s.type === 'CITY')
             const airports = suggestions.filter(s => s.type === 'AIRPORT')
-            const blocks: JSX.Element[] = []
+            const blocks: React.ReactElement[] = []
             if (cities.length) {
               blocks.push(<li key="hdr-cities" className="px-4 py-1 text-[11px] font-semibold text-gray-600 bg-gray-50 sticky top-0">Cities</li>)
               cities.forEach((item) => {

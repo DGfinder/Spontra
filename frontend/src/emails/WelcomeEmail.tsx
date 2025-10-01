@@ -50,7 +50,7 @@ export const WelcomeEmail = ({
             </Section>
             
             <Section style={buttonContainer}>
-              <Button pX={20} pY={12} style={button} href={appUrl}>
+              <Button style={button} href={appUrl}>
                 Start Exploring
               </Button>
             </Section>

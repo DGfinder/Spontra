@@ -123,7 +123,7 @@ export function NetworkStatus({ onRetry, className = '' }: NetworkStatusProps) {
               {config.message}
             </p>
           </div>
-          {onRetry && connectionQuality !== 'good' && (
+          {onRetry && (connectionQuality === 'poor' || connectionQuality === 'offline') && (
             <button
               onClick={onRetry}
               className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
