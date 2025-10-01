@@ -195,17 +195,8 @@ async function main() {
     create: {
       email: adminEmail,
       passwordHash: adminPassword,
-      firstName: 'Admin',
-      lastName: 'User',
-      username: 'admin',
       role: 'admin',
-      isEmailVerified: true,
-      preferences: JSON.stringify({
-        preferredCabinClass: 'BUSINESS',
-        currency: 'USD',
-        language: 'en',
-        newsletter: false
-      })
+      isEmailVerified: true
     }
   })
 
