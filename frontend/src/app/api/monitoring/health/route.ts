@@ -180,7 +180,7 @@ async function checkAmadeus(): Promise<ServiceHealth> {
     const result = await amadeusClient.searchLocations('LON')
     const responseTime = Date.now() - startTime
 
-    if (!result || !result.data || result.data.length === 0) {
+    if (!result || result.length === 0) {
       return {
         status: 'degraded',
         responseTime,
