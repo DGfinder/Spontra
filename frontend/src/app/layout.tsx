@@ -6,7 +6,7 @@ import { UserAuthProvider } from '@/contexts/UserAuthContext'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import AffiliateDisclosure from '@/components/AffiliateDisclosure'
-import { PerformanceTracker } from '@/components/PerformanceTracker'
+// import { PerformanceTracker } from '@/components/PerformanceTracker' // Disabled for MVP build
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -49,7 +49,7 @@ export default function RootLayout({
         />
         <Analytics />
         <SpeedInsights />
-        <PerformanceTracker />
+        {/* <PerformanceTracker /> Disabled for MVP build */}
       </body>
     </html>
   )
