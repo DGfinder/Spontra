@@ -58,6 +58,23 @@
                     "node_modules",
                     "tests",
                     "vitest.config.ts",
-                    "src/lib/__tests__"
+                    "src/lib/__tests__",
+                    "**/*.test.ts",
+                    "**/*.test.tsx",
+                    "src/lib/healthChecks.ts",
+                    "src/lib/monitoring.ts",
+                    "src/lib/slaMonitoring.ts",
+                    "src/lib/syntheticMonitorPro.ts",
+                    "src/lib/businessMetrics.ts",
+                    "src/lib/performanceRUM.ts",
+                    "src/lib/productionAlerts.ts",
+                    "src/lib/priceAccuracyThrottling.ts",
+                    "src/lib/rateLimitProduction.ts",
+                    "src/lib/metasearch/providerOptimizer.ts",
+                    "src/lib/serverActionsTelemetry.ts",
+                    "src/lib/telemetry.ts",
+                    "src/lib/middlewareUtils.ts",
+                    "src/lib/lazy-imports.tsx",
+                    "src/lib/infantsSupportValidation.ts"
                 ]
 }

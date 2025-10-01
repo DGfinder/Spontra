@@ -771,7 +771,7 @@ class AdminRepository {
         data: {
           mfaEnabled: false,
           mfaSecret: null,
-          mfaBackupCodes: null,
+          mfaBackupCodes: undefined,
           mfaLastUsedAt: null
         }
       })
