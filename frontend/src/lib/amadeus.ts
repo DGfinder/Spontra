@@ -8,13 +8,6 @@
  * Strategy: Aggressive caching + token reuse
  */
 
-// Load environment variables (for standalone scripts)
-import { config } from 'dotenv'
-import { resolve } from 'path'
-if (process.env.NODE_ENV !== 'production' && !process.env.AMADEUS_CLIENT_ID) {
-  config({ path: resolve(process.cwd(), '.env.local') })
-}
-
 import axios, { AxiosError } from 'axios'
 
 // ============================================================================
