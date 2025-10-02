@@ -5,9 +5,12 @@ import { formatDuration } from '@/lib/amadeus'
 
 interface SearchRequest {
   departureAirport: string
+  destinationAirport?: string
   theme: string
   minFlightTime: number
   maxFlightTime: number
+  passengers: number
+  cabin: string
 }
 
 interface DestinationResponse {
@@ -47,7 +50,7 @@ interface SearchResponse {
 export async function POST(request: NextRequest): Promise<NextResponse<SearchResponse>> {
   try {
     const body: SearchRequest = await request.json()
-    const { departureAirport, theme, minFlightTime, maxFlightTime } = body
+    const { departureAirport, destinationAirport, theme, minFlightTime, maxFlightTime, passengers, cabin } = body
 
     // Validate required fields
     if (!departureAirport || !theme) {
@@ -103,12 +106,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
     // Extract destination airport codes
     const destinationCodes = validRoutes.map(route => route.destinationAirportCode)
 
+    // If specific destination requested, filter for it
+    const destinationFilter = destinationAirport && destinationAirport.trim()
+      ? { airportCode: destinationAirport.toUpperCase().trim() }
+      : { airportCode: { in: destinationCodes } }
+
     // Step 2: Get destination details for searchable airports AND with POIs for the selected theme
     const potentialDestinations = await db.destination.findMany({
       where: {
-        airportCode: {
-          in: destinationCodes
-        },
+        ...destinationFilter,
         themePOIs: {
           some: {
             theme: theme
@@ -159,7 +165,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
           origin,
           destination: dest.airportCode,
           departureDate: departureDateStr,
-          adults: 1
+          adults: passengers || 1
         })
 
         if (offers.data.length === 0) {

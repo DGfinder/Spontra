@@ -94,100 +94,6 @@ export function SearchForm() {
                 </div>
               </div>
 
-              {/* Theme Selection */}
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                  What Are You Looking For?
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  {themes.map((theme) => {
-                    const Icon = theme.icon
-                    const isSelected = filters.theme === theme.value
-                    return (
-                      <button
-                        key={theme.value}
-                        type="button"
-                        onClick={() => updateFilter('theme', theme.value)}
-                        className={`
-                          flex items-center gap-3 px-4 h-12 rounded-full text-[15px] font-normal
-                          transition-all duration-300
-                          ${isSelected
-                            ? 'text-[#1A1A1A] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]'
-                            : 'bg-transparent text-[#E6E6E6] border border-[rgba(255,255,255,0.16)] hover:bg-white/5'
-                          }
-                        `}
-                        style={isSelected ? {
-                          backgroundColor: theme.color,
-                          borderColor: theme.color
-                        } : {}}
-                      >
-                        <Icon className="h-5 w-5" />
-                        <span>{theme.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-
-              {/* Flight Time Range */}
-              <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                    Flight Time + Direct
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm" style={{ color: '#F3F6F9' }}>
-                      {filters.minFlightTime}h–{filters.maxFlightTime}h
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setOnlyDirect(!onlyDirect)}
-                      className="flex items-center gap-2 rounded transition-all duration-300"
-                    >
-                      <div
-                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
-                                    ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
-                        style={onlyDirect ? {
-                          backgroundColor: themeColor,
-                          borderColor: themeColor
-                        } : {}}
-                      >
-                        {onlyDirect && (
-                          <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm" style={{ color: '#C9CFD6' }}>Only direct</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <input
-                    type="range"
-                    min="1"
-                    max="12"
-                    value={filters.maxFlightTime}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value)
-                      updateFilter('maxFlightTime', val)
-                      if (filters.minFlightTime > val) {
-                        updateFilter('minFlightTime', val)
-                      }
-                    }}
-                    className="w-full range-slider"
-                    style={{
-                      // @ts-ignore - CSS custom properties
-                      '--thumb-color': themeColor
-                    }}
-                  />
-                  <div className="flex justify-between text-xs" style={{ color: '#A7AFB7' }}>
-                    <span>1h</span>
-                    <span>12h</span>
-                  </div>
-                </div>
-              </div>
-
               {/* Passengers & Cabin Class */}
               <div className="flex flex-col gap-1">
                 <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
@@ -276,6 +182,127 @@ export function SearchForm() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Theme Selection */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                  What Are You Looking For?
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {themes.map((theme) => {
+                    const Icon = theme.icon
+                    const isSelected = filters.theme === theme.value
+                    return (
+                      <button
+                        key={theme.value}
+                        type="button"
+                        onClick={() => updateFilter('theme', theme.value)}
+                        className={`
+                          flex items-center gap-3 px-4 h-12 rounded-full text-[15px] font-normal
+                          transition-all duration-300
+                          ${isSelected
+                            ? 'text-[#1A1A1A] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]'
+                            : 'bg-transparent text-[#E6E6E6] border border-[rgba(255,255,255,0.16)] hover:bg-white/5'
+                          }
+                        `}
+                        style={isSelected ? {
+                          backgroundColor: theme.color,
+                          borderColor: theme.color
+                        } : {}}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{theme.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Flight Time Range */}
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                    Flight Time
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm" style={{ color: '#F3F6F9' }}>
+                      {filters.minFlightTime}h–{filters.maxFlightTime}h
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setOnlyDirect(!onlyDirect)}
+                      className="flex items-center gap-2 rounded transition-all duration-300"
+                    >
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
+                                    ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
+                        style={onlyDirect ? {
+                          backgroundColor: themeColor,
+                          borderColor: themeColor
+                        } : {}}
+                      >
+                        {onlyDirect && (
+                          <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-sm" style={{ color: '#C9CFD6' }}>Only direct</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {/* Min Flight Time Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs" style={{ color: '#A7AFB7' }}>Min</span>
+                      <span className="text-xs" style={{ color: '#F3F6F9' }}>{filters.minFlightTime}h</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={filters.minFlightTime}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        if (val <= filters.maxFlightTime) {
+                          updateFilter('minFlightTime', val)
+                        }
+                      }}
+                      className="w-full range-slider"
+                      style={{
+                        // @ts-ignore - CSS custom properties
+                        '--thumb-color': themeColor
+                      }}
+                    />
+                  </div>
+
+                  {/* Max Flight Time Slider */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs" style={{ color: '#A7AFB7' }}>Max</span>
+                      <span className="text-xs" style={{ color: '#F3F6F9' }}>{filters.maxFlightTime}h</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="12"
+                      value={filters.maxFlightTime}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value)
+                        if (val >= filters.minFlightTime) {
+                          updateFilter('maxFlightTime', val)
+                        }
+                      }}
+                      className="w-full range-slider"
+                      style={{
+                        // @ts-ignore - CSS custom properties
+                        '--thumb-color': themeColor
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
 

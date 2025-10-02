@@ -116,9 +116,12 @@ export const useSearchStore = create<SearchState>()(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               departureAirport: filters.departureAirport,
+              destinationAirport: filters.destinationAirport,
               theme: filters.theme,
               minFlightTime: filters.minFlightTime,
-              maxFlightTime: filters.maxFlightTime
+              maxFlightTime: filters.maxFlightTime,
+              passengers: filters.passengers,
+              cabin: filters.cabin
             })
           })
           
