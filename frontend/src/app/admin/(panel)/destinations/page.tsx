@@ -3,22 +3,41 @@
 import { useState, useEffect } from 'react'
 import { getDestinations, getDestinationWithPOIs } from '@/actions/destinationActions'
 import { createPOI, updatePOI, deletePOI, reorderPOI } from '@/actions/themePOIActions'
-import { Decimal } from '@prisma/client/runtime/library'
+import { addVideos, deleteVideo, reorderVideo } from '@/actions/poiVideoActions'
+import { VideoCard } from '@/components/admin/VideoCard'
+import { AddVideosForm } from '@/components/admin/AddVideosForm'
+import { Film } from 'lucide-react'
 
 interface Destination {
   id: string
   cityName: string
-  airportCode: string
+  airportCode: string | null
   country: {
     id: string
     name: string
     code: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: string
+    updatedAt: string
   } | null
+  airports: Array<{
+    isPrimary: boolean
+    createdAt: string
+    airport: {
+      iataCode: string
+      name: string
+    }
+  }>
   _count: {
     themePOIs: number
   }
+}
+
+interface POIVideo {
+  id: string
+  poiId: string
+  videoUrl: string
+  displayOrder: number
+  createdAt: string
 }
 
 interface ThemePOI {
@@ -28,8 +47,9 @@ interface ThemePOI {
   description: string | null
   videoUrl: string | null
   displayOrder: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
+  videos: POIVideo[]
 }
 
 interface DestinationWithPOIs {
@@ -37,13 +57,13 @@ interface DestinationWithPOIs {
   cityName: string
   airportCode: string
   description: string | null
-  popularityScore: Decimal | null
+  popularityScore: number | null
   country: {
     id: string
     name: string
     code: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: string
+    updatedAt: string
   } | null
   themePOIs: ThemePOI[]
 }
@@ -64,6 +84,11 @@ export default function DestinationsPage() {
   const [isAddingPOI, setIsAddingPOI] = useState(false)
   const [newPOI, setNewPOI] = useState({ name: '', description: '', videoUrl: '' })
 
+  // Video management state
+  const [selectedPOI, setSelectedPOI] = useState<ThemePOI | null>(null)
+  const [isAddingVideos, setIsAddingVideos] = useState(false)
+  const [isSubmittingVideos, setIsSubmittingVideos] = useState(false)
+
   useEffect(() => {
     loadDestinations()
   }, [])
@@ -71,8 +96,12 @@ export default function DestinationsPage() {
   async function loadDestinations() {
     setIsLoading(true)
     const result = await getDestinations()
+    console.log('[Destinations] Load result:', result)
     if (result.success && result.data) {
+      console.log('[Destinations] Setting data:', result.data.length, 'destinations')
       setDestinations(result.data)
+    } else {
+      console.error('[Destinations] Failed to load:', result.error)
     }
     setIsLoading(false)
   }
@@ -89,6 +118,8 @@ export default function DestinationsPage() {
     setSelectedDestination(null)
     setIsAddingPOI(false)
     setNewPOI({ name: '', description: '', videoUrl: '' })
+    setSelectedPOI(null)
+    setIsAddingVideos(false)
     loadDestinations()
   }
 
@@ -106,7 +137,6 @@ export default function DestinationsPage() {
     if (result.success) {
       setIsAddingPOI(false)
       setNewPOI({ name: '', description: '', videoUrl: '' })
-      // Reload destination to show new POI
       openPOIModal(selectedDestination.id)
     } else {
       alert(result.error)
@@ -114,7 +144,7 @@ export default function DestinationsPage() {
   }
 
   async function handleDeletePOI(poiId: string) {
-    if (!confirm('Delete this POI?')) return
+    if (!confirm('Delete this POI and all its videos?')) return
 
     const result = await deletePOI(poiId)
     if (result.success && selectedDestination) {
@@ -128,6 +158,44 @@ export default function DestinationsPage() {
     const result = await reorderPOI(poiId, direction)
     if (result.success && selectedDestination) {
       openPOIModal(selectedDestination.id)
+    } else if (result.error) {
+      alert(result.error)
+    }
+  }
+
+  // Video management functions
+  async function handleAddVideos(videoUrls: string[]) {
+    if (!selectedPOI) return
+
+    setIsSubmittingVideos(true)
+    const result = await addVideos(selectedPOI.id, videoUrls)
+
+    if (result.success) {
+      setIsAddingVideos(false)
+      if (selectedDestination) {
+        await openPOIModal(selectedDestination.id)
+      }
+    } else {
+      alert(result.error)
+    }
+    setIsSubmittingVideos(false)
+  }
+
+  async function handleDeleteVideo(videoId: string) {
+    if (!confirm('Delete this video?')) return
+
+    const result = await deleteVideo(videoId)
+    if (result.success && selectedDestination) {
+      await openPOIModal(selectedDestination.id)
+    } else {
+      alert(result.error)
+    }
+  }
+
+  async function handleReorderVideo(videoId: string, direction: 'up' | 'down') {
+    const result = await reorderVideo(videoId, direction)
+    if (result.success && selectedDestination) {
+      await openPOIModal(selectedDestination.id)
     } else if (result.error) {
       alert(result.error)
     }
@@ -163,7 +231,7 @@ export default function DestinationsPage() {
                 Country
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Airport
+                Airports
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                 POIs
@@ -182,8 +250,31 @@ export default function DestinationsPage() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                   {dest.country?.name || 'N/A'}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                  {dest.airportCode}
+                <td className="px-6 py-4 text-sm text-white/70">
+                  <div className="flex flex-wrap gap-1">
+                    {dest.airports && dest.airports.length > 0 ? (
+                      dest.airports.map((da) => (
+                        <span
+                          key={da.airport.iataCode}
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            da.isPrimary
+                              ? 'bg-white/20 text-white'
+                              : 'bg-white/10 text-white/70'
+                          }`}
+                          title={da.airport.name}
+                        >
+                          {da.airport.iataCode}
+                          {da.isPrimary && ' ★'}
+                        </span>
+                      ))
+                    ) : dest.airportCode ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/20 text-white">
+                        {dest.airportCode}
+                      </span>
+                    ) : (
+                      <span className="text-white/50">No airports</span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                   {dest._count.themePOIs} POIs
@@ -202,7 +293,7 @@ export default function DestinationsPage() {
         </table>
       </div>
 
-      {/* POI Modal */}
+      {/* POI Modal with Video Feed */}
       {selectedDestination && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -214,7 +305,7 @@ export default function DestinationsPage() {
                     {selectedDestination.cityName}{selectedDestination.country && `, ${selectedDestination.country.name}`}
                   </h2>
                   <p className="text-white/60 text-sm mt-1">
-                    {selectedDestination.airportCode} • {selectedDestination.themePOIs.length} total POIs
+                    {selectedDestination.airportCode} • {selectedDestination.themePOIs.length} POIs
                   </p>
                 </div>
                 <button
@@ -227,12 +318,16 @@ export default function DestinationsPage() {
             </div>
 
             {/* Theme Tabs */}
-            <div className="flex border-b border-white/10 px-6">
+            <div className="flex border-b border-white/10 px-6 overflow-x-auto">
               {THEMES.map((theme) => (
                 <button
                   key={theme.value}
-                  onClick={() => setActiveTheme(theme.value)}
-                  className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+                  onClick={() => {
+                    setActiveTheme(theme.value)
+                    setSelectedPOI(null)
+                    setIsAddingVideos(false)
+                  }}
+                  className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
                     activeTheme === theme.value
                       ? 'text-white border-white'
                       : 'text-white/60 border-transparent hover:text-white/80'
@@ -243,59 +338,78 @@ export default function DestinationsPage() {
               ))}
             </div>
 
-            {/* POI List */}
+            {/* Instagram-style Video Feed */}
             <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-3">
-                {themePOIs.map((poi, index) => (
-                  <div
-                    key={poi.id}
-                    className="bg-white/5 rounded-lg p-4 border border-white/10"
-                  >
-                    <div className="flex items-start justify-between">
+              {/* POIs for this theme */}
+              <div className="space-y-6">
+                {themePOIs.map((poi) => (
+                  <div key={poi.id} className="space-y-4">
+                    {/* POI Header */}
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10">
                       <div className="flex-1">
                         <h3 className="text-white font-medium">{poi.name}</h3>
                         {poi.description && (
                           <p className="text-white/60 text-sm mt-1">{poi.description}</p>
                         )}
-                        {poi.videoUrl && (
-                          <a
-                            href={poi.videoUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-300 text-sm mt-2 inline-block hover:underline"
-                          >
-                            🎬 {poi.videoUrl}
-                          </a>
-                        )}
                       </div>
-                      <div className="flex items-center space-x-2 ml-4">
+                      <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleReorder(poi.id, 'up')}
-                          disabled={index === 0}
-                          className="text-white/60 hover:text-white disabled:opacity-30"
+                          onClick={() => {
+                            setSelectedPOI(poi)
+                            setIsAddingVideos(true)
+                          }}
+                          className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
                         >
-                          ↑
-                        </button>
-                        <button
-                          onClick={() => handleReorder(poi.id, 'down')}
-                          disabled={index === themePOIs.length - 1}
-                          className="text-white/60 hover:text-white disabled:opacity-30"
-                        >
-                          ↓
+                          <Film className="w-4 h-4" />
+                          Add Videos
                         </button>
                         <button
                           onClick={() => handleDeletePOI(poi.id)}
-                          className="text-red-300 hover:text-red-200 ml-2"
+                          className="text-red-300 hover:text-red-200 text-sm"
                         >
-                          Delete
+                          Delete POI
                         </button>
                       </div>
                     </div>
+
+                    {/* Video Feed for this POI */}
+                    {poi.videos && poi.videos.length > 0 ? (
+                      <div className="space-y-4">
+                        {poi.videos.map((video, videoIndex) => (
+                          <VideoCard
+                            key={video.id}
+                            video={video}
+                            poiName={poi.name}
+                            poiDescription={poi.description}
+                            onEdit={() => {}} // TODO: Implement video URL editing
+                            onDelete={handleDeleteVideo}
+                            onMoveUp={() => handleReorderVideo(video.id, 'up')}
+                            onMoveDown={() => handleReorderVideo(video.id, 'down')}
+                            canMoveUp={videoIndex > 0}
+                            canMoveDown={videoIndex < (poi.videos?.length || 0) - 1}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10 border-dashed">
+                        <Film className="w-12 h-12 text-white/30 mx-auto mb-2" />
+                        <p className="text-white/50 text-sm">No videos yet</p>
+                        <button
+                          onClick={() => {
+                            setSelectedPOI(poi)
+                            setIsAddingVideos(true)
+                          }}
+                          className="mt-3 text-blue-300 hover:text-blue-200 text-sm"
+                        >
+                          Add your first video →
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
 
                 {themePOIs.length === 0 && !isAddingPOI && (
-                  <p className="text-center text-white/50 py-8">
+                  <p className="text-center text-white/50 py-12">
                     No POIs for this theme yet
                   </p>
                 )}
@@ -303,12 +417,12 @@ export default function DestinationsPage() {
 
               {/* Add POI Form */}
               {isAddingPOI ? (
-                <div className="mt-4 bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="mt-6 bg-white/5 rounded-lg p-4 border border-white/10">
                   <h4 className="text-white font-medium mb-3">Add New POI</h4>
                   <div className="space-y-3">
                     <input
                       type="text"
-                      placeholder="POI Name"
+                      placeholder="POI Name (e.g., Eiffel Tower)"
                       value={newPOI.name}
                       onChange={(e) => setNewPOI({ ...newPOI, name: e.target.value })}
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/40"
@@ -319,13 +433,6 @@ export default function DestinationsPage() {
                       onChange={(e) => setNewPOI({ ...newPOI, description: e.target.value })}
                       className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/40"
                       rows={2}
-                    />
-                    <input
-                      type="url"
-                      placeholder="YouTube Shorts URL (optional)"
-                      value={newPOI.videoUrl}
-                      onChange={(e) => setNewPOI({ ...newPOI, videoUrl: e.target.value })}
-                      className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/40"
                     />
                     <div className="flex justify-end space-x-2">
                       <button
@@ -341,7 +448,7 @@ export default function DestinationsPage() {
                         onClick={handleCreatePOI}
                         className="px-3 py-1 bg-white text-brand-purple rounded-lg font-medium hover:bg-white/90"
                       >
-                        Add POI
+                        Create POI
                       </button>
                     </div>
                   </div>
@@ -349,12 +456,35 @@ export default function DestinationsPage() {
               ) : (
                 <button
                   onClick={() => setIsAddingPOI(true)}
-                  className="mt-4 w-full py-3 border-2 border-dashed border-white/20 rounded-lg text-white/60 hover:text-white hover:border-white/40 transition-colors"
+                  className="mt-6 w-full py-3 border-2 border-dashed border-white/20 rounded-lg text-white/60 hover:text-white hover:border-white/40 transition-colors"
                 >
                   + Add New POI
                 </button>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Videos Modal */}
+      {isAddingVideos && selectedPOI && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl w-full max-w-2xl p-6">
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Add Videos to "{selectedPOI.name}"
+            </h2>
+            <p className="text-white/60 text-sm mb-6">
+              Add multiple YouTube Shorts URLs for an Instagram-style feed
+            </p>
+
+            <AddVideosForm
+              onSubmit={handleAddVideos}
+              onCancel={() => {
+                setIsAddingVideos(false)
+                setSelectedPOI(null)
+              }}
+              isSubmitting={isSubmittingVideos}
+            />
           </div>
         </div>
       )}

@@ -188,6 +188,32 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
           return sum + (hours * 60) + minutes
         }, 0)
 
+        // Auto-populate flight route (create only, never update)
+        try {
+          const existingRoute = await db.flightRoute.findUnique({
+            where: {
+              originAirportCode_destinationAirportCode: {
+                originAirportCode: origin,
+                destinationAirportCode: dest.airportCode
+              }
+            }
+          })
+
+          if (!existingRoute) {
+            await db.flightRoute.create({
+              data: {
+                originAirportCode: origin,
+                destinationAirportCode: dest.airportCode,
+                totalDurationMinutes: totalMinutes
+              }
+            })
+            console.log(`[Auto-populate] Created route: ${origin} → ${dest.airportCode} (${totalMinutes}m)`)
+          }
+        } catch (error) {
+          // Non-blocking - don't fail search if route creation fails
+          console.error('[Auto-populate] Route creation failed:', error)
+        }
+
         return {
           id: dest.id,
           cityName: dest.cityName,

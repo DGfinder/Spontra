@@ -43,8 +43,9 @@ model Airport {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  originFlights      FlightRoute[] @relation("OriginAirport")
-  destinationFlights FlightRoute[] @relation("DestinationAirport")
+  originFlights      FlightRoute[]        @relation("OriginAirport")
+  destinationFlights FlightRoute[]        @relation("DestinationAirport")
+  destinations       DestinationAirport[]
 
   @@index([isSearchable])
   @@map("airports")
@@ -80,21 +81,39 @@ model Country {
 // Destinations with themes
 model Destination {
   id              String     @id @default(uuid())
-  airportCode     String     @unique @map("airport_code")
+  airportCode     String?    @map("airport_code")  // Deprecated - kept for migration
   cityName        String     @map("city_name")
-  countryName     String?    @map("country_name")  // Temporary - will be removed after migration
-  countryId       String?    @map("country_id")    // Nullable temporarily for migration
+  countryName     String?    @map("country_name")  // Deprecated - kept for migration
+  countryId       String?    @map("country_id")
   description     String?
   imageUrl        String?    @map("image_url")
   popularityScore Decimal?   @map("popularity_score")
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
-  country         Country?   @relation(fields: [countryId], references: [id])
+  country         Country?               @relation(fields: [countryId], references: [id])
   themePOIs       ThemePOI[]
+  airports        DestinationAirport[]
 
   @@index([countryId])
   @@map("destinations")
+}
+
+// Many-to-many relationship between Destinations and Airports
+model DestinationAirport {
+  id            String      @id @default(uuid())
+  destinationId String      @map("destination_id")
+  airportCode   String      @map("airport_code")
+  isPrimary     Boolean     @default(false) @map("is_primary")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  airport       Airport     @relation(fields: [airportCode], references: [iataCode], onDelete: Cascade)
+
+  @@unique([destinationId, airportCode])
+  @@index([destinationId])
+  @@index([airportCode])
+  @@map("destination_airports")
 }
 
 // Theme-specific Points of Interest for destinations
@@ -104,15 +123,30 @@ model ThemePOI {
   theme           String      // "adventure", "nature", "vibe", "indulge", "discover"
   name            String
   description     String?
-  videoUrl        String?     @map("video_url")
+  videoUrl        String?     @map("video_url")  // DEPRECATED: Use POIVideo relation instead
   displayOrder    Int         @default(0) @map("display_order")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
   destination     Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  videos          POIVideo[]
 
   @@index([destinationId, theme])
   @@map("theme_pois")
+}
+
+// Multiple videos per POI (YouTube Shorts feed)
+model POIVideo {
+  id              String      @id @default(uuid())
+  poiId           String      @map("poi_id")
+  videoUrl        String      @map("video_url")
+  displayOrder    Int         @default(0) @map("display_order")
+  createdAt       DateTime    @default(now()) @map("created_at")
+
+  poi             ThemePOI    @relation(fields: [poiId], references: [id], onDelete: Cascade)
+
+  @@index([poiId])
+  @@map("poi_videos")
 }
 
 // Basic search sessions

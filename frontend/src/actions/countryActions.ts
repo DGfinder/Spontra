@@ -20,6 +20,69 @@ export async function getCountries() {
   }
 }
 
+export async function getCountryWithCities(countryId: string) {
+  try {
+    const destinations = await db.destination.findMany({
+      where: { countryId },
+      orderBy: { cityName: 'asc' },
+      include: {
+        _count: {
+          select: { themePOIs: true }
+        }
+      }
+    })
+
+    // Fetch airports using raw SQL (until Prisma Client is regenerated)
+    const airportLinks = await db.$queryRaw<Array<{
+      destination_id: string
+      airport_code: string
+      is_primary: boolean
+      iata_code: string
+      name: string
+    }>>`
+      SELECT
+        da.destination_id,
+        da.airport_code,
+        da.is_primary,
+        a.iata_code,
+        a.name
+      FROM destination_airports da
+      JOIN airports a ON da.airport_code = a.iata_code
+      WHERE da.destination_id IN (
+        SELECT id FROM destinations WHERE country_id = ${countryId}
+      )
+      ORDER BY da.is_primary DESC, da.airport_code ASC
+    `
+
+    // Group airports by destination
+    const airportsByDest = new Map<string, typeof airportLinks>()
+    for (const link of airportLinks) {
+      if (!airportsByDest.has(link.destination_id)) {
+        airportsByDest.set(link.destination_id, [])
+      }
+      airportsByDest.get(link.destination_id)!.push(link)
+    }
+
+    // Serialize for client
+    const serialized = destinations.map(dest => ({
+      id: dest.id,
+      cityName: dest.cityName,
+      airportCode: dest.airportCode,
+      airports: (airportsByDest.get(dest.id) || []).map(da => ({
+        iataCode: da.iata_code,
+        name: da.name,
+        isPrimary: da.is_primary
+      })),
+      _count: dest._count
+    }))
+
+    return { success: true, data: serialized }
+  } catch (error) {
+    console.error('[getCountryWithCities] Error:', error)
+    return { success: false, error: 'Failed to fetch country cities' }
+  }
+}
+
 export async function createCountry(data: { name: string; code: string }) {
   try {
     const country = await db.country.create({
