@@ -1,12 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
-import { Trash2, Edit2, GripVertical } from 'lucide-react'
-
-// Dynamically import ReactPlayer to avoid SSR issues
-const ReactPlayer = dynamic(() => import('react-player'), { ssr: false })
+import { Trash2, Edit2, GripVertical, Play } from 'lucide-react'
 
 interface POIVideo {
   id: string
@@ -39,7 +35,7 @@ export function VideoCard({
   canMoveDown = true,
   dragHandleProps
 }: VideoCardProps) {
-  const [isPlaying, setIsPlaying] = useState(false)
+  const [showPlayer, setShowPlayer] = useState(false)
   const [imageError, setImageError] = useState(false)
 
   const videoId = extractYouTubeId(video.videoUrl)
@@ -50,23 +46,45 @@ export function VideoCard({
       {/* Video Embed */}
       <div className="aspect-video relative bg-black">
         {videoId ? (
-          <ReactPlayer
-            url={video.videoUrl}
-            width="100%"
-            height="100%"
-            playing={isPlaying}
-            controls
-            light={!imageError ? thumbnailUrl : false}
-            onError={() => setImageError(true)}
-            config={{
-              youtube: {
-                playerVars: {
-                  modestbranding: 1,
-                  rel: 0
-                }
-              }
-            }}
-          />
+          showPlayer ? (
+            <iframe
+              width="100%"
+              height="100%"
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="absolute inset-0"
+            />
+          ) : (
+            <div 
+              className="w-full h-full relative cursor-pointer group"
+              onClick={() => setShowPlayer(true)}
+            >
+              {!imageError && thumbnailUrl ? (
+                <img
+                  src={thumbnailUrl}
+                  alt={`${poiName} video thumbnail`}
+                  className="w-full h-full object-cover"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                  <div className="text-center text-white/70">
+                    <Play className="w-12 h-12 mx-auto mb-2" />
+                    <p className="text-sm">Click to play video</p>
+                  </div>
+                </div>
+              )}
+              {/* Play button overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/50 transition-colors">
+                <div className="bg-red-600 rounded-full p-4 group-hover:scale-110 transition-transform">
+                  <Play className="w-6 h-6 text-white fill-current" />
+                </div>
+              </div>
+            </div>
+          )
         ) : (
           <div className="w-full h-full flex items-center justify-center text-white/50">
             <div className="text-center">

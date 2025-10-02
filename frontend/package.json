@@ -44,7 +44,6 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.63.0",
-    "react-player": "^3.3.3",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.9.2",
