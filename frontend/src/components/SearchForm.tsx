@@ -16,10 +16,10 @@ export function SearchForm() {
 
   const themes = [
     { value: 'adventure', label: '🏔️ Adventure', color: 'adventure' },
-    { value: 'beach', label: '🏖️ Beach', color: 'beach' },
-    { value: 'city', label: '🏙️ City Break', color: 'city' },
-    { value: 'culture', label: '🏛️ Culture', color: 'culture' },
-    { value: 'nature', label: '🌲 Nature', color: 'nature' }
+    { value: 'nature', label: '🌲 Nature', color: 'nature' },
+    { value: 'vibe', label: '🎭 Vibe', color: 'vibe' },
+    { value: 'indulge', label: '🍷 Indulge', color: 'indulge' },
+    { value: 'discover', label: '🔍 Discover', color: 'discover' }
   ] as const
 
   return (

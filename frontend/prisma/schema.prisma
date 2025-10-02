@@ -31,20 +31,22 @@ model User {
 
 // Airport data
 model Airport {
-  id          String   @id @default(uuid())
-  iataCode    String   @unique @map("iata_code")
-  name        String
-  city        String
-  country     String
-  latitude    Decimal?
-  longitude   Decimal?
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           String   @id @default(uuid())
+  iataCode     String   @unique @map("iata_code")
+  name         String
+  city         String
+  country      String
+  latitude     Decimal?
+  longitude    Decimal?
+  isActive     Boolean  @default(true) @map("is_active")
+  isSearchable Boolean  @default(false) @map("is_searchable")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   originFlights      FlightRoute[] @relation("OriginAirport")
   destinationFlights FlightRoute[] @relation("DestinationAirport")
 
+  @@index([isSearchable])
   @@map("airports")
 }
 

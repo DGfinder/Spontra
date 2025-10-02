@@ -94,7 +94,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
     // Extract destination airport codes
     const destinationCodes = validRoutes.map(route => route.destinationAirportCode)
 
-    // Step 2: Get destination details for these airports
+    // Step 2: Get destination details for searchable airports only
     const potentialDestinations = await db.destination.findMany({
       where: {
         airportCode: {
@@ -107,14 +107,32 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
       }
     })
 
-    console.log('[Search API] Found', potentialDestinations.length, 'potential destinations')
+    // Filter out destinations with non-searchable airports
+    const searchableAirports = await db.airport.findMany({
+      where: {
+        iataCode: {
+          in: potentialDestinations.map(d => d.airportCode)
+        },
+        isSearchable: true
+      },
+      select: {
+        iataCode: true
+      }
+    })
+
+    const searchableAirportCodes = new Set(searchableAirports.map(a => a.iataCode))
+    const filteredDestinations = potentialDestinations.filter(dest =>
+      searchableAirportCodes.has(dest.airportCode)
+    )
+
+    console.log('[Search API] Found', filteredDestinations.length, 'searchable destinations')
 
     // Step 3: Get real flight data for each destination (parallel)
     const today = new Date()
     const departureDate = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
     const departureDateStr = departureDate.toISOString().split('T')[0]
 
-    const flightDataPromises = potentialDestinations.map(async (dest) => {
+    const flightDataPromises = filteredDestinations.map(async (dest) => {
       try {
         const { offers, metrics } = await getCachedFlightOffers({
           origin,
