@@ -9,8 +9,11 @@ interface Destination {
   cityName: string
   airportCode: string
   country: {
+    id: string
     name: string
     code: string
+    createdAt: Date
+    updatedAt: Date
   } | null
   _count: {
     themePOIs: number
