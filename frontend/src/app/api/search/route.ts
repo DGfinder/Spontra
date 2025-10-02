@@ -13,9 +13,18 @@ interface SearchRequest {
 interface DestinationResponse {
   id: string
   cityName: string
-  countryName: string
+  country: {
+    name: string
+    code: string
+  }
   airportCode: string
   description?: string | null
+  themePOIs?: Array<{
+    id: string
+    name: string
+    description: string | null
+    videoUrl: string | null
+  }>
   flightDuration?: number
   priceEstimate?: string
   cheapestPrice?: number
