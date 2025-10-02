@@ -3,7 +3,7 @@ import Link from 'next/link'
 export default function AdminPanelLayout({
   children,
 }: {
-  children: React.Node
+  children: React.ReactNode
 }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-purple via-brand-blue to-brand-teal">
