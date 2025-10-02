@@ -1,0 +1,1111 @@
+[
+  {
+    "query": {
+      "origin": "LAX",
+      "destination": "JFK",
+      "departureDate": "2025-11-15",
+      "adults": 1
+    },
+    "offersCount": 47,
+    "sample": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-10-03",
+      "lastTicketingDateTime": "2025-10-03",
+      "numberOfBookableSeats": 7,
+      "itineraries": [
+        {
+          "duration": "PT5H22M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "LAX",
+                "terminal": "5",
+                "at": "2025-11-15T21:55:00"
+              },
+              "arrival": {
+                "iataCode": "JFK",
+                "terminal": "5",
+                "at": "2025-11-16T06:17:00"
+              },
+              "carrierCode": "B6",
+              "number": "2724",
+              "aircraft": {
+                "code": "32S"
+              },
+              "operating": {
+                "carrierCode": "B6"
+              },
+              "duration": "PT5H22M",
+              "id": "31",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "123.44",
+        "base": "100.64",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "123.44",
+        "additionalServices": [
+          {
+            "amount": "35.00",
+            "type": "CHECKED_BAGS"
+          }
+        ]
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": false
+      },
+      "validatingAirlineCodes": [
+        "B6"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "123.44",
+            "base": "100.64"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "31",
+              "cabin": "ECONOMY",
+              "fareBasis": "PI2QUEL1",
+              "brandedFare": "DN",
+              "brandedFareLabel": "BLUE BASIC",
+              "class": "L",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "CHECKED BAG FIRST",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CHECKED BAG SECOND",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "EXTRA LEGROOM",
+                  "isChargeable": true,
+                  "amenityType": "PRE_RESERVED_SEAT",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "ADVANCE SEAT SELECTION",
+                  "isChargeable": true,
+                  "amenityType": "PRE_RESERVED_SEAT",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "SNACK",
+                  "isChargeable": false,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "ALCOHOLIC DRINK",
+                  "isChargeable": true,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "NON ALCOHOLIC DRINK",
+                  "isChargeable": false,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "cheapest": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-10-03",
+      "lastTicketingDateTime": "2025-10-03",
+      "numberOfBookableSeats": 7,
+      "itineraries": [
+        {
+          "duration": "PT5H22M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "LAX",
+                "terminal": "5",
+                "at": "2025-11-15T21:55:00"
+              },
+              "arrival": {
+                "iataCode": "JFK",
+                "terminal": "5",
+                "at": "2025-11-16T06:17:00"
+              },
+              "carrierCode": "B6",
+              "number": "2724",
+              "aircraft": {
+                "code": "32S"
+              },
+              "operating": {
+                "carrierCode": "B6"
+              },
+              "duration": "PT5H22M",
+              "id": "31",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "123.44",
+        "base": "100.64",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "123.44",
+        "additionalServices": [
+          {
+            "amount": "35.00",
+            "type": "CHECKED_BAGS"
+          }
+        ]
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": false
+      },
+      "validatingAirlineCodes": [
+        "B6"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "123.44",
+            "base": "100.64"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "31",
+              "cabin": "ECONOMY",
+              "fareBasis": "PI2QUEL1",
+              "brandedFare": "DN",
+              "brandedFareLabel": "BLUE BASIC",
+              "class": "L",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "CHECKED BAG FIRST",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CHECKED BAG SECOND",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "EXTRA LEGROOM",
+                  "isChargeable": true,
+                  "amenityType": "PRE_RESERVED_SEAT",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "ADVANCE SEAT SELECTION",
+                  "isChargeable": true,
+                  "amenityType": "PRE_RESERVED_SEAT",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "SNACK",
+                  "isChargeable": false,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "ALCOHOLIC DRINK",
+                  "isChargeable": true,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "NON ALCOHOLIC DRINK",
+                  "isChargeable": false,
+                  "amenityType": "MEAL",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "count": 47,
+      "links": {
+        "self": "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=LAX&destinationLocationCode=JFK&departureDate=2025-11-15&adults=1&currencyCode=USD&max=50"
+      }
+    }
+  },
+  {
+    "query": {
+      "origin": "SFO",
+      "destination": "MIA",
+      "departureDate": "2025-11-20",
+      "adults": 2
+    },
+    "offersCount": 22,
+    "sample": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-10-03",
+      "lastTicketingDateTime": "2025-10-03",
+      "numberOfBookableSeats": 3,
+      "itineraries": [
+        {
+          "duration": "PT8H30M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "SFO",
+                "terminal": "1",
+                "at": "2025-11-20T18:30:00"
+              },
+              "arrival": {
+                "iataCode": "SAN",
+                "terminal": "2",
+                "at": "2025-11-20T20:04:00"
+              },
+              "carrierCode": "AS",
+              "number": "3376",
+              "aircraft": {
+                "code": "E75"
+              },
+              "operating": {
+                "carrierName": "SKYWEST AIRLINES AS ALASKASKYWEST"
+              },
+              "duration": "PT1H34M",
+              "id": "23",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            },
+            {
+              "departure": {
+                "iataCode": "SAN",
+                "terminal": "2",
+                "at": "2025-11-20T22:15:00"
+              },
+              "arrival": {
+                "iataCode": "MIA",
+                "at": "2025-11-21T06:00:00"
+              },
+              "carrierCode": "AS",
+              "number": "6844",
+              "aircraft": {
+                "code": "7M8"
+              },
+              "operating": {
+                "carrierCode": "AA"
+              },
+              "duration": "PT4H45M",
+              "id": "24",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "591.98",
+        "base": "504.18",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "591.98"
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": false
+      },
+      "validatingAirlineCodes": [
+        "AS"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "295.99",
+            "base": "252.09"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "23",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            },
+            {
+              "segmentId": "24",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "travelerId": "2",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "295.99",
+            "base": "252.09"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "23",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            },
+            {
+              "segmentId": "24",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "cheapest": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-10-03",
+      "lastTicketingDateTime": "2025-10-03",
+      "numberOfBookableSeats": 3,
+      "itineraries": [
+        {
+          "duration": "PT8H30M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "SFO",
+                "terminal": "1",
+                "at": "2025-11-20T18:30:00"
+              },
+              "arrival": {
+                "iataCode": "SAN",
+                "terminal": "2",
+                "at": "2025-11-20T20:04:00"
+              },
+              "carrierCode": "AS",
+              "number": "3376",
+              "aircraft": {
+                "code": "E75"
+              },
+              "operating": {
+                "carrierName": "SKYWEST AIRLINES AS ALASKASKYWEST"
+              },
+              "duration": "PT1H34M",
+              "id": "23",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            },
+            {
+              "departure": {
+                "iataCode": "SAN",
+                "terminal": "2",
+                "at": "2025-11-20T22:15:00"
+              },
+              "arrival": {
+                "iataCode": "MIA",
+                "at": "2025-11-21T06:00:00"
+              },
+              "carrierCode": "AS",
+              "number": "6844",
+              "aircraft": {
+                "code": "7M8"
+              },
+              "operating": {
+                "carrierCode": "AA"
+              },
+              "duration": "PT4H45M",
+              "id": "24",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "591.98",
+        "base": "504.18",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "591.98"
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": false
+      },
+      "validatingAirlineCodes": [
+        "AS"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "295.99",
+            "base": "252.09"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "23",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            },
+            {
+              "segmentId": "24",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "travelerId": "2",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "295.99",
+            "base": "252.09"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "23",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            },
+            {
+              "segmentId": "24",
+              "cabin": "ECONOMY",
+              "fareBasis": "GH0OAKMN",
+              "brandedFare": "PM",
+              "brandedFareLabel": "PARTNER MAIN",
+              "class": "G",
+              "includedCheckedBags": {
+                "quantity": 0
+              },
+              "includedCabinBags": {
+                "quantity": 2
+              },
+              "amenities": [
+                {
+                  "description": "STANDARD PIECE MAX 50LB 62LI",
+                  "isChargeable": true,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "CARRY ON UP TO 45 LI 115 LCM",
+                  "isChargeable": false,
+                  "amenityType": "BAGGAGE",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                },
+                {
+                  "description": "BASIC SEAT",
+                  "isChargeable": false,
+                  "amenityType": "BRANDED_FARES",
+                  "amenityProvider": {
+                    "name": "BrandedFare"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "count": 22,
+      "links": {
+        "self": "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SFO&destinationLocationCode=MIA&departureDate=2025-11-20&adults=2&currencyCode=USD&max=50"
+      }
+    }
+  },
+  {
+    "query": {
+      "origin": "LAX",
+      "destination": "LHR",
+      "departureDate": "2025-12-01",
+      "adults": 1
+    },
+    "offersCount": 50,
+    "sample": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-12-01",
+      "lastTicketingDateTime": "2025-12-01",
+      "numberOfBookableSeats": 9,
+      "itineraries": [
+        {
+          "duration": "PT9H15M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "LAX",
+                "at": "2025-12-01T18:20:00"
+              },
+              "arrival": {
+                "iataCode": "LHR",
+                "at": "2025-12-02T11:35:00"
+              },
+              "carrierCode": "6X",
+              "number": "278",
+              "aircraft": {
+                "code": "777"
+              },
+              "operating": {
+                "carrierCode": "6X"
+              },
+              "duration": "PT9H15M",
+              "id": "44",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "278.50",
+        "base": "250.00",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "278.50",
+        "additionalServices": [
+          {
+            "amount": "2.30",
+            "type": "CHECKED_BAGS"
+          }
+        ]
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": true
+      },
+      "validatingAirlineCodes": [
+        "6X"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "278.50",
+            "base": "250.00"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "44",
+              "cabin": "ECONOMY",
+              "fareBasis": "YROBSON",
+              "class": "Y",
+              "includedCheckedBags": {
+                "quantity": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "cheapest": {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "instantTicketingRequired": false,
+      "nonHomogeneous": false,
+      "oneWay": false,
+      "isUpsellOffer": false,
+      "lastTicketingDate": "2025-12-01",
+      "lastTicketingDateTime": "2025-12-01",
+      "numberOfBookableSeats": 9,
+      "itineraries": [
+        {
+          "duration": "PT9H15M",
+          "segments": [
+            {
+              "departure": {
+                "iataCode": "LAX",
+                "at": "2025-12-01T18:20:00"
+              },
+              "arrival": {
+                "iataCode": "LHR",
+                "at": "2025-12-02T11:35:00"
+              },
+              "carrierCode": "6X",
+              "number": "278",
+              "aircraft": {
+                "code": "777"
+              },
+              "operating": {
+                "carrierCode": "6X"
+              },
+              "duration": "PT9H15M",
+              "id": "44",
+              "numberOfStops": 0,
+              "blacklistedInEU": false
+            }
+          ]
+        }
+      ],
+      "price": {
+        "currency": "USD",
+        "total": "278.50",
+        "base": "250.00",
+        "fees": [
+          {
+            "amount": "0.00",
+            "type": "SUPPLIER"
+          },
+          {
+            "amount": "0.00",
+            "type": "TICKETING"
+          }
+        ],
+        "grandTotal": "278.50",
+        "additionalServices": [
+          {
+            "amount": "2.30",
+            "type": "CHECKED_BAGS"
+          }
+        ]
+      },
+      "pricingOptions": {
+        "fareType": [
+          "PUBLISHED"
+        ],
+        "includedCheckedBagsOnly": true
+      },
+      "validatingAirlineCodes": [
+        "6X"
+      ],
+      "travelerPricings": [
+        {
+          "travelerId": "1",
+          "fareOption": "STANDARD",
+          "travelerType": "ADULT",
+          "price": {
+            "currency": "USD",
+            "total": "278.50",
+            "base": "250.00"
+          },
+          "fareDetailsBySegment": [
+            {
+              "segmentId": "44",
+              "cabin": "ECONOMY",
+              "fareBasis": "YROBSON",
+              "class": "Y",
+              "includedCheckedBags": {
+                "quantity": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "meta": {
+      "count": 50,
+      "links": {
+        "self": "https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=LAX&destinationLocationCode=LHR&departureDate=2025-12-01&adults=1&currencyCode=USD&max=50"
+      }
+    }
+  }
+]

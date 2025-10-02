@@ -10,7 +10,9 @@
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "test:amadeus": "tsx src/scripts/test-amadeus.ts",
+    "test:cache": "tsx src/scripts/test-cache.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
