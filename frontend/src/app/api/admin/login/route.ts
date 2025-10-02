@@ -8,6 +8,7 @@ const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-k
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
+    console.log('[Admin Login] Attempt for email:', email)
 
     // Find user
     const user = await db.user.findUnique({
@@ -15,14 +16,18 @@ export async function POST(request: NextRequest) {
     })
 
     if (!user) {
+      console.log('[Admin Login] User not found:', email)
       return NextResponse.json(
         { success: false, error: 'Invalid credentials' },
         { status: 401 }
       )
     }
 
+    console.log('[Admin Login] User found, role:', user.role)
+
     // Verify password
     const isValidPassword = await bcrypt.compare(password, user.passwordHash)
+    console.log('[Admin Login] Password valid:', isValidPassword)
 
     if (!isValidPassword) {
       return NextResponse.json(
@@ -33,11 +38,14 @@ export async function POST(request: NextRequest) {
 
     // Check if user is admin
     if (user.role !== 'admin') {
+      console.log('[Admin Login] User is not admin, role:', user.role)
       return NextResponse.json(
         { success: false, error: 'Unauthorized - Admin access required' },
         { status: 403 }
       )
     }
+
+    console.log('[Admin Login] Login successful for:', email)
 
     // Create JWT token
     const token = await new SignJWT({

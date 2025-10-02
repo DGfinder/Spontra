@@ -23,6 +23,7 @@ export default function AdminLoginPage() {
       })
 
       const data = await response.json()
+      console.log('Login response:', data, 'Status:', response.status)
 
       if (data.success) {
         router.push('/admin/countries')
