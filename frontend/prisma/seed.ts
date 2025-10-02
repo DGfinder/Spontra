@@ -17,12 +17,15 @@ async function main() {
 
   // Create admin user
   console.log('👤 Creating admin user...')
-  const adminEmail = 'admin@spontra.com'
-  const adminPassword = await hashPassword('Admin123!')
+  const adminEmail = 'hayden.george.hamilton@gmail.com'
+  const adminPassword = await hashPassword('Argentina1212!')
 
   const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
-    update: {},
+    update: {
+      passwordHash: adminPassword,
+      role: 'admin'
+    },
     create: {
       email: adminEmail,
       passwordHash: adminPassword,
@@ -32,6 +35,50 @@ async function main() {
   })
 
   console.log('✅ Created admin user:', adminUser.email)
+
+  // Create countries first
+  console.log('🌍 Creating countries...')
+
+  const countries = [
+    { name: 'United States', code: 'US' },
+    { name: 'Canada', code: 'CA' },
+    { name: 'Mexico', code: 'MX' },
+    { name: 'United Kingdom', code: 'GB' },
+    { name: 'France', code: 'FR' },
+    { name: 'Spain', code: 'ES' },
+    { name: 'Italy', code: 'IT' },
+    { name: 'Netherlands', code: 'NL' },
+    { name: 'Turkey', code: 'TR' },
+    { name: 'Ireland', code: 'IE' },
+    { name: 'Czech Republic', code: 'CZ' },
+    { name: 'Portugal', code: 'PT' },
+    { name: 'Greece', code: 'GR' },
+    { name: 'Japan', code: 'JP' },
+    { name: 'Singapore', code: 'SG' },
+    { name: 'Hong Kong', code: 'HK' },
+    { name: 'Thailand', code: 'TH' },
+    { name: 'United Arab Emirates', code: 'AE' },
+    { name: 'Australia', code: 'AU' },
+    { name: 'South Korea', code: 'KR' },
+    { name: 'India', code: 'IN' },
+    { name: 'Brazil', code: 'BR' },
+    { name: 'Argentina', code: 'AR' },
+    { name: 'South Africa', code: 'ZA' },
+    { name: 'Egypt', code: 'EG' },
+  ]
+
+  const countryMap: Record<string, string> = {}
+
+  for (const country of countries) {
+    const created = await prisma.country.upsert({
+      where: { code: country.code },
+      update: {},
+      create: country
+    })
+    countryMap[country.name] = created.id
+  }
+
+  console.log(`✅ Created ${countries.length} countries`)
 
   // Comprehensive airport list (~100 major airports marked as searchable)
   console.log('✈️ Creating airports...')
@@ -183,14 +230,68 @@ async function main() {
   ]
 
   for (const destination of destinations) {
+    const countryId = countryMap[destination.countryName]
+    if (!countryId) {
+      console.warn(`⚠️  Country not found for ${destination.cityName}: ${destination.countryName}`)
+      continue
+    }
+
     await prisma.destination.upsert({
       where: { airportCode: destination.airportCode },
       update: {},
-      create: destination
+      create: {
+        airportCode: destination.airportCode,
+        cityName: destination.cityName,
+        countryId: countryId,
+        description: destination.description,
+        popularityScore: destination.popularityScore
+      }
     })
   }
 
   console.log(`✅ Created ${destinations.length} destinations`)
+
+  // Add sample Theme POIs for a few destinations
+  console.log('🎬 Creating sample Theme POIs...')
+
+  const samplePOIs = [
+    // Barcelona - Adventure
+    { destinationCode: 'BCN', theme: 'adventure', name: 'Montserrat Mountain Hiking', description: 'Epic mountain trails with stunning views', videoUrl: 'https://youtube.com/shorts/example1', order: 1 },
+    { destinationCode: 'BCN', theme: 'adventure', name: 'Park Güell Exploration', description: 'Gaudí\'s whimsical park adventure', videoUrl: 'https://youtube.com/shorts/example2', order: 2 },
+
+    // Barcelona - Vibe
+    { destinationCode: 'BCN', theme: 'vibe', name: 'Gothic Quarter Nightlife', description: 'Vibrant bars and clubs in medieval streets', videoUrl: 'https://youtube.com/shorts/example3', order: 1 },
+    { destinationCode: 'BCN', theme: 'vibe', name: 'Beach Club Sunset', description: 'Barceloneta beach party scene', videoUrl: 'https://youtube.com/shorts/example4', order: 2 },
+
+    // Tokyo - Discover
+    { destinationCode: 'NRT', theme: 'discover', name: 'Sensoji Temple Visit', description: 'Ancient Buddhist temple in Asakusa', videoUrl: 'https://youtube.com/shorts/example5', order: 1 },
+    { destinationCode: 'NRT', theme: 'discover', name: 'Tsukiji Fish Market Tour', description: 'World-famous seafood market experience', videoUrl: 'https://youtube.com/shorts/example6', order: 2 },
+
+    // New York - Indulge
+    { destinationCode: 'JFK', theme: 'indulge', name: 'Michelin Star Restaurant Crawl', description: 'Fine dining across Manhattan', videoUrl: 'https://youtube.com/shorts/example7', order: 1 },
+    { destinationCode: 'JFK', theme: 'indulge', name: 'Broadway Show Experience', description: 'World-class theater performances', videoUrl: 'https://youtube.com/shorts/example8', order: 2 },
+  ]
+
+  for (const poi of samplePOIs) {
+    const destination = await prisma.destination.findUnique({
+      where: { airportCode: poi.destinationCode }
+    })
+
+    if (destination) {
+      await prisma.themePOI.create({
+        data: {
+          destinationId: destination.id,
+          theme: poi.theme,
+          name: poi.name,
+          description: poi.description,
+          videoUrl: poi.videoUrl,
+          displayOrder: poi.order
+        }
+      })
+    }
+  }
+
+  console.log(`✅ Created ${samplePOIs.length} sample POIs`)
 
   // Create comprehensive flight routes
   console.log('🛫 Creating flight routes...')

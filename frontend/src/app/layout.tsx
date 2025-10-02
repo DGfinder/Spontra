@@ -1,6 +1,15 @@
 import React from 'react'
 import './globals.css'
 import type { Metadata } from 'next'
+import { Arimo } from 'next/font/google'
+import { BackgroundManager } from '@/components/BackgroundManager'
+
+const arimo = Arimo({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-arimo',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'Spontra - Discover Your Next Adventure',
@@ -30,14 +39,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className="h-full antialiased bg-linear-to-br from-brand-blue via-brand-indigo to-brand-purple overflow-x-hidden">
+      <body className={`h-full antialiased overflow-x-hidden ${arimo.variable}`}>
         <div className="relative min-h-full">
-          {/* Background pattern overlay */}
-          <div 
-            className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]" 
-            aria-hidden="true" 
-          />
-          
+          {/* Dynamic Background Manager */}
+          <BackgroundManager />
+
           {/* Main content */}
           <div className="relative z-10">
             {children}

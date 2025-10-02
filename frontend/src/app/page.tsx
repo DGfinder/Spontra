@@ -128,7 +128,7 @@ function SearchResults() {
                 </h3>
                 <div className="flex items-center gap-2 text-white/60">
                   <MapPinIcon className="h-4 w-4" />
-                  <span className="text-sm">{destination.countryName}</span>
+                  <span className="text-sm">{destination.country.name}</span>
                   <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
                     {destination.airportCode}
                   </span>

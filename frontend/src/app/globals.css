@@ -5,20 +5,36 @@
   --color-brand-blue: #3b82f6;
   --color-brand-purple: #8b5cf6;
   --color-brand-indigo: #6366f1;
-  
+  --color-brand-gold: #FFC83A;
+
   /* Semantic theme colors */
-  --color-adventure: #f97316;
-  --color-nature: #22c55e;
+  --color-adventure: #ffbd0a;
+  --color-nature: #02c06d;
+  --color-indulge: #e52b00;
+  --color-vibe: #eb5b25;
+  --color-discover: #7f6ae4;
   --color-culture: #a855f7;
   --color-beach: #06b6d4;
   --color-city: #6b7280;
-  
+
+  /* Figma design tokens */
+  --figma-primary-gold: #FFC83A;
+  --figma-bg-dark: rgba(11, 15, 18, 0.84);
+  --figma-border-gold: rgba(255, 200, 58, 0.2);
+  --figma-text-primary: #F3F6F9;
+  --figma-text-secondary: #C9CFD6;
+  --figma-text-muted: #A7AFB7;
+  --figma-text-dark: #1A1A1A;
+  --figma-border-subtle: rgba(255, 255, 255, 0.12);
+  --figma-bg-input: #22272B;
+
   /* Enhanced spacing scale */
   --spacing: 0.25rem;
-  
+
   /* Custom font families */
   --font-display: "Inter", system-ui, sans-serif;
-  
+  --font-arimo: var(--font-arimo), "Arimo", sans-serif;
+
   /* Smooth animations */
   --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -44,4 +60,49 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* Range slider styling for Figma design with dynamic theme colors */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  --thumb-color: #FFC83A;
+}
+
+input[type="range"]::-webkit-slider-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  background: var(--thumb-color);
+  border-radius: 50%;
+  margin-top: -6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  background: var(--thumb-color);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
 }

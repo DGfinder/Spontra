@@ -2,7 +2,7 @@ import React from 'react'
 import { clsx } from 'clsx'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'adventure' | 'nature' | 'culture'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'adventure' | 'nature' | 'culture'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
   isLoading?: boolean
@@ -31,31 +31,37 @@ export function Button({
       'hover:bg-brand-blue/90 hover:shadow-xl hover:-translate-y-0.5',
       'focus:ring-brand-blue/50',
     ].join(' '),
-    
+
     secondary: [
       'bg-white/20 text-white border border-white/30 backdrop-blur-sm',
       'hover:bg-white/30 hover:border-white/50',
       'focus:ring-white/50',
     ].join(' '),
-    
+
     ghost: [
       'bg-transparent text-white',
       'hover:bg-white/10',
       'focus:ring-white/30',
     ].join(' '),
-    
+
+    gold: [
+      'bg-[#FFC83A] text-[#1A1A1A] shadow-lg font-bold',
+      'hover:bg-[#FFD15C] hover:shadow-xl',
+      'focus:ring-[#FFC83A]/50',
+    ].join(' '),
+
     adventure: [
       'bg-adventure text-white shadow-lg',
       'hover:bg-adventure/90 hover:shadow-xl hover:-translate-y-0.5',
       'focus:ring-adventure/50',
     ].join(' '),
-    
+
     nature: [
       'bg-nature text-white shadow-lg',
       'hover:bg-nature/90 hover:shadow-xl hover:-translate-y-0.5',
       'focus:ring-nature/50',
     ].join(' '),
-    
+
     culture: [
       'bg-culture text-white shadow-lg',
       'hover:bg-culture/90 hover:shadow-xl hover:-translate-y-0.5',

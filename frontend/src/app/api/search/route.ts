@@ -94,11 +94,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
     // Extract destination airport codes
     const destinationCodes = validRoutes.map(route => route.destinationAirportCode)
 
-    // Step 2: Get destination details for searchable airports only
+    // Step 2: Get destination details for searchable airports AND with POIs for the selected theme
     const potentialDestinations = await db.destination.findMany({
       where: {
         airportCode: {
           in: destinationCodes
+        },
+        themePOIs: {
+          some: {
+            theme: theme
+          }
+        }
+      },
+      include: {
+        country: true,
+        themePOIs: {
+          where: { theme: theme },
+          orderBy: { displayOrder: 'asc' }
         }
       },
       take: 20, // Limit to top 20 destinations
@@ -164,9 +176,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
         return {
           id: dest.id,
           cityName: dest.cityName,
-          countryName: dest.countryName,
+          country: {
+            name: dest.country.name,
+            code: dest.country.code
+          },
           airportCode: dest.airportCode,
           description: dest.description,
+          themePOIs: dest.themePOIs.map(poi => ({
+            id: poi.id,
+            name: poi.name,
+            description: poi.description,
+            videoUrl: poi.videoUrl
+          })),
           flightDuration: Math.round(totalMinutes / 60), // hours
           priceEstimate: `From ${cheapest.price.currency} $${cheapest.price.total}`,
           cheapestPrice: parseFloat(cheapest.price.total),

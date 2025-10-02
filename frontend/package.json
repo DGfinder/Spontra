@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
     "test:amadeus": "tsx src/scripts/test-amadeus.ts",
-    "test:cache": "tsx src/scripts/test-cache.ts"
+    "test:cache": "tsx src/scripts/test-cache.ts",
+    "optimize:backgrounds": "node scripts/optimize-backgrounds.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -50,6 +51,7 @@
     "eslint-config-next": "^15.5.4",
     "prettier": "^3.4.0",
     "prisma": "^6.16.0",
+    "sharp": "^0.34.4",
     "tsx": "^4.19.0"
   }
 }

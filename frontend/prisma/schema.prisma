@@ -64,19 +64,55 @@ model FlightRoute {
   @@map("flight_routes")
 }
 
+// Countries
+model Country {
+  id           String        @id @default(uuid())
+  name         String        @unique
+  code         String        @unique  // ISO code: "US", "FR", "JP"
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  destinations Destination[]
+
+  @@map("countries")
+}
+
 // Destinations with themes
 model Destination {
-  id              String   @id @default(uuid())
-  airportCode     String   @unique @map("airport_code")
-  cityName        String   @map("city_name")
-  countryName     String   @map("country_name")
+  id              String     @id @default(uuid())
+  airportCode     String     @unique @map("airport_code")
+  cityName        String     @map("city_name")
+  countryName     String?    @map("country_name")  // Temporary - will be removed after migration
+  countryId       String?    @map("country_id")    // Nullable temporarily for migration
   description     String?
-  imageUrl        String?  @map("image_url")
-  popularityScore Decimal? @map("popularity_score")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  imageUrl        String?    @map("image_url")
+  popularityScore Decimal?   @map("popularity_score")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
 
+  country         Country?   @relation(fields: [countryId], references: [id])
+  themePOIs       ThemePOI[]
+
+  @@index([countryId])
   @@map("destinations")
+}
+
+// Theme-specific Points of Interest for destinations
+model ThemePOI {
+  id              String      @id @default(uuid())
+  destinationId   String      @map("destination_id")
+  theme           String      // "adventure", "nature", "vibe", "indulge", "discover"
+  name            String
+  description     String?
+  videoUrl        String?     @map("video_url")
+  displayOrder    Int         @default(0) @map("display_order")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  destination     Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([destinationId, theme])
+  @@map("theme_pois")
 }
 
 // Basic search sessions

@@ -17,7 +17,8 @@
       "Bash(powershell:*)",
       "Bash(git push:*)",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate dev --name add_offer_cache)",
-      "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"yes\" DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate reset --force)"
+      "Bash(PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION=\"yes\" DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate reset --force)",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate dev --name add_country_and_theme_poi)"
     ],
     "deny": [],
     "ask": []

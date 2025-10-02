@@ -3,11 +3,11 @@
 import React, { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { Button } from './ui/Button'
-import { MapPinIcon, CalendarIcon, ClockIcon } from 'lucide-react'
+import { MapPinIcon, Compass, Trees, Wine, Music, Globe } from 'lucide-react'
 
 export function SearchForm() {
   const { filters, updateFilter, search, isLoading, error } = useSearchStore()
-  const [isFocused, setIsFocused] = useState<string | null>(null)
+  const [onlyDirect, setOnlyDirect] = useState(false)
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -15,164 +15,185 @@ export function SearchForm() {
   }
 
   const themes = [
-    { value: 'adventure', label: '🏔️ Adventure', color: 'adventure' },
-    { value: 'nature', label: '🌲 Nature', color: 'nature' },
-    { value: 'vibe', label: '🎭 Vibe', color: 'vibe' },
-    { value: 'indulge', label: '🍷 Indulge', color: 'indulge' },
-    { value: 'discover', label: '🔍 Discover', color: 'discover' }
+    { value: 'adventure', label: 'Adventure', icon: Compass, color: '#ffbd0a' },
+    { value: 'nature', label: 'Nature', icon: Trees, color: '#02c06d' },
+    { value: 'indulge', label: 'Indulge', icon: Wine, color: '#e52b00' },
+    { value: 'vibe', label: 'Vibe', icon: Music, color: '#eb5b25' },
+    { value: 'discover', label: 'Discover', icon: Globe, color: '#7f6ae4' }
   ] as const
 
-  return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-2xl">
-        {/* Hero Section */}
-        <div className="text-center mb-12 animate-float">
-          <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
-            Spontra
-          </h1>
-          <p className="text-2xl text-white/90 mb-3 font-light">
-            Discover your next adventure
-          </p>
-          <p className="text-lg text-white/70 max-w-md mx-auto">
-            Find amazing destinations based on flight time and your travel style
-          </p>
-        </div>
+  // Get the current theme color
+  const currentTheme = themes.find(t => t.value === filters.theme)
+  const themeColor = currentTheme?.color || '#FFC83A' // fallback to gold
 
-        {/* Search Form */}
+  return (
+    <div className="flex items-center justify-center min-h-screen p-6">
+      <div className="w-full max-w-[420px]">
+        {/* Search Card */}
         <form onSubmit={handleSearch}>
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20">
-            <div className="space-y-8">
-              
+          <div
+            className="bg-[rgba(11,15,18,0.84)] backdrop-blur-sm rounded-2xl p-[21px] pb-1
+                       border transition-colors duration-500"
+            style={{
+              fontFamily: 'var(--font-arimo)',
+              borderColor: `${themeColor}33`, // 20% opacity
+              boxShadow: `0 24px 48px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2), 0 0 0 1px ${themeColor}22`
+            }}
+          >
+            <div className="space-y-3">
+              {/* Header */}
+              <div className="mb-2">
+                <h1 className="text-[26px] font-bold leading-[39px]" style={{ color: '#F3F6F9' }}>
+                  Book Your Next Trip
+                </h1>
+              </div>
+
               {/* Departure Airport */}
-              <div className="space-y-3">
-                <label className="flex items-center gap-2 text-white text-sm font-medium">
-                  <MapPinIcon className="h-4 w-4" />
-                  Where are you flying from?
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                  From
                 </label>
                 <div className="relative">
+                  <MapPinIcon
+                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                    style={{ color: '#C9CFD6' }}
+                  />
                   <input
                     type="text"
                     value={filters.departureAirport}
                     onChange={(e) => updateFilter('departureAirport', e.target.value)}
-                    onFocus={() => setIsFocused('departure')}
-                    onBlur={() => setIsFocused(null)}
-                    placeholder="e.g. LAX, JFK, LHR"
-                    className={`
-                      w-full px-6 py-4 rounded-2xl text-white placeholder-white/50 
-                      border transition-all duration-300 transform-gpu
-                      ${isFocused === 'departure' 
-                        ? 'bg-white/25 border-white/60 scale-[1.02] shadow-lg' 
-                        : 'bg-white/15 border-white/30 hover:bg-white/20'
-                      }
-                      focus:outline-none focus:bg-white/25 focus:border-white/60 focus:scale-[1.02]
-                      data-filled:bg-white/20
-                    `}
-                    data-filled={filters.departureAirport ? true : undefined}
+                    placeholder="LHR - London Heathrow"
+                    className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
+                               bg-transparent border border-[rgba(255,255,255,0.12)]
+                               text-white placeholder:text-[#A7AFB7]
+                               focus:outline-none focus:border-[rgba(255,255,255,0.24)]
+                               transition-colors"
                   />
                 </div>
               </div>
 
               {/* Theme Selection */}
-              <div className="space-y-4">
-                <label className="flex items-center gap-2 text-white text-sm font-medium">
-                  <CalendarIcon className="h-4 w-4" />
-                  What type of adventure?
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                  What Are You Looking For?
                 </label>
-                
-                {/* Dynamic grid using v4.0 - auto-generates columns */}
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                  {themes.map((theme) => (
-                    <button
-                      key={theme.value}
-                      type="button"
-                      onClick={() => updateFilter('theme', theme.value)}
-                      className={`
-                        p-4 rounded-2xl text-sm font-medium transition-all duration-300 transform-gpu
-                        border backdrop-blur-sm
-                        ${filters.theme === theme.value
-                          ? `bg-${theme.color} text-white border-white/50 scale-105 shadow-xl`
-                          : 'bg-white/10 text-white/90 border-white/20 hover:bg-white/20 hover:scale-[1.02] active:scale-95'
-                        }
-                        focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent
-                      `}
-                    >
-                      <div className="text-lg mb-1">{theme.label.split(' ')[0]}</div>
-                      <div className="text-xs opacity-90">{theme.label.split(' ')[1]}</div>
-                    </button>
-                  ))}
+                <div className="flex flex-wrap gap-3">
+                  {themes.map((theme) => {
+                    const Icon = theme.icon
+                    const isSelected = filters.theme === theme.value
+                    return (
+                      <button
+                        key={theme.value}
+                        type="button"
+                        onClick={() => updateFilter('theme', theme.value)}
+                        className={`
+                          flex items-center gap-3 px-4 h-12 rounded-full text-[15px] font-normal
+                          transition-all duration-300
+                          ${isSelected
+                            ? 'text-[#1A1A1A] shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)]'
+                            : 'bg-transparent text-[#E6E6E6] border border-[rgba(255,255,255,0.16)] hover:bg-white/5'
+                          }
+                        `}
+                        style={isSelected ? {
+                          backgroundColor: theme.color,
+                          borderColor: theme.color
+                        } : {}}
+                      >
+                        <Icon className="h-5 w-5" />
+                        <span>{theme.label}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
               {/* Flight Time Range */}
-              <div className="space-y-4">
-                <label className="flex items-center gap-2 text-white text-sm font-medium">
-                  <ClockIcon className="h-4 w-4" />
-                  Flight time: {filters.minFlightTime}h - {filters.maxFlightTime}h
-                </label>
-                
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-white/70 text-xs font-medium">Min hours</label>
-                    <div className="relative">
-                      <input
-                        type="range"
-                        min="1"
-                        max="12"
-                        value={filters.minFlightTime}
-                        onChange={(e) => updateFilter('minFlightTime', parseInt(e.target.value))}
-                        className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer slider"
-                        style={{
-                          background: `linear-gradient(to right, var(--color-brand-blue) 0%, var(--color-brand-blue) ${(filters.minFlightTime / 12) * 100}%, rgba(255,255,255,0.2) ${(filters.minFlightTime / 12) * 100}%, rgba(255,255,255,0.2) 100%)`
-                        }}
-                      />
-                      <div className="flex justify-between text-xs text-white/50 mt-1">
-                        <span>1h</span>
-                        <span>12h</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                    Flight Time + Direct
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm" style={{ color: '#F3F6F9' }}>
+                      {filters.minFlightTime}h–{filters.maxFlightTime}h
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setOnlyDirect(!onlyDirect)}
+                      className="flex items-center gap-2 rounded transition-all duration-300"
+                    >
+                      <div
+                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
+                                    ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
+                        style={onlyDirect ? {
+                          backgroundColor: themeColor,
+                          borderColor: themeColor
+                        } : {}}
+                      >
+                        {onlyDirect && (
+                          <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
                       </div>
-                    </div>
+                      <span className="text-sm" style={{ color: '#C9CFD6' }}>Only direct</span>
+                    </button>
                   </div>
-                  
-                  <div className="space-y-2">
-                    <label className="block text-white/70 text-xs font-medium">Max hours</label>
-                    <div className="relative">
-                      <input
-                        type="range"
-                        min="1"
-                        max="12"
-                        value={filters.maxFlightTime}
-                        onChange={(e) => updateFilter('maxFlightTime', parseInt(e.target.value))}
-                        className="w-full h-2 bg-white/20 rounded-full appearance-none cursor-pointer slider"
-                        style={{
-                          background: `linear-gradient(to right, var(--color-brand-purple) 0%, var(--color-brand-purple) ${(filters.maxFlightTime / 12) * 100}%, rgba(255,255,255,0.2) ${(filters.maxFlightTime / 12) * 100}%, rgba(255,255,255,0.2) 100%)`
-                        }}
-                      />
-                      <div className="flex justify-between text-xs text-white/50 mt-1">
-                        <span>1h</span>
-                        <span>12h</span>
-                      </div>
-                    </div>
+                </div>
+                <div className="space-y-1">
+                  <input
+                    type="range"
+                    min="1"
+                    max="12"
+                    value={filters.maxFlightTime}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value)
+                      updateFilter('maxFlightTime', val)
+                      if (filters.minFlightTime > val) {
+                        updateFilter('minFlightTime', val)
+                      }
+                    }}
+                    className="w-full range-slider"
+                    style={{
+                      // @ts-ignore - CSS custom properties
+                      '--thumb-color': themeColor
+                    }}
+                  />
+                  <div className="flex justify-between text-xs" style={{ color: '#A7AFB7' }}>
+                    <span>1h</span>
+                    <span>12h</span>
                   </div>
                 </div>
               </div>
 
               {/* Error Display */}
               {error && (
-                <div className="bg-red-500/20 border border-red-400/30 rounded-2xl p-4 backdrop-blur-sm">
+                <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-3 mb-3">
                   <p className="text-red-200 text-sm">{error}</p>
                 </div>
               )}
 
-              {/* Search Button */}
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                isLoading={isLoading}
-                disabled={!filters.departureAirport || !filters.theme}
-                className="w-full text-lg font-semibold shadow-2xl"
-              >
-                {isLoading ? 'Searching amazing destinations...' : 'Find My Adventure'}
-              </Button>
+              {/* Action Buttons Container */}
+              <div className="pt-3 border-t border-[rgba(255,255,255,0.08)] space-y-3">
+                <button
+                  type="submit"
+                  disabled={!filters.departureAirport || !filters.theme || isLoading}
+                  className="w-full h-12 rounded-[10px] text-base font-bold text-[#1A1A1A]
+                             transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+                             hover:opacity-90 active:scale-[0.98] shadow-lg"
+                  style={{ backgroundColor: themeColor }}
+                >
+                  {isLoading ? 'Searching...' : 'Search flights'}
+                </button>
+
+                <button
+                  type="button"
+                  className="w-full text-sm underline text-center transition-colors duration-300 hover:opacity-80"
+                  style={{ color: '#C9CFD6' }}
+                >
+                  Explore Map
+                </button>
+              </div>
             </div>
           </div>
         </form>
