@@ -177,8 +177,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
           id: dest.id,
           cityName: dest.cityName,
           country: {
-            name: dest.country.name,
-            code: dest.country.code
+            name: dest.country?.name || '',
+            code: dest.country?.code || ''
           },
           airportCode: dest.airportCode,
           description: dest.description,
