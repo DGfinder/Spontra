@@ -8,7 +8,13 @@
       "Bash(sed:*)",
       "Bash(find:*)",
       "Bash(true)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(touch:*)",
+      "Bash(npm install:*)",
+      "Bash(npx next build:*)",
+      "Bash(npm run dev:*)",
+      "WebSearch",
+      "Bash(powershell:*)"
     ],
     "deny": [],
     "ask": []

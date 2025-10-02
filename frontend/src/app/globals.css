@@ -1,3 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+:root {
+  /* Brand colors using modern oklch color space */
+  --color-brand-blue: #3b82f6;
+  --color-brand-purple: #8b5cf6;
+  --color-brand-indigo: #6366f1;
+  
+  /* Semantic theme colors */
+  --color-adventure: #f97316;
+  --color-nature: #22c55e;
+  --color-culture: #a855f7;
+  --color-beach: #06b6d4;
+  --color-city: #6b7280;
+  
+  /* Enhanced spacing scale */
+  --spacing: 0.25rem;
+  
+  /* Custom font families */
+  --font-display: "Inter", system-ui, sans-serif;
+  
+  /* Smooth animations */
+  --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Global styles for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-display);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom animations using CSS variables */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
