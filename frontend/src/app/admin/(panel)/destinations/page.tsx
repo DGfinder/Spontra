@@ -11,7 +11,7 @@ interface Destination {
   country: {
     name: string
     code: string
-  }
+  } | null
   _count: {
     themePOIs: number
   }
@@ -171,7 +171,7 @@ export default function DestinationsPage() {
                   {dest.cityName}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                  {dest.country.name}
+                  {dest.country?.name || 'N/A'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                   {dest.airportCode}
