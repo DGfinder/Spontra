@@ -3,7 +3,8 @@
 import React, { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { Button } from './ui/Button'
-import { MapPinIcon, Compass, Trees, Wine, Music, Globe, Users, ChevronDown } from 'lucide-react'
+import { DualRangeSlider } from './DualRangeSlider'
+import { MapPinIcon, Compass, Trees, Wine, Music, Globe, Users, ChevronDown, Calendar } from 'lucide-react'
 
 export function SearchForm() {
   const { filters, updateFilter, search, isLoading, error } = useSearchStore()
@@ -91,6 +92,84 @@ export function SearchForm() {
                                focus:outline-none focus:border-[rgba(255,255,255,0.24)]
                                transition-colors"
                   />
+                </div>
+              </div>
+
+              {/* Dates */}
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                  Dates
+                </label>
+
+                {/* Trip Type Toggle */}
+                <div className="flex gap-2 mb-2">
+                  {(['round-trip', 'one-way'] as const).map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => updateFilter('tripType', type)}
+                      className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                                 ${filters.tripType === type
+                                   ? 'text-[#1A1A1A]'
+                                   : 'bg-transparent text-white/70 border border-white/20 hover:bg-white/5'
+                                 }`}
+                      style={filters.tripType === type ? { backgroundColor: themeColor } : {}}
+                    >
+                      {type === 'round-trip' ? 'Round-trip' : 'One-way'}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Date Inputs */}
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Departure Date */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs" style={{ color: '#A7AFB7' }}>
+                      Departure
+                    </label>
+                    <div className="relative">
+                      <Calendar
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none"
+                        style={{ color: '#C9CFD6' }}
+                      />
+                      <input
+                        type="date"
+                        value={filters.departureDate}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => updateFilter('departureDate', e.target.value)}
+                        className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
+                                   bg-transparent border border-[rgba(255,255,255,0.12)]
+                                   text-white
+                                   focus:outline-none focus:border-[rgba(255,255,255,0.24)]
+                                   transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Return Date */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs" style={{ color: '#A7AFB7' }}>
+                      Return
+                    </label>
+                    <div className="relative">
+                      <Calendar
+                        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none"
+                        style={{ color: '#C9CFD6' }}
+                      />
+                      <input
+                        type="date"
+                        value={filters.returnDate}
+                        min={filters.departureDate}
+                        onChange={(e) => updateFilter('returnDate', e.target.value)}
+                        disabled={filters.tripType === 'one-way'}
+                        className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
+                                   bg-transparent border border-[rgba(255,255,255,0.12)]
+                                   text-white
+                                   focus:outline-none focus:border-[rgba(255,255,255,0.24)]
+                                   transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -220,90 +299,47 @@ export function SearchForm() {
                 </div>
               </div>
 
-              {/* Flight Time Range */}
+              {/* Flight Time Range - Single Dual-Handle Slider */}
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
                     Flight Time
                   </label>
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm" style={{ color: '#F3F6F9' }}>
-                      {filters.minFlightTime}h–{filters.maxFlightTime}h
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setOnlyDirect(!onlyDirect)}
-                      className="flex items-center gap-2 rounded transition-all duration-300"
+                  <button
+                    type="button"
+                    onClick={() => setOnlyDirect(!onlyDirect)}
+                    className="flex items-center gap-2 rounded transition-all duration-300"
+                  >
+                    <div
+                      className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
+                                  ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
+                      style={onlyDirect ? {
+                        backgroundColor: themeColor,
+                        borderColor: themeColor
+                      } : {}}
                     >
-                      <div
-                        className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
-                                    ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
-                        style={onlyDirect ? {
-                          backgroundColor: themeColor,
-                          borderColor: themeColor
-                        } : {}}
-                      >
-                        {onlyDirect && (
-                          <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm" style={{ color: '#C9CFD6' }}>Only direct</span>
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {/* Min Flight Time Slider */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs" style={{ color: '#A7AFB7' }}>Min</span>
-                      <span className="text-xs" style={{ color: '#F3F6F9' }}>{filters.minFlightTime}h</span>
+                      {onlyDirect && (
+                        <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
                     </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="12"
-                      value={filters.minFlightTime}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value)
-                        if (val <= filters.maxFlightTime) {
-                          updateFilter('minFlightTime', val)
-                        }
-                      }}
-                      className="w-full range-slider"
-                      style={{
-                        // @ts-ignore - CSS custom properties
-                        '--thumb-color': themeColor
-                      }}
-                    />
-                  </div>
+                    <span className="text-sm" style={{ color: '#C9CFD6' }}>Only direct</span>
+                  </button>
+                </div>
 
-                  {/* Max Flight Time Slider */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs" style={{ color: '#A7AFB7' }}>Max</span>
-                      <span className="text-xs" style={{ color: '#F3F6F9' }}>{filters.maxFlightTime}h</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="12"
-                      value={filters.maxFlightTime}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value)
-                        if (val >= filters.minFlightTime) {
-                          updateFilter('maxFlightTime', val)
-                        }
-                      }}
-                      className="w-full range-slider"
-                      style={{
-                        // @ts-ignore - CSS custom properties
-                        '--thumb-color': themeColor
-                      }}
-                    />
-                  </div>
-                </div>
+                <DualRangeSlider
+                  min={1}
+                  max={12}
+                  minValue={filters.minFlightTime}
+                  maxValue={filters.maxFlightTime}
+                  onChange={(min, max) => {
+                    updateFilter('minFlightTime', min)
+                    updateFilter('maxFlightTime', max)
+                  }}
+                  formatLabel={(v) => `${v}h`}
+                  themeColor={themeColor}
+                />
               </div>
 
               {/* Error Display */}
@@ -317,7 +353,14 @@ export function SearchForm() {
               <div className="pt-3 border-t border-[rgba(255,255,255,0.08)] space-y-3">
                 <button
                   type="submit"
-                  disabled={!filters.departureAirport || !filters.theme || isLoading}
+                  disabled={
+                    !filters.departureAirport ||
+                    filters.departureAirport.length !== 3 ||
+                    !filters.theme ||
+                    !filters.departureDate ||
+                    (filters.tripType === 'round-trip' && !filters.returnDate) ||
+                    isLoading
+                  }
                   className="w-full h-12 rounded-[10px] text-base font-bold text-[#1A1A1A]
                              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
                              hover:opacity-90 active:scale-[0.98] shadow-lg"
