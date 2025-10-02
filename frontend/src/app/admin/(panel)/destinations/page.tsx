@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getDestinations, getDestinationWithPOIs } from '@/actions/destinationActions'
 import { createPOI, updatePOI, deletePOI, reorderPOI } from '@/actions/themePOIActions'
+import { Decimal } from '@prisma/client/runtime/library'
 
 interface Destination {
   id: string
@@ -27,6 +28,8 @@ interface ThemePOI {
   description: string | null
   videoUrl: string | null
   displayOrder: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 interface DestinationWithPOIs {
@@ -34,11 +37,14 @@ interface DestinationWithPOIs {
   cityName: string
   airportCode: string
   description: string | null
-  popularityScore: number | null
+  popularityScore: Decimal | null
   country: {
+    id: string
     name: string
     code: string
-  }
+    createdAt: Date
+    updatedAt: Date
+  } | null
   themePOIs: ThemePOI[]
 }
 
@@ -205,7 +211,7 @@ export default function DestinationsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-white">
-                    {selectedDestination.cityName}, {selectedDestination.country.name}
+                    {selectedDestination.cityName}{selectedDestination.country && `, ${selectedDestination.country.name}`}
                   </h2>
                   <p className="text-white/60 text-sm mt-1">
                     {selectedDestination.airportCode} • {selectedDestination.themePOIs.length} total POIs
