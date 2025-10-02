@@ -22,9 +22,12 @@ export interface Destination {
 
 export interface SearchFilters {
   departureAirport: string
+  destinationAirport: string
   theme: string
   minFlightTime: number
   maxFlightTime: number
+  passengers: number
+  cabin: string
 }
 
 interface SearchState {
@@ -49,9 +52,12 @@ interface SearchState {
 
 const initialFilters: SearchFilters = {
   departureAirport: '',
-  theme: '',
+  destinationAirport: '',
+  theme: 'adventure', // Default to adventure to show background
   minFlightTime: 2,
-  maxFlightTime: 8
+  maxFlightTime: 8,
+  passengers: 1,
+  cabin: 'Economy'
 }
 
 export const useSearchStore = create<SearchState>()(

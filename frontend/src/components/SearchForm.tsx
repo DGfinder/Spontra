@@ -3,11 +3,12 @@
 import React, { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { Button } from './ui/Button'
-import { MapPinIcon, Compass, Trees, Wine, Music, Globe } from 'lucide-react'
+import { MapPinIcon, Compass, Trees, Wine, Music, Globe, Users, ChevronDown } from 'lucide-react'
 
 export function SearchForm() {
   const { filters, updateFilter, search, isLoading, error } = useSearchStore()
   const [onlyDirect, setOnlyDirect] = useState(false)
+  const [isPassengerOpen, setIsPassengerOpen] = useState(false)
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,7 +28,7 @@ export function SearchForm() {
   const themeColor = currentTheme?.color || '#FFC83A' // fallback to gold
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-6">
+    <div className="flex items-start justify-start min-h-screen pl-[120px] pt-[60px]">
       <div className="w-full max-w-[420px]">
         {/* Search Card */}
         <form onSubmit={handleSearch}>
@@ -48,22 +49,43 @@ export function SearchForm() {
                 </h1>
               </div>
 
-              {/* Departure Airport */}
-              <div className="flex flex-col gap-1">
-                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                  From
-                </label>
-                <div className="relative">
-                  <MapPinIcon
-                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                    style={{ color: '#C9CFD6' }}
-                  />
+              {/* Route - From and To */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Departure Airport */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                    From
+                  </label>
+                  <div className="relative">
+                    <MapPinIcon
+                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
+                      style={{ color: '#C9CFD6' }}
+                    />
+                    <input
+                      type="text"
+                      value={filters.departureAirport}
+                      onChange={(e) => updateFilter('departureAirport', e.target.value)}
+                      placeholder="LHR - London Heathrow"
+                      className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
+                                 bg-transparent border border-[rgba(255,255,255,0.12)]
+                                 text-white placeholder:text-[#A7AFB7]
+                                 focus:outline-none focus:border-[rgba(255,255,255,0.24)]
+                                 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                {/* Destination Airport */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                    To
+                  </label>
                   <input
                     type="text"
-                    value={filters.departureAirport}
-                    onChange={(e) => updateFilter('departureAirport', e.target.value)}
-                    placeholder="LHR - London Heathrow"
-                    className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
+                    value={filters.destinationAirport}
+                    onChange={(e) => updateFilter('destinationAirport', e.target.value)}
+                    placeholder="Anywhere"
+                    className="w-full h-[47px] px-4 rounded-[10px] text-sm
                                bg-transparent border border-[rgba(255,255,255,0.12)]
                                text-white placeholder:text-[#A7AFB7]
                                focus:outline-none focus:border-[rgba(255,255,255,0.24)]
@@ -163,6 +185,97 @@ export function SearchForm() {
                     <span>1h</span>
                     <span>12h</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Passengers & Cabin Class */}
+              <div className="flex flex-col gap-1">
+                <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
+                  Travelers
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsPassengerOpen(!isPassengerOpen)}
+                    className="w-full h-[47px] px-4 rounded-[10px] text-sm
+                               bg-transparent border border-[rgba(255,255,255,0.12)]
+                               text-white transition-colors
+                               focus:outline-none focus:border-[rgba(255,255,255,0.24)]
+                               hover:border-[rgba(255,255,255,0.24)]
+                               flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4" style={{ color: '#C9CFD6' }} />
+                      <span style={{ color: '#F3F6F9' }}>
+                        {filters.passengers} passenger{filters.passengers !== 1 ? 's' : ''} • {filters.cabin}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${isPassengerOpen ? 'rotate-180' : ''}`}
+                      style={{ color: '#C9CFD6' }}
+                    />
+                  </button>
+
+                  {isPassengerOpen && (
+                    <div className="absolute z-10 mt-1 w-full space-y-3 bg-[rgba(11,15,18,0.95)] border border-[rgba(255,255,255,0.12)] rounded-[10px] p-4 shadow-lg">
+                      {/* Passengers Counter */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm" style={{ color: '#F3F6F9' }}>Passengers</span>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => updateFilter('passengers', Math.max(1, filters.passengers - 1))}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm
+                                       transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]"
+                            style={{ color: '#F3F6F9' }}
+                          >
+                            -
+                          </button>
+                          <span className="text-sm w-8 text-center" style={{ color: '#F3F6F9' }}>
+                            {filters.passengers}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => updateFilter('passengers', filters.passengers + 1)}
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm
+                                       transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]"
+                            style={{ color: '#F3F6F9' }}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Cabin Class Selection */}
+                      <div className="space-y-2">
+                        <span className="text-sm" style={{ color: '#F3F6F9' }}>Cabin Class</span>
+                        <div className="grid grid-cols-2 gap-2">
+                          {['Economy', 'Premium', 'Business', 'First'].map((cabin) => (
+                            <button
+                              key={cabin}
+                              type="button"
+                              onClick={() => {
+                                updateFilter('cabin', cabin)
+                                setIsPassengerOpen(false)
+                              }}
+                              className={`px-3 py-2 rounded-md text-sm transition-all duration-300
+                                         ${filters.cabin === cabin
+                                           ? 'text-[#1A1A1A] font-medium'
+                                           : 'bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]'
+                                         }`}
+                              style={filters.cabin === cabin ? {
+                                backgroundColor: themeColor
+                              } : {
+                                color: '#F3F6F9'
+                              }}
+                            >
+                              {cabin}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
