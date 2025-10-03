@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, Globe, MapPin, Route, ArrowLeft } from 'lucide-react'
+import { LayoutGrid, Globe, MapPin, Route, Map, ArrowLeft } from 'lucide-react'
 
 export default function AdminPanelLayout({
   children,
@@ -15,6 +15,7 @@ export default function AdminPanelLayout({
     { href: '/admin/countries', label: 'Countries', icon: Globe },
     { href: '/admin/destinations', label: 'Destinations', icon: MapPin },
     { href: '/admin/routes', label: 'Flight Routes', icon: Route },
+    { href: '/admin/map', label: 'Map View', icon: Map },
   ]
 
   return (

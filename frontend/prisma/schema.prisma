@@ -125,6 +125,8 @@ model ThemePOI {
   name            String
   description     String?
   videoUrl        String?     @map("video_url")  // DEPRECATED: Use POIVideo relation instead
+  latitude        Decimal?
+  longitude       Decimal?
   displayOrder    Int         @default(0) @map("display_order")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
