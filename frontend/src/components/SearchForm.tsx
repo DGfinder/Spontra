@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { Button } from './ui/Button'
 import { DualRangeSlider } from './DualRangeSlider'
+import { AirportAutocomplete } from './AirportAutocomplete'
 import { MapPinIcon, Compass, Trees, Wine, Music, Globe, Users, ChevronDown, Calendar } from 'lucide-react'
 
 export function SearchForm() {
@@ -53,46 +54,24 @@ export function SearchForm() {
               {/* Route - From and To */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Departure Airport */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                    From
-                  </label>
-                  <div className="relative">
-                    <MapPinIcon
-                      className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                      style={{ color: '#C9CFD6' }}
-                    />
-                    <input
-                      type="text"
-                      value={filters.departureAirport}
-                      onChange={(e) => updateFilter('departureAirport', e.target.value)}
-                      placeholder="LHR - London Heathrow"
-                      className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
-                                 bg-transparent border border-[rgba(255,255,255,0.12)]
-                                 text-white placeholder:text-[#A7AFB7]
-                                 focus:outline-none focus:border-[rgba(255,255,255,0.24)]
-                                 transition-colors"
-                    />
-                  </div>
-                </div>
+                <AirportAutocomplete
+                  value={filters.departureAirport}
+                  onChange={(code) => updateFilter('departureAirport', code)}
+                  label="From"
+                  placeholder="LHR - London Heathrow"
+                  showIcon={true}
+                  themeColor={themeColor}
+                />
 
                 {/* Destination Airport */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                    To
-                  </label>
-                  <input
-                    type="text"
-                    value={filters.destinationAirport}
-                    onChange={(e) => updateFilter('destinationAirport', e.target.value)}
-                    placeholder="Anywhere"
-                    className="w-full h-[47px] px-4 rounded-[10px] text-sm
-                               bg-transparent border border-[rgba(255,255,255,0.12)]
-                               text-white placeholder:text-[#A7AFB7]
-                               focus:outline-none focus:border-[rgba(255,255,255,0.24)]
-                               transition-colors"
-                  />
-                </div>
+                <AirportAutocomplete
+                  value={filters.destinationAirport}
+                  onChange={(code) => updateFilter('destinationAirport', code)}
+                  label="To"
+                  placeholder="Anywhere"
+                  showIcon={false}
+                  themeColor={themeColor}
+                />
               </div>
 
               {/* Dates */}
