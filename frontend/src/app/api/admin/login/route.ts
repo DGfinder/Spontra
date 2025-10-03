@@ -3,11 +3,11 @@ import { SignJWT } from 'jose'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key-change-in-production')
+const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || 'your-secret-key-change-in-production')
 
-// Warn if JWT_SECRET is not properly configured
-if (!process.env.JWT_SECRET) {
-  console.warn('[Admin Login] WARNING: JWT_SECRET environment variable not set. Using fallback (insecure).')
+// Warn if ADMIN_JWT_SECRET is not properly configured
+if (!process.env.ADMIN_JWT_SECRET) {
+  console.warn('[Admin Login] WARNING: ADMIN_JWT_SECRET environment variable not set. Using fallback (insecure).')
 }
 
 export async function POST(request: NextRequest) {

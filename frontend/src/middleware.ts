@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key-change-in-production')
+const secret = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET || 'your-secret-key-change-in-production')
 
 export async function middleware(request: NextRequest) {
   // Protect admin panel routes
