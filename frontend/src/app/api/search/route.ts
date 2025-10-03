@@ -20,7 +20,8 @@ interface DestinationResponse {
     name: string
     code: string
   }
-  airportCode: string
+  airportCode: string  // Primary airport IATA code
+  airportName?: string // Primary airport name
   description?: string | null
   themePOIs?: Array<{
     id: string
@@ -106,51 +107,115 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
     // Extract destination airport codes
     const destinationCodes = validRoutes.map(route => route.destinationAirportCode)
 
-    // If specific destination requested, filter for it
-    const destinationFilter = destinationAirport && destinationAirport.trim()
-      ? { airportCode: destinationAirport.toUpperCase().trim() }
-      : { airportCode: { in: destinationCodes } }
+    // Step 2: Get destinations with their primary airports via join table
+    // Use raw SQL to query the many-to-many relationship
+    type DestinationWithAirport = {
+      destination_id: string
+      city_name: string
+      country_id: string | null
+      description: string | null
+      popularity_score: string | null
+      airport_code: string
+      airport_name: string
+      is_primary: boolean
+      is_searchable: boolean
+      country_name: string | null
+      country_code: string | null
+    }
 
-    // Step 2: Get destination details for searchable airports AND with POIs for the selected theme
-    const potentialDestinations = await db.destination.findMany({
+    // Build the query based on whether specific destination is requested
+    const destinationsWithAirports = destinationAirport && destinationAirport.trim()
+      ? await db.$queryRaw<DestinationWithAirport[]>`
+          SELECT DISTINCT ON (d.id)
+            d.id as destination_id,
+            d.city_name,
+            d.country_id,
+            d.description,
+            d.popularity_score,
+            da.airport_code,
+            a.name as airport_name,
+            da.is_primary,
+            a.is_searchable,
+            c.name as country_name,
+            c.code as country_code
+          FROM destinations d
+          INNER JOIN destination_airports da ON d.id = da.destination_id
+          INNER JOIN airports a ON da.airport_code = a.iata_code
+          LEFT JOIN countries c ON d.country_id = c.id
+          WHERE a.is_searchable = true
+            AND da.airport_code = ${destinationAirport.toUpperCase().trim()}
+            AND EXISTS (
+              SELECT 1 FROM theme_pois tp
+              WHERE tp.destination_id = d.id
+              AND tp.theme = ${theme}
+            )
+          ORDER BY d.id, da.is_primary DESC, da.airport_code ASC
+          LIMIT 20
+        `
+      : await db.$queryRaw<DestinationWithAirport[]>`
+          SELECT DISTINCT ON (d.id)
+            d.id as destination_id,
+            d.city_name,
+            d.country_id,
+            d.description,
+            d.popularity_score,
+            da.airport_code,
+            a.name as airport_name,
+            da.is_primary,
+            a.is_searchable,
+            c.name as country_name,
+            c.code as country_code
+          FROM destinations d
+          INNER JOIN destination_airports da ON d.id = da.destination_id
+          INNER JOIN airports a ON da.airport_code = a.iata_code
+          LEFT JOIN countries c ON d.country_id = c.id
+          WHERE a.is_searchable = true
+            AND da.airport_code = ANY(${destinationCodes})
+            AND EXISTS (
+              SELECT 1 FROM theme_pois tp
+              WHERE tp.destination_id = d.id
+              AND tp.theme = ${theme}
+            )
+          ORDER BY d.id, da.is_primary DESC, da.airport_code ASC
+          LIMIT 20
+        `
+
+    // Fetch theme POIs for matched destinations
+    const destinationIds = destinationsWithAirports.map(d => d.destination_id)
+    const themePOIs = destinationIds.length > 0 ? await db.themePOI.findMany({
       where: {
-        ...destinationFilter,
-        themePOIs: {
-          some: {
-            theme: theme
-          }
-        }
+        destinationId: { in: destinationIds },
+        theme: theme
       },
-      include: {
-        country: true,
-        themePOIs: {
-          where: { theme: theme },
-          orderBy: { displayOrder: 'asc' }
-        }
-      },
-      take: 20, // Limit to top 20 destinations
-      orderBy: {
-        popularityScore: 'desc'
-      }
-    })
+      orderBy: { displayOrder: 'asc' }
+    }) : []
 
-    // Filter out destinations with non-searchable airports
-    const searchableAirports = await db.airport.findMany({
-      where: {
-        iataCode: {
-          in: potentialDestinations.map(d => d.airportCode)
-        },
-        isSearchable: true
-      },
-      select: {
-        iataCode: true
+    // Group POIs by destination
+    const poisByDest = new Map<string, typeof themePOIs>()
+    for (const poi of themePOIs) {
+      if (!poisByDest.has(poi.destinationId)) {
+        poisByDest.set(poi.destinationId, [])
       }
-    })
+      poisByDest.get(poi.destinationId)!.push(poi)
+    }
 
-    const searchableAirportCodes = new Set(searchableAirports.map(a => a.iataCode))
-    const filteredDestinations = potentialDestinations.filter(dest =>
-      searchableAirportCodes.has(dest.airportCode)
-    )
+    // Build structured destination objects
+    const filteredDestinations = destinationsWithAirports.map(d => ({
+      id: d.destination_id,
+      cityName: d.city_name,
+      description: d.description,
+      popularityScore: d.popularity_score ? parseFloat(d.popularity_score) : null,
+      country: d.country_name && d.country_code ? {
+        name: d.country_name,
+        code: d.country_code
+      } : null,
+      primaryAirport: {
+        iataCode: d.airport_code,
+        name: d.airport_name,
+        isPrimary: d.is_primary
+      },
+      themePOIs: poisByDest.get(d.destination_id) || []
+    }))
 
     console.log('[Search API] Found', filteredDestinations.length, 'searchable destinations')
 
@@ -161,9 +226,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
 
     const flightDataPromises = filteredDestinations.map(async (dest) => {
       try {
+        const airportCode = dest.primaryAirport.iataCode
+
         const { offers, metrics } = await getCachedFlightOffers({
           origin,
-          destination: dest.airportCode,
+          destination: airportCode,
           departureDate: departureDateStr,
           adults: passengers || 1
         })
@@ -194,7 +261,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
             where: {
               originAirportCode_destinationAirportCode: {
                 originAirportCode: origin,
-                destinationAirportCode: dest.airportCode
+                destinationAirportCode: airportCode
               }
             }
           })
@@ -203,11 +270,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
             await db.flightRoute.create({
               data: {
                 originAirportCode: origin,
-                destinationAirportCode: dest.airportCode,
+                destinationAirportCode: airportCode,
                 totalDurationMinutes: totalMinutes
               }
             })
-            console.log(`[Auto-populate] Created route: ${origin} → ${dest.airportCode} (${totalMinutes}m)`)
+            console.log(`[Auto-populate] Created route: ${origin} → ${airportCode} (${totalMinutes}m)`)
           }
         } catch (error) {
           // Non-blocking - don't fail search if route creation fails
@@ -221,7 +288,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
             name: dest.country?.name || '',
             code: dest.country?.code || ''
           },
-          airportCode: dest.airportCode,
+          airportCode: airportCode,
+          airportName: dest.primaryAirport.name,
           description: dest.description,
           themePOIs: dest.themePOIs.map(poi => ({
             id: poi.id,
@@ -238,7 +306,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<SearchRes
           cacheHitTime: metrics.hitTime
         }
       } catch (error) {
-        console.error(`[Search API] Failed to get flights for ${dest.airportCode}:`, error)
+        console.error(`[Search API] Failed to get flights for ${dest.primaryAirport.iataCode}:`, error)
         return null
       }
     })

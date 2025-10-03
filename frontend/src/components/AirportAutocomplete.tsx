@@ -30,7 +30,7 @@ export function AirportAutocomplete({
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   // Load initial airport data when value changes externally
   useEffect(() => {

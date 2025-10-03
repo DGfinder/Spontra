@@ -67,7 +67,7 @@ export async function getCountryWithCities(countryId: string) {
     const serialized = destinations.map(dest => ({
       id: dest.id,
       cityName: dest.cityName,
-      airportCode: dest.airportCode,
+      airportCode: dest.airportCode, // Deprecated field, kept for backwards compatibility
       airports: (airportsByDest.get(dest.id) || []).map(da => ({
         iataCode: da.iata_code,
         name: da.name,
