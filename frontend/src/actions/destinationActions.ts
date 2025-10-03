@@ -86,12 +86,11 @@ export async function getDestinationWithPOIs(id: string) {
       include: {
         country: true,
         themePOIs: {
-          // Temporarily commented out until Prisma Client is regenerated
-          // include: {
-          //   videos: {
-          //     orderBy: { displayOrder: 'asc' }
-          //   }
-          // },
+          include: {
+            videos: {
+              orderBy: { displayOrder: 'asc' }
+            }
+          },
           orderBy: [{ theme: 'asc' }, { displayOrder: 'asc' }]
         }
       }
@@ -131,9 +130,17 @@ export async function getDestinationWithPOIs(id: string) {
         description: poi.description,
         videoUrl: poi.videoUrl,
         displayOrder: poi.displayOrder,
+        latitude: poi.latitude ? Number(poi.latitude) : null,
+        longitude: poi.longitude ? Number(poi.longitude) : null,
         createdAt: poi.createdAt.toISOString(),
         updatedAt: poi.updatedAt.toISOString(),
-        videos: [] // Temporary until Prisma Client regenerated
+        videos: poi.videos.map(video => ({
+          id: video.id,
+          poiId: video.poiId,
+          videoUrl: video.videoUrl,
+          displayOrder: video.displayOrder,
+          createdAt: video.createdAt.toISOString()
+        }))
       }))
     }
 

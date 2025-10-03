@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { ArrowLeftIcon, MapPinIcon, ClockIcon, DollarSignIcon } from 'lucide-react'
 
 function SearchResults() {
-  const { destinations, isLoading, error, setCurrentStep, reset } = useSearchStore()
+  const { destinations, filters, isLoading, error, setCurrentStep, reset } = useSearchStore()
 
   if (isLoading) {
     return (
@@ -172,8 +172,10 @@ function SearchResults() {
                   size="sm"
                   className="w-full group-hover:shadow-lg"
                   onClick={() => {
-                    // TODO: Navigate to flight booking
-                    console.log('Explore:', destination.cityName)
+                    const searchParams = new URLSearchParams()
+                    if (filters.departureAirport) searchParams.set('from', filters.departureAirport)
+                    if (filters.theme) searchParams.set('theme', filters.theme)
+                    window.location.href = `/destinations/${destination.id}?${searchParams.toString()}`
                   }}
                 >
                   Explore {destination.cityName}
