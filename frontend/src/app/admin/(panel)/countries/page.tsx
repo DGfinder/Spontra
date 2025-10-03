@@ -8,7 +8,6 @@ import { addVideos, deleteVideo, reorderVideo } from '@/actions/poiVideoActions'
 import { VideoCard } from '@/components/admin/VideoCard'
 import { AddVideosForm } from '@/components/admin/AddVideosForm'
 import { ChevronDown, ChevronRight, Film } from 'lucide-react'
-import { Decimal } from '@prisma/client/runtime/library'
 
 interface Country {
   id: string
@@ -56,15 +55,15 @@ interface ThemePOI {
 interface DestinationWithPOIs {
   id: string
   cityName: string
-  airportCode: string
+  airportCode: string | null
   description: string | null
-  popularityScore: Decimal | null
+  popularityScore: number | null
   country: {
     id: string
     name: string
     code: string
-    createdAt: Date
-    updatedAt: Date
+    createdAt: string
+    updatedAt: string
   } | null
   themePOIs: ThemePOI[]
 }
@@ -525,7 +524,7 @@ export default function CountriesPage() {
                     {selectedDestination.cityName}{selectedDestination.country && `, ${selectedDestination.country.name}`}
                   </h2>
                   <p className="text-white/60 text-sm mt-1">
-                    {selectedDestination.airportCode} • {selectedDestination.themePOIs.length} total POIs
+                    {selectedDestination.airportCode || 'No airport'} • {selectedDestination.themePOIs.length} total POIs
                   </p>
                 </div>
                 <button

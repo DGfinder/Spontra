@@ -55,7 +55,7 @@ interface ThemePOI {
 interface DestinationWithPOIs {
   id: string
   cityName: string
-  airportCode: string
+  airportCode: string | null
   description: string | null
   popularityScore: number | null
   country: {
@@ -305,7 +305,7 @@ export default function DestinationsPage() {
                     {selectedDestination.cityName}{selectedDestination.country && `, ${selectedDestination.country.name}`}
                   </h2>
                   <p className="text-white/60 text-sm mt-1">
-                    {selectedDestination.airportCode} • {selectedDestination.themePOIs.length} POIs
+                    {selectedDestination.airportCode || 'No airport'} • {selectedDestination.themePOIs.length} POIs
                   </p>
                 </div>
                 <button
