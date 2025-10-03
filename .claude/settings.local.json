@@ -21,7 +21,9 @@
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx prisma migrate dev --name add_country_and_theme_poi)",
       "Bash(git log:*)",
       "Bash(npx prisma migrate:*)",
-      "mcp__postgres__query"
+      "mcp__postgres__query",
+      "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx tsx src/scripts/verify-direct-routes-batch.ts 0 2)",
+      "Bash(npx prisma generate:*)"
     ],
     "deny": [],
     "ask": []

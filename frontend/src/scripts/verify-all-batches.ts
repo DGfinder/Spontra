@@ -9,6 +9,7 @@
  *   npx tsx src/scripts/verify-all-batches.ts
  */
 
+import 'dotenv/config'
 import { spawn } from 'child_process'
 import { PrismaClient } from '@prisma/client'
 

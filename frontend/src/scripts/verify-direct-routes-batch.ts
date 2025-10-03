@@ -13,6 +13,7 @@
  *   npx tsx src/scripts/verify-direct-routes-batch.ts 2 50    # Process origins 100-149
  */
 
+import 'dotenv/config'
 import { PrismaClient } from '@prisma/client'
 import { getDirectDestinations } from '@/lib/amadeus'
 

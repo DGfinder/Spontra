@@ -2,7 +2,15 @@
 
 import { useState, useEffect, useRef, KeyboardEvent } from 'react'
 import { MapPinIcon, Loader2, X } from 'lucide-react'
-import { searchAirports, type Airport } from '@/actions/airportActions'
+import Fuse from 'fuse.js'
+
+export interface Airport {
+  id: string
+  iataCode: string
+  name: string
+  city: string
+  country: string
+}
 
 interface AirportAutocompleteProps {
   value: string
@@ -11,6 +19,19 @@ interface AirportAutocompleteProps {
   label?: string
   showIcon?: boolean
   themeColor?: string
+}
+
+// Fuse.js configuration for fuzzy search
+const fuseOptions = {
+  keys: [
+    { name: 'iataCode', weight: 2 }, // Prioritize IATA code matches
+    { name: 'city', weight: 1.5 },
+    { name: 'name', weight: 1 },
+    { name: 'country', weight: 0.5 }
+  ],
+  threshold: 0.3, // Lower = stricter matching
+  ignoreLocation: true,
+  minMatchCharLength: 2
 }
 
 export function AirportAutocomplete({
@@ -23,29 +44,45 @@ export function AirportAutocomplete({
 }: AirportAutocompleteProps) {
   const [inputValue, setInputValue] = useState('')
   const [airports, setAirports] = useState<Airport[]>([])
+  const [allAirports, setAllAirports] = useState<Airport[]>([])
   const [isOpen, setIsOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [selectedAirport, setSelectedAirport] = useState<Airport | null>(null)
 
   const wrapperRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const fuseRef = useRef<Fuse<Airport> | null>(null)
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
+
+  // Load airports data on mount (only once)
+  useEffect(() => {
+    async function loadAirports() {
+      try {
+        const response = await fetch('/data/airports.json')
+        const data: Airport[] = await response.json()
+        setAllAirports(data)
+        fuseRef.current = new Fuse(data, fuseOptions)
+        setIsLoading(false)
+      } catch (error) {
+        console.error('[AirportAutocomplete] Failed to load airports:', error)
+        setIsLoading(false)
+      }
+    }
+
+    loadAirports()
+  }, [])
 
   // Load initial airport data when value changes externally
   useEffect(() => {
-    if (value && value.length === 3 && !selectedAirport) {
-      searchAirports(value).then(result => {
-        if (result.success && result.data && result.data.length > 0) {
-          const airport = result.data.find(a => a.iataCode === value.toUpperCase())
-          if (airport) {
-            setSelectedAirport(airport)
-            setInputValue(`${airport.iataCode} - ${airport.city}, ${airport.country}`)
-          }
-        }
-      })
+    if (value && value.length === 3 && !selectedAirport && allAirports.length > 0) {
+      const airport = allAirports.find(a => a.iataCode === value.toUpperCase())
+      if (airport) {
+        setSelectedAirport(airport)
+        setInputValue(`${airport.iataCode} - ${airport.city}, ${airport.country}`)
+      }
     }
-  }, [value, selectedAirport])
+  }, [value, selectedAirport, allAirports])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -59,7 +96,7 @@ export function AirportAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Debounced search
+  // Debounced client-side fuzzy search
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
@@ -71,16 +108,18 @@ export function AirportAutocomplete({
       return
     }
 
-    debounceRef.current = setTimeout(async () => {
-      setIsLoading(true)
-      const result = await searchAirports(inputValue)
-      if (result.success && result.data) {
-        setAirports(result.data)
-        setIsOpen(result.data.length > 0)
-        setSelectedIndex(0)
-      }
-      setIsLoading(false)
-    }, 300)
+    if (!fuseRef.current) {
+      return
+    }
+
+    // Instant client-side search with minimal debounce for smooth UX
+    debounceRef.current = setTimeout(() => {
+      const results = fuseRef.current!.search(inputValue)
+      const matchedAirports = results.map(result => result.item).slice(0, 8)
+      setAirports(matchedAirports)
+      setIsOpen(matchedAirports.length > 0)
+      setSelectedIndex(0)
+    }, 150) // Reduced from 300ms to 150ms for faster feel
 
     return () => {
       if (debounceRef.current) {
@@ -166,11 +205,12 @@ export function AirportAutocomplete({
             }
           }}
           placeholder={placeholder}
+          disabled={isLoading}
           className={`w-full h-[47px] ${showIcon ? 'pl-10' : 'pl-4'} pr-10 rounded-[10px] text-sm
                      bg-transparent border border-[rgba(255,255,255,0.12)]
                      text-white placeholder:text-[#A7AFB7]
                      focus:outline-none focus:border-[rgba(255,255,255,0.24)]
-                     transition-colors`}
+                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed`}
         />
 
         {/* Loading / Clear button */}
@@ -192,7 +232,7 @@ export function AirportAutocomplete({
       {/* Dropdown */}
       {isOpen && airports.length > 0 && (
         <div
-          className="absolute z-50 mt-1 w-full bg-[rgba(11,15,18,0.95)] border rounded-[10px] shadow-xl overflow-hidden"
+          className="absolute z-50 mt-1 w-full bg-[rgba(11,15,18,0.95)] border rounded-[10px] shadow-xl overflow-hidden backdrop-blur-xl"
           style={{
             borderColor: 'rgba(255,255,255,0.12)',
             top: 'calc(100% + 4px)'

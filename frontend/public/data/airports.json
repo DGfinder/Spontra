@@ -1,0 +1,3215 @@
+[
+  {
+    "id": "4e07a800-a1de-4971-9a44-a37ee19daf95",
+    "iataCode": "AAL",
+    "name": "Aalborg Airport",
+    "city": "Aalborg",
+    "country": "Denmark"
+  },
+  {
+    "id": "39b4e6cf-10cb-40f1-9b20-19285eccfddd",
+    "iataCode": "AAR",
+    "name": "Aarhus Airport",
+    "city": "Aarhus",
+    "country": "Denmark"
+  },
+  {
+    "id": "9191a03c-f8f3-414e-abd8-330c6d38a424",
+    "iataCode": "ABJ",
+    "name": "Félix-Houphouët-Boigny International Airport",
+    "city": "Abidjan",
+    "country": "Ivory Coast"
+  },
+  {
+    "id": "30fcb2aa-560c-48ad-8989-578d1232ce8e",
+    "iataCode": "ABQ",
+    "name": "Albuquerque International Sunport",
+    "city": "Albuquerque",
+    "country": "United States"
+  },
+  {
+    "id": "ab476eb2-8c7f-4bd3-9ac4-880e361ed9b5",
+    "iataCode": "ABV",
+    "name": "Nnamdi Azikiwe International Airport",
+    "city": "Abuja",
+    "country": "Nigeria"
+  },
+  {
+    "id": "2caf9a57-c977-48d7-8f9b-5fe6168cd5d5",
+    "iataCode": "ACC",
+    "name": "Kotoka International Airport",
+    "city": "Accra",
+    "country": "Ghana"
+  },
+  {
+    "id": "0aadce94-0f01-4146-a2f9-2e8daeff8017",
+    "iataCode": "ADA",
+    "name": "Adana Airport",
+    "city": "Adana",
+    "country": "Turkey"
+  },
+  {
+    "id": "bd55cd3f-3fc5-4d46-9e72-2a721612576a",
+    "iataCode": "ADB",
+    "name": "Adnan Menderes Airport",
+    "city": "İzmir",
+    "country": "Turkey"
+  },
+  {
+    "id": "07813094-a8d9-488c-b18a-e3ae69332545",
+    "iataCode": "ADD",
+    "name": "Addis Ababa Bole International Airport",
+    "city": "Addis Ababa",
+    "country": "Ethiopia"
+  },
+  {
+    "id": "8f1ce7b5-cda0-4737-b090-4f629751664f",
+    "iataCode": "ADL",
+    "name": "Adelaide Airport",
+    "city": "Adelaide",
+    "country": "Australia"
+  },
+  {
+    "id": "79c2c3df-b4f4-43e9-9b82-76e58412f914",
+    "iataCode": "AEP",
+    "name": "Jorge Newbery Airpark",
+    "city": "Buenos Aires",
+    "country": "Argentina"
+  },
+  {
+    "id": "e6b7daa7-e9f3-480f-b45a-5e3fd987a783",
+    "iataCode": "AES",
+    "name": "Ålesund Airport",
+    "city": "Ålesund",
+    "country": "Norway"
+  },
+  {
+    "id": "072e528c-17b0-4f24-9ab8-e56ffc51a2ca",
+    "iataCode": "AGP",
+    "name": "Málaga-Costa del Sol Airport",
+    "city": "Málaga",
+    "country": "Spain"
+  },
+  {
+    "id": "9c7df1d0-51c4-4a2e-b5f1-2560baa3a7d2",
+    "iataCode": "AKL",
+    "name": "Auckland Airport",
+    "city": "Auckland",
+    "country": "New Zealand"
+  },
+  {
+    "id": "146d3fe7-f135-4650-9e0c-70f34aacdbe8",
+    "iataCode": "ALC",
+    "name": "Alicante-Elche Airport",
+    "city": "Alicante",
+    "country": "Spain"
+  },
+  {
+    "id": "b255ff2a-2924-4d5e-bad7-a9fc2f506646",
+    "iataCode": "ALG",
+    "name": "Houari Boumediene Airport",
+    "city": "Algiers",
+    "country": "Algeria"
+  },
+  {
+    "id": "60ab4d28-8883-4938-a814-233284703aaf",
+    "iataCode": "AMD",
+    "name": "Sardar Vallabhbhai Patel International Airport",
+    "city": "Ahmedabad",
+    "country": "India"
+  },
+  {
+    "id": "34e92be1-7133-426f-b0fd-0100ab9a6a30",
+    "iataCode": "AMM",
+    "name": "Queen Alia International Airport",
+    "city": "Amman",
+    "country": "Jordan"
+  },
+  {
+    "id": "c9ae6ebe-3198-4a05-8b91-d48a0235578b",
+    "iataCode": "AMS",
+    "name": "Amsterdam Airport Schiphol",
+    "city": "Amsterdam",
+    "country": "Netherlands"
+  },
+  {
+    "id": "42999420-470a-4755-ba60-416c57b91cab",
+    "iataCode": "ANC",
+    "name": "Ted Stevens Anchorage International Airport",
+    "city": "Anchorage",
+    "country": "United States"
+  },
+  {
+    "id": "658ac962-2d2b-42f6-a801-2a81e547746f",
+    "iataCode": "ANF",
+    "name": "Andrés Sabella Gálvez International Airport",
+    "city": "Antofagasta",
+    "country": "Chile"
+  },
+  {
+    "id": "dee424fe-083d-4dec-8d5f-abac4981e55d",
+    "iataCode": "ANR",
+    "name": "Antwerp International Airport",
+    "city": "Antwerp",
+    "country": "Belgium"
+  },
+  {
+    "id": "f0f8de3a-6b5d-4e87-ba2b-662e8904a4a2",
+    "iataCode": "AQP",
+    "name": "Rodríguez Ballón International Airport",
+    "city": "Arequipa",
+    "country": "Peru"
+  },
+  {
+    "id": "3d22a868-87d9-495a-b18b-d0ad6d2d3af4",
+    "iataCode": "ARN",
+    "name": "Stockholm Arlanda Airport",
+    "city": "Stockholm",
+    "country": "Sweden"
+  },
+  {
+    "id": "e6c67ad1-2a91-4df4-8d9f-0df28909d593",
+    "iataCode": "ASU",
+    "name": "Silvio Pettirossi International Airport",
+    "city": "Asunción",
+    "country": "Paraguay"
+  },
+  {
+    "id": "f17db932-e5dc-4fab-91da-5f848ddd28ba",
+    "iataCode": "ATH",
+    "name": "Athens International Airport",
+    "city": "Athens",
+    "country": "Greece"
+  },
+  {
+    "id": "df14e419-a9bf-4a53-9f49-aa6d5b39d891",
+    "iataCode": "ATL",
+    "name": "Hartsfield-Jackson Atlanta International Airport",
+    "city": "Atlanta",
+    "country": "United States"
+  },
+  {
+    "id": "a98f8197-c79c-49c1-bac3-99782785f869",
+    "iataCode": "AUA",
+    "name": "Queen Beatrix International Airport",
+    "city": "Oranjestad",
+    "country": "Aruba"
+  },
+  {
+    "id": "c97fdbd3-23e5-4c48-9dc2-b93fc9f82227",
+    "iataCode": "AUH",
+    "name": "Abu Dhabi International Airport",
+    "city": "Abu Dhabi",
+    "country": "United Arab Emirates"
+  },
+  {
+    "id": "c2293c25-1bef-4901-86ae-adeba3531c58",
+    "iataCode": "AUS",
+    "name": "Austin-Bergstrom International Airport",
+    "city": "Austin",
+    "country": "United States"
+  },
+  {
+    "id": "0eab3ce3-e3c6-4dab-83e9-be9fbf4aad11",
+    "iataCode": "AYT",
+    "name": "Antalya Airport",
+    "city": "Antalya",
+    "country": "Turkey"
+  },
+  {
+    "id": "601351f4-3378-4256-bd1c-1390f039181a",
+    "iataCode": "BAH",
+    "name": "Bahrain International Airport",
+    "city": "Manama",
+    "country": "Bahrain"
+  },
+  {
+    "id": "84bfc83f-1f8c-4b11-97ee-75a910bf36bf",
+    "iataCode": "BAQ",
+    "name": "Ernesto Cortissoz International Airport",
+    "city": "Barranquilla",
+    "country": "Colombia"
+  },
+  {
+    "id": "ff9e7ea6-3a0b-408a-b102-67e8f8fe2b82",
+    "iataCode": "BCM",
+    "name": "Bacău Airport",
+    "city": "Bacău",
+    "country": "Romania"
+  },
+  {
+    "id": "e9dc7d88-6bce-454a-a883-1a3c97690e54",
+    "iataCode": "BCN",
+    "name": "Barcelona-El Prat Airport",
+    "city": "Barcelona",
+    "country": "Spain"
+  },
+  {
+    "id": "521f93e5-d3f7-4070-a55d-abd058a17806",
+    "iataCode": "BDL",
+    "name": "Bradley International Airport",
+    "city": "Hartford",
+    "country": "United States"
+  },
+  {
+    "id": "3d3bc594-25de-4821-a3da-1d129d0efcdc",
+    "iataCode": "BEG",
+    "name": "Belgrade Nikola Tesla Airport",
+    "city": "Belgrade",
+    "country": "Serbia"
+  },
+  {
+    "id": "e36ce4cf-c920-48cb-b5d0-095e3d1cc981",
+    "iataCode": "BEL",
+    "name": "Val de Cans International Airport",
+    "city": "Belém",
+    "country": "Brazil"
+  },
+  {
+    "id": "cd87d585-c20c-40a0-84ad-63fafcfe1ff8",
+    "iataCode": "BER",
+    "name": "Berlin Brandenburg Airport",
+    "city": "Berlin",
+    "country": "Germany"
+  },
+  {
+    "id": "3f76eed9-9c2f-4908-90a6-0a90ea7d3bba",
+    "iataCode": "BEY",
+    "name": "Rafic Hariri International Airport",
+    "city": "Beirut",
+    "country": "Lebanon"
+  },
+  {
+    "id": "1af11a22-c47a-42f2-b57a-94cdb5240303",
+    "iataCode": "BGC",
+    "name": "Bragança Airport",
+    "city": "Bragança",
+    "country": "Portugal"
+  },
+  {
+    "id": "8981a72c-25a1-4af5-baf6-8c24cf302d82",
+    "iataCode": "BGI",
+    "name": "Grantley Adams International Airport",
+    "city": "Bridgetown",
+    "country": "Barbados"
+  },
+  {
+    "id": "2c7b18d8-6b84-40fc-a3d0-8d91e77aca09",
+    "iataCode": "BGO",
+    "name": "Bergen Airport Flesland",
+    "city": "Bergen",
+    "country": "Norway"
+  },
+  {
+    "id": "36c357a4-9f44-4a36-b43b-5e136b380af5",
+    "iataCode": "BGY",
+    "name": "Milan Bergamo Airport",
+    "city": "Bergamo",
+    "country": "Italy"
+  },
+  {
+    "id": "55adade2-5bce-4aae-a7fc-4eb1b1595fd8",
+    "iataCode": "BHM",
+    "name": "Birmingham-Shuttlesworth International Airport",
+    "city": "Birmingham",
+    "country": "United States"
+  },
+  {
+    "id": "732cfb0a-29d2-4cde-bf8e-fa4cb5d1bb5f",
+    "iataCode": "BHX",
+    "name": "Birmingham Airport",
+    "city": "Birmingham",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "024c71de-864e-4c71-83e5-566d70073b38",
+    "iataCode": "BIO",
+    "name": "Bilbao Airport",
+    "city": "Bilbao",
+    "country": "Spain"
+  },
+  {
+    "id": "8db1aa3b-06de-42cf-b293-ef95221b534d",
+    "iataCode": "BJV",
+    "name": "Bodrum Airport",
+    "city": "Bodrum",
+    "country": "Turkey"
+  },
+  {
+    "id": "ac5cb673-239d-4719-ba3b-39f15658fe38",
+    "iataCode": "BKK",
+    "name": "Suvarnabhumi Airport",
+    "city": "Bangkok",
+    "country": "Thailand"
+  },
+  {
+    "id": "e7418094-ccbc-4da6-ab67-15b67aa8662f",
+    "iataCode": "BLL",
+    "name": "Billund Airport",
+    "city": "Billund",
+    "country": "Denmark"
+  },
+  {
+    "id": "ecc9211b-8976-4ea5-b228-3815ae5fdeb3",
+    "iataCode": "BLQ",
+    "name": "Bologna Guglielmo Marconi Airport",
+    "city": "Bologna",
+    "country": "Italy"
+  },
+  {
+    "id": "92cfc38e-0c3f-4b55-8958-6809a7183b82",
+    "iataCode": "BLR",
+    "name": "Kempegowda International Airport",
+    "city": "Bangalore",
+    "country": "India"
+  },
+  {
+    "id": "ccdbdaee-e68d-486f-85aa-d18dba0aa858",
+    "iataCode": "BMA",
+    "name": "Stockholm Bromma Airport",
+    "city": "Stockholm",
+    "country": "Sweden"
+  },
+  {
+    "id": "4f282b6a-de5c-425d-a88e-e51f112c38c1",
+    "iataCode": "BNA",
+    "name": "Nashville International Airport",
+    "city": "Nashville",
+    "country": "United States"
+  },
+  {
+    "id": "861a713d-6bc2-4a8d-9ec6-29bf707d7d17",
+    "iataCode": "BNE",
+    "name": "Brisbane Airport",
+    "city": "Brisbane",
+    "country": "Australia"
+  },
+  {
+    "id": "e170e706-8659-4756-9a48-7f6a0b7cde94",
+    "iataCode": "BOD",
+    "name": "Bordeaux-Mérignac Airport",
+    "city": "Bordeaux",
+    "country": "France"
+  },
+  {
+    "id": "5cd36e58-ff8a-443f-accf-bf57534e3d72",
+    "iataCode": "BOG",
+    "name": "El Dorado International Airport",
+    "city": "Bogotá",
+    "country": "Colombia"
+  },
+  {
+    "id": "d2e5014f-a20c-4cb0-90d2-c1bea7c7468b",
+    "iataCode": "BOI",
+    "name": "Boise Airport",
+    "city": "Boise",
+    "country": "United States"
+  },
+  {
+    "id": "9ee72662-6ef5-43f7-9af7-c161eb2f3c19",
+    "iataCode": "BOJ",
+    "name": "Burgas Airport",
+    "city": "Burgas",
+    "country": "Bulgaria"
+  },
+  {
+    "id": "602ca477-3f5a-452f-a36f-b5e14565e46f",
+    "iataCode": "BOM",
+    "name": "Chhatrapati Shivaji Maharaj International Airport",
+    "city": "Mumbai",
+    "country": "India"
+  },
+  {
+    "id": "e4d46a68-02f9-46aa-831d-e89d5d9807f6",
+    "iataCode": "BOO",
+    "name": "Bodø Airport",
+    "city": "Bodø",
+    "country": "Norway"
+  },
+  {
+    "id": "e2b6dc2c-90d9-4d84-a97a-fff6460bf9ec",
+    "iataCode": "BOS",
+    "name": "Logan International Airport",
+    "city": "Boston",
+    "country": "United States"
+  },
+  {
+    "id": "8586dfa5-5aca-4c1a-b393-d32b8a5c2eb8",
+    "iataCode": "BRC",
+    "name": "San Carlos de Bariloche Airport",
+    "city": "Bariloche",
+    "country": "Argentina"
+  },
+  {
+    "id": "55e945d3-40b6-4a58-a6aa-afe46641cec2",
+    "iataCode": "BRN",
+    "name": "Bern Airport",
+    "city": "Bern",
+    "country": "Switzerland"
+  },
+  {
+    "id": "95d413e9-3033-4aa6-9568-7626793cc552",
+    "iataCode": "BRQ",
+    "name": "Brno-Tuřany Airport",
+    "city": "Brno",
+    "country": "Czech Republic"
+  },
+  {
+    "id": "276af53f-5e34-44cc-9ab8-79ec924d1c78",
+    "iataCode": "BRS",
+    "name": "Bristol Airport",
+    "city": "Bristol",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "94fd66db-7f64-4135-8509-6f8c6dc1fa1a",
+    "iataCode": "BRU",
+    "name": "Brussels Airport",
+    "city": "Brussels",
+    "country": "Belgium"
+  },
+  {
+    "id": "34add61e-bdfc-414b-b970-edb9b04d0e6b",
+    "iataCode": "BSB",
+    "name": "Brasília International Airport",
+    "city": "Brasília",
+    "country": "Brazil"
+  },
+  {
+    "id": "c4eeda21-07cb-4370-bf63-8e497a9df035",
+    "iataCode": "BSL",
+    "name": "EuroAirport Basel-Mulhouse-Freiburg",
+    "city": "Basel/Mulhouse",
+    "country": "France"
+  },
+  {
+    "id": "a51ee657-707b-4095-8d6f-69b93cc53b6c",
+    "iataCode": "BTS",
+    "name": "Bratislava Airport",
+    "city": "Bratislava",
+    "country": "Slovakia"
+  },
+  {
+    "id": "eb8f29dd-f507-43ba-9919-86cd2892e7a5",
+    "iataCode": "BUD",
+    "name": "Budapest Ferenc Liszt International Airport",
+    "city": "Budapest",
+    "country": "Hungary"
+  },
+  {
+    "id": "51e88deb-388a-443d-9a60-9f3044c52db2",
+    "iataCode": "BUF",
+    "name": "Buffalo Niagara International Airport",
+    "city": "Buffalo",
+    "country": "United States"
+  },
+  {
+    "id": "2310b915-f125-4244-802e-0394d6997bdb",
+    "iataCode": "BUR",
+    "name": "Hollywood Burbank Airport",
+    "city": "Burbank",
+    "country": "United States"
+  },
+  {
+    "id": "f8f7c3f6-4006-4a75-adba-7337aafc0b75",
+    "iataCode": "BWI",
+    "name": "Baltimore/Washington International Airport",
+    "city": "Baltimore",
+    "country": "United States"
+  },
+  {
+    "id": "24132853-474e-4608-a549-95f89cce99c5",
+    "iataCode": "BWK",
+    "name": "Bol Airport",
+    "city": "Bol",
+    "country": "Croatia"
+  },
+  {
+    "id": "a70ce69c-ac55-4df8-8f22-6844b1380932",
+    "iataCode": "BZE",
+    "name": "Philip S. W. Goldson International Airport",
+    "city": "Belize City",
+    "country": "Belize"
+  },
+  {
+    "id": "7bf40c1d-719f-42a1-917a-f48d12a3eab8",
+    "iataCode": "CAG",
+    "name": "Cagliari Elmas Airport",
+    "city": "Cagliari",
+    "country": "Italy"
+  },
+  {
+    "id": "6963d9c5-48c4-49fe-a203-e0fd799db459",
+    "iataCode": "CAI",
+    "name": "Cairo International Airport",
+    "city": "Cairo",
+    "country": "Egypt"
+  },
+  {
+    "id": "7ea17d7d-f41a-43ff-97ef-dbb5db72b568",
+    "iataCode": "CAN",
+    "name": "Guangzhou Baiyun International Airport",
+    "city": "Guangzhou",
+    "country": "China"
+  },
+  {
+    "id": "bcd8a2bd-7312-450b-9e13-e2c1efbc31e2",
+    "iataCode": "CBR",
+    "name": "Canberra Airport",
+    "city": "Canberra",
+    "country": "Australia"
+  },
+  {
+    "id": "a513edf5-2840-4b75-8eaa-6162bad3c1a5",
+    "iataCode": "CCU",
+    "name": "Netaji Subhas Chandra Bose International Airport",
+    "city": "Kolkata",
+    "country": "India"
+  },
+  {
+    "id": "ebc46d26-4bcb-4630-aba3-cb78d91403bc",
+    "iataCode": "CEB",
+    "name": "Mactan-Cebu International Airport",
+    "city": "Cebu",
+    "country": "Philippines"
+  },
+  {
+    "id": "1fb68c5b-65e6-4d91-b499-cf96bc7bc1ce",
+    "iataCode": "CFU",
+    "name": "Corfu International Airport",
+    "city": "Corfu",
+    "country": "Greece"
+  },
+  {
+    "id": "5162c0fa-cae9-4447-94aa-a5c818530061",
+    "iataCode": "CGH",
+    "name": "Congonhas Airport",
+    "city": "São Paulo",
+    "country": "Brazil"
+  },
+  {
+    "id": "5e3d9ef0-1730-4794-9e8d-8e3a26ee2354",
+    "iataCode": "CGK",
+    "name": "Soekarno-Hatta International Airport",
+    "city": "Jakarta",
+    "country": "Indonesia"
+  },
+  {
+    "id": "ab6d950c-2a4d-4e30-84a0-7e6b6bcfa35c",
+    "iataCode": "CGN",
+    "name": "Cologne Bonn Airport",
+    "city": "Cologne",
+    "country": "Germany"
+  },
+  {
+    "id": "d98597ec-ab40-4b0f-be95-cadb24ffe013",
+    "iataCode": "CHC",
+    "name": "Christchurch International Airport",
+    "city": "Christchurch",
+    "country": "New Zealand"
+  },
+  {
+    "id": "15245f88-cfdb-479b-a267-77a44946f3cc",
+    "iataCode": "CHQ",
+    "name": "Chania International Airport",
+    "city": "Chania",
+    "country": "Greece"
+  },
+  {
+    "id": "dd6e7c52-15c2-4240-9a4b-eaa591c8ff3c",
+    "iataCode": "CHV",
+    "name": "Chaves Airport",
+    "city": "Chaves",
+    "country": "Portugal"
+  },
+  {
+    "id": "e7331f51-c701-4a89-8e8b-f925f2671caf",
+    "iataCode": "CJU",
+    "name": "Jeju International Airport",
+    "city": "Jeju",
+    "country": "South Korea"
+  },
+  {
+    "id": "b712c553-5de3-4d78-8e74-28e7e943d856",
+    "iataCode": "CKG",
+    "name": "Chongqing Jiangbei International Airport",
+    "city": "Chongqing",
+    "country": "China"
+  },
+  {
+    "id": "305ccfd2-7cac-43c5-bfb4-3be770c52b75",
+    "iataCode": "CLE",
+    "name": "Cleveland Hopkins International Airport",
+    "city": "Cleveland",
+    "country": "United States"
+  },
+  {
+    "id": "4ed2c86f-5528-4ad9-9529-69533b719843",
+    "iataCode": "CLJ",
+    "name": "Cluj-Napoca International Airport",
+    "city": "Cluj-Napoca",
+    "country": "Romania"
+  },
+  {
+    "id": "971fbca5-bcdd-421c-8d1f-e38315edf7f9",
+    "iataCode": "CLO",
+    "name": "Alfonso Bonilla Aragón International Airport",
+    "city": "Cali",
+    "country": "Colombia"
+  },
+  {
+    "id": "3ae879d1-f92e-4c8f-89bf-cf2686a06720",
+    "iataCode": "CLT",
+    "name": "Charlotte Douglas International Airport",
+    "city": "Charlotte",
+    "country": "United States"
+  },
+  {
+    "id": "4aa6eaf3-875c-44df-997e-5887b46cd1ec",
+    "iataCode": "CMH",
+    "name": "John Glenn Columbus International Airport",
+    "city": "Columbus",
+    "country": "United States"
+  },
+  {
+    "id": "8cde6b8f-afe2-4497-8530-298d14a2f44a",
+    "iataCode": "CMN",
+    "name": "Mohammed V International Airport",
+    "city": "Casablanca",
+    "country": "Morocco"
+  },
+  {
+    "id": "bc1f9fc0-42f7-41ee-97cb-f8d087faafdf",
+    "iataCode": "CNF",
+    "name": "Tancredo Neves International Airport",
+    "city": "Belo Horizonte",
+    "country": "Brazil"
+  },
+  {
+    "id": "9d1976d2-23bd-4dc2-86a8-08a16bb00c17",
+    "iataCode": "CNS",
+    "name": "Cairns Airport",
+    "city": "Cairns",
+    "country": "Australia"
+  },
+  {
+    "id": "99db0864-ed61-419b-b471-166da45d386f",
+    "iataCode": "CNX",
+    "name": "Chiang Mai International Airport",
+    "city": "Chiang Mai",
+    "country": "Thailand"
+  },
+  {
+    "id": "f075bd30-0199-45a3-afb1-577c3bb54095",
+    "iataCode": "COK",
+    "name": "Cochin International Airport",
+    "city": "Kochi",
+    "country": "India"
+  },
+  {
+    "id": "7bf7e31a-8e5e-4cef-bee6-680f7ef9d01c",
+    "iataCode": "COR",
+    "name": "Ingeniero Aeronáutico Ambrosio L.V. Taravella International Airport",
+    "city": "Córdoba",
+    "country": "Argentina"
+  },
+  {
+    "id": "1fc3d838-cae3-4d08-8a1f-5bf611cc5f74",
+    "iataCode": "CPH",
+    "name": "Copenhagen Airport",
+    "city": "Copenhagen",
+    "country": "Denmark"
+  },
+  {
+    "id": "b2f40a39-3993-483b-8b41-bab31b84deef",
+    "iataCode": "CPT",
+    "name": "Cape Town International Airport",
+    "city": "Cape Town",
+    "country": "South Africa"
+  },
+  {
+    "id": "fbef8efc-3f1e-4019-94c5-9bf14cd6558e",
+    "iataCode": "CRA",
+    "name": "Craiova Airport",
+    "city": "Craiova",
+    "country": "Romania"
+  },
+  {
+    "id": "c0026d8f-aac9-41f8-b128-431087c7fd1c",
+    "iataCode": "CRK",
+    "name": "Clark International Airport",
+    "city": "Angeles",
+    "country": "Philippines"
+  },
+  {
+    "id": "66487c76-2ecd-4c19-ac6d-d00bb3ffb6a1",
+    "iataCode": "CRL",
+    "name": "Brussels South Charleroi Airport",
+    "city": "Charleroi",
+    "country": "Belgium"
+  },
+  {
+    "id": "9de02ff8-27b0-4e12-ad86-9382947c608d",
+    "iataCode": "CTA",
+    "name": "Catania-Fontanarossa Airport",
+    "city": "Catania",
+    "country": "Italy"
+  },
+  {
+    "id": "f31520cf-ebef-47a1-a7f9-f4278ab476c4",
+    "iataCode": "CTG",
+    "name": "Rafael Núñez International Airport",
+    "city": "Cartagena",
+    "country": "Colombia"
+  },
+  {
+    "id": "7669940b-bb4d-44cd-8c49-e01eedef0d27",
+    "iataCode": "CTS",
+    "name": "New Chitose Airport",
+    "city": "Sapporo",
+    "country": "Japan"
+  },
+  {
+    "id": "56924b76-9ddf-4e3b-bf0a-6ef5711379ad",
+    "iataCode": "CTU",
+    "name": "Chengdu Shuangliu International Airport",
+    "city": "Chengdu",
+    "country": "China"
+  },
+  {
+    "id": "82fa713d-e1d0-4610-a9a6-414d8d8a7586",
+    "iataCode": "CUN",
+    "name": "Cancún International Airport",
+    "city": "Cancún",
+    "country": "Mexico"
+  },
+  {
+    "id": "698e44ea-19ab-498a-9306-666048f51890",
+    "iataCode": "CUR",
+    "name": "Curaçao International Airport",
+    "city": "Willemstad",
+    "country": "Curaçao"
+  },
+  {
+    "id": "26f6d44b-bf8a-4e19-800d-bc13acf9b867",
+    "iataCode": "CUZ",
+    "name": "Alejandro Velasco Astete International Airport",
+    "city": "Cusco",
+    "country": "Peru"
+  },
+  {
+    "id": "ce51007e-788a-4df9-9d18-41d421b0b95d",
+    "iataCode": "CVG",
+    "name": "Cincinnati/Northern Kentucky International Airport",
+    "city": "Cincinnati",
+    "country": "United States"
+  },
+  {
+    "id": "918e06f7-7f13-4c12-82f7-51233d810887",
+    "iataCode": "CWB",
+    "name": "Afonso Pena International Airport",
+    "city": "Curitiba",
+    "country": "Brazil"
+  },
+  {
+    "id": "17d6ab38-8fad-4adb-b731-99357714ab99",
+    "iataCode": "DAD",
+    "name": "Da Nang International Airport",
+    "city": "Da Nang",
+    "country": "Vietnam"
+  },
+  {
+    "id": "92c11f03-000c-4549-a439-ebc8be2390c9",
+    "iataCode": "DAR",
+    "name": "Julius Nyerere International Airport",
+    "city": "Dar es Salaam",
+    "country": "Tanzania"
+  },
+  {
+    "id": "6af5a701-08de-4066-b1d8-335ba236bebd",
+    "iataCode": "DBV",
+    "name": "Dubrovnik Airport",
+    "city": "Dubrovnik",
+    "country": "Croatia"
+  },
+  {
+    "id": "0b5d4848-74bb-4ab8-81cf-9e10fd120410",
+    "iataCode": "DCA",
+    "name": "Ronald Reagan Washington National Airport",
+    "city": "Washington DC",
+    "country": "United States"
+  },
+  {
+    "id": "53d567ef-1be3-48e5-80f0-c4cef438bfcb",
+    "iataCode": "DEB",
+    "name": "Debrecen International Airport",
+    "city": "Debrecen",
+    "country": "Hungary"
+  },
+  {
+    "id": "85ca0540-9503-4601-a4af-34c657a539b8",
+    "iataCode": "DEL",
+    "name": "Indira Gandhi International Airport",
+    "city": "New Delhi",
+    "country": "India"
+  },
+  {
+    "id": "6575d728-3a0f-40dc-983e-b4cf46427301",
+    "iataCode": "DEN",
+    "name": "Denver International Airport",
+    "city": "Denver",
+    "country": "United States"
+  },
+  {
+    "id": "517add2d-a8b3-4d9d-ba25-7c52b780575a",
+    "iataCode": "DFW",
+    "name": "Dallas/Fort Worth International Airport",
+    "city": "Dallas",
+    "country": "United States"
+  },
+  {
+    "id": "11ffc3b0-d63b-4382-9daf-9bd896c806fe",
+    "iataCode": "DJE",
+    "name": "Djerba-Zarzis International Airport",
+    "city": "Djerba",
+    "country": "Tunisia"
+  },
+  {
+    "id": "9761e575-4d39-44c3-8b0e-4c038a4c7ae2",
+    "iataCode": "DLC",
+    "name": "Dalian Zhoushuizi International Airport",
+    "city": "Dalian",
+    "country": "China"
+  },
+  {
+    "id": "b29d3656-60b2-4b74-8d23-97746c881f87",
+    "iataCode": "DLM",
+    "name": "Dalaman Airport",
+    "city": "Dalaman",
+    "country": "Turkey"
+  },
+  {
+    "id": "6694e86f-9262-4b9e-adc1-60a2db8c3479",
+    "iataCode": "DMK",
+    "name": "Don Mueang International Airport",
+    "city": "Bangkok",
+    "country": "Thailand"
+  },
+  {
+    "id": "d53be8b8-0571-4e9a-b565-72012534e5c7",
+    "iataCode": "DMM",
+    "name": "King Fahd International Airport",
+    "city": "Dammam",
+    "country": "Saudi Arabia"
+  },
+  {
+    "id": "10e87b48-b5ec-417e-8bce-cbc4501e951f",
+    "iataCode": "DOH",
+    "name": "Hamad International Airport",
+    "city": "Doha",
+    "country": "Qatar"
+  },
+  {
+    "id": "fb461826-d1cb-4cab-b68d-a7ee4941c7c9",
+    "iataCode": "DPS",
+    "name": "Ngurah Rai International Airport",
+    "city": "Denpasar",
+    "country": "Indonesia"
+  },
+  {
+    "id": "32aeb0b8-b767-47f8-9c5f-2d8936cf1732",
+    "iataCode": "DRT",
+    "name": "Dortmund Airport",
+    "city": "Dortmund",
+    "country": "Germany"
+  },
+  {
+    "id": "f2a381fb-34fb-41e2-8568-de0c94067548",
+    "iataCode": "DSM",
+    "name": "Des Moines International Airport",
+    "city": "Des Moines",
+    "country": "United States"
+  },
+  {
+    "id": "e6bc8e09-bd79-4a6a-a69a-a82377feb81d",
+    "iataCode": "DSS",
+    "name": "Blaise Diagne International Airport",
+    "city": "Dakar",
+    "country": "Senegal"
+  },
+  {
+    "id": "ea0447b2-7427-4109-91e8-b39607dee3e5",
+    "iataCode": "DTW",
+    "name": "Detroit Metropolitan Airport",
+    "city": "Detroit",
+    "country": "United States"
+  },
+  {
+    "id": "e380c7c4-8970-4686-95dc-459ce1a538c9",
+    "iataCode": "DUB",
+    "name": "Dublin Airport",
+    "city": "Dublin",
+    "country": "Ireland"
+  },
+  {
+    "id": "fa8fd578-d109-4020-8679-d0b63c73e061",
+    "iataCode": "DUD",
+    "name": "Dunedin Airport",
+    "city": "Dunedin",
+    "country": "New Zealand"
+  },
+  {
+    "id": "78c22900-108d-4aba-8617-9a46e5446128",
+    "iataCode": "DUR",
+    "name": "King Shaka International Airport",
+    "city": "Durban",
+    "country": "South Africa"
+  },
+  {
+    "id": "14090bde-cfee-45c7-a6e1-b931f4f08e3c",
+    "iataCode": "DUS",
+    "name": "Düsseldorf Airport",
+    "city": "Düsseldorf",
+    "country": "Germany"
+  },
+  {
+    "id": "fb524e98-4f92-4c4d-8e40-c4bfcf050a19",
+    "iataCode": "EBB",
+    "name": "Entebbe International Airport",
+    "city": "Entebbe",
+    "country": "Uganda"
+  },
+  {
+    "id": "eaaad2da-b400-47f6-ba07-07782361d002",
+    "iataCode": "EDI",
+    "name": "Edinburgh Airport",
+    "city": "Edinburgh",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "f514f095-1791-4814-a950-f465f5792f3a",
+    "iataCode": "EIN",
+    "name": "Eindhoven Airport",
+    "city": "Eindhoven",
+    "country": "Netherlands"
+  },
+  {
+    "id": "4cf82561-3ccd-40b6-88a4-4a37d27e612a",
+    "iataCode": "ESB",
+    "name": "Esenboğa International Airport",
+    "city": "Ankara",
+    "country": "Turkey"
+  },
+  {
+    "id": "640a4dd6-93e9-45c0-ab24-9c75953b06c5",
+    "iataCode": "EVN",
+    "name": "Zvartnots International Airport",
+    "city": "Yerevan",
+    "country": "Armenia"
+  },
+  {
+    "id": "a5d62ed8-2823-40a0-b257-f148dc6868c6",
+    "iataCode": "EWR",
+    "name": "Newark Liberty International Airport",
+    "city": "Newark",
+    "country": "United States"
+  },
+  {
+    "id": "80757867-3d94-4050-8d52-02f2956fcab6",
+    "iataCode": "EZE",
+    "name": "Ministro Pistarini International Airport",
+    "city": "Buenos Aires",
+    "country": "Argentina"
+  },
+  {
+    "id": "dd7e4413-de59-4faf-86ba-6188b9b5d021",
+    "iataCode": "FAO",
+    "name": "Faro Airport",
+    "city": "Faro",
+    "country": "Portugal"
+  },
+  {
+    "id": "9009fb1b-29df-4c34-8656-7cc6c736007c",
+    "iataCode": "FCO",
+    "name": "Leonardo da Vinci-Fiumicino Airport",
+    "city": "Rome",
+    "country": "Italy"
+  },
+  {
+    "id": "a395e42a-f0eb-4b7e-bc06-fb3fdeb604e6",
+    "iataCode": "FEZ",
+    "name": "Fès–Saïs Airport",
+    "city": "Fès",
+    "country": "Morocco"
+  },
+  {
+    "id": "1f27063a-538c-4470-90f4-e9cd58c3cbfa",
+    "iataCode": "FLL",
+    "name": "Fort Lauderdale-Hollywood International Airport",
+    "city": "Fort Lauderdale",
+    "country": "United States"
+  },
+  {
+    "id": "b1edca78-3406-45ac-91a3-eea67f5d9335",
+    "iataCode": "FNC",
+    "name": "Funchal Madeira Airport",
+    "city": "Funchal",
+    "country": "Portugal"
+  },
+  {
+    "id": "689cd571-4f92-4403-b53e-f6e3213d61de",
+    "iataCode": "FOR",
+    "name": "Pinto Martins International Airport",
+    "city": "Fortaleza",
+    "country": "Brazil"
+  },
+  {
+    "id": "dd9b9fd6-19b3-4725-9964-8836721b8bf2",
+    "iataCode": "FRA",
+    "name": "Frankfurt Airport",
+    "city": "Frankfurt",
+    "country": "Germany"
+  },
+  {
+    "id": "9415c25b-95fa-485b-bb6c-4c2ddfdeb995",
+    "iataCode": "FUK",
+    "name": "Fukuoka Airport",
+    "city": "Fukuoka",
+    "country": "Japan"
+  },
+  {
+    "id": "6726bbb7-907e-438a-93ee-87fa59dea0f3",
+    "iataCode": "GBE",
+    "name": "Sir Seretse Khama International Airport",
+    "city": "Gaborone",
+    "country": "Botswana"
+  },
+  {
+    "id": "f573f44b-b81e-4e1b-80df-5259f5f6d10f",
+    "iataCode": "GDL",
+    "name": "Guadalajara International Airport",
+    "city": "Guadalajara",
+    "country": "Mexico"
+  },
+  {
+    "id": "8c0d665a-bccd-4bc2-8274-023e254fd64a",
+    "iataCode": "GDN",
+    "name": "Gdańsk Lech Wałęsa Airport",
+    "city": "Gdańsk",
+    "country": "Poland"
+  },
+  {
+    "id": "b919457f-7f30-4bd7-a5d1-8fbc9e2aa94c",
+    "iataCode": "GEG",
+    "name": "Spokane International Airport",
+    "city": "Spokane",
+    "country": "United States"
+  },
+  {
+    "id": "88ff6b80-50ce-4bc5-aff5-0d1cae1b30e5",
+    "iataCode": "GEO",
+    "name": "Cheddi Jagan International Airport",
+    "city": "Georgetown",
+    "country": "Guyana"
+  },
+  {
+    "id": "5cc043da-8bd5-4390-a772-a0568d874742",
+    "iataCode": "GIG",
+    "name": "Rio de Janeiro/Galeão International Airport",
+    "city": "Rio de Janeiro",
+    "country": "Brazil"
+  },
+  {
+    "id": "564782e5-a7e2-4ed4-8f05-334c4a97dd6c",
+    "iataCode": "GLA",
+    "name": "Glasgow Airport",
+    "city": "Glasgow",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "5704049f-52ed-4394-a0ad-187c49e232a2",
+    "iataCode": "GMP",
+    "name": "Gimpo International Airport",
+    "city": "Seoul",
+    "country": "South Korea"
+  },
+  {
+    "id": "e8217d73-215c-48c5-acc1-09ec77d67ce1",
+    "iataCode": "GND",
+    "name": "Maurice Bishop International Airport",
+    "city": "St. George's",
+    "country": "Grenada"
+  },
+  {
+    "id": "7ec8bbb7-6e7e-433d-ae96-4b66643b8b10",
+    "iataCode": "GOI",
+    "name": "Dabolim Airport",
+    "city": "Goa",
+    "country": "India"
+  },
+  {
+    "id": "360ad3e4-f9ee-43d7-bb47-240f958b4432",
+    "iataCode": "GOT",
+    "name": "Gothenburg Landvetter Airport",
+    "city": "Gothenburg",
+    "country": "Sweden"
+  },
+  {
+    "id": "d9dd22d2-9cb1-4402-8456-1d2cf0e7c903",
+    "iataCode": "GOZ",
+    "name": "Gorna Oryahovitsa Airport",
+    "city": "Gorna Oryahovitsa",
+    "country": "Bulgaria"
+  },
+  {
+    "id": "05aee03a-1aac-45f6-9b12-889d52c858cc",
+    "iataCode": "GRQ",
+    "name": "Groningen Airport Eelde",
+    "city": "Groningen",
+    "country": "Netherlands"
+  },
+  {
+    "id": "dda7bbfa-ed53-4a84-b3da-df232751f4d1",
+    "iataCode": "GRU",
+    "name": "São Paulo/Guarulhos International Airport",
+    "city": "São Paulo",
+    "country": "Brazil"
+  },
+  {
+    "id": "d55916c9-4f82-456c-83dc-a32186e4899b",
+    "iataCode": "GRZ",
+    "name": "Graz Airport",
+    "city": "Graz",
+    "country": "Austria"
+  },
+  {
+    "id": "b8afd199-b151-456d-a156-59637c2ebcbc",
+    "iataCode": "GUA",
+    "name": "La Aurora International Airport",
+    "city": "Guatemala City",
+    "country": "Guatemala"
+  },
+  {
+    "id": "1e566ff0-3370-4179-9973-00898a8c6ada",
+    "iataCode": "GVA",
+    "name": "Geneva Airport",
+    "city": "Geneva",
+    "country": "Switzerland"
+  },
+  {
+    "id": "7d143f2a-b6eb-4b82-8895-e38e98da61d1",
+    "iataCode": "GYE",
+    "name": "José Joaquín de Olmedo International Airport",
+    "city": "Guayaquil",
+    "country": "Ecuador"
+  },
+  {
+    "id": "308d05fe-d255-48e7-b701-8a0f83c7db48",
+    "iataCode": "GZT",
+    "name": "Gaziantep Airport",
+    "city": "Gaziantep",
+    "country": "Turkey"
+  },
+  {
+    "id": "e590db1b-e9e4-428b-a7ca-d1515ddde51d",
+    "iataCode": "HAJ",
+    "name": "Hannover Airport",
+    "city": "Hannover",
+    "country": "Germany"
+  },
+  {
+    "id": "9c6da9a3-da46-4930-99cc-70e65c6a6b48",
+    "iataCode": "HAM",
+    "name": "Hamburg Airport",
+    "city": "Hamburg",
+    "country": "Germany"
+  },
+  {
+    "id": "27bf37ef-e67d-4133-959a-6a66d7e84dc3",
+    "iataCode": "HAN",
+    "name": "Noi Bai International Airport",
+    "city": "Hanoi",
+    "country": "Vietnam"
+  },
+  {
+    "id": "6dba42bb-f651-4ffb-93f9-4494a5a0b015",
+    "iataCode": "HAU",
+    "name": "Haugesund Airport",
+    "city": "Haugesund",
+    "country": "Norway"
+  },
+  {
+    "id": "d127eebe-7ca0-4491-817c-836a57e739b9",
+    "iataCode": "HAV",
+    "name": "José Martí International Airport",
+    "city": "Havana",
+    "country": "Cuba"
+  },
+  {
+    "id": "92ec90fa-2dee-4858-8198-ab369d95c0c6",
+    "iataCode": "HEL",
+    "name": "Helsinki-Vantaa Airport",
+    "city": "Helsinki",
+    "country": "Finland"
+  },
+  {
+    "id": "4f6bbb8c-f6a6-4119-a278-6ac6665c6f97",
+    "iataCode": "HER",
+    "name": "Heraklion International Airport",
+    "city": "Heraklion",
+    "country": "Greece"
+  },
+  {
+    "id": "86ba5572-5ced-4332-9616-7d3718db0d4d",
+    "iataCode": "HGH",
+    "name": "Hangzhou Xiaoshan International Airport",
+    "city": "Hangzhou",
+    "country": "China"
+  },
+  {
+    "id": "03d39d80-dc63-4776-b23f-cf39fbabd866",
+    "iataCode": "HIJ",
+    "name": "Hiroshima Airport",
+    "city": "Hiroshima",
+    "country": "Japan"
+  },
+  {
+    "id": "1703d4e0-f2ad-4d59-8e8e-12deb557809f",
+    "iataCode": "HKG",
+    "name": "Hong Kong International Airport",
+    "city": "Hong Kong",
+    "country": "Hong Kong"
+  },
+  {
+    "id": "45425bda-3165-4510-9c33-6faf221f9c59",
+    "iataCode": "HKT",
+    "name": "Phuket International Airport",
+    "city": "Phuket",
+    "country": "Thailand"
+  },
+  {
+    "id": "0364f08c-1db2-49dd-8863-1de5c0075b95",
+    "iataCode": "HMO",
+    "name": "Hermosillo International Airport",
+    "city": "Hermosillo",
+    "country": "Mexico"
+  },
+  {
+    "id": "c3b2cffd-a48d-407e-a556-02fdfdf88e0a",
+    "iataCode": "HND",
+    "name": "Tokyo Haneda Airport",
+    "city": "Tokyo",
+    "country": "Japan"
+  },
+  {
+    "id": "14729a1c-219d-4bfc-874a-8ed2be642d0d",
+    "iataCode": "HNL",
+    "name": "Daniel K. Inouye International Airport",
+    "city": "Honolulu",
+    "country": "United States"
+  },
+  {
+    "id": "a054c1ea-25e9-4f4f-9864-ced76eec52b0",
+    "iataCode": "HOR",
+    "name": "Horta Airport",
+    "city": "Horta",
+    "country": "Portugal"
+  },
+  {
+    "id": "878ca8cf-c7e2-404b-9f80-3c6642677955",
+    "iataCode": "HRG",
+    "name": "Hurghada International Airport",
+    "city": "Hurghada",
+    "country": "Egypt"
+  },
+  {
+    "id": "49c03761-b33e-44a4-9a2d-eec33da3a60e",
+    "iataCode": "HYD",
+    "name": "Rajiv Gandhi International Airport",
+    "city": "Hyderabad",
+    "country": "India"
+  },
+  {
+    "id": "8267e79c-cf61-42d5-9399-9051c6f2ba1b",
+    "iataCode": "IAD",
+    "name": "Washington Dulles International Airport",
+    "city": "Washington DC",
+    "country": "United States"
+  },
+  {
+    "id": "c74c2d5a-6b79-41ee-b261-ffdb1e0706f1",
+    "iataCode": "IAH",
+    "name": "George Bush Intercontinental Airport",
+    "city": "Houston",
+    "country": "United States"
+  },
+  {
+    "id": "e3c5f26e-fc0c-4d92-8214-d7ad5f20ba58",
+    "iataCode": "IAS",
+    "name": "Iași International Airport",
+    "city": "Iași",
+    "country": "Romania"
+  },
+  {
+    "id": "1561e936-2794-4484-9e68-511bfbaeaf5a",
+    "iataCode": "IBZ",
+    "name": "Ibiza Airport",
+    "city": "Ibiza",
+    "country": "Spain"
+  },
+  {
+    "id": "033c96d3-b7da-4549-86f2-13832887d047",
+    "iataCode": "ICN",
+    "name": "Incheon International Airport",
+    "city": "Seoul",
+    "country": "South Korea"
+  },
+  {
+    "id": "2b5005db-1a76-44a8-802e-4e09fb66ba85",
+    "iataCode": "IND",
+    "name": "Indianapolis International Airport",
+    "city": "Indianapolis",
+    "country": "United States"
+  },
+  {
+    "id": "7a3d7f3f-c3fd-4db4-aae9-1ec3111d04e7",
+    "iataCode": "INI",
+    "name": "Niš Constantine the Great Airport",
+    "city": "Niš",
+    "country": "Serbia"
+  },
+  {
+    "id": "911bd856-8108-4dbe-a170-c84bfca496fa",
+    "iataCode": "INN",
+    "name": "Innsbruck Airport",
+    "city": "Innsbruck",
+    "country": "Austria"
+  },
+  {
+    "id": "d7e5f8b5-1649-4292-a8fa-5e36bb88e83a",
+    "iataCode": "IPC",
+    "name": "Mataveri International Airport",
+    "city": "Easter Island",
+    "country": "Chile"
+  },
+  {
+    "id": "966063e0-a341-4abd-956a-3ecfeeed13a1",
+    "iataCode": "IST",
+    "name": "Istanbul Airport",
+    "city": "Istanbul",
+    "country": "Turkey"
+  },
+  {
+    "id": "657e31e2-be3b-40a1-b75f-64abd12cc146",
+    "iataCode": "IVL",
+    "name": "Ivalo Airport",
+    "city": "Ivalo",
+    "country": "Finland"
+  },
+  {
+    "id": "eb35b557-6d60-4683-b8af-a342c2377622",
+    "iataCode": "JAI",
+    "name": "Jaipur International Airport",
+    "city": "Jaipur",
+    "country": "India"
+  },
+  {
+    "id": "d9728fff-1697-4585-8ae8-1565cd9dfaa0",
+    "iataCode": "JAX",
+    "name": "Jacksonville International Airport",
+    "city": "Jacksonville",
+    "country": "United States"
+  },
+  {
+    "id": "a079cf04-b243-4abb-83be-a1a5df3c5515",
+    "iataCode": "JED",
+    "name": "King Abdulaziz International Airport",
+    "city": "Jeddah",
+    "country": "Saudi Arabia"
+  },
+  {
+    "id": "4583768f-b8c1-4b83-95b4-caa456f402c8",
+    "iataCode": "JHB",
+    "name": "Senai International Airport",
+    "city": "Johor Bahru",
+    "country": "Malaysia"
+  },
+  {
+    "id": "8bef3b7a-2b9e-48c5-a7ac-8d9ca3a6eff7",
+    "iataCode": "JMK",
+    "name": "Mykonos Airport",
+    "city": "Mykonos",
+    "country": "Greece"
+  },
+  {
+    "id": "19d11194-2273-4045-855d-308e8192696c",
+    "iataCode": "JNB",
+    "name": "O.R. Tambo International Airport",
+    "city": "Johannesburg",
+    "country": "South Africa"
+  },
+  {
+    "id": "07972da5-d72f-4020-b9f9-e81f382e1346",
+    "iataCode": "JOG",
+    "name": "Adisutjipto International Airport",
+    "city": "Yogyakarta",
+    "country": "Indonesia"
+  },
+  {
+    "id": "e3eb090a-4242-4656-9115-b5dcbc90ff8a",
+    "iataCode": "JRO",
+    "name": "Kilimanjaro International Airport",
+    "city": "Kilimanjaro",
+    "country": "Tanzania"
+  },
+  {
+    "id": "33c7c0c3-b2e3-4e0c-bde6-d4ec7fa63685",
+    "iataCode": "JTR",
+    "name": "Santorini Airport",
+    "city": "Santorini",
+    "country": "Greece"
+  },
+  {
+    "id": "da0f60d0-2570-4c5c-9826-88fcea6b61e1",
+    "iataCode": "JYV",
+    "name": "Jyväskylä Airport",
+    "city": "Jyväskylä",
+    "country": "Finland"
+  },
+  {
+    "id": "c9af8b19-1582-4681-941f-9f15f3370081",
+    "iataCode": "KAJ",
+    "name": "Kajaani Airport",
+    "city": "Kajaani",
+    "country": "Finland"
+  },
+  {
+    "id": "0ca1acdb-53dd-4fd7-a21e-00d97160439a",
+    "iataCode": "KEF",
+    "name": "Keflavík International Airport",
+    "city": "Reykjavik",
+    "country": "Iceland"
+  },
+  {
+    "id": "4c388e3e-6012-4de4-991e-a9f8b1dc231e",
+    "iataCode": "KEM",
+    "name": "Kemi-Tornio Airport",
+    "city": "Kemi",
+    "country": "Finland"
+  },
+  {
+    "id": "dc7e485c-17b8-4f42-8016-a1ed1a4061d0",
+    "iataCode": "KGL",
+    "name": "Kigali International Airport",
+    "city": "Kigali",
+    "country": "Rwanda"
+  },
+  {
+    "id": "b69a0b85-1a18-45a5-a449-ce7f5c80a805",
+    "iataCode": "KGS",
+    "name": "Kos Island International Airport",
+    "city": "Kos",
+    "country": "Greece"
+  },
+  {
+    "id": "4989ce76-e91d-4e41-83ac-cc60930c59e6",
+    "iataCode": "KHH",
+    "name": "Kaohsiung International Airport",
+    "city": "Kaohsiung",
+    "country": "Taiwan"
+  },
+  {
+    "id": "053410bc-1981-426a-9b6d-a6222af9fc3b",
+    "iataCode": "KID",
+    "name": "Kristianstad Airport",
+    "city": "Kristianstad",
+    "country": "Sweden"
+  },
+  {
+    "id": "40434ff9-52fe-4c27-a253-6028c72a955f",
+    "iataCode": "KIN",
+    "name": "Norman Manley International Airport",
+    "city": "Kingston",
+    "country": "Jamaica"
+  },
+  {
+    "id": "979ab7b1-4b6c-4649-8635-4bbc9560178a",
+    "iataCode": "KIR",
+    "name": "Kerry Airport",
+    "city": "Kerry",
+    "country": "Ireland"
+  },
+  {
+    "id": "f167f0c2-9456-4ba6-bd8c-7a90bdf804bf",
+    "iataCode": "KIX",
+    "name": "Kansai International Airport",
+    "city": "Osaka",
+    "country": "Japan"
+  },
+  {
+    "id": "18cc7661-bcee-4ecc-8468-4d72773ac208",
+    "iataCode": "KLU",
+    "name": "Klagenfurt Airport",
+    "city": "Klagenfurt",
+    "country": "Austria"
+  },
+  {
+    "id": "2f65539f-9926-4944-a058-c3c8d7ae30b3",
+    "iataCode": "KLV",
+    "name": "Karlovy Vary Airport",
+    "city": "Karlovy Vary",
+    "country": "Czech Republic"
+  },
+  {
+    "id": "d70f033a-2142-4753-8c93-511e2f0fde7f",
+    "iataCode": "KMG",
+    "name": "Kunming Changshui International Airport",
+    "city": "Kunming",
+    "country": "China"
+  },
+  {
+    "id": "a105a333-fe70-452f-aea3-a0d141374b09",
+    "iataCode": "KOJ",
+    "name": "Kagoshima Airport",
+    "city": "Kagoshima",
+    "country": "Japan"
+  },
+  {
+    "id": "29aeb93c-735c-452d-a709-598d75f842f1",
+    "iataCode": "KRK",
+    "name": "Kraków John Paul II Airport",
+    "city": "Kraków",
+    "country": "Poland"
+  },
+  {
+    "id": "766787d5-f598-4086-acd8-f4080193373c",
+    "iataCode": "KRP",
+    "name": "Karup Airport",
+    "city": "Karup",
+    "country": "Denmark"
+  },
+  {
+    "id": "da14e253-8fa4-49ee-b819-d6cfc0830dfc",
+    "iataCode": "KRS",
+    "name": "Kristiansand Airport",
+    "city": "Kristiansand",
+    "country": "Norway"
+  },
+  {
+    "id": "3f2f9ca6-7a26-4915-8892-7a63f6f910ac",
+    "iataCode": "KSC",
+    "name": "Košice International Airport",
+    "city": "Košice",
+    "country": "Slovakia"
+  },
+  {
+    "id": "ea1ca907-d627-4420-94df-f8f6829e3837",
+    "iataCode": "KTW",
+    "name": "Katowice Airport",
+    "city": "Katowice",
+    "country": "Poland"
+  },
+  {
+    "id": "3d3c43f9-23c5-4a82-b899-c43c05bf78d6",
+    "iataCode": "KUL",
+    "name": "Kuala Lumpur International Airport",
+    "city": "Kuala Lumpur",
+    "country": "Malaysia"
+  },
+  {
+    "id": "1f5fc46a-a8ca-4404-9c0a-e6663eb3b7c8",
+    "iataCode": "KUN",
+    "name": "Kaunas Airport",
+    "city": "Kaunas",
+    "country": "Lithuania"
+  },
+  {
+    "id": "b5539055-737a-4858-be5b-ca3f5f26da93",
+    "iataCode": "KWI",
+    "name": "Kuwait International Airport",
+    "city": "Kuwait City",
+    "country": "Kuwait"
+  },
+  {
+    "id": "aa8aabe6-627f-416c-92b5-865af1af7a05",
+    "iataCode": "LAS",
+    "name": "Harry Reid International Airport",
+    "city": "Las Vegas",
+    "country": "United States"
+  },
+  {
+    "id": "37c76979-4aad-4ce4-8831-add1914b5280",
+    "iataCode": "LCA",
+    "name": "Larnaca International Airport",
+    "city": "Larnaca",
+    "country": "Cyprus"
+  },
+  {
+    "id": "0006889b-bb04-4e44-b511-21ff77a27a00",
+    "iataCode": "LGA",
+    "name": "LaGuardia Airport",
+    "city": "New York",
+    "country": "United States"
+  },
+  {
+    "id": "3dae580f-0081-4d02-b9a4-c15d9efca823",
+    "iataCode": "LGG",
+    "name": "Liège Airport",
+    "city": "Liège",
+    "country": "Belgium"
+  },
+  {
+    "id": "38a0f7ea-5507-46dc-9687-8b9d623601a4",
+    "iataCode": "LGK",
+    "name": "Langkawi International Airport",
+    "city": "Langkawi",
+    "country": "Malaysia"
+  },
+  {
+    "id": "fabdd485-da13-4ac1-92a2-7ad00081791c",
+    "iataCode": "LGW",
+    "name": "London Gatwick Airport",
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "e8011d5f-a3aa-4dd5-8173-4b7991c82715",
+    "iataCode": "LIL",
+    "name": "Lille Airport",
+    "city": "Lille",
+    "country": "France"
+  },
+  {
+    "id": "dcb501d6-015c-4e48-b16f-88b261b12d46",
+    "iataCode": "LIM",
+    "name": "Jorge Chávez International Airport",
+    "city": "Lima",
+    "country": "Peru"
+  },
+  {
+    "id": "f642dede-1bab-4482-93d8-d6bdcc312682",
+    "iataCode": "LIN",
+    "name": "Milan Linate Airport",
+    "city": "Milan",
+    "country": "Italy"
+  },
+  {
+    "id": "c955bea3-8b86-4ef2-bf98-673b42872662",
+    "iataCode": "LIR",
+    "name": "Daniel Oduber Quirós International Airport",
+    "city": "Liberia",
+    "country": "Costa Rica"
+  },
+  {
+    "id": "aabb125d-7251-459b-b3c4-d906df106729",
+    "iataCode": "LIS",
+    "name": "Lisbon Portela Airport",
+    "city": "Lisbon",
+    "country": "Portugal"
+  },
+  {
+    "id": "8818bb9a-e94d-438e-82a6-f944aa7d8aa4",
+    "iataCode": "LJU",
+    "name": "Ljubljana Jože Pučnik Airport",
+    "city": "Ljubljana",
+    "country": "Slovenia"
+  },
+  {
+    "id": "e637f4e8-86c9-4681-a5ec-ef604025e768",
+    "iataCode": "LLA",
+    "name": "Luleå Airport",
+    "city": "Luleå",
+    "country": "Sweden"
+  },
+  {
+    "id": "5cd3d9d2-b46e-47c0-bdf2-b1993ec29b88",
+    "iataCode": "LNZ",
+    "name": "Linz Airport",
+    "city": "Linz",
+    "country": "Austria"
+  },
+  {
+    "id": "166f4311-4d80-4234-ba4a-101c3d9537d6",
+    "iataCode": "LOS",
+    "name": "Murtala Muhammed International Airport",
+    "city": "Lagos",
+    "country": "Nigeria"
+  },
+  {
+    "id": "c8d5bff2-6508-41d2-966a-67e50af00bf4",
+    "iataCode": "LPB",
+    "name": "El Alto International Airport",
+    "city": "La Paz",
+    "country": "Bolivia"
+  },
+  {
+    "id": "86c8265b-d8a8-4f84-b0f5-4c7d8651795d",
+    "iataCode": "LTN",
+    "name": "London Luton Airport",
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "da6620d3-edb6-42e7-8eca-2eb782e59131",
+    "iataCode": "LUG",
+    "name": "Lugano Airport",
+    "city": "Lugano",
+    "country": "Switzerland"
+  },
+  {
+    "id": "6734a579-f35c-41ce-bad1-644ab71f9ecc",
+    "iataCode": "LUX",
+    "name": "Luxembourg Airport",
+    "city": "Luxembourg City",
+    "country": "Luxembourg"
+  },
+  {
+    "id": "6ee6bb11-319f-4601-9c2a-ebcf8ef46eca",
+    "iataCode": "LUZ",
+    "name": "Lublin Airport",
+    "city": "Lublin",
+    "country": "Poland"
+  },
+  {
+    "id": "c58c8694-6a97-4645-a9ea-88456df227a3",
+    "iataCode": "LYS",
+    "name": "Lyon-Saint Exupéry Airport",
+    "city": "Lyon",
+    "country": "France"
+  },
+  {
+    "id": "a38a0f2f-4de3-47e3-b4e2-d0685e50dd4d",
+    "iataCode": "MAA",
+    "name": "Chennai International Airport",
+    "city": "Chennai",
+    "country": "India"
+  },
+  {
+    "id": "bf7c388b-e2ee-4cd4-a0be-39d25a13613c",
+    "iataCode": "MAD",
+    "name": "Adolfo Suárez Madrid-Barajas Airport",
+    "city": "Madrid",
+    "country": "Spain"
+  },
+  {
+    "id": "61ec07c8-4cc3-4aea-9953-30800ea834f9",
+    "iataCode": "MAN",
+    "name": "Manchester Airport",
+    "city": "Manchester",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "8fd594cb-3ecd-43e0-80a3-6fde07c688c0",
+    "iataCode": "MAO",
+    "name": "Eduardo Gomes International Airport",
+    "city": "Manaus",
+    "country": "Brazil"
+  },
+  {
+    "id": "2a8aa481-0242-46d2-9063-37445cbabb46",
+    "iataCode": "MBA",
+    "name": "Moi International Airport",
+    "city": "Mombasa",
+    "country": "Kenya"
+  },
+  {
+    "id": "1abfc7e0-9c9f-4c33-9fd6-9d5606c1f732",
+    "iataCode": "MBJ",
+    "name": "Sangster International Airport",
+    "city": "Montego Bay",
+    "country": "Jamaica"
+  },
+  {
+    "id": "e2b14501-9e57-42be-a953-6d074c3a922c",
+    "iataCode": "MCI",
+    "name": "Kansas City International Airport",
+    "city": "Kansas City",
+    "country": "United States"
+  },
+  {
+    "id": "152bb8a8-91d4-41e2-8d86-9b2bf74607aa",
+    "iataCode": "MCO",
+    "name": "Orlando International Airport",
+    "city": "Orlando",
+    "country": "United States"
+  },
+  {
+    "id": "76de6a1a-d2e8-428c-9786-90f18db96923",
+    "iataCode": "MCT",
+    "name": "Muscat International Airport",
+    "city": "Muscat",
+    "country": "Oman"
+  },
+  {
+    "id": "4925d2af-a128-4427-8f71-f71c3b8a28f6",
+    "iataCode": "MDE",
+    "name": "José María Córdova International Airport",
+    "city": "Medellín",
+    "country": "Colombia"
+  },
+  {
+    "id": "f7cb085d-c73d-48be-a92e-7202cc512d3d",
+    "iataCode": "MDW",
+    "name": "Chicago Midway International Airport",
+    "city": "Chicago",
+    "country": "United States"
+  },
+  {
+    "id": "f78a9d19-06d1-4635-95a4-42f8e0ce4e04",
+    "iataCode": "MDZ",
+    "name": "Governor Francisco Gabrielli International Airport",
+    "city": "Mendoza",
+    "country": "Argentina"
+  },
+  {
+    "id": "2a7708e7-c731-4697-b895-5d92b636cbbd",
+    "iataCode": "MEL",
+    "name": "Melbourne Airport",
+    "city": "Melbourne",
+    "country": "Australia"
+  },
+  {
+    "id": "c294b25d-0d24-4fe2-8233-eec4ed67c4e9",
+    "iataCode": "MEM",
+    "name": "Memphis International Airport",
+    "city": "Memphis",
+    "country": "United States"
+  },
+  {
+    "id": "2117e091-ffef-4a91-a2e5-0e4b14a55211",
+    "iataCode": "MEX",
+    "name": "Mexico City International Airport",
+    "city": "Mexico City",
+    "country": "Mexico"
+  },
+  {
+    "id": "28f0dfef-16df-4133-bce0-77436040b8cd",
+    "iataCode": "MGA",
+    "name": "Augusto C. Sandino International Airport",
+    "city": "Managua",
+    "country": "Nicaragua"
+  },
+  {
+    "id": "1d8120eb-0d00-412a-b7f6-0b94d5b418ec",
+    "iataCode": "MIA",
+    "name": "Miami International Airport",
+    "city": "Miami",
+    "country": "United States"
+  },
+  {
+    "id": "f2fc8784-7803-49de-8739-8feb5409504b",
+    "iataCode": "MKE",
+    "name": "Milwaukee Mitchell International Airport",
+    "city": "Milwaukee",
+    "country": "United States"
+  },
+  {
+    "id": "ec4f0cb9-6b1c-4880-9434-e898198225c6",
+    "iataCode": "MLA",
+    "name": "Malta International Airport",
+    "city": "Valletta",
+    "country": "Malta"
+  },
+  {
+    "id": "740270fc-5f2c-4c52-991a-dd6c5e09d451",
+    "iataCode": "MMX",
+    "name": "Malmö Airport",
+    "city": "Malmö",
+    "country": "Sweden"
+  },
+  {
+    "id": "6466a520-68c7-456f-8f75-2798fbcc1502",
+    "iataCode": "MNL",
+    "name": "Ninoy Aquino International Airport",
+    "city": "Manila",
+    "country": "Philippines"
+  },
+  {
+    "id": "2088fc48-23f8-401c-8151-ba6b8124269b",
+    "iataCode": "MOL",
+    "name": "Molde Airport",
+    "city": "Molde",
+    "country": "Norway"
+  },
+  {
+    "id": "583f1e91-96ef-47fd-b950-dfbb4feb87cf",
+    "iataCode": "MRS",
+    "name": "Marseille Provence Airport",
+    "city": "Marseille",
+    "country": "France"
+  },
+  {
+    "id": "319dbd4e-9e94-43d8-8f63-a31d3ecc3d3e",
+    "iataCode": "MRU",
+    "name": "Sir Seewoosagur Ramgoolam International Airport",
+    "city": "Mauritius",
+    "country": "Mauritius"
+  },
+  {
+    "id": "fc31a96e-8071-43c2-83c8-b04ca61e86e9",
+    "iataCode": "MSP",
+    "name": "Minneapolis-St Paul International Airport",
+    "city": "Minneapolis",
+    "country": "United States"
+  },
+  {
+    "id": "4425edfb-1d36-4a7a-8cf6-3def03bb90df",
+    "iataCode": "MST",
+    "name": "Maastricht Aachen Airport",
+    "city": "Maastricht",
+    "country": "Netherlands"
+  },
+  {
+    "id": "6b198d4c-3a8b-4910-b507-7b3dae53e099",
+    "iataCode": "MSY",
+    "name": "Louis Armstrong New Orleans International Airport",
+    "city": "New Orleans",
+    "country": "United States"
+  },
+  {
+    "id": "785bb1a5-fbf4-4c1f-8719-bdabac4168a0",
+    "iataCode": "MTY",
+    "name": "Monterrey International Airport",
+    "city": "Monterrey",
+    "country": "Mexico"
+  },
+  {
+    "id": "9b9df67d-0cc2-48ce-983e-c9e0a41aecd3",
+    "iataCode": "MUC",
+    "name": "Munich Airport",
+    "city": "Munich",
+    "country": "Germany"
+  },
+  {
+    "id": "13671336-d59d-4352-b2f4-02e67f859ea0",
+    "iataCode": "MVD",
+    "name": "Carrasco International Airport",
+    "city": "Montevideo",
+    "country": "Uruguay"
+  },
+  {
+    "id": "5f74a01a-7709-4bf6-b260-efda99c0ce60",
+    "iataCode": "MXP",
+    "name": "Milan Malpensa Airport",
+    "city": "Milan",
+    "country": "Italy"
+  },
+  {
+    "id": "232852c9-bc71-4f11-9199-e30602bd1bf4",
+    "iataCode": "MZT",
+    "name": "Mazatlán International Airport",
+    "city": "Mazatlán",
+    "country": "Mexico"
+  },
+  {
+    "id": "d838b37b-7c94-4e9d-97fd-52e286bb5a62",
+    "iataCode": "NAP",
+    "name": "Naples International Airport",
+    "city": "Naples",
+    "country": "Italy"
+  },
+  {
+    "id": "cbe94063-38dd-4e7c-b429-a111a24a775a",
+    "iataCode": "NAS",
+    "name": "Lynden Pindling International Airport",
+    "city": "Nassau",
+    "country": "Bahamas"
+  },
+  {
+    "id": "b867a690-9c90-4327-b49a-300471b65e8e",
+    "iataCode": "NBO",
+    "name": "Jomo Kenyatta International Airport",
+    "city": "Nairobi",
+    "country": "Kenya"
+  },
+  {
+    "id": "85084d74-7732-429b-8da6-039aa0c559ec",
+    "iataCode": "NCE",
+    "name": "Nice Côte d'Azur Airport",
+    "city": "Nice",
+    "country": "France"
+  },
+  {
+    "id": "6c6f7658-28d6-4585-9b53-424d1111dddd",
+    "iataCode": "NCL",
+    "name": "Newcastle Airport",
+    "city": "Newcastle",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "14e0d605-dc3f-4af9-9700-159911fd5955",
+    "iataCode": "NGO",
+    "name": "Chubu Centrair International Airport",
+    "city": "Nagoya",
+    "country": "Japan"
+  },
+  {
+    "id": "7a3a067b-24e4-4f21-9f3e-4b5061303646",
+    "iataCode": "NKG",
+    "name": "Nanjing Lukou International Airport",
+    "city": "Nanjing",
+    "country": "China"
+  },
+  {
+    "id": "71b961fc-8a79-4038-b9f9-926f693407cb",
+    "iataCode": "NOC",
+    "name": "Ireland West Airport Knock",
+    "city": "Knock",
+    "country": "Ireland"
+  },
+  {
+    "id": "43931ec8-cc5e-4678-9c28-d50589e43e22",
+    "iataCode": "NTE",
+    "name": "Nantes Atlantique Airport",
+    "city": "Nantes",
+    "country": "France"
+  },
+  {
+    "id": "493c34f6-172d-4fcc-89cb-ef2b6f555f28",
+    "iataCode": "NUE",
+    "name": "Nuremberg Airport",
+    "city": "Nuremberg",
+    "country": "Germany"
+  },
+  {
+    "id": "38464e09-1914-4d95-a84b-67101b7639a8",
+    "iataCode": "OAK",
+    "name": "Oakland International Airport",
+    "city": "Oakland",
+    "country": "United States"
+  },
+  {
+    "id": "1e64f5b5-a9d7-4e9a-955f-6edf22ed36a2",
+    "iataCode": "OKA",
+    "name": "Naha Airport",
+    "city": "Naha",
+    "country": "Japan"
+  },
+  {
+    "id": "7b97e19e-24e1-4413-a05f-126dcaf99625",
+    "iataCode": "OKC",
+    "name": "Will Rogers World Airport",
+    "city": "Oklahoma City",
+    "country": "United States"
+  },
+  {
+    "id": "43413844-67e2-4348-a479-1fdb9f7b7741",
+    "iataCode": "OMA",
+    "name": "Eppley Airfield",
+    "city": "Omaha",
+    "country": "United States"
+  },
+  {
+    "id": "e178d63c-efb4-45c2-bb7e-2868b74933b9",
+    "iataCode": "OMR",
+    "name": "Oradea International Airport",
+    "city": "Oradea",
+    "country": "Romania"
+  },
+  {
+    "id": "16e877f1-1094-452d-9d4c-385b7f2ac969",
+    "iataCode": "ONT",
+    "name": "Ontario International Airport",
+    "city": "Ontario",
+    "country": "United States"
+  },
+  {
+    "id": "c16643ea-1bf3-477e-a0a2-58d3e9366025",
+    "iataCode": "OOL",
+    "name": "Gold Coast Airport",
+    "city": "Gold Coast",
+    "country": "Australia"
+  },
+  {
+    "id": "4c9ceea2-1fd8-4ed7-9bb9-1105fb58cdba",
+    "iataCode": "OPO",
+    "name": "Porto Airport",
+    "city": "Porto",
+    "country": "Portugal"
+  },
+  {
+    "id": "bf335fa5-3818-4c01-82d8-8d97742ae974",
+    "iataCode": "ORD",
+    "name": "O'Hare International Airport",
+    "city": "Chicago",
+    "country": "United States"
+  },
+  {
+    "id": "6ab31aab-3cda-4b53-9928-3eab5b0b5015",
+    "iataCode": "ORF",
+    "name": "Norfolk International Airport",
+    "city": "Norfolk",
+    "country": "United States"
+  },
+  {
+    "id": "1a0efaa3-d948-4500-8a2b-7dbdd098bf08",
+    "iataCode": "ORK",
+    "name": "Cork Airport",
+    "city": "Cork",
+    "country": "Ireland"
+  },
+  {
+    "id": "1cbdbd83-6cda-442a-b34c-59bf323d568d",
+    "iataCode": "ORY",
+    "name": "Paris Orly Airport",
+    "city": "Paris",
+    "country": "France"
+  },
+  {
+    "id": "9946bc02-7964-4016-bcf4-913db2d051e5",
+    "iataCode": "OSI",
+    "name": "Osijek Airport",
+    "city": "Osijek",
+    "country": "Croatia"
+  },
+  {
+    "id": "5629bdd9-0d06-48b8-aafe-39e3af5207e3",
+    "iataCode": "OSL",
+    "name": "Oslo Airport",
+    "city": "Oslo",
+    "country": "Norway"
+  },
+  {
+    "id": "a1bd7455-b4f9-4b29-9d77-7585b8be8532",
+    "iataCode": "OSR",
+    "name": "Ostrava Leoš Janáček Airport",
+    "city": "Ostrava",
+    "country": "Czech Republic"
+  },
+  {
+    "id": "43826b15-af34-4b1c-9f45-641ab66df70f",
+    "iataCode": "OST",
+    "name": "Ostend-Bruges International Airport",
+    "city": "Ostend",
+    "country": "Belgium"
+  },
+  {
+    "id": "74567ba9-8f38-4d0a-a145-b8e34456bc2b",
+    "iataCode": "OTP",
+    "name": "Henri Coandă International Airport",
+    "city": "Bucharest",
+    "country": "Romania"
+  },
+  {
+    "id": "a27b7f97-32fc-4f04-9d2c-ce7db04b232e",
+    "iataCode": "OUL",
+    "name": "Oulu Airport",
+    "city": "Oulu",
+    "country": "Finland"
+  },
+  {
+    "id": "fe987836-e22d-482e-b502-bdd3d727634d",
+    "iataCode": "PBI",
+    "name": "Palm Beach International Airport",
+    "city": "West Palm Beach",
+    "country": "United States"
+  },
+  {
+    "id": "c549799f-d800-4857-9896-332984c6b41b",
+    "iataCode": "PBM",
+    "name": "Johan Adolf Pengel International Airport",
+    "city": "Paramaribo",
+    "country": "Suriname"
+  },
+  {
+    "id": "ce1409ba-9a80-43d0-905e-64741177469e",
+    "iataCode": "PDL",
+    "name": "Ponta Delgada Airport",
+    "city": "Ponta Delgada",
+    "country": "Portugal"
+  },
+  {
+    "id": "3b6a7f63-7f23-42b9-aef4-4466f49e3f4e",
+    "iataCode": "PDV",
+    "name": "Plovdiv Airport",
+    "city": "Plovdiv",
+    "country": "Bulgaria"
+  },
+  {
+    "id": "a8bc9d36-5614-4c1d-9455-ecba77a43d09",
+    "iataCode": "PDX",
+    "name": "Portland International Airport",
+    "city": "Portland",
+    "country": "United States"
+  },
+  {
+    "id": "94811288-38b6-4f70-9b79-3da498b88921",
+    "iataCode": "PED",
+    "name": "Pardubice Airport",
+    "city": "Pardubice",
+    "country": "Czech Republic"
+  },
+  {
+    "id": "93c530bc-76f7-432b-b404-8602c7cf14a7",
+    "iataCode": "PEK",
+    "name": "Beijing Capital International Airport",
+    "city": "Beijing",
+    "country": "China"
+  },
+  {
+    "id": "4b036c18-a5c6-4bf5-94f8-56c188aed130",
+    "iataCode": "PEN",
+    "name": "Penang International Airport",
+    "city": "Penang",
+    "country": "Malaysia"
+  },
+  {
+    "id": "6131d008-ee5f-43a2-bd2a-62ae4d58d48d",
+    "iataCode": "PER",
+    "name": "Perth Airport",
+    "city": "Perth",
+    "country": "Australia"
+  },
+  {
+    "id": "9c79fff7-2ce9-48e9-878e-65e00987bab1",
+    "iataCode": "PFO",
+    "name": "Paphos International Airport",
+    "city": "Paphos",
+    "country": "Cyprus"
+  },
+  {
+    "id": "e07102cc-ff0e-490e-86c8-56b28bdbe6ae",
+    "iataCode": "PHL",
+    "name": "Philadelphia International Airport",
+    "city": "Philadelphia",
+    "country": "United States"
+  },
+  {
+    "id": "ace48f62-9cf0-4f2f-9af7-1e07bbc6bf8a",
+    "iataCode": "PHX",
+    "name": "Phoenix Sky Harbor International Airport",
+    "city": "Phoenix",
+    "country": "United States"
+  },
+  {
+    "id": "ec785ced-d92f-4ec4-b9bd-190848b4923f",
+    "iataCode": "PIT",
+    "name": "Pittsburgh International Airport",
+    "city": "Pittsburgh",
+    "country": "United States"
+  },
+  {
+    "id": "c02b71cd-a646-4b1d-b302-7546062a6575",
+    "iataCode": "PLQ",
+    "name": "Palanga International Airport",
+    "city": "Palanga",
+    "country": "Lithuania"
+  },
+  {
+    "id": "faee9a42-c639-4658-b040-0212416907b3",
+    "iataCode": "PMI",
+    "name": "Palma de Mallorca Airport",
+    "city": "Palma",
+    "country": "Spain"
+  },
+  {
+    "id": "ea90b6d3-4ff0-4dc8-a6fe-2dd10cb16d84",
+    "iataCode": "POA",
+    "name": "Salgado Filho International Airport",
+    "city": "Porto Alegre",
+    "country": "Brazil"
+  },
+  {
+    "id": "7bf3c5f2-4f52-41b0-9067-f3c56a56a235",
+    "iataCode": "POS",
+    "name": "Piarco International Airport",
+    "city": "Port of Spain",
+    "country": "Trinidad and Tobago"
+  },
+  {
+    "id": "fc8522de-53ba-4cc4-a2f1-c24f0651358e",
+    "iataCode": "POZ",
+    "name": "Poznań-Ławica Airport",
+    "city": "Poznań",
+    "country": "Poland"
+  },
+  {
+    "id": "76b3eb4e-a97e-4b12-8647-9a98d971b7cb",
+    "iataCode": "PRG",
+    "name": "Václav Havel Airport Prague",
+    "city": "Prague",
+    "country": "Czech Republic"
+  },
+  {
+    "id": "a775289c-1b69-4a71-b0ef-9400def47db2",
+    "iataCode": "PSA",
+    "name": "Pisa International Airport",
+    "city": "Pisa",
+    "country": "Italy"
+  },
+  {
+    "id": "a5363289-6027-4d2e-a4a7-6933925e3d21",
+    "iataCode": "PTY",
+    "name": "Tocumen International Airport",
+    "city": "Panama City",
+    "country": "Panama"
+  },
+  {
+    "id": "746bc891-58a0-4751-9541-6842363b631d",
+    "iataCode": "PUJ",
+    "name": "Punta Cana International Airport",
+    "city": "Punta Cana",
+    "country": "Dominican Republic"
+  },
+  {
+    "id": "6e4e783f-9235-423c-9efe-caee33458306",
+    "iataCode": "PUS",
+    "name": "Gimhae International Airport",
+    "city": "Busan",
+    "country": "South Korea"
+  },
+  {
+    "id": "dd2b6f79-453b-4cd8-bb71-41a5c60e19cb",
+    "iataCode": "PUY",
+    "name": "Pula Airport",
+    "city": "Pula",
+    "country": "Croatia"
+  },
+  {
+    "id": "c770868e-7dfa-4363-81bd-f319d76107ac",
+    "iataCode": "PVD",
+    "name": "Rhode Island T.F. Green International Airport",
+    "city": "Providence",
+    "country": "United States"
+  },
+  {
+    "id": "120ff2d1-ddaa-4549-9f47-e126e6045fc0",
+    "iataCode": "PVG",
+    "name": "Shanghai Pudong International Airport",
+    "city": "Shanghai",
+    "country": "China"
+  },
+  {
+    "id": "03983b15-4844-4276-8c49-9b69b1af7150",
+    "iataCode": "PVR",
+    "name": "Puerto Vallarta International Airport",
+    "city": "Puerto Vallarta",
+    "country": "Mexico"
+  },
+  {
+    "id": "176eabc6-3752-4867-bcde-888661e4ec83",
+    "iataCode": "RAK",
+    "name": "Marrakesh Menara Airport",
+    "city": "Marrakesh",
+    "country": "Morocco"
+  },
+  {
+    "id": "a1d52205-c8c4-40f0-8a5a-d2c662df5eb6",
+    "iataCode": "RDU",
+    "name": "Raleigh-Durham International Airport",
+    "city": "Raleigh",
+    "country": "United States"
+  },
+  {
+    "id": "8681f109-dda2-4517-a86c-041ac6454af3",
+    "iataCode": "REC",
+    "name": "Recife/Guararapes International Airport",
+    "city": "Recife",
+    "country": "Brazil"
+  },
+  {
+    "id": "ec77ff37-5e32-4726-8a7d-fdfbc4b84026",
+    "iataCode": "RHO",
+    "name": "Rhodes International Airport",
+    "city": "Rhodes",
+    "country": "Greece"
+  },
+  {
+    "id": "6569cea3-cb27-4f21-871c-75b088dd1b19",
+    "iataCode": "RIC",
+    "name": "Richmond International Airport",
+    "city": "Richmond",
+    "country": "United States"
+  },
+  {
+    "id": "d4dcc4ae-9487-4e98-a2a2-127ed40bc1e0",
+    "iataCode": "RIX",
+    "name": "Riga International Airport",
+    "city": "Riga",
+    "country": "Latvia"
+  },
+  {
+    "id": "fde71175-a748-41c8-89d0-66d2701459b2",
+    "iataCode": "RJK",
+    "name": "Rijeka Airport",
+    "city": "Rijeka",
+    "country": "Croatia"
+  },
+  {
+    "id": "c3e1171a-bd2d-4b65-8b62-ef9445763855",
+    "iataCode": "RKV",
+    "name": "Reykjavík Airport",
+    "city": "Reykjavik",
+    "country": "Iceland"
+  },
+  {
+    "id": "e9973eb9-d518-4634-8a0f-425d0b8cdcb7",
+    "iataCode": "RNB",
+    "name": "Ronneby Airport",
+    "city": "Ronneby",
+    "country": "Sweden"
+  },
+  {
+    "id": "41a627b1-90ed-4622-85bf-4f10e934c64b",
+    "iataCode": "RNO",
+    "name": "Reno-Tahoe International Airport",
+    "city": "Reno",
+    "country": "United States"
+  },
+  {
+    "id": "a53139f9-2336-4b24-bd3c-4f3bc46530af",
+    "iataCode": "RSW",
+    "name": "Southwest Florida International Airport",
+    "city": "Fort Myers",
+    "country": "United States"
+  },
+  {
+    "id": "f6600ddd-2ae9-4bbf-8e69-1e4dbb9d8279",
+    "iataCode": "RTM",
+    "name": "Rotterdam The Hague Airport",
+    "city": "Rotterdam",
+    "country": "Netherlands"
+  },
+  {
+    "id": "c1d348b0-53fe-4dd8-a1d0-af3305b7e7b0",
+    "iataCode": "RUH",
+    "name": "King Khalid International Airport",
+    "city": "Riyadh",
+    "country": "Saudi Arabia"
+  },
+  {
+    "id": "91950cd8-751b-4562-9c2d-575d4ed91dad",
+    "iataCode": "RVN",
+    "name": "Rovaniemi Airport",
+    "city": "Rovaniemi",
+    "country": "Finland"
+  },
+  {
+    "id": "340451de-ed0b-4385-9d8b-015bb447b4bd",
+    "iataCode": "RZE",
+    "name": "Rzeszów-Jasionka Airport",
+    "city": "Rzeszów",
+    "country": "Poland"
+  },
+  {
+    "id": "4179cdf8-3495-4b94-b564-27116124e335",
+    "iataCode": "SAL",
+    "name": "Monseñor Óscar Arnulfo Romero International Airport",
+    "city": "San Salvador",
+    "country": "El Salvador"
+  },
+  {
+    "id": "804d8d3b-a52e-4700-b916-9d0e377832fa",
+    "iataCode": "SAN",
+    "name": "San Diego International Airport",
+    "city": "San Diego",
+    "country": "United States"
+  },
+  {
+    "id": "26993d29-841c-410b-aca8-9d685e645c5d",
+    "iataCode": "SAT",
+    "name": "San Antonio International Airport",
+    "city": "San Antonio",
+    "country": "United States"
+  },
+  {
+    "id": "9cb28de7-a2cf-4c7a-994e-1c66e3e1f287",
+    "iataCode": "SAW",
+    "name": "Sabiha Gökçen International Airport",
+    "city": "Istanbul",
+    "country": "Turkey"
+  },
+  {
+    "id": "8477844a-31b1-4122-ae8c-ccf505d52e48",
+    "iataCode": "SBZ",
+    "name": "Sibiu International Airport",
+    "city": "Sibiu",
+    "country": "Romania"
+  },
+  {
+    "id": "165e9639-38cf-46c7-a0b9-a9f617ba4ace",
+    "iataCode": "SCL",
+    "name": "Arturo Merino Benítez International Airport",
+    "city": "Santiago",
+    "country": "Chile"
+  },
+  {
+    "id": "73dcb58d-9673-4d4e-9a5b-837cf4d2aa00",
+    "iataCode": "SDJ",
+    "name": "Sendai Airport",
+    "city": "Sendai",
+    "country": "Japan"
+  },
+  {
+    "id": "9fcdee25-3c4c-4195-8214-15a8f775bd21",
+    "iataCode": "SDQ",
+    "name": "Las Américas International Airport",
+    "city": "Santo Domingo",
+    "country": "Dominican Republic"
+  },
+  {
+    "id": "f539d923-ecba-4a18-9e29-b442bc0a75e9",
+    "iataCode": "SEA",
+    "name": "Seattle-Tacoma International Airport",
+    "city": "Seattle",
+    "country": "United States"
+  },
+  {
+    "id": "8ea47f8e-e648-4d9c-8bfb-cda6057bab34",
+    "iataCode": "SEZ",
+    "name": "Seychelles International Airport",
+    "city": "Mahé",
+    "country": "Seychelles"
+  },
+  {
+    "id": "1a3bb71b-292b-4b6f-9730-c47f0c943416",
+    "iataCode": "SFO",
+    "name": "San Francisco International Airport",
+    "city": "San Francisco",
+    "country": "United States"
+  },
+  {
+    "id": "97156052-06bb-42df-b9f7-e326abe119f6",
+    "iataCode": "SGN",
+    "name": "Tan Son Nhat International Airport",
+    "city": "Ho Chi Minh City",
+    "country": "Vietnam"
+  },
+  {
+    "id": "6f2b9544-b8f2-420c-a8a1-d4e36b76c16b",
+    "iataCode": "SHA",
+    "name": "Shanghai Hongqiao International Airport",
+    "city": "Shanghai",
+    "country": "China"
+  },
+  {
+    "id": "822bf97a-95a7-43bd-bd91-e46a32d9b9dc",
+    "iataCode": "SHJ",
+    "name": "Sharjah International Airport",
+    "city": "Sharjah",
+    "country": "United Arab Emirates"
+  },
+  {
+    "id": "5215faa0-4eb1-4c4b-b15d-3028550969c4",
+    "iataCode": "SJC",
+    "name": "Norman Y. Mineta San José International Airport",
+    "city": "San Jose",
+    "country": "United States"
+  },
+  {
+    "id": "8b027e0b-38c5-4610-9af4-0bb2ff492fc9",
+    "iataCode": "SJD",
+    "name": "Los Cabos International Airport",
+    "city": "San José del Cabo",
+    "country": "Mexico"
+  },
+  {
+    "id": "f2766765-b793-41b8-8a92-e6a3729c20b2",
+    "iataCode": "SJO",
+    "name": "Juan Santamaría International Airport",
+    "city": "San José",
+    "country": "Costa Rica"
+  },
+  {
+    "id": "4777812e-000c-4137-8df4-d56621564529",
+    "iataCode": "SJU",
+    "name": "Luis Muñoz Marín International Airport",
+    "city": "San Juan",
+    "country": "Puerto Rico"
+  },
+  {
+    "id": "22eb84a2-a0ef-49a1-bfd4-cfe7d8f19865",
+    "iataCode": "SKG",
+    "name": "Thessaloniki Airport",
+    "city": "Thessaloniki",
+    "country": "Greece"
+  },
+  {
+    "id": "ec72fc56-b7f8-4f76-8f51-b4cbe93deb4e",
+    "iataCode": "SLC",
+    "name": "Salt Lake City International Airport",
+    "city": "Salt Lake City",
+    "country": "United States"
+  },
+  {
+    "id": "2614d2bb-f631-40c1-83f3-762469883527",
+    "iataCode": "SMA",
+    "name": "Santa Maria Airport",
+    "city": "Santa Maria",
+    "country": "Portugal"
+  },
+  {
+    "id": "e256f3f1-d2f9-4848-802f-412e56b1e663",
+    "iataCode": "SMF",
+    "name": "Sacramento International Airport",
+    "city": "Sacramento",
+    "country": "United States"
+  },
+  {
+    "id": "3236ae9f-d5fd-472a-804c-4f465f9bf9cc",
+    "iataCode": "SNA",
+    "name": "John Wayne Airport",
+    "city": "Santa Ana",
+    "country": "United States"
+  },
+  {
+    "id": "ffcec966-b7cc-430f-a38b-bb6adaac1882",
+    "iataCode": "SNN",
+    "name": "Shannon Airport",
+    "city": "Shannon",
+    "country": "Ireland"
+  },
+  {
+    "id": "4d7bd7d7-741d-4e94-a1e2-a566fef75c16",
+    "iataCode": "SOB",
+    "name": "Sármellék International Airport",
+    "city": "Sármellék",
+    "country": "Hungary"
+  },
+  {
+    "id": "02e3a1bd-7bc9-4f63-9501-83bda98492a7",
+    "iataCode": "SOF",
+    "name": "Sofia Airport",
+    "city": "Sofia",
+    "country": "Bulgaria"
+  },
+  {
+    "id": "4c8dff76-2072-41ce-81ba-bc7c3797b1c3",
+    "iataCode": "SPU",
+    "name": "Split Airport",
+    "city": "Split",
+    "country": "Croatia"
+  },
+  {
+    "id": "1299f663-6978-48a1-951c-306ffc29dd2a",
+    "iataCode": "SRQ",
+    "name": "Sarasota-Bradenton International Airport",
+    "city": "Sarasota",
+    "country": "United States"
+  },
+  {
+    "id": "193cf615-ed3d-4217-9a22-c63d949e3232",
+    "iataCode": "SSA",
+    "name": "Salvador International Airport",
+    "city": "Salvador",
+    "country": "Brazil"
+  },
+  {
+    "id": "fc6ef81f-d186-4451-9408-2704aae8270f",
+    "iataCode": "SSH",
+    "name": "Sharm El Sheikh International Airport",
+    "city": "Sharm El Sheikh",
+    "country": "Egypt"
+  },
+  {
+    "id": "6de151a4-91d0-40a2-a733-ce7f5cac5017",
+    "iataCode": "STL",
+    "name": "St. Louis Lambert International Airport",
+    "city": "St. Louis",
+    "country": "United States"
+  },
+  {
+    "id": "ba6ac633-2564-43ff-b81d-e54bca4ad6fb",
+    "iataCode": "STN",
+    "name": "London Stansted Airport",
+    "city": "London",
+    "country": "United Kingdom"
+  },
+  {
+    "id": "88426d33-d624-4f4e-85a6-30fe9a670d44",
+    "iataCode": "STR",
+    "name": "Stuttgart Airport",
+    "city": "Stuttgart",
+    "country": "Germany"
+  },
+  {
+    "id": "e33bdc8c-67db-4b0a-abab-c341c033da75",
+    "iataCode": "SUB",
+    "name": "Juanda International Airport",
+    "city": "Surabaya",
+    "country": "Indonesia"
+  },
+  {
+    "id": "1879eff4-317d-45c1-af32-78c462117f2d",
+    "iataCode": "SUJ",
+    "name": "Satu Mare Airport",
+    "city": "Satu Mare",
+    "country": "Romania"
+  },
+  {
+    "id": "8feef58d-53b8-446b-a641-2ddb6381317e",
+    "iataCode": "SVG",
+    "name": "Stavanger Airport Sola",
+    "city": "Stavanger",
+    "country": "Norway"
+  },
+  {
+    "id": "9751b5f9-f3bf-4efa-b753-7ddc70aaf80f",
+    "iataCode": "SVQ",
+    "name": "Seville Airport",
+    "city": "Seville",
+    "country": "Spain"
+  },
+  {
+    "id": "96bb0eb4-29b7-4523-89d5-13b642b84015",
+    "iataCode": "SZG",
+    "name": "Salzburg Airport",
+    "city": "Salzburg",
+    "country": "Austria"
+  },
+  {
+    "id": "7f7959c8-6f2d-4fc3-800a-bd606b51be8c",
+    "iataCode": "SZX",
+    "name": "Shenzhen Bao'an International Airport",
+    "city": "Shenzhen",
+    "country": "China"
+  },
+  {
+    "id": "51942cef-2f21-4463-89ee-0e7e5bc32cd0",
+    "iataCode": "SZZ",
+    "name": "Szczecin-Goleniów Airport",
+    "city": "Szczecin",
+    "country": "Poland"
+  },
+  {
+    "id": "2ccd1c3e-7633-4ab5-a5b4-1467f3ffc8c4",
+    "iataCode": "TAE",
+    "name": "Daegu International Airport",
+    "city": "Daegu",
+    "country": "South Korea"
+  },
+  {
+    "id": "5a86b3f3-9450-44b9-8237-c504eb8c3167",
+    "iataCode": "TAO",
+    "name": "Qingdao Liuting International Airport",
+    "city": "Qingdao",
+    "country": "China"
+  },
+  {
+    "id": "2efcae99-7fe4-44bd-8833-3a56f1d00dc2",
+    "iataCode": "TBS",
+    "name": "Tbilisi International Airport",
+    "city": "Tbilisi",
+    "country": "Georgia"
+  },
+  {
+    "id": "de3980b9-7607-41af-86b0-c18fbd3970ab",
+    "iataCode": "TER",
+    "name": "Lajes Airport",
+    "city": "Terceira",
+    "country": "Portugal"
+  },
+  {
+    "id": "21885378-5d18-4b90-b709-9be175bcd8d0",
+    "iataCode": "TFS",
+    "name": "Tenerife South Airport",
+    "city": "Tenerife",
+    "country": "Spain"
+  },
+  {
+    "id": "42e8848c-28c4-430b-bdac-b547c1ebfd14",
+    "iataCode": "TGM",
+    "name": "Târgu Mureș Airport",
+    "city": "Târgu Mureș",
+    "country": "Romania"
+  },
+  {
+    "id": "c4cf6aa0-8a67-44f8-9c90-d1d2b18c07a2",
+    "iataCode": "TGU",
+    "name": "Toncontín International Airport",
+    "city": "Tegucigalpa",
+    "country": "Honduras"
+  },
+  {
+    "id": "d5124dbd-0280-4035-9502-f0b0c4e18a5f",
+    "iataCode": "TIJ",
+    "name": "Tijuana International Airport",
+    "city": "Tijuana",
+    "country": "Mexico"
+  },
+  {
+    "id": "12aab263-ccf1-4c2d-8349-d0b83406c054",
+    "iataCode": "TKU",
+    "name": "Turku Airport",
+    "city": "Turku",
+    "country": "Finland"
+  },
+  {
+    "id": "5a3cfcf1-2125-4462-811c-7a2261513092",
+    "iataCode": "TLL",
+    "name": "Tallinn Airport",
+    "city": "Tallinn",
+    "country": "Estonia"
+  },
+  {
+    "id": "a7793337-d50b-4c85-a498-bc28159df4a3",
+    "iataCode": "TLS",
+    "name": "Toulouse-Blagnac Airport",
+    "city": "Toulouse",
+    "country": "France"
+  },
+  {
+    "id": "0785c3ce-8e19-43a4-b045-3973d0a086b9",
+    "iataCode": "TLV",
+    "name": "Ben Gurion Airport",
+    "city": "Tel Aviv",
+    "country": "Israel"
+  },
+  {
+    "id": "e9351a87-b793-4381-a3e3-153d1d10887b",
+    "iataCode": "TMP",
+    "name": "Tampere-Pirkkala Airport",
+    "city": "Tampere",
+    "country": "Finland"
+  },
+  {
+    "id": "9624a4eb-8952-4b2b-b462-fba6f21d9d04",
+    "iataCode": "TNG",
+    "name": "Tangier Ibn Battouta Airport",
+    "city": "Tangier",
+    "country": "Morocco"
+  },
+  {
+    "id": "ba62c81d-98e2-4c85-a9a8-34b63e8e8bb5",
+    "iataCode": "TOS",
+    "name": "Tromsø Airport",
+    "city": "Tromsø",
+    "country": "Norway"
+  },
+  {
+    "id": "2d480373-d445-4bb3-981d-2424031f5704",
+    "iataCode": "TPA",
+    "name": "Tampa International Airport",
+    "city": "Tampa",
+    "country": "United States"
+  },
+  {
+    "id": "c300cd6b-8c1a-4a8a-9f68-4fc21ae3b2f1",
+    "iataCode": "TPE",
+    "name": "Taiwan Taoyuan International Airport",
+    "city": "Taipei",
+    "country": "Taiwan"
+  },
+  {
+    "id": "55957683-c4f7-4d5a-b698-baab91451de7",
+    "iataCode": "TRD",
+    "name": "Trondheim Airport Værnes",
+    "city": "Trondheim",
+    "country": "Norway"
+  },
+  {
+    "id": "c40fa688-3d90-428f-9271-6bcec3530969",
+    "iataCode": "TSA",
+    "name": "Taipei Songshan Airport",
+    "city": "Taipei",
+    "country": "Taiwan"
+  },
+  {
+    "id": "1ef6f1da-b592-4045-9b10-4a649023335c",
+    "iataCode": "TSN",
+    "name": "Tianjin Binhai International Airport",
+    "city": "Tianjin",
+    "country": "China"
+  },
+  {
+    "id": "5576054b-9015-4631-b92e-edbb05ec60d3",
+    "iataCode": "TSR",
+    "name": "Timișoara Traian Vuia Airport",
+    "city": "Timișoara",
+    "country": "Romania"
+  },
+  {
+    "id": "2c160f63-25ac-4297-9cb3-508d6a9c8fab",
+    "iataCode": "TUN",
+    "name": "Tunis-Carthage International Airport",
+    "city": "Tunis",
+    "country": "Tunisia"
+  },
+  {
+    "id": "2d6d3641-fe60-4cc5-a777-05b9adad14be",
+    "iataCode": "TUS",
+    "name": "Tucson International Airport",
+    "city": "Tucson",
+    "country": "United States"
+  },
+  {
+    "id": "ae6c1c0a-d570-48dd-ac1e-6314097e5b29",
+    "iataCode": "TZX",
+    "name": "Trabzon Airport",
+    "city": "Trabzon",
+    "country": "Turkey"
+  },
+  {
+    "id": "99586c4c-5abb-4542-9271-848a74f700db",
+    "iataCode": "UIO",
+    "name": "Mariscal Sucre International Airport",
+    "city": "Quito",
+    "country": "Ecuador"
+  },
+  {
+    "id": "53b1690f-efcb-4a6c-a665-757e51165870",
+    "iataCode": "UME",
+    "name": "Umeå Airport",
+    "city": "Umeå",
+    "country": "Sweden"
+  },
+  {
+    "id": "7710ef45-82eb-4239-af05-0af8214f15ab",
+    "iataCode": "USM",
+    "name": "Samui Airport",
+    "city": "Koh Samui",
+    "country": "Thailand"
+  },
+  {
+    "id": "ff91acf6-0d69-4b2b-abac-de9902106bfb",
+    "iataCode": "UVF",
+    "name": "Hewanorra International Airport",
+    "city": "Vieux Fort",
+    "country": "Saint Lucia"
+  },
+  {
+    "id": "2a6b8be4-3b1a-486d-b64c-cfdde48c98fe",
+    "iataCode": "VAA",
+    "name": "Vaasa Airport",
+    "city": "Vaasa",
+    "country": "Finland"
+  },
+  {
+    "id": "c4d690b1-e240-406f-9f89-f189e94b599e",
+    "iataCode": "VAR",
+    "name": "Varna Airport",
+    "city": "Varna",
+    "country": "Bulgaria"
+  },
+  {
+    "id": "845a18b8-b615-4928-9cf3-583f63cb4f3c",
+    "iataCode": "VBY",
+    "name": "Visby Airport",
+    "city": "Visby",
+    "country": "Sweden"
+  },
+  {
+    "id": "a9558ac4-b311-4bc2-83d5-2e1bfe21f498",
+    "iataCode": "VCE",
+    "name": "Venice Marco Polo Airport",
+    "city": "Venice",
+    "country": "Italy"
+  },
+  {
+    "id": "4d84800e-b9a1-446c-9feb-49a8e07468e7",
+    "iataCode": "VFA",
+    "name": "Victoria Falls International Airport",
+    "city": "Victoria Falls",
+    "country": "Zimbabwe"
+  },
+  {
+    "id": "b6844337-7adf-4824-815b-93ec2ad0ff84",
+    "iataCode": "VIE",
+    "name": "Vienna International Airport",
+    "city": "Vienna",
+    "country": "Austria"
+  },
+  {
+    "id": "22c39736-a6f7-47f9-bc56-d85f416efde5",
+    "iataCode": "VLC",
+    "name": "Valencia Airport",
+    "city": "Valencia",
+    "country": "Spain"
+  },
+  {
+    "id": "d642f550-2489-4c7b-8843-e36e49bab0ca",
+    "iataCode": "VNO",
+    "name": "Vilnius Airport",
+    "city": "Vilnius",
+    "country": "Lithuania"
+  },
+  {
+    "id": "c5d79597-a549-43ad-a8af-d95c0a2a3ffb",
+    "iataCode": "VRA",
+    "name": "Juan Gualberto Gómez Airport",
+    "city": "Varadero",
+    "country": "Cuba"
+  },
+  {
+    "id": "2f6c6f46-e78a-41b6-b056-4b979b029218",
+    "iataCode": "VST",
+    "name": "Stockholm Västerås Airport",
+    "city": "Västerås",
+    "country": "Sweden"
+  },
+  {
+    "id": "87a05466-f45f-4294-b0c0-f931e12361df",
+    "iataCode": "VVI",
+    "name": "Viru Viru International Airport",
+    "city": "Santa Cruz",
+    "country": "Bolivia"
+  },
+  {
+    "id": "c48b6535-58a3-468d-89d1-46d499ed3bfd",
+    "iataCode": "WAW",
+    "name": "Warsaw Chopin Airport",
+    "city": "Warsaw",
+    "country": "Poland"
+  },
+  {
+    "id": "24da314c-6260-4cd2-a1da-b30f671efd6e",
+    "iataCode": "WDH",
+    "name": "Hosea Kutako International Airport",
+    "city": "Windhoek",
+    "country": "Namibia"
+  },
+  {
+    "id": "eca25302-856b-425a-af78-6ff50e93f5b4",
+    "iataCode": "WLG",
+    "name": "Wellington International Airport",
+    "city": "Wellington",
+    "country": "New Zealand"
+  },
+  {
+    "id": "317a43fa-96fa-4c2b-8e61-9707fbe8f2f8",
+    "iataCode": "WMI",
+    "name": "Warsaw Modlin Airport",
+    "city": "Warsaw",
+    "country": "Poland"
+  },
+  {
+    "id": "af0db152-756c-46ff-ab8d-0842cdd30192",
+    "iataCode": "WRO",
+    "name": "Wrocław Airport",
+    "city": "Wrocław",
+    "country": "Poland"
+  },
+  {
+    "id": "6e08f1fc-d2b4-414e-80c5-824fe29f4838",
+    "iataCode": "WUH",
+    "name": "Wuhan Tianhe International Airport",
+    "city": "Wuhan",
+    "country": "China"
+  },
+  {
+    "id": "17690b8b-eeb0-401c-94c9-68c01125ecd1",
+    "iataCode": "XIY",
+    "name": "Xi'an Xianyang International Airport",
+    "city": "Xi'an",
+    "country": "China"
+  },
+  {
+    "id": "9dd41527-ee3e-4bb5-a8ba-d2e56a5048e3",
+    "iataCode": "YEG",
+    "name": "Edmonton International Airport",
+    "city": "Edmonton",
+    "country": "Canada"
+  },
+  {
+    "id": "bc22a8b6-9c22-43af-bf2c-4ffe7ecb3869",
+    "iataCode": "YHZ",
+    "name": "Halifax Stanfield International Airport",
+    "city": "Halifax",
+    "country": "Canada"
+  },
+  {
+    "id": "bd906455-a223-4efd-948e-17fc58cb9b0e",
+    "iataCode": "YOW",
+    "name": "Ottawa Macdonald-Cartier International Airport",
+    "city": "Ottawa",
+    "country": "Canada"
+  },
+  {
+    "id": "62bc4ac0-765a-4296-95b8-82d4a9127831",
+    "iataCode": "YQB",
+    "name": "Québec City Jean Lesage International Airport",
+    "city": "Quebec City",
+    "country": "Canada"
+  },
+  {
+    "id": "ea92c56b-4f4b-44e2-92a8-51303d2e840f",
+    "iataCode": "YUL",
+    "name": "Montréal-Pierre Elliott Trudeau International Airport",
+    "city": "Montreal",
+    "country": "Canada"
+  },
+  {
+    "id": "f719736c-b831-4ce3-a947-f0914cda9089",
+    "iataCode": "YVR",
+    "name": "Vancouver International Airport",
+    "city": "Vancouver",
+    "country": "Canada"
+  },
+  {
+    "id": "81f0ab47-ca9d-49d2-8842-c6bd66897a65",
+    "iataCode": "YWG",
+    "name": "Winnipeg James Armstrong Richardson International Airport",
+    "city": "Winnipeg",
+    "country": "Canada"
+  },
+  {
+    "id": "88afb5fc-7e14-4ba2-994b-cc3203b213ee",
+    "iataCode": "YYC",
+    "name": "Calgary International Airport",
+    "city": "Calgary",
+    "country": "Canada"
+  },
+  {
+    "id": "abe23c0e-b513-4872-98b3-6262d637c582",
+    "iataCode": "YYJ",
+    "name": "Victoria International Airport",
+    "city": "Victoria",
+    "country": "Canada"
+  },
+  {
+    "id": "d7f2091d-c7ec-4cc2-906c-e0156f0f8156",
+    "iataCode": "YYZ",
+    "name": "Toronto Pearson International Airport",
+    "city": "Toronto",
+    "country": "Canada"
+  },
+  {
+    "id": "d1b9c9c4-c47d-458b-91b4-8228efe50aef",
+    "iataCode": "ZAD",
+    "name": "Zadar Airport",
+    "city": "Zadar",
+    "country": "Croatia"
+  },
+  {
+    "id": "da4b2c9b-730c-4f8f-a0d4-8c2174739a18",
+    "iataCode": "ZAG",
+    "name": "Zagreb Airport",
+    "city": "Zagreb",
+    "country": "Croatia"
+  },
+  {
+    "id": "632b8237-7849-4e10-92c2-3369ec14a2e1",
+    "iataCode": "ZIH",
+    "name": "Ixtapa-Zihuatanejo International Airport",
+    "city": "Zihuatanejo",
+    "country": "Mexico"
+  },
+  {
+    "id": "5eb9c055-4221-472f-9734-4544ccd86ef3",
+    "iataCode": "ZNZ",
+    "name": "Abeid Amani Karume International Airport",
+    "city": "Zanzibar",
+    "country": "Tanzania"
+  },
+  {
+    "id": "6486c90f-2d74-4832-82fe-b8391d263156",
+    "iataCode": "ZQN",
+    "name": "Queenstown Airport",
+    "city": "Queenstown",
+    "country": "New Zealand"
+  },
+  {
+    "id": "2d70a3d2-d569-4abb-a36b-7d49ad32f319",
+    "iataCode": "ZRH",
+    "name": "Zurich Airport",
+    "city": "Zurich",
+    "country": "Switzerland"
+  },
+  {
+    "id": "5e0fbfdc-6c75-4d00-89e0-26b45419ee52",
+    "iataCode": "ZTH",
+    "name": "Zakynthos International Airport",
+    "city": "Zakynthos",
+    "country": "Greece"
+  }
+]

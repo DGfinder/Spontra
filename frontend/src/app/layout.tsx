@@ -3,6 +3,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import { Arimo } from 'next/font/google'
 import { BackgroundManager } from '@/components/BackgroundManager'
+import { ToastContainer } from '@/components/ui/Toast'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -48,6 +49,9 @@ export default function RootLayout({
           <div className="relative z-10">
             {children}
           </div>
+
+          {/* Toast Notifications */}
+          <ToastContainer />
         </div>
       </body>
     </html>

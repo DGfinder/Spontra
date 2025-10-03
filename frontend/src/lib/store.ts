@@ -33,6 +33,7 @@ export interface SearchFilters {
   departureDate: string // "YYYY-MM-DD"
   returnDate: string // "YYYY-MM-DD"
   tripType: 'round-trip' | 'one-way'
+  onlyDirect: boolean
 }
 
 interface SearchState {
@@ -81,7 +82,8 @@ const initialFilters: SearchFilters = {
   cabin: 'Economy',
   departureDate: getDefaultDepartureDate(),
   returnDate: getDefaultReturnDate(),
-  tripType: 'round-trip'
+  tripType: 'round-trip',
+  onlyDirect: false
 }
 
 export const useSearchStore = create<SearchState>()(
@@ -156,7 +158,8 @@ export const useSearchStore = create<SearchState>()(
               minFlightTime: filters.minFlightTime,
               maxFlightTime: filters.maxFlightTime,
               passengers: filters.passengers,
-              cabin: filters.cabin
+              cabin: filters.cabin,
+              onlyDirect: filters.onlyDirect
             })
           })
 

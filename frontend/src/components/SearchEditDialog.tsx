@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { X, MapPin, Users, ChevronDown, Compass, Trees, Wine, Music, Globe, Calendar } from 'lucide-react'
+import { X, Users, ChevronDown, Compass, Trees, Wine, Music, Globe, Calendar } from 'lucide-react'
 import { SearchFilters } from '@/lib/store'
 import { DualRangeSlider } from './DualRangeSlider'
+import { AirportAutocomplete } from './AirportAutocomplete'
 
 interface SearchEditDialogProps {
   isOpen: boolean
@@ -94,31 +95,14 @@ export function SearchEditDialog({
           {/* Form */}
           <div className="space-y-4">
             {/* Departure Airport */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-normal uppercase" style={{ color: '#C9CFD6' }}>
-                From
-              </label>
-              <div className="relative">
-                <MapPin
-                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4"
-                  style={{ color: '#C9CFD6' }}
-                />
-                <input
-                  type="text"
-                  value={filters.departureAirport}
-                  onChange={(e) =>
-                    setFilters({ ...filters, departureAirport: e.target.value.toUpperCase() })
-                  }
-                  placeholder="LHR"
-                  maxLength={3}
-                  className="w-full h-12 pl-10 pr-4 rounded-xl text-sm
-                             bg-transparent border border-[rgba(255,255,255,0.12)]
-                             text-white placeholder:text-[#A7AFB7]
-                             focus:outline-none focus:border-[rgba(255,255,255,0.24)]
-                             transition-colors"
-                />
-              </div>
-            </div>
+            <AirportAutocomplete
+              value={filters.departureAirport}
+              onChange={(iataCode) => setFilters({ ...filters, departureAirport: iataCode })}
+              placeholder="Search departure airport..."
+              label="From"
+              showIcon={true}
+              themeColor={themeColor}
+            />
 
             {/* Travelers & Cabin */}
             <div className="flex flex-col gap-2">
@@ -179,10 +163,12 @@ export function SearchEditDialog({
                         <button
                           type="button"
                           onClick={() =>
-                            setFilters({ ...filters, passengers: filters.passengers + 1 })
+                            setFilters({ ...filters, passengers: Math.min(9, filters.passengers + 1) })
                           }
+                          disabled={filters.passengers >= 9}
                           className="w-8 h-8 rounded-full flex items-center justify-center text-sm
-                                     transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]"
+                                     transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]
+                                     disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{ color: '#F3F6F9' }}
                         >
                           +

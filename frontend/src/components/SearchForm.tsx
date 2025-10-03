@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSearchStore } from '@/lib/store'
 import { Button } from './ui/Button'
 import { DualRangeSlider } from './DualRangeSlider'
@@ -9,20 +9,81 @@ import { MapPinIcon, Compass, Trees, Wine, Music, Globe, Users, ChevronDown, Cal
 
 export function SearchForm() {
   const { filters, updateFilter, search, isLoading, error } = useSearchStore()
-  const [onlyDirect, setOnlyDirect] = useState(false)
   const [isPassengerOpen, setIsPassengerOpen] = useState(false)
+  const departureInputRef = useRef<HTMLDivElement>(null)
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Cmd/Ctrl + K to focus departure airport
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        const input = departureInputRef.current?.querySelector('input')
+        input?.focus()
+      }
+      // Escape to close passenger dropdown
+      if (e.key === 'Escape' && isPassengerOpen) {
+        setIsPassengerOpen(false)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isPassengerOpen])
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
     await search()
   }
 
+  // Smart date handling: auto-set return date when departure changes
+  const handleDepartureDateChange = (newDate: string) => {
+    updateFilter('departureDate', newDate)
+
+    // If return date is empty or before new departure, set it to +7 days
+    if (!filters.returnDate || filters.returnDate < newDate) {
+      const departure = new Date(newDate)
+      departure.setDate(departure.getDate() + 7)
+      updateFilter('returnDate', departure.toISOString().split('T')[0])
+    }
+  }
+
   const themes = [
-    { value: 'adventure', label: 'Adventure', icon: Compass, color: '#ffbd0a' },
-    { value: 'nature', label: 'Nature', icon: Trees, color: '#02c06d' },
-    { value: 'indulge', label: 'Indulge', icon: Wine, color: '#e52b00' },
-    { value: 'vibe', label: 'Vibe', icon: Music, color: '#eb5b25' },
-    { value: 'discover', label: 'Discover', icon: Globe, color: '#7f6ae4' }
+    {
+      value: 'adventure',
+      label: 'Adventure',
+      icon: Compass,
+      color: '#ffbd0a',
+      description: 'Hiking, surfing, skiing, skydiving & extreme sports'
+    },
+    {
+      value: 'nature',
+      label: 'Nature',
+      icon: Trees,
+      color: '#02c06d',
+      description: 'National parks, wildlife, mountains & natural wonders'
+    },
+    {
+      value: 'indulge',
+      label: 'Indulge',
+      icon: Wine,
+      color: '#e52b00',
+      description: 'Fine dining, wine tasting, spas & luxury experiences'
+    },
+    {
+      value: 'vibe',
+      label: 'Vibe',
+      icon: Music,
+      color: '#eb5b25',
+      description: 'Nightlife, music festivals, bars & entertainment'
+    },
+    {
+      value: 'discover',
+      label: 'Discover',
+      icon: Globe,
+      color: '#7f6ae4',
+      description: 'Museums, historic sites, culture & local traditions'
+    }
   ] as const
 
   // Get the current theme color
@@ -45,23 +106,43 @@ export function SearchForm() {
           >
             <div className="space-y-3">
               {/* Header */}
-              <div className="mb-2">
+              <div className="mb-2 flex items-center justify-between">
                 <h1 className="text-[26px] font-bold leading-[39px]" style={{ color: '#F3F6F9' }}>
                   Book Your Next Trip
                 </h1>
+                {(filters.departureAirport || filters.destinationAirport || filters.passengers > 1 || filters.cabin !== 'Economy') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateFilter('departureAirport', '')
+                      updateFilter('destinationAirport', '')
+                      updateFilter('passengers', 1)
+                      updateFilter('cabin', 'Economy')
+                      updateFilter('minFlightTime', 2)
+                      updateFilter('maxFlightTime', 8)
+                      updateFilter('onlyDirect', false)
+                    }}
+                    className="text-xs underline transition-colors hover:opacity-80"
+                    style={{ color: '#A7AFB7' }}
+                  >
+                    Reset
+                  </button>
+                )}
               </div>
 
               {/* Route - From and To */}
               <div className="grid grid-cols-2 gap-3">
                 {/* Departure Airport */}
-                <AirportAutocomplete
-                  value={filters.departureAirport}
-                  onChange={(code) => updateFilter('departureAirport', code)}
-                  label="From"
-                  placeholder="LHR - London Heathrow"
-                  showIcon={true}
-                  themeColor={themeColor}
-                />
+                <div ref={departureInputRef}>
+                  <AirportAutocomplete
+                    value={filters.departureAirport}
+                    onChange={(code) => updateFilter('departureAirport', code)}
+                    label="From"
+                    placeholder="Your departure airport"
+                    showIcon={true}
+                    themeColor={themeColor}
+                  />
+                </div>
 
                 {/* Destination Airport */}
                 <AirportAutocomplete
@@ -115,7 +196,7 @@ export function SearchForm() {
                         type="date"
                         value={filters.departureDate}
                         min={new Date().toISOString().split('T')[0]}
-                        onChange={(e) => updateFilter('departureDate', e.target.value)}
+                        onChange={(e) => handleDepartureDateChange(e.target.value)}
                         className="w-full h-[47px] pl-10 pr-4 rounded-[10px] text-sm
                                    bg-transparent border border-[rgba(255,255,255,0.12)]
                                    text-white
@@ -200,9 +281,11 @@ export function SearchForm() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => updateFilter('passengers', filters.passengers + 1)}
+                            onClick={() => updateFilter('passengers', Math.min(9, filters.passengers + 1))}
+                            disabled={filters.passengers >= 9}
                             className="w-8 h-8 rounded-full flex items-center justify-center text-sm
-                                       transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]"
+                                       transition-colors bg-[rgba(255,255,255,0.12)] hover:bg-[rgba(255,255,255,0.18)]
+                                       disabled:opacity-30 disabled:cursor-not-allowed"
                             style={{ color: '#F3F6F9' }}
                           >
                             +
@@ -257,6 +340,7 @@ export function SearchForm() {
                         key={theme.value}
                         type="button"
                         onClick={() => updateFilter('theme', theme.value)}
+                        title={theme.description}
                         className={`
                           flex items-center gap-3 px-4 h-12 rounded-full text-[15px] font-normal
                           transition-all duration-300
@@ -286,18 +370,18 @@ export function SearchForm() {
                   </label>
                   <button
                     type="button"
-                    onClick={() => setOnlyDirect(!onlyDirect)}
+                    onClick={() => updateFilter('onlyDirect', !filters.onlyDirect)}
                     className="flex items-center gap-2 rounded transition-all duration-300"
                   >
                     <div
                       className={`w-4 h-4 rounded border flex items-center justify-center transition-all duration-300
-                                  ${onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
-                      style={onlyDirect ? {
+                                  ${filters.onlyDirect ? '' : 'border-[rgba(255,255,255,0.19)]'}`}
+                      style={filters.onlyDirect ? {
                         backgroundColor: themeColor,
                         borderColor: themeColor
                       } : {}}
                     >
-                      {onlyDirect && (
+                      {filters.onlyDirect && (
                         <svg className="w-3 h-3 text-[#1A1A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
@@ -348,12 +432,39 @@ export function SearchForm() {
                   {isLoading ? 'Searching...' : 'Search flights'}
                 </button>
 
+                {/* Validation feedback */}
+                {!isLoading && (
+                  !filters.departureAirport ? (
+                    <p className="text-xs text-center" style={{ color: '#A7AFB7' }}>
+                      Please select a departure airport to continue
+                    </p>
+                  ) : filters.departureAirport.length !== 3 ? (
+                    <p className="text-xs text-center" style={{ color: '#A7AFB7' }}>
+                      Airport code must be 3 letters (e.g., LAX, JFK)
+                    </p>
+                  ) : !filters.theme ? (
+                    <p className="text-xs text-center" style={{ color: '#A7AFB7' }}>
+                      Choose what you're looking for above
+                    </p>
+                  ) : !filters.departureDate ? (
+                    <p className="text-xs text-center" style={{ color: '#A7AFB7' }}>
+                      Select your departure date
+                    </p>
+                  ) : filters.tripType === 'round-trip' && !filters.returnDate ? (
+                    <p className="text-xs text-center" style={{ color: '#A7AFB7' }}>
+                      Select your return date
+                    </p>
+                  ) : null
+                )}
+
                 <button
                   type="button"
-                  className="w-full text-sm underline text-center transition-colors duration-300 hover:opacity-80"
+                  disabled
+                  className="w-full text-sm underline text-center transition-colors duration-300 opacity-50 cursor-not-allowed"
                   style={{ color: '#C9CFD6' }}
+                  title="Coming Soon - Interactive map exploration"
                 >
-                  Explore Map
+                  Explore Map (Coming Soon)
                 </button>
               </div>
             </div>

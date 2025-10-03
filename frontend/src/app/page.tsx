@@ -8,79 +8,53 @@ import { SearchEditDialog } from '@/components/SearchEditDialog'
 import { CountryGrid } from '@/components/CountryGrid'
 import { Button } from '@/components/ui/Button'
 import { ArrowLeftIcon, MapPinIcon, ClockIcon, DollarSignIcon } from 'lucide-react'
+import { useUrlSync } from '@/lib/hooks/useUrlSync'
+import { SearchResultsSkeleton, CountryGridSkeleton } from '@/components/ui/Skeleton'
+import { ProgressSteps } from '@/components/ui/ProgressSteps'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 function SearchResults() {
   const { destinations, filters, isLoading, error, setCurrentStep, reset } = useSearchStore()
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
-          <h2 className="text-2xl font-semibold text-white mb-2">Discovering amazing destinations...</h2>
-          <p className="text-white/70">This will just take a moment</p>
-        </div>
-      </div>
-    )
+    return <SearchResultsSkeleton />
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-red-500/20 border border-red-400/30 rounded-3xl p-8 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold text-red-200 mb-4">Oops! Something went wrong</h2>
-            <p className="text-red-200/80 mb-6">{error}</p>
-            <div className="space-y-3">
-              <Button
-                onClick={() => setCurrentStep('search')}
-                variant="secondary"
-                className="w-full"
-              >
-                Try Again
-              </Button>
-              <Button
-                onClick={reset}
-                variant="ghost"
-                className="w-full"
-              >
-                Start Over
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        type="error"
+        title="Oops! Something went wrong"
+        description={error}
+        theme={filters.theme}
+        primaryAction={{
+          label: 'Try Again',
+          onClick: () => setCurrentStep('search')
+        }}
+        secondaryAction={{
+          label: 'Start Over',
+          onClick: reset
+        }}
+      />
     )
   }
 
   if (destinations.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
-            <h2 className="text-xl font-semibold text-white mb-4">No destinations found</h2>
-            <p className="text-white/70 mb-6">
-              We couldn't find any destinations matching your criteria. Try adjusting your filters.
-            </p>
-            <div className="space-y-3">
-              <Button
-                onClick={() => setCurrentStep('search')}
-                variant="primary"
-                className="w-full"
-              >
-                Adjust Search
-              </Button>
-              <Button
-                onClick={reset}
-                variant="ghost"
-                className="w-full"
-              >
-                Start Over
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        type="no-results"
+        title="No destinations found"
+        description="We couldn't find any destinations matching your criteria. Try adjusting your filters or exploring different options."
+        theme={filters.theme}
+        primaryAction={{
+          label: 'Adjust Search',
+          onClick: () => setCurrentStep('search')
+        }}
+        secondaryAction={{
+          label: 'Start Over',
+          onClick: reset
+        }}
+      />
     )
   }
 
@@ -246,13 +220,22 @@ function CountryResults() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-white/30 border-t-white mx-auto mb-6"></div>
-          <h2 className="text-2xl font-semibold text-white mb-2">
-            Discovering amazing destinations...
-          </h2>
-          <p className="text-white/70">This will just take a moment</p>
+      <div className="min-h-screen">
+        <SearchSummaryBar
+          filters={filters}
+          onEdit={() => setIsEditDialogOpen(true)}
+          theme={filters.theme}
+        />
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="animate-pulse">
+                <div className="h-10 w-48 bg-white/10 rounded-lg mb-2"></div>
+                <div className="h-5 w-32 bg-white/10 rounded"></div>
+              </div>
+            </div>
+          </div>
+          <CountryGridSkeleton />
         </div>
       </div>
     )
@@ -260,47 +243,39 @@ function CountryResults() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-red-500/20 border border-red-400/30 rounded-3xl p-8 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold text-red-200 mb-4">
-              Oops! Something went wrong
-            </h2>
-            <p className="text-red-200/80 mb-6">{error}</p>
-            <div className="space-y-3">
-              <Button onClick={() => setCurrentStep('search')} variant="secondary" className="w-full">
-                Try Again
-              </Button>
-              <Button onClick={reset} variant="ghost" className="w-full">
-                Start Over
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        type="error"
+        title="Oops! Something went wrong"
+        description={error}
+        theme={filters.theme}
+        primaryAction={{
+          label: 'Try Again',
+          onClick: () => setCurrentStep('search')
+        }}
+        secondaryAction={{
+          label: 'Start Over',
+          onClick: reset
+        }}
+      />
     )
   }
 
   if (countryGroups.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
-            <h2 className="text-xl font-semibold text-white mb-4">No countries found</h2>
-            <p className="text-white/70 mb-6">
-              We couldn't find any countries matching your criteria. Try adjusting your filters.
-            </p>
-            <div className="space-y-3">
-              <Button onClick={() => setCurrentStep('search')} variant="primary" className="w-full">
-                Adjust Search
-              </Button>
-              <Button onClick={reset} variant="ghost" className="w-full">
-                Start Over
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EmptyState
+        type="no-results"
+        title="No countries found"
+        description="We couldn't find any countries matching your criteria. Try adjusting your flight time or departure airport."
+        theme={filters.theme}
+        primaryAction={{
+          label: 'Adjust Search',
+          onClick: () => setCurrentStep('search')
+        }}
+        secondaryAction={{
+          label: 'Start Over',
+          onClick: reset
+        }}
+      />
     )
   }
 
@@ -312,6 +287,9 @@ function CountryResults() {
         onEdit={() => setIsEditDialogOpen(true)}
         theme={filters.theme}
       />
+
+      {/* Progress Indicator */}
+      <ProgressSteps currentStep="countries" theme={filters.theme} />
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -378,6 +356,9 @@ function CountryResults() {
 
 export default function HomePage() {
   const { currentStep } = useSearchStore()
+
+  // Sync filters with URL parameters for shareable links
+  useUrlSync()
 
   return (
     <main className="min-h-screen">
