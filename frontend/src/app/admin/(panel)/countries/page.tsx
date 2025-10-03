@@ -37,18 +37,19 @@ interface POIVideo {
   poiId: string
   videoUrl: string
   displayOrder: number
-  createdAt: Date
+  createdAt: string
 }
 
 interface ThemePOI {
   id: string
+  destinationId: string
   theme: string
   name: string
   description: string | null
   videoUrl: string | null
   displayOrder: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   videos: POIVideo[]
 }
 
