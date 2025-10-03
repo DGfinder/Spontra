@@ -5,10 +5,17 @@ import bcrypt from 'bcryptjs'
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'your-secret-key-change-in-production')
 
+// Warn if JWT_SECRET is not properly configured
+if (!process.env.JWT_SECRET) {
+  console.warn('[Admin Login] WARNING: JWT_SECRET environment variable not set. Using fallback (insecure).')
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
     console.log('[Admin Login] Attempt for email:', email)
+    console.log('[Admin Login] Environment:', process.env.NODE_ENV)
+    console.log('[Admin Login] Request URL:', request.url)
 
     // Find user
     const user = await db.user.findUnique({
@@ -57,6 +64,8 @@ export async function POST(request: NextRequest) {
       .setExpirationTime('7d')
       .sign(secret)
 
+    console.log('[Admin Login] JWT token created, length:', token.length)
+
     // Set cookie
     const response = NextResponse.json({
       success: true,
@@ -67,12 +76,16 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // CRITICAL: Set cookie with explicit path='/' so it's sent to /admin/* routes
     response.cookies.set('auth_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      path: '/', // Ensure cookie is sent to all routes
       maxAge: 60 * 60 * 24 * 7 // 7 days
     })
+
+    console.log('[Admin Login] Cookie set with path=/, secure:', process.env.NODE_ENV === 'production')
 
     return response
 

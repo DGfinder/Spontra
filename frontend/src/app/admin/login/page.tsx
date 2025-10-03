@@ -15,23 +15,32 @@ export default function AdminLoginPage() {
     setError('')
     setIsLoading(true)
 
+    console.log('[Admin Login Client] Submitting login for:', email)
+    console.log('[Admin Login Client] Current URL:', window.location.href)
+
     try {
       const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'same-origin' // Ensure cookies are sent/received
       })
 
       const data = await response.json()
-      console.log('Login response:', data, 'Status:', response.status)
+      console.log('[Admin Login Client] Response status:', response.status)
+      console.log('[Admin Login Client] Response data:', data)
+      console.log('[Admin Login Client] Response headers:', Object.fromEntries(response.headers.entries()))
 
       if (data.success) {
+        console.log('[Admin Login Client] Login successful, redirecting to /admin/countries')
         router.push('/admin/countries')
       } else {
+        console.error('[Admin Login Client] Login failed:', data.error)
         setError(data.error || 'Login failed')
       }
     } catch (err) {
-      setError('Network error occurred')
+      console.error('[Admin Login Client] Network error:', err)
+      setError(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
