@@ -40,12 +40,16 @@ export async function getOriginAirports() {
 
 export async function getRoutesByOrigin(originAirportCode: string) {
   try {
-    // Get all routes for this origin with destination details
+    // Get all routes for this origin with destination details and verification status
     const routes = await db.$queryRaw<Array<{
       id: string
       origin_airport_code: string
       destination_airport_code: string
       total_duration_minutes: number
+      is_direct: boolean | null
+      is_estimated: boolean
+      data_source: string | null
+      last_updated: Date | null
       dest_city: string
       dest_country: string
     }>>`
@@ -54,6 +58,10 @@ export async function getRoutesByOrigin(originAirportCode: string) {
         fr.origin_airport_code,
         fr.destination_airport_code,
         fr.total_duration_minutes,
+        fr.is_direct,
+        fr.is_estimated,
+        fr.data_source,
+        fr.last_updated,
         a.city as dest_city,
         a.country as dest_country
       FROM flight_routes fr
@@ -68,6 +76,10 @@ export async function getRoutesByOrigin(originAirportCode: string) {
       originAirportCode: route.origin_airport_code,
       destinationAirportCode: route.destination_airport_code,
       totalDurationMinutes: route.total_duration_minutes,
+      isDirect: route.is_direct,
+      isEstimated: route.is_estimated,
+      dataSource: route.data_source,
+      lastUpdated: route.last_updated?.toISOString() || null,
       destinationCity: route.dest_city,
       destinationCountry: route.dest_country
     }))

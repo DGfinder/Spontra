@@ -18,6 +18,10 @@ interface FlightRoute {
   totalDurationMinutes: number
   destinationCity: string
   destinationCountry: string
+  isDirect: boolean | null
+  isEstimated: boolean
+  dataSource: string | null
+  lastUpdated: string | null
 }
 
 interface Airport {
@@ -280,6 +284,7 @@ export default function RoutesPage() {
                                 <tr className="text-xs text-white/50 uppercase">
                                   <th className="text-left pb-2">Destination</th>
                                   <th className="text-left pb-2">Airport Code</th>
+                                  <th className="text-left pb-2">Flight Type</th>
                                   <th className="text-left pb-2">Flight Duration</th>
                                   <th className="text-right pb-2">Actions</th>
                                 </tr>
@@ -293,8 +298,30 @@ export default function RoutesPage() {
                                     <td className="py-3 text-sm text-white/70">
                                       {route.destinationAirportCode}
                                     </td>
+                                    <td className="py-3 text-sm">
+                                      {route.isDirect === null ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-500/20 text-gray-300">
+                                          ❓ Unknown
+                                        </span>
+                                      ) : route.isDirect ? (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-300">
+                                          ✈️ Direct
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300">
+                                          🔄 Connections
+                                        </span>
+                                      )}
+                                    </td>
                                     <td className="py-3 text-sm text-white/70">
-                                      {formatDuration(route.totalDurationMinutes)}
+                                      <div className="flex items-center gap-2">
+                                        {formatDuration(route.totalDurationMinutes)}
+                                        {route.isEstimated && (
+                                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/20 text-blue-300">
+                                            📊 Est.
+                                          </span>
+                                        )}
+                                      </div>
                                     </td>
                                     <td className="py-3 text-right text-sm space-x-3">
                                       <button

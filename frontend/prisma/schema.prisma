@@ -53,15 +53,23 @@ model Airport {
 
 // Flight routes and durations
 model FlightRoute {
-  id                        String @id @default(uuid())
-  originAirportCode         String @map("origin_airport_code")
-  destinationAirportCode    String @map("destination_airport_code")
-  totalDurationMinutes      Int    @map("total_duration_minutes")
+  id                        String    @id @default(uuid())
+  originAirportCode         String    @map("origin_airport_code")
+  destinationAirportCode    String    @map("destination_airport_code")
+  totalDurationMinutes      Int       @map("total_duration_minutes")
+
+  // Route verification fields
+  isDirect                  Boolean?  @map("is_direct")           // null = unknown, true = direct flight exists, false = connections only
+  isEstimated               Boolean   @default(true) @map("is_estimated")  // true = calculated estimate, false = real API data
+  dataSource                String?   @map("data_source")         // "estimated", "amadeus", etc.
+  lastUpdated               DateTime? @map("last_updated")        // When route data was last updated from API
 
   originAirport      Airport @relation("OriginAirport", fields: [originAirportCode], references: [iataCode])
   destinationAirport Airport @relation("DestinationAirport", fields: [destinationAirportCode], references: [iataCode])
 
   @@unique([originAirportCode, destinationAirportCode])
+  @@index([isDirect])
+  @@index([isEstimated])
   @@map("flight_routes")
 }
 

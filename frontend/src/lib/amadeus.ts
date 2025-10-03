@@ -290,3 +290,82 @@ export function getTotalDuration(offer: FlightOffer): number {
 
   return totalMinutes
 }
+
+// ============================================================================
+// Airport Routes API (Cached Data)
+// ============================================================================
+
+export interface DirectDestination {
+  type: string
+  subtype: string
+  name: string
+  iataCode: string
+}
+
+export interface AirportRoutesResponse {
+  data: DirectDestination[]
+}
+
+/**
+ * Get all direct destinations from an airport (cached data)
+ * Uses Airport & City Search API - much more efficient than Flight Offers
+ *
+ * @param departureAirportCode - IATA code (e.g., 'LAX')
+ * @returns List of destinations with direct flights
+ */
+export async function getDirectDestinations(
+  departureAirportCode: string
+): Promise<DirectDestination[]> {
+  const token = await getAccessToken()
+
+  console.log('[Amadeus] Fetching direct destinations from:', departureAirportCode)
+
+  try {
+    const response = await axios.get<AirportRoutesResponse>(
+      `${AMADEUS_BASE_URL}/v1/airport/direct-destinations`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params: {
+          departureAirportCode: departureAirportCode
+        }
+      }
+    )
+
+    console.log(`[Amadeus] Found ${response.data.data.length} direct destinations from ${departureAirportCode}`)
+    return response.data.data
+
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError
+      const status = axiosError.response?.status
+
+      // Rate limiting (429)
+      if (status === 429) {
+        console.error('[Amadeus] Rate limited (429)')
+        throw new Error('RATE_LIMITED: Please slow down API requests')
+      }
+
+      // Not found (404) - airport has no direct routes
+      if (status === 404) {
+        console.log(`[Amadeus] No direct destinations found for ${departureAirportCode}`)
+        return []
+      }
+
+      // Authentication error (401)
+      if (status === 401) {
+        console.error('[Amadeus] Unauthorized (401)')
+        tokenCache = null
+        throw new Error('UNAUTHORIZED: Authentication expired')
+      }
+
+      throw new Error(
+        `API_ERROR: Failed to fetch direct destinations (${status}): ${axiosError.message}`
+      )
+    }
+
+    console.error('[Amadeus] Unknown error:', error)
+    throw new Error('UNKNOWN_ERROR: Failed to fetch direct destinations')
+  }
+}
