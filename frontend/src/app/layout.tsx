@@ -4,6 +4,8 @@ import type { Metadata } from 'next'
 import { Arimo } from 'next/font/google'
 import { BackgroundManager } from '@/components/BackgroundManager'
 import { ToastContainer } from '@/components/ui/Toast'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -41,13 +43,21 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`h-full antialiased overflow-x-hidden ${arimo.variable}`}>
-        <div className="relative min-h-full">
+        <div className="relative min-h-full flex flex-col">
           {/* Dynamic Background Manager */}
           <BackgroundManager />
 
+          {/* Context-Aware Header */}
+          <Header />
+
           {/* Main content */}
-          <div className="relative z-10">
+          <div className="relative z-10 flex-1 flex flex-col">
             {children}
+          </div>
+
+          {/* Context-Aware Footer */}
+          <div className="relative z-10">
+            <Footer />
           </div>
 
           {/* Toast Notifications */}

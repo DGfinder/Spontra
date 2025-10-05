@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import Link from 'next/link'
 import { MapPin, Compass, Clock, Users, Armchair, Edit3 } from 'lucide-react'
 import { SearchFilters } from '@/lib/store'
 
@@ -33,6 +34,14 @@ export function SearchSummaryBar({ filters, onEdit, theme }: SearchSummaryBarPro
     >
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
+          {/* Spontra Logo */}
+          <Link
+            href="/"
+            className="text-white font-bold text-lg hover:opacity-80 transition-opacity flex-shrink-0"
+          >
+            Spontra
+          </Link>
+
           {/* Search Pills */}
           <div className="flex items-center gap-3 flex-wrap flex-1">
             {/* Departure Airport */}

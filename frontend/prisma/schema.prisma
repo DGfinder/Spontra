@@ -136,6 +136,11 @@ model ThemePOI {
   latitude        Decimal?
   longitude       Decimal?
   displayOrder    Int         @default(0) @map("display_order")
+
+  // SEO Fields
+  caption         String?     @db.Text // Instagram-style caption (50-100 words) for SEO and social
+  altText         String?     @map("alt_text") @db.VarChar(255) // Image alt text for accessibility & SEO
+  instagramUrl    String?     @map("instagram_url") // Link to Instagram post if applicable
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
@@ -152,6 +157,11 @@ model POIVideo {
   poiId           String      @map("poi_id")
   videoUrl        String      @map("video_url")
   displayOrder    Int         @default(0) @map("display_order")
+
+  // SEO Fields
+  caption         String?     @db.Text // Instagram-style caption (50-100 words) for SEO and social
+  altText         String?     @map("alt_text") @db.VarChar(255) // Image alt text for accessibility & SEO
+  instagramUrl    String?     @map("instagram_url") // Link to Instagram post if applicable
   createdAt       DateTime    @default(now()) @map("created_at")
 
   poi             ThemePOI    @relation(fields: [poiId], references: [id], onDelete: Cascade)

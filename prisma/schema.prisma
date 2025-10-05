@@ -138,6 +138,7 @@ model Destination {
   cityName         String   @map("city_name") @db.VarChar(100)
   countryName      String   @map("country_name") @db.VarChar(100)
   countryCode      String?  @map("country_code") @db.VarChar(2)
+  countryId        String?  @map("country_id")
   description      String?
   imageUrl         String?  @map("image_url")
   activities       Json?    // Array of activity objects
@@ -149,39 +150,58 @@ model Destination {
   language         Json?    // Array of languages
   currency         String?  @db.VarChar(3)
   visaRequired     Boolean? @map("visa_required")
+
+  // SEO Fields
+  slug             String?  @unique @db.VarChar(100) // URL-friendly slug (e.g., "paris")
+  metaTitle        String?  @map("meta_title") @db.VarChar(60) // SEO title
+  metaDescription  String?  @map("meta_description") @db.VarChar(160) // SEO description
+  seoContent       Json?    @map("seo_content") // { thingsToDo: [], gettingThere: "", localTips: [] }
+
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
   // Relations
   airport              Airport              @relation(fields: [airportCode], references: [iataCode])
+  country              Country?             @relation(fields: [countryId], references: [id])
   themeDestinations    ThemeDestination[]
   destinationExploreRequests DestinationExploreRequest[]
+  themePOIs            ThemePOI[]
   pois                 POI[]
 
   @@index([airportCode])
   @@index([countryName])
   @@index([popularityScore])
+  @@index([slug])
   @@map("destinations")
 }
 
 model ThemeDestination {
-  id            String      @id @default(uuid())
-  theme         String      @db.VarChar(50)
-  airportCode   String      @map("airport_code") @db.VarChar(3)
-  themeScore    Decimal?    @map("theme_score") @db.Decimal(3, 1)
-  flightTimeRange String?   @map("flight_time_range") @db.VarChar(20)
-  originAirport String?     @map("origin_airport") @db.VarChar(3)
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  id              String      @id @default(uuid())
+  theme           String      @db.VarChar(50)
+  airportCode     String      @map("airport_code") @db.VarChar(3)
+  themeScore      Decimal?    @map("theme_score") @db.Decimal(3, 1)
+  flightTimeRange String?     @map("flight_time_range") @db.VarChar(20)
+  originAirport   String?     @map("origin_airport") @db.VarChar(3)
+
+  // SEO Fields
+  slug            String?     @unique @db.VarChar(150) // URL-friendly slug (e.g., "paris-adventure")
+  metaTitle       String?     @map("meta_title") @db.VarChar(60) // SEO title
+  metaDescription String?     @map("meta_description") @db.VarChar(160) // SEO description
+  heroCaption     String?     @map("hero_caption") @db.Text // Instagram-style caption (150-200 words)
+  seoContent      Json?       @map("seo_content") // { thingsToDo: [], gettingThere: "", localTips: [], faqItems: [] }
+
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
 
   // Relations
-  destination   Destination @relation(fields: [airportCode], references: [airportCode])
-  reels         Reel[]
+  destination     Destination @relation(fields: [airportCode], references: [airportCode])
+  reels           Reel[]
 
   @@unique([theme, airportCode, originAirport])
   @@index([theme])
   @@index([airportCode])
   @@index([originAirport])
+  @@index([slug])
   @@map("theme_destinations")
 }
 

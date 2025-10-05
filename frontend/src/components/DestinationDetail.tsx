@@ -23,6 +23,9 @@ export interface ThemePOI {
   displayOrder: number
   latitude: number | null
   longitude: number | null
+  caption: string | null
+  altText: string | null
+  instagramUrl: string | null
   createdAt: string
   updatedAt: string
   videos: POIVideo[]
