@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutGrid, Globe, MapPin, Route, Map, ArrowLeft } from 'lucide-react'
+import { ToastContainer } from '@/components/ui/Toast'
 
 export default function AdminPanelLayout({
   children,
@@ -70,6 +71,9 @@ export default function AdminPanelLayout({
           {children}
         </div>
       </main>
+
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   )
 }
