@@ -13,6 +13,9 @@ import { SearchResultsSkeleton, CountryGridSkeleton } from '@/components/ui/Skel
 import { ProgressSteps } from '@/components/ui/ProgressSteps'
 import { EmptyState } from '@/components/ui/EmptyState'
 
+// Force dynamic rendering for URL sync functionality
+export const dynamic = 'force-dynamic'
+
 function SearchResults() {
   const { destinations, filters, isLoading, error, setCurrentStep, reset } = useSearchStore()
 
