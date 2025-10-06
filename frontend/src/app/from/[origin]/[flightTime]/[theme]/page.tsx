@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
-import { CountryGrid } from '@/components/CountryGrid'
+import { CountryGridWrapper } from '@/components/CountryGridWrapper'
 import { StructuredData } from '@/components/SEO/StructuredData'
 import { generateTimeBasedSearchMetadata, getThemeInfo } from '@/lib/seo/generateMetadata'
 import { generateBreadcrumbStructuredData } from '@/lib/seo/generateStructuredData'
@@ -212,13 +212,9 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
         {/* Results */}
         <main className="max-w-6xl mx-auto px-4 py-8">
           {countryGroups.length > 0 ? (
-            <CountryGrid
+            <CountryGridWrapper
               countries={countryGroups}
               theme={theme}
-              onExplore={(countryCode) => {
-                // Navigate to explore page for this country
-                window.location.href = `/explore/${countryCode.toLowerCase()}`
-              }}
             />
           ) : (
             <div className="text-center py-16">
