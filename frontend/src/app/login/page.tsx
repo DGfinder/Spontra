@@ -1,9 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import Script from 'next/script'
+
+// Declare Turnstile types
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (element: string | HTMLElement, options: any) => string
+      reset: (widgetId: string) => void
+      remove: (widgetId: string) => void
+      getResponse: (widgetId: string) => string
+    }
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -14,18 +27,45 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [emailVerificationWarning, setEmailVerificationWarning] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileWidgetId = useRef<string | null>(null)
+
+  // Initialize Turnstile when script loads
+  const handleTurnstileLoad = () => {
+    if (window.turnstile && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+      turnstileWidgetId.current = window.turnstile.render('#turnstile-widget', {
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+        callback: (token: string) => {
+          setTurnstileToken(token)
+        },
+        'error-callback': () => {
+          setError('CAPTCHA verification failed. Please refresh and try again.')
+        },
+      })
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setEmailVerificationWarning(false)
+
+    // Check for Turnstile token if enabled
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
+      setError('Please complete the CAPTCHA verification')
+      return
+    }
+
     setIsLoading(true)
 
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          ...formData,
+          turnstileToken: turnstileToken || undefined,
+        })
       })
 
       const data = await response.json()
@@ -50,12 +90,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-white/70">Log in to your Spontra account</p>
-        </div>
+    <>
+      {/* Load Turnstile Script */}
+      {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+        <Script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+          onLoad={handleTurnstileLoad}
+        />
+      )}
+
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+            <p className="text-white/70">Log in to your Spontra account</p>
+          </div>
 
         {error && (
           <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-white">
@@ -113,6 +162,13 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Turnstile CAPTCHA Widget */}
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <div className="flex justify-center">
+              <div id="turnstile-widget"></div>
+            </div>
+          )}
+
           <Button
             type="submit"
             variant="primary"
@@ -133,5 +189,6 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+    </>
   )
 }

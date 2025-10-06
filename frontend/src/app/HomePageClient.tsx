@@ -7,14 +7,158 @@ import { SearchSummaryBar } from '@/components/SearchSummaryBar'
 import { SearchEditDialog } from '@/components/SearchEditDialog'
 import { CountryGrid } from '@/components/CountryGrid'
 import { Button } from '@/components/ui/Button'
-import { ArrowLeftIcon, MapPinIcon, ClockIcon, DollarSignIcon } from 'lucide-react'
+import { ArrowLeftIcon, MapPinIcon, ClockIcon, DollarSignIcon, BookmarkIcon, Heart } from 'lucide-react'
 import { useUrlSync } from '@/lib/hooks/useUrlSync'
 import { SearchResultsSkeleton, CountryGridSkeleton } from '@/components/ui/Skeleton'
 import { ProgressSteps } from '@/components/ui/ProgressSteps'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { useAuth } from '@/lib/hooks/useAuth'
+import { useRouter } from 'next/navigation'
+import { toast } from 'react-toastify'
+import { useEffect } from 'react'
 
 function SearchResults() {
   const { destinations, filters, isLoading, error, setCurrentStep, reset } = useSearchStore()
+  const { user } = useAuth()
+  const router = useRouter()
+  const [isSaving, setIsSaving] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
+  const [favoritesMap, setFavoritesMap] = useState<Map<string, string>>(new Map()) // destinationId -> favoriteId
+
+  // Fetch user's favorites on mount
+  useEffect(() => {
+    if (user) {
+      fetchFavorites()
+    }
+  }, [user])
+
+  const fetchFavorites = async () => {
+    try {
+      const response = await fetch('/api/user/favorites', {
+        credentials: 'include',
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        const favSet = new Set<string>()
+        const favMap = new Map<string, string>()
+        data.favorites.forEach((fav: any) => {
+          favSet.add(fav.destinationId)
+          favMap.set(fav.destinationId, fav.id)
+        })
+        setFavorites(favSet)
+        setFavoritesMap(favMap)
+      }
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error)
+    }
+  }
+
+  const handleToggleFavorite = async (destinationId: string) => {
+    if (!user) {
+      toast.info('Please log in to save favorites')
+      router.push('/login')
+      return
+    }
+
+    const isFavorited = favorites.has(destinationId)
+
+    if (isFavorited) {
+      // Remove from favorites
+      const favoriteId = favoritesMap.get(destinationId)
+      if (!favoriteId) return
+
+      try {
+        const response = await fetch(`/api/user/favorites/${favoriteId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          const newFavorites = new Set(favorites)
+          newFavorites.delete(destinationId)
+          setFavorites(newFavorites)
+
+          const newMap = new Map(favoritesMap)
+          newMap.delete(destinationId)
+          setFavoritesMap(newMap)
+
+          toast.success('Removed from favorites')
+        } else {
+          toast.error('Failed to remove favorite')
+        }
+      } catch (error) {
+        toast.error('An error occurred')
+      }
+    } else {
+      // Add to favorites
+      try {
+        const response = await fetch('/api/user/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ destinationId }),
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          const newFavorites = new Set(favorites)
+          newFavorites.add(destinationId)
+          setFavorites(newFavorites)
+
+          const newMap = new Map(favoritesMap)
+          newMap.set(destinationId, data.favorite.id)
+          setFavoritesMap(newMap)
+
+          toast.success('Added to favorites')
+        } else {
+          toast.error(data.error || 'Failed to add favorite')
+        }
+      } catch (error) {
+        toast.error('An error occurred')
+      }
+    }
+  }
+
+  const handleSaveSearch = async () => {
+    if (!user) {
+      toast.info('Please log in to save searches')
+      router.push('/login')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch('/api/user/saved-searches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          originAirport: filters.departureAirport,
+          theme: filters.theme,
+          minFlightTime: filters.minFlightTime,
+          maxFlightTime: filters.maxFlightTime,
+          priceAlertEnabled: false,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Search saved successfully!')
+      } else {
+        toast.error(data.error || 'Failed to save search')
+      }
+    } catch (error) {
+      toast.error('An error occurred')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (isLoading) {
     return <SearchResultsSkeleton />
@@ -81,37 +225,67 @@ function SearchResults() {
             </div>
           </div>
 
-          <Button
-            onClick={reset}
-            variant="secondary"
-            size="sm"
-          >
-            New Search
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleSaveSearch}
+              variant="secondary"
+              size="sm"
+              disabled={isSaving}
+              className="flex items-center gap-2"
+            >
+              <BookmarkIcon className="h-4 w-4" />
+              {isSaving ? 'Saving...' : 'Save Search'}
+            </Button>
+            <Button
+              onClick={reset}
+              variant="secondary"
+              size="sm"
+            >
+              New Search
+            </Button>
+          </div>
         </div>
 
         {/* Results Grid - Using v4.0 dynamic grid utilities */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {destinations.map((destination: Destination) => (
-            <div
-              key={destination.id}
-              className="group bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20
-                         hover:bg-white/15 hover:border-white/30 hover:scale-[1.02]
-                         transition-all duration-300 transform-gpu shadow-xl hover:shadow-2xl"
-            >
-              {/* Destination Header */}
-              <div className="mb-4">
-                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-white/95 transition-colors">
-                  {destination.cityName}
-                </h3>
-                <div className="flex items-center gap-2 text-white/60">
-                  <MapPinIcon className="h-4 w-4" />
-                  <span className="text-sm">{destination.country.name}</span>
-                  <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                    {destination.airportCode}
-                  </span>
+          {destinations.map((destination: Destination) => {
+            const isFavorited = favorites.has(destination.id)
+
+            return (
+              <div
+                key={destination.id}
+                className="group bg-white/10 backdrop-blur-xl rounded-3xl p-6 border border-white/20
+                           hover:bg-white/15 hover:border-white/30 hover:scale-[1.02]
+                           transition-all duration-300 transform-gpu shadow-xl hover:shadow-2xl relative"
+              >
+                {/* Favorite Button */}
+                <button
+                  onClick={() => handleToggleFavorite(destination.id)}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-black/30 hover:bg-black/50 transition-colors z-10"
+                  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                >
+                  <Heart
+                    className={`h-5 w-5 transition-colors ${
+                      isFavorited
+                        ? 'fill-red-500 text-red-500'
+                        : 'text-white/80 hover:text-white'
+                    }`}
+                  />
+                </button>
+
+                {/* Destination Header */}
+                <div className="mb-4">
+                  <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-white/95 transition-colors">
+                    {destination.cityName}
+                  </h3>
+                  <div className="flex items-center gap-2 text-white/60">
+                    <MapPinIcon className="h-4 w-4" />
+                    <span className="text-sm">{destination.country.name}</span>
+                    <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                      {destination.airportCode}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
               {/* Description */}
               <p className="text-white/80 text-sm mb-6 leading-relaxed">
@@ -155,8 +329,9 @@ function SearchResults() {
                   Explore {destination.cityName}
                 </Button>
               </div>
-            </div>
-          ))}
+              </div>
+            )
+          })}
         </div>
 
         {/* Footer Actions */}

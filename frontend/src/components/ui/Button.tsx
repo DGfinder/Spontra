@@ -2,7 +2,7 @@ import React from 'react'
 import { clsx } from 'clsx'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'adventure' | 'nature' | 'culture'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'adventure' | 'nature' | 'culture' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
   isLoading?: boolean
@@ -66,6 +66,12 @@ export function Button({
       'bg-culture text-white shadow-lg',
       'hover:bg-culture/90 hover:shadow-xl hover:-translate-y-0.5',
       'focus:ring-culture/50',
+    ].join(' '),
+
+    danger: [
+      'bg-red-600 text-white shadow-lg',
+      'hover:bg-red-700 hover:shadow-xl hover:-translate-y-0.5',
+      'focus:ring-red-600/50',
     ].join(' '),
   }
   
