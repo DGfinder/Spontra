@@ -121,11 +121,20 @@ export function initializeAnalytics(): void {
     return
   }
 
-  // Initialize Google Analytics 4
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('consent', 'update', {
-      'analytics_storage': 'granted',
-      'ad_storage': hasConsent('marketing') ? 'granted' : 'denied'
+  // Dynamically import to avoid SSR issues
+  if (typeof window !== 'undefined') {
+    import('./analytics').then(({ initializeGA4 }) => {
+      initializeGA4()
+
+      // Update consent mode if gtag is already loaded
+      if (window.gtag) {
+        window.gtag('consent', 'update', {
+          'analytics_storage': 'granted',
+          'ad_storage': hasConsent('marketing') ? 'granted' : 'denied'
+        })
+      }
+    }).catch(err => {
+      console.error('[Analytics] Failed to initialize GA4:', err)
     })
   }
 

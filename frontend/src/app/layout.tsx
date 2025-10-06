@@ -7,6 +7,7 @@ import { ToastContainer } from '@/components/ui/Toast'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { CookieConsent } from '@/components/CookieConsent'
+import { PageViewTracker } from '@/components/PageViewTracker'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -66,6 +67,9 @@ export default function RootLayout({
 
           {/* GDPR Cookie Consent Banner */}
           <CookieConsent />
+
+          {/* Google Analytics Page View Tracking */}
+          <PageViewTracker />
         </div>
       </body>
     </html>
