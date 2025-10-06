@@ -169,4 +169,4 @@ debug_*.*
 # Cloud and deployment
 .vercel/
 .netlify/
-.firebase/
+.firebase/nul
