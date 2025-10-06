@@ -26,7 +26,108 @@ model User {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
+  // Relations
+  emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  savedSearches           SavedSearch[]
+  favoriteDestinations    FavoriteDestination[]
+
   @@map("users")
+}
+
+// Email verification tokens
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+// Password reset tokens
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  usedAt    DateTime? @map("used_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+// Saved searches for logged-in users
+model SavedSearch {
+  id                 String   @id @default(uuid())
+  userId             String   @map("user_id")
+  originAirport      String   @map("origin_airport")
+  theme              String?
+  minFlightTime      Int?     @map("min_flight_time")
+  maxFlightTime      Int?     @map("max_flight_time")
+  priceAlertEnabled  Boolean  @default(false) @map("price_alert_enabled")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("saved_searches")
+}
+
+// Favorite destinations for logged-in users
+model FavoriteDestination {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  destinationId String   @map("destination_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, destinationId])
+  @@index([userId])
+  @@map("favorite_destinations")
+}
+
+// Affiliate click tracking for commission attribution
+model AffiliateClick {
+  id            String    @id @default(uuid())
+  userId        String?   @map("user_id")  // Optional - null for anonymous users
+  destinationId String?   @map("destination_id")  // Which destination they were viewing
+  partner       String    // "skyscanner", "kayak", "google_flights"
+  clickUrl      String    @map("click_url") @db.Text  // Full affiliate URL clicked
+
+  // Search context (what they were searching for)
+  originAirport      String?  @map("origin_airport")
+  destinationAirport String?  @map("destination_airport")
+
+  // Tracking data
+  referrer      String?   @db.Text  // HTTP referrer
+  ipAddress     String?   @map("ip_address")  // For fraud detection
+  userAgent     String?   @map("user_agent") @db.Text  // Browser/device info
+
+  // Conversion tracking (updated by webhooks if partner supports it)
+  converted     Boolean   @default(false)  // Did this click result in a booking?
+  convertedAt   DateTime? @map("converted_at")  // When conversion happened
+  commission    Decimal?  @db.Decimal(10, 2)  // Commission earned (if known)
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([destinationId])
+  @@index([partner])
+  @@index([createdAt])
+  @@index([converted])
+  @@map("affiliate_clicks")
 }
 
 // Airport data
@@ -100,9 +201,10 @@ model Destination {
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
-  country         Country?               @relation(fields: [countryId], references: [id])
-  themePOIs       ThemePOI[]
-  airports        DestinationAirport[]
+  country              Country?               @relation(fields: [countryId], references: [id])
+  themePOIs            ThemePOI[]
+  airports             DestinationAirport[]
+  favoritedBy          FavoriteDestination[]
 
   @@index([countryId])
   @@map("destinations")

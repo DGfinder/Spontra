@@ -6,6 +6,7 @@ import { BackgroundManager } from '@/components/BackgroundManager'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { CookieConsent } from '@/components/CookieConsent'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -62,6 +63,9 @@ export default function RootLayout({
 
           {/* Toast Notifications */}
           <ToastContainer />
+
+          {/* GDPR Cookie Consent Banner */}
+          <CookieConsent />
         </div>
       </body>
     </html>
