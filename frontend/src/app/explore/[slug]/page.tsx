@@ -130,7 +130,7 @@ export default async function ExplorePage({ params }: PageProps) {
         slug: dest.slug || slugify(dest.cityName),
         country: {
           name: countryName,
-          code: dest.country?.code || dest.countryCode || 'XX'
+          code: dest.country?.code || 'XX'
         }
       })
     }
