@@ -9,15 +9,15 @@ import { VideoEditDialog } from './VideoEditDialog'
 import { AddVideosForm } from '../AddVideosForm'
 import { BulkActionBar } from './BulkActionBar'
 import { POITemplates, type POITemplate } from './POITemplates'
+import { ThemeInfoPanel } from './ThemeInfoPanel'
 import { useToast } from '@/components/ui/Toast'
+import { THEME_CONFIGS } from '@/lib/constants/themes'
 
-const THEMES = [
-  { value: 'adventure', label: 'Adventure', emoji: '🏔️' },
-  { value: 'nature', label: 'Nature', emoji: '🌲' },
-  { value: 'vibe', label: 'Vibe', emoji: '🎭' },
-  { value: 'indulge', label: 'Indulge', emoji: '🍷' },
-  { value: 'discover', label: 'Discover', emoji: '🔍' }
-] as const
+const THEMES = THEME_CONFIGS.map(({ value, label, emoji }) => ({
+  value,
+  label,
+  emoji
+}))
 
 interface ManagePOIModalProps {
   destinationId: string | null
@@ -115,7 +115,7 @@ export function ManagePOIModal({
       {/* Main Modal */}
       <div
         className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50
-                   w-full max-w-5xl max-h-[90vh] overflow-hidden"
+                   w-full max-w-7xl max-h-[90vh] overflow-hidden"
         role="dialog"
         aria-modal="true"
         aria-labelledby="poi-modal-title"
@@ -166,51 +166,65 @@ export function ManagePOIModal({
             ))}
           </div>
 
-          {/* Content Area */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {poiManager.uiMode === 'list' && (
-              <POIList
-                pois={poiManager.themePOIs}
-                onAddPOI={() => poiManager.setUIMode('select-template')}
-                onEditPOI={(poi) => poiManager.setUIMode('edit-poi', poi)}
-                onDeletePOI={poiManager.handleDeletePOI}
-                onReorderPOI={poiManager.handleReorderPOI}
-                onAddVideos={(poi) => poiManager.setUIMode('add-videos', poi)}
-                onEditVideo={(videoId, poi) => {
-                  poiManager.setUIMode('edit-video', poi, videoId)
-                }}
-                onDeleteVideo={poiManager.handleDeleteVideo}
-                onReorderVideo={poiManager.handleReorderVideo}
-                onBulkReorderVideos={poiManager.handleBulkReorderVideos}
-                isLoading={poiManager.isSubmitting}
-                selectedPOIIds={selectedPOIIds}
-                onSelectionChange={setSelectedPOIIds}
-              />
-            )}
+          {/* Content Area - Two Column Layout */}
+          <div className="flex-1 overflow-hidden flex flex-col lg:flex-row gap-6 p-6">
+            {/* Left Column - Main Content */}
+            <div className="flex-1 overflow-y-auto lg:w-2/3">
+              {poiManager.uiMode === 'list' && (
+                <POIList
+                  pois={poiManager.themePOIs}
+                  onAddPOI={() => poiManager.setUIMode('select-template')}
+                  onEditPOI={(poi) => poiManager.setUIMode('edit-poi', poi)}
+                  onDeletePOI={poiManager.handleDeletePOI}
+                  onReorderPOI={poiManager.handleReorderPOI}
+                  onAddVideos={(poi) => poiManager.setUIMode('add-videos', poi)}
+                  onEditVideo={(videoId, poi) => {
+                    poiManager.setUIMode('edit-video', poi, videoId)
+                  }}
+                  onDeleteVideo={poiManager.handleDeleteVideo}
+                  onReorderVideo={poiManager.handleReorderVideo}
+                  onBulkReorderVideos={poiManager.handleBulkReorderVideos}
+                  isLoading={poiManager.isSubmitting}
+                  selectedPOIIds={selectedPOIIds}
+                  onSelectionChange={setSelectedPOIIds}
+                />
+              )}
 
-            {poiManager.uiMode === 'select-template' && (
-              <POITemplates
-                onSelectTemplate={handleSelectTemplate}
-                onCancel={() => poiManager.setUIMode('list', null)}
-              />
-            )}
+              {poiManager.uiMode === 'select-template' && (
+                <POITemplates
+                  onSelectTemplate={handleSelectTemplate}
+                  onCancel={() => poiManager.setUIMode('list', null)}
+                />
+              )}
 
-            {(poiManager.uiMode === 'add-poi' || poiManager.uiMode === 'edit-poi') && (
-              <POIEditor
-                poi={poiManager.selectedPOI}
-                templateData={poiManager.templateData}
-                onSubmit={async (data) => {
-                  if (poiManager.uiMode === 'add-poi') {
-                    return await poiManager.handleCreatePOI(data)
-                  } else if (poiManager.selectedPOI) {
-                    return await poiManager.handleUpdatePOI(poiManager.selectedPOI.id, data)
-                  }
-                  return { success: false, error: 'Invalid operation' }
-                }}
-                onCancel={() => poiManager.setUIMode('list', null)}
-                isSubmitting={poiManager.isSubmitting}
+              {(poiManager.uiMode === 'add-poi' || poiManager.uiMode === 'edit-poi') && (
+                <POIEditor
+                  poi={poiManager.selectedPOI}
+                  templateData={poiManager.templateData}
+                  onSubmit={async (data) => {
+                    if (poiManager.uiMode === 'add-poi') {
+                      return await poiManager.handleCreatePOI(data)
+                    } else if (poiManager.selectedPOI) {
+                      return await poiManager.handleUpdatePOI(poiManager.selectedPOI.id, data)
+                    }
+                    return { success: false, error: 'Invalid operation' }
+                  }}
+                  onCancel={() => poiManager.setUIMode('list', null)}
+                  isSubmitting={poiManager.isSubmitting}
+                />
+              )}
+            </div>
+
+            {/* Right Column - Theme Info Panel */}
+            <div className="hidden lg:block lg:w-1/3 shrink-0">
+              <ThemeInfoPanel
+                theme={poiManager.activeTheme}
+                uiMode={poiManager.uiMode}
+                selectedPOI={poiManager.selectedPOI}
+                selectedCount={selectedPOIIds.length}
+                cityName={poiManager.destination?.cityName}
               />
-            )}
+            </div>
           </div>
         </div>
       </div>
