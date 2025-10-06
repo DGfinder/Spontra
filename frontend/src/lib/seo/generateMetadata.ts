@@ -3,7 +3,7 @@ import { Compass, Trees, Wine, Music, Globe } from 'lucide-react'
 
 interface DestinationMetadata {
   cityName: string
-  countryName: string
+  countryName?: string | null
   description?: string | null
   imageUrl?: string | null
   metaTitle?: string | null
@@ -68,9 +68,11 @@ export function generateDestinationMetadata(data: DestinationMetadata): Metadata
   const title = data.metaTitle ||
     `${data.cityName} Travel Guide - Flights, Hotels & Things to Do | Spontra`
 
+  const locationName = data.countryName ? `${data.cityName}, ${data.countryName}` : data.cityName
+
   const description = data.metaDescription ||
     data.description ||
-    `Discover ${data.cityName}, ${data.countryName}. Find cheap flights, explore activities, watch traveler videos. Plan your spontaneous trip with Spontra.`
+    `Discover ${locationName}. Find cheap flights, explore activities, watch traveler videos. Plan your spontaneous trip with Spontra.`
 
   return {
     title,
@@ -83,7 +85,7 @@ export function generateDestinationMetadata(data: DestinationMetadata): Metadata
           url: data.imageUrl,
           width: 1200,
           height: 630,
-          alt: `${data.cityName}, ${data.countryName}`
+          alt: locationName
         }
       ] : [],
       type: 'website',
@@ -106,6 +108,7 @@ export function generateDestinationMetadata(data: DestinationMetadata): Metadata
  */
 export function generateThemeDestinationMetadata(data: ThemeMetadata): Metadata {
   const themeInfo = THEME_DATA[data.theme] || THEME_DATA.adventure
+  const locationName = data.countryName ? `${data.cityName}, ${data.countryName}` : data.cityName
 
   const title = data.metaTitle ||
     `${data.cityName} ${themeInfo.label} - ${themeInfo.tagline} | Spontra`
@@ -125,7 +128,7 @@ export function generateThemeDestinationMetadata(data: ThemeMetadata): Metadata 
           url: data.imageUrl,
           width: 1200,
           height: 630,
-          alt: `${data.cityName} ${themeInfo.label} - ${data.countryName}`
+          alt: `${data.cityName} ${themeInfo.label} - ${locationName}`
         }
       ] : [],
       type: 'website',
@@ -142,7 +145,7 @@ export function generateThemeDestinationMetadata(data: ThemeMetadata): Metadata 
     },
     keywords: [
       data.cityName,
-      data.countryName,
+      ...(data.countryName ? [data.countryName] : []),
       themeInfo.label.toLowerCase(),
       data.theme,
       'travel',

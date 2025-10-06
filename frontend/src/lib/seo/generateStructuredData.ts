@@ -2,7 +2,7 @@ import type { Thing, WithContext } from 'schema-dts'
 
 interface DestinationData {
   cityName: string
-  countryName: string
+  countryName?: string | null
   description?: string | null
   imageUrl?: string | null
   latitude?: number | null
@@ -36,16 +36,18 @@ interface VideoData {
 export function generateDestinationStructuredData(
   data: DestinationData
 ): WithContext<Thing> {
+  const locationName = data.countryName ? `${data.cityName}, ${data.countryName}` : data.cityName
+
   const base: any = {
     '@context': 'https://schema.org',
     '@type': 'TravelDestination',
     name: data.cityName,
-    description: data.description || `Travel guide for ${data.cityName}, ${data.countryName}`,
+    description: data.description || `Travel guide for ${locationName}`,
     ...(data.imageUrl && {
       image: {
         '@type': 'ImageObject',
         url: data.imageUrl,
-        caption: `${data.cityName}, ${data.countryName}`
+        caption: locationName
       }
     }),
     ...(data.latitude && data.longitude && {
@@ -66,11 +68,13 @@ export function generateDestinationStructuredData(
 export function generateThemeDestinationStructuredData(
   data: ThemeDestinationData
 ): WithContext<Thing> {
+  const locationName = data.countryName ? `${data.cityName}, ${data.countryName}` : data.cityName
+
   const base: any = {
     '@context': 'https://schema.org',
     '@type': 'TravelDestination',
     name: `${data.cityName} - ${capitalizeFirst(data.theme)}`,
-    description: data.description || `${capitalizeFirst(data.theme)} experiences in ${data.cityName}, ${data.countryName}`,
+    description: data.description || `${capitalizeFirst(data.theme)} experiences in ${locationName}`,
     ...(data.imageUrl && {
       image: {
         '@type': 'ImageObject',
