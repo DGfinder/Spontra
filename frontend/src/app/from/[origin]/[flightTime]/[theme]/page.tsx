@@ -96,10 +96,14 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
         include: {
           destinations: {
             include: {
-              country: true,
-              themePOIs: {
-                where: { theme },
-                take: 1 // Just check if any exist
+              destination: {
+                include: {
+                  country: true,
+                  themePOIs: {
+                    where: { theme },
+                    take: 1 // Just check if any exist
+                  }
+                }
               }
             }
           }
@@ -115,12 +119,14 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
   const destinationsByCountry = new Map<string, any[]>()
 
   for (const route of routes) {
-    for (const destination of route.destinationAirport.destinations) {
+    for (const destAirport of route.destinationAirport.destinations) {
+      const destination = destAirport.destination
+
       // Only include destinations that have POIs for this theme
       if (destination.themePOIs.length === 0) continue
 
-      const countryName = destination.country?.name || destination.countryName
-      const countryCode = destination.country?.code || destination.countryCode || 'XX'
+      const countryName = destination.country?.name || destination.countryName || 'Unknown'
+      const countryCode = destination.country?.code || 'XX'
 
       if (!destinationsByCountry.has(countryName)) {
         destinationsByCountry.set(countryName, [])
@@ -129,7 +135,7 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
       destinationsByCountry.get(countryName)!.push({
         id: destination.id,
         cityName: destination.cityName,
-        airportCode: destination.airportCode,
+        airportCode: destAirport.airportCode,
         imageUrl: destination.imageUrl,
         description: destination.description,
         slug: destination.slug || slugify(destination.cityName),
@@ -143,13 +149,22 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
   }
 
   // Convert to array format for CountryGrid
-  const countryGroups = Array.from(destinationsByCountry.entries()).map(([countryName, destinations]) => ({
-    country: {
-      name: countryName,
-      code: destinations[0].country.code
-    },
-    destinations: destinations.sort((a, b) => a.flightDuration - b.flightDuration)
-  }))
+  const countryGroups = Array.from(destinationsByCountry.entries()).map(([countryName, destinations]) => {
+    const sortedDestinations = destinations.sort((a, b) => a.flightDuration - b.flightDuration)
+    const shortestFlight = sortedDestinations[0]
+
+    return {
+      countryCode: destinations[0].country.code,
+      countryName: countryName,
+      imageUrl: null,
+      imageType: 'gradient' as const,
+      shortestFlightTime: shortestFlight.flightDuration / 60, // Convert minutes to hours
+      cheapestPrice: 0, // Not available in this context
+      currency: 'USD',
+      destinationCount: destinations.length,
+      destinations: sortedDestinations
+    }
+  })
 
   // Structured data for SEO
   const breadcrumbStructuredData = generateBreadcrumbStructuredData([
@@ -198,9 +213,12 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
         <main className="max-w-6xl mx-auto px-4 py-8">
           {countryGroups.length > 0 ? (
             <CountryGrid
-              countryGroups={countryGroups}
+              countries={countryGroups}
               theme={theme}
-              originAirport={originCode}
+              onExplore={(countryCode) => {
+                // Navigate to explore page for this country
+                window.location.href = `/explore/${countryCode.toLowerCase()}`
+              }}
             />
           ) : (
             <div className="text-center py-16">

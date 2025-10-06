@@ -3,7 +3,7 @@
  * Handles JWT creation/verification, password hashing, and token generation
  */
 
-import { SignJWT, jwtVerify } from 'jose'
+import { SignJWT, jwtVerify, type JWTPayload as JoseJWTPayload } from 'jose'
 import bcrypt from 'bcryptjs'
 import { randomBytes } from 'crypto'
 
@@ -16,7 +16,7 @@ const ADMIN_JWT_SECRET = new TextEncoder().encode(
   process.env.ADMIN_JWT_SECRET || 'your-admin-secret-key-change-in-production'
 )
 
-export interface JWTPayload {
+export interface JWTPayload extends JoseJWTPayload {
   userId: string
   email: string
   role: 'user' | 'admin'
