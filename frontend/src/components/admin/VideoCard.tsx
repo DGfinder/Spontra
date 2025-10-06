@@ -8,6 +8,9 @@ interface POIVideo {
   id: string
   videoUrl: string
   displayOrder: number
+  caption?: string | null
+  altText?: string | null
+  instagramUrl?: string | null
 }
 
 interface VideoCardProps {
@@ -104,6 +107,36 @@ export function VideoCard({
               <p className="text-white/60 text-sm mt-1 line-clamp-2">
                 {poiDescription}
               </p>
+            )}
+
+            {/* Video Metadata */}
+            {(video.caption || video.altText || video.instagramUrl) && (
+              <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
+                {video.caption && (
+                  <div>
+                    <span className="text-xs text-white/40">Caption: </span>
+                    <span className="text-xs text-white/60 line-clamp-2">{video.caption}</span>
+                  </div>
+                )}
+                {video.altText && (
+                  <div>
+                    <span className="text-xs text-white/40">Alt: </span>
+                    <span className="text-xs text-white/60">{video.altText}</span>
+                  </div>
+                )}
+                {video.instagramUrl && (
+                  <div>
+                    <a
+                      href={video.instagramUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-300 hover:text-blue-200 underline"
+                    >
+                      📷 Instagram Post
+                    </a>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

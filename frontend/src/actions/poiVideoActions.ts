@@ -18,14 +18,21 @@ export async function getVideosForPOI(poiId: string) {
   }
 }
 
-export async function addVideos(poiId: string, videoUrls: string[]) {
+export interface VideoWithMetadata {
+  url: string
+  caption?: string
+  altText?: string
+  instagramUrl?: string
+}
+
+export async function addVideos(poiId: string, videos: VideoWithMetadata[]) {
   try {
     // Validate all URLs have valid YouTube IDs
-    const invalidUrls = videoUrls.filter(url => !extractYouTubeId(url))
+    const invalidUrls = videos.filter(v => !extractYouTubeId(v.url))
     if (invalidUrls.length > 0) {
       return {
         success: false,
-        error: `Invalid YouTube URLs: ${invalidUrls.join(', ')}`
+        error: `Invalid YouTube URLs: ${invalidUrls.map(v => v.url).join(', ')}`
       }
     }
 
@@ -38,12 +45,15 @@ export async function addVideos(poiId: string, videoUrls: string[]) {
 
     const startOrder = (maxOrder?.displayOrder ?? -1) + 1
 
-    // Create all videos
+    // Create all videos with metadata
     await db.pOIVideo.createMany({
-      data: videoUrls.map((url, index) => ({
+      data: videos.map((video, index) => ({
         poiId,
-        videoUrl: url,
-        displayOrder: startOrder + index
+        videoUrl: video.url,
+        displayOrder: startOrder + index,
+        caption: video.caption || null,
+        altText: video.altText || null,
+        instagramUrl: video.instagramUrl || null
       }))
     })
 

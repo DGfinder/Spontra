@@ -22,6 +22,11 @@ export async function createPOI(data: {
   name: string
   description?: string
   videoUrl?: string
+  latitude?: number
+  longitude?: number
+  caption?: string
+  altText?: string
+  instagramUrl?: string
 }) {
   try {
     // Get the highest display order for this theme
@@ -51,6 +56,11 @@ export async function updatePOI(id: string, data: {
   name: string
   description?: string
   videoUrl?: string
+  latitude?: number
+  longitude?: number
+  caption?: string
+  altText?: string
+  instagramUrl?: string
 }) {
   try {
     const poi = await db.themePOI.update({
