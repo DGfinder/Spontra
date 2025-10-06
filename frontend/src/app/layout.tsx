@@ -2,6 +2,7 @@ import React from 'react'
 import './globals.css'
 import type { Metadata } from 'next'
 import { Arimo } from 'next/font/google'
+import { Suspense } from 'react'
 import { BackgroundManager } from '@/components/BackgroundManager'
 import { ToastContainer } from '@/components/ui/Toast'
 import { Header } from '@/components/Header'
@@ -69,7 +70,9 @@ export default function RootLayout({
           <CookieConsent />
 
           {/* Google Analytics Page View Tracking */}
-          <PageViewTracker />
+          <Suspense fallback={null}>
+            <PageViewTracker />
+          </Suspense>
         </div>
       </body>
     </html>
