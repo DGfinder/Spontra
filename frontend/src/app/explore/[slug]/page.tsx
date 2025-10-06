@@ -117,7 +117,7 @@ export default async function ExplorePage({ params }: PageProps) {
     const destinationsByCountry = new Map<string, any[]>()
 
     for (const dest of destinations) {
-      const countryName = dest.country?.name || dest.countryName
+      const countryName = dest.country?.name || dest.countryName || 'Unknown'
       if (!destinationsByCountry.has(countryName)) {
         destinationsByCountry.set(countryName, [])
       }
