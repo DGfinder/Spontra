@@ -1,8 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getDestinations } from '@/actions/destinationActions'
 import { ManagePOIModal } from '@/components/admin/poi/ManagePOIModal'
+import { DestinationStats } from '@/components/admin/destinations/DestinationStats'
+import { DestinationFilters, type FilterState } from '@/components/admin/destinations/DestinationFilters'
+import { CountryGroup } from '@/components/admin/destinations/CountryGroup'
 
 interface Destination {
   id: string
@@ -28,10 +31,19 @@ interface Destination {
   }
 }
 
+interface GroupedDestinations {
+  [countryName: string]: Destination[]
+}
+
 export default function DestinationsPage() {
   const [destinations, setDestinations] = useState<Destination[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedDestinationId, setSelectedDestinationId] = useState<string | null>(null)
+  const [filters, setFilters] = useState<FilterState>({
+    searchQuery: '',
+    poiFilter: 'all',
+    sortBy: 'country'
+  })
 
   useEffect(() => {
     loadDestinations()
@@ -50,6 +62,69 @@ export default function DestinationsPage() {
     setIsLoading(false)
   }
 
+  // Filter and sort destinations
+  const filteredAndSortedDestinations = useMemo(() => {
+    let filtered = destinations
+
+    // Apply search filter
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (d) =>
+          d.cityName.toLowerCase().includes(query) ||
+          d.country?.name.toLowerCase().includes(query)
+      )
+    }
+
+    // Apply POI filter
+    if (filters.poiFilter === 'has-pois') {
+      filtered = filtered.filter((d) => d._count.themePOIs > 0)
+    } else if (filters.poiFilter === 'missing-pois') {
+      filtered = filtered.filter((d) => d._count.themePOIs === 0)
+    }
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'city-asc':
+          return a.cityName.localeCompare(b.cityName)
+        case 'city-desc':
+          return b.cityName.localeCompare(a.cityName)
+        case 'country':
+          return (a.country?.name || 'Unknown').localeCompare(b.country?.name || 'Unknown')
+        case 'pois-high':
+          return b._count.themePOIs - a._count.themePOIs
+        case 'pois-low':
+          return a._count.themePOIs - b._count.themePOIs
+        default:
+          return 0
+      }
+    })
+
+    return sorted
+  }, [destinations, filters])
+
+  // Group destinations by country
+  const groupedDestinations = useMemo(() => {
+    const grouped: GroupedDestinations = {}
+
+    filteredAndSortedDestinations.forEach((dest) => {
+      const countryName = dest.country?.name || 'Unknown Country'
+      if (!grouped[countryName]) {
+        grouped[countryName] = []
+      }
+      grouped[countryName].push(dest)
+    })
+
+    // Sort countries alphabetically
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key]
+        return acc
+      }, {} as GroupedDestinations)
+  }, [filteredAndSortedDestinations])
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -66,79 +141,37 @@ export default function DestinationsPage() {
         <p className="text-white/70 mt-1">Manage destination content and theme POIs</p>
       </div>
 
-      {/* Table */}
-      <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
-        <table className="min-w-full divide-y divide-white/10">
-          <thead className="bg-white/5">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                City
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Country
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Airports
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                POIs
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-white/70 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/10">
-            {destinations.map((dest) => (
-              <tr key={dest.id} className="hover:bg-white/5 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                  {dest.cityName}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                  {dest.country?.name || 'N/A'}
-                </td>
-                <td className="px-6 py-4 text-sm text-white/70">
-                  <div className="flex flex-wrap gap-1">
-                    {dest.airports && dest.airports.length > 0 ? (
-                      dest.airports.map((da) => (
-                        <span
-                          key={da.airport.iataCode}
-                          className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                            da.isPrimary
-                              ? 'bg-white/20 text-white'
-                              : 'bg-white/10 text-white/70'
-                          }`}
-                          title={da.airport.name}
-                        >
-                          {da.airport.iataCode}
-                          {da.isPrimary && ' ★'}
-                        </span>
-                      ))
-                    ) : dest.airportCode ? (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-white/20 text-white">
-                        {dest.airportCode}
-                      </span>
-                    ) : (
-                      <span className="text-white/50">No airports</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                  {dest._count.themePOIs} POIs
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button
-                    onClick={() => setSelectedDestinationId(dest.id)}
-                    className="text-blue-300 hover:text-blue-200"
-                  >
-                    Manage POIs
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Statistics Dashboard */}
+      <DestinationStats destinations={destinations} />
+
+      {/* Filters */}
+      <DestinationFilters filters={filters} onFilterChange={setFilters} />
+
+      {/* Grouped Destinations */}
+      {Object.keys(groupedDestinations).length === 0 ? (
+        <div className="text-center py-16 bg-white/5 border border-white/10 rounded-xl">
+          <p className="text-white/60">No destinations found matching your filters</p>
+          <button
+            onClick={() =>
+              setFilters({ searchQuery: '', poiFilter: 'all', sortBy: 'country' })
+            }
+            className="mt-4 text-blue-300 hover:text-blue-200 text-sm"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Object.entries(groupedDestinations).map(([countryName, countryDestinations]) => (
+            <CountryGroup
+              key={countryName}
+              countryName={countryName}
+              destinations={countryDestinations}
+              onManageDestination={setSelectedDestinationId}
+            />
+          ))}
+        </div>
+      )}
 
       {/* POI Management Modal */}
       <ManagePOIModal
