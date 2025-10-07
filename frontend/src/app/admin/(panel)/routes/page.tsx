@@ -1,8 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { getOriginAirports, getRoutesByOrigin, createFlightRoute, updateFlightRoute, deleteFlightRoute, getSearchableAirports } from '@/actions/flightRouteActions'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { getOriginAirports, getRoutesByOrigin, createFlightRoute, updateFlightRoute, deleteFlightRoute, getSearchableAirports, getRouteStatistics } from '@/actions/flightRouteActions'
+import { RouteStats } from '@/components/admin/routes/RouteStats'
+import { RouteFilters, type RouteFilterState } from '@/components/admin/routes/RouteFilters'
+import { OriginContinentGroup } from '@/components/admin/routes/OriginContinentGroup'
+import { getContinentName, CONTINENTS } from '@/lib/constants/continents'
 
 interface OriginAirport {
   airportCode: string
@@ -30,12 +33,39 @@ interface Airport {
   country: string
 }
 
+interface GroupedOrigins {
+  [countryName: string]: OriginAirport[]
+}
+
+interface RouteStatistics {
+  totalRoutes: number
+  directRoutes: number
+  connectionRoutes: number
+  unknownRoutes: number
+  estimatedRoutes: number
+}
+
 export default function RoutesPage() {
   const [origins, setOrigins] = useState<OriginAirport[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedOriginCode, setExpandedOriginCode] = useState<string | null>(null)
   const [routesForOrigin, setRoutesForOrigin] = useState<FlightRoute[]>([])
   const [loadingRoutes, setLoadingRoutes] = useState(false)
+  const [routeStats, setRouteStats] = useState<RouteStatistics>({
+    totalRoutes: 0,
+    directRoutes: 0,
+    connectionRoutes: 0,
+    unknownRoutes: 0,
+    estimatedRoutes: 0
+  })
+
+  // Filters
+  const [filters, setFilters] = useState<RouteFilterState>({
+    searchQuery: '',
+    routeType: 'all',
+    dataSource: 'all',
+    sortBy: 'country'
+  })
 
   // Form state
   const [isAddFormOpen, setIsAddFormOpen] = useState(false)
@@ -51,6 +81,7 @@ export default function RoutesPage() {
 
   useEffect(() => {
     loadOrigins()
+    loadRouteStatistics()
   }, [])
 
   async function loadOrigins() {
@@ -60,6 +91,13 @@ export default function RoutesPage() {
       setOrigins(result.data)
     }
     setIsLoading(false)
+  }
+
+  async function loadRouteStatistics() {
+    const result = await getRouteStatistics()
+    if (result.success && result.data) {
+      setRouteStats(result.data)
+    }
   }
 
   async function toggleOriginExpansion(airportCode: string) {
@@ -124,6 +162,7 @@ export default function RoutesPage() {
     if (result.success) {
       setIsAddFormOpen(false)
       await loadOrigins()
+      await loadRouteStatistics()
       // Refresh expanded routes if applicable
       if (expandedOriginCode === formData.originAirportCode.toUpperCase()) {
         const routesResult = await getRoutesByOrigin(formData.originAirportCode.toUpperCase())
@@ -164,6 +203,7 @@ export default function RoutesPage() {
     const result = await deleteFlightRoute(id)
     if (result.success) {
       await loadOrigins()
+      await loadRouteStatistics()
       // Refresh expanded routes
       if (expandedOriginCode) {
         const routesResult = await getRoutesByOrigin(expandedOriginCode)
@@ -175,6 +215,89 @@ export default function RoutesPage() {
       alert(result.error)
     }
   }
+
+  // Filter and sort origins
+  const filteredAndSortedOrigins = useMemo(() => {
+    let filtered = origins
+
+    // Apply search filter
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        (o) =>
+          o.airportCode.toLowerCase().includes(query) ||
+          o.city.toLowerCase().includes(query) ||
+          o.country.toLowerCase().includes(query)
+      )
+    }
+
+    // Note: Route type and data source filters would require fetching all routes,
+    // which is too expensive. These filters are kept for UI consistency but
+    // would need optimization (e.g., database-level filtering) for production.
+
+    // Apply sorting
+    const sorted = [...filtered].sort((a, b) => {
+      switch (filters.sortBy) {
+        case 'code-asc':
+          return a.airportCode.localeCompare(b.airportCode)
+        case 'code-desc':
+          return b.airportCode.localeCompare(a.airportCode)
+        case 'country':
+          return a.country.localeCompare(b.country)
+        case 'routes-high':
+          return b.routeCount - a.routeCount
+        case 'routes-low':
+          return a.routeCount - b.routeCount
+        default:
+          return 0
+      }
+    })
+
+    return sorted
+  }, [origins, filters])
+
+  // Group origins by continent, then by country
+  const groupedByContinent = useMemo(() => {
+    // First group by country
+    const byCountry: GroupedOrigins = {}
+    filteredAndSortedOrigins.forEach((origin) => {
+      const countryName = origin.country || 'Unknown Country'
+      if (!byCountry[countryName]) {
+        byCountry[countryName] = []
+      }
+      byCountry[countryName].push(origin)
+    })
+
+    // Then group countries by continent
+    const byContinent: { [continentName: string]: GroupedOrigins } = {}
+    Object.entries(byCountry).forEach(([countryName, origins]) => {
+      const continentName = getContinentName(countryName)
+      if (!byContinent[continentName]) {
+        byContinent[continentName] = {}
+      }
+      byContinent[continentName][countryName] = origins
+    })
+
+    // Sort continents by predefined order, then sort countries within each continent
+    const continentOrder = [...CONTINENTS.map(c => c.name), 'Other']
+    const sorted = continentOrder
+      .filter(continentName => byContinent[continentName]) // Only include continents that have data
+      .reduce((acc, continentName) => {
+        const countries = byContinent[continentName]
+        // Sort countries alphabetically within each continent
+        const sortedCountries = Object.keys(countries)
+          .sort()
+          .reduce((countryAcc, countryName) => {
+            countryAcc[countryName] = countries[countryName]
+            return countryAcc
+          }, {} as GroupedOrigins)
+
+        acc[continentName] = sortedCountries
+        return acc
+      }, {} as { [continentName: string]: GroupedOrigins })
+
+    return sorted
+  }, [filteredAndSortedOrigins])
 
   if (isLoading) {
     return (
@@ -200,170 +323,59 @@ export default function RoutesPage() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
-        <table className="min-w-full divide-y divide-white/10">
-          <thead className="bg-white/5">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Origin Airport
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                City
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Country
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
-                Routes
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/10">
-            {origins.map((origin) => {
-              const isExpanded = expandedOriginCode === origin.airportCode
-              return (
-                <React.Fragment key={origin.airportCode}>
-                  {/* Main Origin Row */}
-                  <tr
-                    onClick={() => toggleOriginExpansion(origin.airportCode)}
-                    className="hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                      <div className="flex items-center gap-2">
-                        {isExpanded ? (
-                          <ChevronDown className="w-4 h-4 text-white/70" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-white/70" />
-                        )}
-                        {origin.airportCode}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                      {origin.city}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                      {origin.country}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
-                      {origin.routeCount} routes
-                    </td>
-                  </tr>
+      {/* Statistics Dashboard */}
+      <RouteStats
+        origins={origins}
+        totalRoutes={routeStats.totalRoutes}
+        directRoutes={routeStats.directRoutes}
+        connectionRoutes={routeStats.connectionRoutes}
+        unknownRoutes={routeStats.unknownRoutes}
+        estimatedRoutes={routeStats.estimatedRoutes}
+      />
 
-                  {/* Expanded Routes Section */}
-                  {isExpanded && (
-                    <tr>
-                      <td colSpan={4} className="bg-white/5 px-6 py-4">
-                        {loadingRoutes ? (
-                          <div className="flex items-center justify-center py-8">
-                            <div className="animate-spin rounded-full h-8 w-8 border-4 border-white/30 border-t-white"></div>
-                          </div>
-                        ) : routesForOrigin.length === 0 ? (
-                          <div className="text-center py-8 text-white/50">
-                            No routes from this airport yet
-                          </div>
-                        ) : (
-                          <div className="space-y-4">
-                            {/* Summary */}
-                            <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                              <span className="text-sm text-white/70">{routesForOrigin.length} destinations</span>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  openAddForm(origin.airportCode)
-                                }}
-                                className="text-sm bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition-colors"
-                              >
-                                + Add Destination
-                              </button>
-                            </div>
+      {/* Filters */}
+      <RouteFilters filters={filters} onFilterChange={setFilters} />
 
-                            {/* Nested Routes Table */}
-                            <table className="min-w-full">
-                              <thead>
-                                <tr className="text-xs text-white/50 uppercase">
-                                  <th className="text-left pb-2">Destination</th>
-                                  <th className="text-left pb-2">Airport Code</th>
-                                  <th className="text-left pb-2">Flight Type</th>
-                                  <th className="text-left pb-2">Flight Duration</th>
-                                  <th className="text-right pb-2">Actions</th>
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-white/5">
-                                {routesForOrigin.map((route) => (
-                                  <tr key={route.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="py-3 text-sm text-white">
-                                      {route.destinationCity}, {route.destinationCountry}
-                                    </td>
-                                    <td className="py-3 text-sm text-white/70">
-                                      {route.destinationAirportCode}
-                                    </td>
-                                    <td className="py-3 text-sm">
-                                      {route.isDirect === null ? (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-500/20 text-gray-300">
-                                          ❓ Unknown
-                                        </span>
-                                      ) : route.isDirect ? (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-300">
-                                          ✈️ Direct
-                                        </span>
-                                      ) : (
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/20 text-orange-300">
-                                          🔄 Connections
-                                        </span>
-                                      )}
-                                    </td>
-                                    <td className="py-3 text-sm text-white/70">
-                                      <div className="flex items-center gap-2">
-                                        {formatDuration(route.totalDurationMinutes)}
-                                        {route.isEstimated && (
-                                          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-500/20 text-blue-300">
-                                            📊 Est.
-                                          </span>
-                                        )}
-                                      </div>
-                                    </td>
-                                    <td className="py-3 text-right text-sm space-x-3">
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          openEditForm(route)
-                                        }}
-                                        className="text-blue-300 hover:text-blue-200"
-                                      >
-                                        Edit
-                                      </button>
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation()
-                                          handleDelete(route.id)
-                                        }}
-                                        className="text-red-300 hover:text-red-200"
-                                      >
-                                        Delete
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              )
-            })}
-          </tbody>
-        </table>
+      {/* Grouped Origins by Continent */}
+      {Object.keys(groupedByContinent).length === 0 ? (
+        <div className="text-center py-16 bg-white/5 border border-white/10 rounded-xl">
+          <p className="text-white/60">No origin airports found matching your filters</p>
+          <button
+            onClick={() =>
+              setFilters({ searchQuery: '', routeType: 'all', dataSource: 'all', sortBy: 'country' })
+            }
+            className="mt-4 text-blue-300 hover:text-blue-200 text-sm"
+          >
+            Clear filters
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {Object.entries(groupedByContinent).map(([continentName, countryGroups]) => {
+            const continentConfig = CONTINENTS.find(c => c.name === continentName) || {
+              name: continentName,
+              emoji: '🌐',
+              color: '#6b7280',
+              countries: []
+            }
 
-        {origins.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-white/50">No flight routes yet. Add your first one!</p>
-          </div>
-        )}
-      </div>
+            return (
+              <OriginContinentGroup
+                key={continentName}
+                continent={continentConfig}
+                groupedOrigins={countryGroups}
+                onToggleOrigin={toggleOriginExpansion}
+                expandedOriginCode={expandedOriginCode}
+                routesForOrigin={routesForOrigin}
+                loadingRoutes={loadingRoutes}
+                onAddRoute={openAddForm}
+                onEditRoute={openEditForm}
+                onDeleteRoute={handleDelete}
+              />
+            )
+          })}
+        </div>
+      )}
 
       {/* Add Route Modal */}
       {isAddFormOpen && (

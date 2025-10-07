@@ -171,3 +171,38 @@ export async function getSearchableAirports() {
     return { success: false, error: 'Failed to fetch airports' }
   }
 }
+
+export async function getRouteStatistics() {
+  try {
+    const stats = await db.$queryRaw<Array<{
+      total_routes: bigint
+      direct_routes: bigint
+      connection_routes: bigint
+      unknown_routes: bigint
+      estimated_routes: bigint
+    }>>`
+      SELECT
+        COUNT(*)::int as total_routes,
+        SUM(CASE WHEN is_direct = true THEN 1 ELSE 0 END)::int as direct_routes,
+        SUM(CASE WHEN is_direct = false THEN 1 ELSE 0 END)::int as connection_routes,
+        SUM(CASE WHEN is_direct IS NULL THEN 1 ELSE 0 END)::int as unknown_routes,
+        SUM(CASE WHEN is_estimated = true THEN 1 ELSE 0 END)::int as estimated_routes
+      FROM flight_routes
+    `
+
+    const result = stats[0]
+    return {
+      success: true,
+      data: {
+        totalRoutes: Number(result.total_routes),
+        directRoutes: Number(result.direct_routes),
+        connectionRoutes: Number(result.connection_routes),
+        unknownRoutes: Number(result.unknown_routes),
+        estimatedRoutes: Number(result.estimated_routes)
+      }
+    }
+  } catch (error) {
+    console.error('[getRouteStatistics] Error:', error)
+    return { success: false, error: 'Failed to fetch route statistics' }
+  }
+}
