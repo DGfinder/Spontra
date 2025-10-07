@@ -60,7 +60,22 @@ export function FlightTimeSelector({ timeRange, timeInfo, airports }: FlightTime
   }, {} as Record<string, Airport[]>)
 
   const handleThemeSelect = (airportCode: string, theme: string) => {
-    router.push(`/from/${airportCode}/${timeInfo.range}/${theme}`)
+    // Add default search params for dates and travelers
+    const today = new Date()
+    const twoWeeksOut = new Date(today)
+    twoWeeksOut.setDate(today.getDate() + 14)
+
+    const oneWeekLater = new Date(twoWeeksOut)
+    oneWeekLater.setDate(twoWeeksOut.getDate() + 7)
+
+    const params = new URLSearchParams({
+      departure: twoWeeksOut.toISOString().split('T')[0],
+      return: oneWeekLater.toISOString().split('T')[0],
+      travelers: '2',
+      directOnly: 'false'
+    })
+
+    router.push(`/from/${airportCode}/${timeInfo.range}/${theme}?${params.toString()}`)
   }
 
   return (

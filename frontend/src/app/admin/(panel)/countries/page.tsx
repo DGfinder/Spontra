@@ -9,6 +9,7 @@ interface Country {
   id: string
   name: string
   code: string
+  mapSvg?: string | null
   _count: {
     destinations: number
   }
@@ -33,7 +34,7 @@ export default function CountriesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingCountry, setEditingCountry] = useState<Country | null>(null)
-  const [formData, setFormData] = useState({ name: '', code: '' })
+  const [formData, setFormData] = useState({ name: '', code: '', mapSvg: '' })
 
   // Expansion state
   const [expandedCountryId, setExpandedCountryId] = useState<string | null>(null)
@@ -58,13 +59,13 @@ export default function CountriesPage() {
 
   function openCreateForm() {
     setEditingCountry(null)
-    setFormData({ name: '', code: '' })
+    setFormData({ name: '', code: '', mapSvg: '' })
     setIsFormOpen(true)
   }
 
   function openEditForm(country: Country) {
     setEditingCountry(country)
-    setFormData({ name: country.name, code: country.code })
+    setFormData({ name: country.name, code: country.code, mapSvg: country.mapSvg || '' })
     setIsFormOpen(true)
   }
 
@@ -341,6 +342,31 @@ export default function CountriesPage() {
                   maxLength={2}
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Map SVG Code (Optional)
+                </label>
+                <textarea
+                  value={formData.mapSvg}
+                  onChange={(e) => setFormData({ ...formData, mapSvg: e.target.value })}
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/40 font-mono text-xs resize-y"
+                  placeholder='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">...</svg>'
+                  rows={6}
+                />
+                <p className="text-xs text-white/50 mt-1">
+                  Paste the complete SVG code for the country map outline
+                </p>
+                {formData.mapSvg && (
+                  <div className="mt-2 p-3 bg-white/5 rounded-lg border border-white/10">
+                    <div className="text-xs text-white/70 mb-2">Preview:</div>
+                    <div
+                      className="w-16 h-16 mx-auto"
+                      dangerouslySetInnerHTML={{ __html: formData.mapSvg }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">

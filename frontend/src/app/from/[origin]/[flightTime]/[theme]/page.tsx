@@ -1,7 +1,9 @@
 import { notFound } from 'next/navigation'
 import { db } from '@/lib/db'
 import { CountryGridWrapper } from '@/components/CountryGridWrapper'
+import { SearchFilterBar } from '@/components/SearchFilterBar'
 import { StructuredData } from '@/components/SEO/StructuredData'
+import { ScrollRestoration } from '@/components/ScrollRestoration'
 import { generateTimeBasedSearchMetadata, getThemeInfo } from '@/lib/seo/generateMetadata'
 import { generateBreadcrumbStructuredData } from '@/lib/seo/generateStructuredData'
 import Link from 'next/link'
@@ -60,6 +62,12 @@ export default async function TimeBasedSearchPage({ params, searchParams }: Page
 
   // Check for dev mode
   const isDevMode = search.dev === 'true'
+
+  // Extract search parameters
+  const departureDate = search.departure
+  const returnDate = search.return
+  const travelers = search.travelers ? parseInt(search.travelers) : 2
+  const directOnly = search.directOnly === 'true'
 
   // Validate inputs
   if (!VALID_THEMES.includes(theme)) {
@@ -153,22 +161,43 @@ export default async function TimeBasedSearchPage({ params, searchParams }: Page
   }
 
   // Convert to array format for CountryGrid
-  const countryGroups = Array.from(destinationsByCountry.entries()).map(([countryName, destinations]) => {
-    const sortedDestinations = destinations.sort((a, b) => a.flightDuration - b.flightDuration)
-    const shortestFlight = sortedDestinations[0]
+  const countryGroups = await Promise.all(
+    Array.from(destinationsByCountry.entries()).map(async ([countryName, destinations]) => {
+      const sortedDestinations = destinations.sort((a, b) => a.flightDuration - b.flightDuration)
+      const shortestFlight = sortedDestinations[0]
 
-    return {
-      countryCode: destinations[0].country.code,
-      countryName: countryName,
-      imageUrl: null,
-      imageType: 'gradient' as const,
-      shortestFlightTime: shortestFlight.flightDuration / 60, // Convert minutes to hours
-      cheapestPrice: 0, // Not available in this context
-      currency: 'USD',
-      destinationCount: destinations.length,
-      destinations: sortedDestinations
-    }
-  })
+      // Fetch POI highlights for this country
+      const pois = await db.themePOI.findMany({
+        where: {
+          theme,
+          destination: {
+            country: {
+              name: countryName
+            }
+          }
+        },
+        select: {
+          name: true
+        },
+        take: 3,
+        distinct: ['name']
+      })
+
+      return {
+        countryCode: destinations[0].country.code,
+        countryName: countryName,
+        mapSvg: destinations[0].country.mapSvg,
+        imageUrl: null,
+        imageType: 'gradient' as const,
+        shortestFlightTime: shortestFlight.flightDuration / 60, // Convert minutes to hours
+        cheapestPrice: 0, // Not available in this context
+        currency: 'USD',
+        destinationCount: destinations.length,
+        destinations: sortedDestinations,
+        poiHighlights: pois.map(p => p.name)
+      }
+    })
+  )
 
   // Structured data for SEO
   const breadcrumbStructuredData = generateBreadcrumbStructuredData([
@@ -186,10 +215,25 @@ export default async function TimeBasedSearchPage({ params, searchParams }: Page
       {/* Structured Data */}
       <StructuredData data={breadcrumbStructuredData} />
 
+      {/* Scroll Restoration */}
+      <ScrollRestoration />
+
       {/* Page Content */}
-      <div className="min-h-screen bg-gradient-to-br from-brand-purple via-brand-purple to-brand-blue">
+      <div className="min-h-screen relative">
+        {/* Theme Background Image */}
+        <div
+          className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `url(/${theme}-background.jpg)`,
+            filter: 'brightness(0.7)'
+          }}
+        />
+        <div className="fixed inset-0 z-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60" />
+
+        {/* Content */}
+        <div className="relative z-10">
         {/* Header */}
-        <header className="border-b border-white/10 bg-white/5 backdrop-blur-xl">
+        <header className="backdrop-blur-xl bg-black/30">
           <div className="max-w-6xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between mb-4">
               <Link
@@ -225,6 +269,22 @@ export default async function TimeBasedSearchPage({ params, searchParams }: Page
 
         {/* Results */}
         <main className="max-w-6xl mx-auto px-4 py-8">
+          {/* Search Filter Bar - Centered */}
+          <div className="mb-8 flex justify-center">
+            <div className="w-full max-w-6xl">
+              <SearchFilterBar
+                origin={originCode}
+                flightTime={flightTime}
+                theme={theme}
+                originCity={originAirport.city}
+                departureDate={departureDate}
+                returnDate={returnDate}
+                travelers={travelers}
+                directOnly={directOnly}
+              />
+            </div>
+          </div>
+
           {countryGroups.length > 0 ? (
             <CountryGridWrapper
               countries={countryGroups}
@@ -250,6 +310,7 @@ export default async function TimeBasedSearchPage({ params, searchParams }: Page
             </div>
           )}
         </main>
+        </div>
       </div>
     </>
   )

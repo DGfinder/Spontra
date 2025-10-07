@@ -83,12 +83,13 @@ export async function getCountryWithCities(countryId: string) {
   }
 }
 
-export async function createCountry(data: { name: string; code: string }) {
+export async function createCountry(data: { name: string; code: string; mapSvg?: string }) {
   try {
     const country = await db.country.create({
       data: {
         name: data.name,
-        code: data.code.toUpperCase()
+        code: data.code.toUpperCase(),
+        mapSvg: data.mapSvg || null
       }
     })
 
@@ -99,13 +100,14 @@ export async function createCountry(data: { name: string; code: string }) {
   }
 }
 
-export async function updateCountry(id: string, data: { name: string; code: string }) {
+export async function updateCountry(id: string, data: { name: string; code: string; mapSvg?: string }) {
   try {
     const country = await db.country.update({
       where: { id },
       data: {
         name: data.name,
-        code: data.code.toUpperCase()
+        code: data.code.toUpperCase(),
+        mapSvg: data.mapSvg || null
       }
     })
 

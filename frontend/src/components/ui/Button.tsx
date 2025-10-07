@@ -2,20 +2,37 @@ import React from 'react'
 import { clsx } from 'clsx'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'adventure' | 'nature' | 'culture' | 'danger'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'gold' | 'adventure' | 'nature' | 'culture' | 'danger' | 'vibe' | 'indulge' | 'discover'
   size?: 'sm' | 'md' | 'lg'
   children: React.ReactNode
   isLoading?: boolean
 }
 
-export function Button({ 
-  variant = 'primary', 
-  size = 'md', 
+// Helper function to get theme color from CSS variables
+function getThemeColor(theme: string): string {
+  const colorMap: Record<string, string> = {
+    adventure: '#ffbd0a',
+    nature: '#02c06d',
+    indulge: '#e52b00',
+    vibe: '#eb5b25',
+    discover: '#7f6ae4',
+    culture: '#a855f7',
+  }
+  return colorMap[theme] || '#3b82f6'
+}
+
+// Theme variants that need inline styles (Tailwind v4 doesn't recognize custom color classes)
+const themeVariants = ['adventure', 'nature', 'culture', 'vibe', 'indulge', 'discover']
+
+export function Button({
+  variant = 'primary',
+  size = 'md',
   className = '',
   disabled = false,
   isLoading = false,
-  children, 
-  ...props 
+  style,
+  children,
+  ...props
 }: ButtonProps) {
   const baseClasses = [
     'inline-flex items-center justify-center rounded-xl font-medium',
@@ -24,7 +41,7 @@ export function Button({
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
     'active:scale-[0.98] transform-gpu',
   ].join(' ')
-  
+
   const variantClasses = {
     primary: [
       'bg-brand-blue text-white shadow-lg',
@@ -50,37 +67,35 @@ export function Button({
       'focus:ring-[#FFC83A]/50',
     ].join(' '),
 
-    adventure: [
-      'bg-adventure text-white shadow-lg',
-      'hover:bg-adventure/90 hover:shadow-xl hover:-translate-y-0.5',
-      'focus:ring-adventure/50',
-    ].join(' '),
-
-    nature: [
-      'bg-nature text-white shadow-lg',
-      'hover:bg-nature/90 hover:shadow-xl hover:-translate-y-0.5',
-      'focus:ring-nature/50',
-    ].join(' '),
-
-    culture: [
-      'bg-culture text-white shadow-lg',
-      'hover:bg-culture/90 hover:shadow-xl hover:-translate-y-0.5',
-      'focus:ring-culture/50',
-    ].join(' '),
-
     danger: [
       'bg-red-600 text-white shadow-lg',
       'hover:bg-red-700 hover:shadow-xl hover:-translate-y-0.5',
       'focus:ring-red-600/50',
     ].join(' '),
+
+    // Theme variants will use inline styles, so we define base styles only
+    adventure: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
+    nature: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
+    culture: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
+    vibe: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
+    indulge: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
+    discover: 'text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5',
   }
-  
+
   const sizeClasses = {
     sm: 'px-3 py-2 text-sm h-9',
     md: 'px-6 py-3 text-base h-12',
     lg: 'px-8 py-4 text-lg h-14'
   }
-  
+
+  // Apply inline styles for theme variants
+  const inlineStyles: React.CSSProperties = themeVariants.includes(variant)
+    ? {
+        backgroundColor: getThemeColor(variant),
+        ...style
+      }
+    : { ...style }
+
   const classes = clsx(
     baseClasses,
     variantClasses[variant],
@@ -89,8 +104,9 @@ export function Button({
   )
   
   return (
-    <button 
-      className={classes} 
+    <button
+      className={classes}
+      style={inlineStyles}
       disabled={disabled || isLoading}
       {...props}
     >
