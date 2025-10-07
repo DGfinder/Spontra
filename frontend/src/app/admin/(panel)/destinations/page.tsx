@@ -5,7 +5,8 @@ import { getDestinations } from '@/actions/destinationActions'
 import { ManagePOIModal } from '@/components/admin/poi/ManagePOIModal'
 import { DestinationStats } from '@/components/admin/destinations/DestinationStats'
 import { DestinationFilters, type FilterState } from '@/components/admin/destinations/DestinationFilters'
-import { CountryGroup } from '@/components/admin/destinations/CountryGroup'
+import { ContinentGroup } from '@/components/admin/destinations/ContinentGroup'
+import { getContinentName, CONTINENTS } from '@/lib/constants/continents'
 
 interface Destination {
   id: string
@@ -104,25 +105,47 @@ export default function DestinationsPage() {
     return sorted
   }, [destinations, filters])
 
-  // Group destinations by country
-  const groupedDestinations = useMemo(() => {
-    const grouped: GroupedDestinations = {}
-
+  // Group destinations by continent, then by country
+  const groupedByContinent = useMemo(() => {
+    // First group by country
+    const byCountry: GroupedDestinations = {}
     filteredAndSortedDestinations.forEach((dest) => {
       const countryName = dest.country?.name || 'Unknown Country'
-      if (!grouped[countryName]) {
-        grouped[countryName] = []
+      if (!byCountry[countryName]) {
+        byCountry[countryName] = []
       }
-      grouped[countryName].push(dest)
+      byCountry[countryName].push(dest)
     })
 
-    // Sort countries alphabetically
-    return Object.keys(grouped)
-      .sort()
-      .reduce((acc, key) => {
-        acc[key] = grouped[key]
+    // Then group countries by continent
+    const byContinent: { [continentName: string]: GroupedDestinations } = {}
+    Object.entries(byCountry).forEach(([countryName, destinations]) => {
+      const continentName = getContinentName(countryName)
+      if (!byContinent[continentName]) {
+        byContinent[continentName] = {}
+      }
+      byContinent[continentName][countryName] = destinations
+    })
+
+    // Sort continents by predefined order, then sort countries within each continent
+    const continentOrder = [...CONTINENTS.map(c => c.name), 'Other']
+    const sorted = continentOrder
+      .filter(continentName => byContinent[continentName]) // Only include continents that have data
+      .reduce((acc, continentName) => {
+        const countries = byContinent[continentName]
+        // Sort countries alphabetically within each continent
+        const sortedCountries = Object.keys(countries)
+          .sort()
+          .reduce((countryAcc, countryName) => {
+            countryAcc[countryName] = countries[countryName]
+            return countryAcc
+          }, {} as GroupedDestinations)
+
+        acc[continentName] = sortedCountries
         return acc
-      }, {} as GroupedDestinations)
+      }, {} as { [continentName: string]: GroupedDestinations })
+
+    return sorted
   }, [filteredAndSortedDestinations])
 
   if (isLoading) {
@@ -147,8 +170,8 @@ export default function DestinationsPage() {
       {/* Filters */}
       <DestinationFilters filters={filters} onFilterChange={setFilters} />
 
-      {/* Grouped Destinations */}
-      {Object.keys(groupedDestinations).length === 0 ? (
+      {/* Grouped Destinations by Continent */}
+      {Object.keys(groupedByContinent).length === 0 ? (
         <div className="text-center py-16 bg-white/5 border border-white/10 rounded-xl">
           <p className="text-white/60">No destinations found matching your filters</p>
           <button
@@ -161,15 +184,24 @@ export default function DestinationsPage() {
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
-          {Object.entries(groupedDestinations).map(([countryName, countryDestinations]) => (
-            <CountryGroup
-              key={countryName}
-              countryName={countryName}
-              destinations={countryDestinations}
-              onManageDestination={setSelectedDestinationId}
-            />
-          ))}
+        <div className="space-y-6">
+          {Object.entries(groupedByContinent).map(([continentName, countryGroups]) => {
+            const continentConfig = CONTINENTS.find(c => c.name === continentName) || {
+              name: continentName,
+              emoji: '🌐',
+              color: '#6b7280',
+              countries: []
+            }
+
+            return (
+              <ContinentGroup
+                key={continentName}
+                continent={continentConfig}
+                groupedDestinations={countryGroups}
+                onManageDestination={setSelectedDestinationId}
+              />
+            )
+          })}
         </div>
       )}
 
