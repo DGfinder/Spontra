@@ -39,7 +39,7 @@ export function OriginContinentGroup({
   onAddRoute,
   onEditRoute,
   onDeleteRoute,
-  defaultExpanded = true
+  defaultExpanded = false
 }: OriginContinentGroupProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 

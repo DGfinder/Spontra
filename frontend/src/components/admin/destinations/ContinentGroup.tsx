@@ -44,7 +44,7 @@ export function ContinentGroup({
   continent,
   groupedDestinations,
   onManageDestination,
-  defaultExpanded = true
+  defaultExpanded = false
 }: ContinentGroupProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
