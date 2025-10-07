@@ -192,6 +192,7 @@ export function ManagePOIModal({
 
               {poiManager.uiMode === 'select-template' && (
                 <POITemplates
+                  theme={poiManager.activeTheme}
                   onSelectTemplate={handleSelectTemplate}
                   onCancel={() => poiManager.setUIMode('list', null)}
                 />
