@@ -47,6 +47,7 @@ interface DestinationDetailProps {
   destination: DestinationData
   originAirport?: string
   selectedTheme?: string
+  isDevMode?: boolean
 }
 
 const THEMES = [
@@ -60,7 +61,8 @@ const THEMES = [
 export function DestinationDetail({
   destination,
   originAirport,
-  selectedTheme = 'adventure'
+  selectedTheme = 'adventure',
+  isDevMode = false
 }: DestinationDetailProps) {
   const [activeTheme, setActiveTheme] = useState(selectedTheme)
 
@@ -74,6 +76,19 @@ export function DestinationDetail({
         destination={destination}
         originAirport={originAirport}
       />
+
+      {/* Dev Mode Badge */}
+      {isDevMode && (
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20">
+          <div className="max-w-6xl mx-auto px-4 py-2">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xs font-medium text-yellow-200">
+                🔧 Dev Mode: Viewing page without POI requirements
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Theme Tabs */}
       <div className="sticky top-0 z-10 bg-gradient-to-b from-brand-purple/95 via-brand-purple/90 to-brand-purple/80 backdrop-blur-lg border-b border-white/10">
