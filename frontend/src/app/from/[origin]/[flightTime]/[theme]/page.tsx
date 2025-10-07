@@ -54,8 +54,12 @@ export async function generateMetadata({ params }: PageProps) {
 /**
  * Page Component
  */
-export default async function TimeBasedSearchPage({ params }: PageProps) {
+export default async function TimeBasedSearchPage({ params, searchParams }: PageProps) {
   const { origin, flightTime, theme } = await params
+  const search = await searchParams
+
+  // Check for dev mode
+  const isDevMode = search.dev === 'true'
 
   // Validate inputs
   if (!VALID_THEMES.includes(theme)) {
@@ -122,8 +126,8 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
     for (const destAirport of route.destinationAirport.destinations) {
       const destination = destAirport.destination
 
-      // Only include destinations that have POIs for this theme
-      if (destination.themePOIs.length === 0) continue
+      // Only include destinations that have POIs for this theme (skip filter in dev mode)
+      if (!isDevMode && destination.themePOIs.length === 0) continue
 
       const countryName = destination.country?.name || destination.countryName || 'Unknown'
       const countryCode = destination.country?.code || 'XX'
@@ -187,13 +191,23 @@ export default async function TimeBasedSearchPage({ params }: PageProps) {
         {/* Header */}
         <header className="border-b border-white/10 bg-white/5 backdrop-blur-xl">
           <div className="max-w-6xl mx-auto px-4 py-6">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors mb-4"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Search
-            </Link>
+            <div className="flex items-center justify-between mb-4">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Search
+              </Link>
+
+              {isDevMode && (
+                <div className="px-3 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full">
+                  <span className="text-xs font-medium text-yellow-200">
+                    🔧 Dev Mode: Showing all destinations
+                  </span>
+                </div>
+              )}
+            </div>
 
             <h1 className="text-4xl font-bold text-white mb-2">
               {themeInfo.label} Destinations
