@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, MapPin, Plane } from 'lucide-react'
 import { Button } from '../ui/Button'
-import { generateSkyscannerLink, trackAffiliateClick } from '@/lib/affiliate'
+import { PriceWidget } from '../booking/PriceWidget'
+import { BookingModal } from '../booking/BookingModal'
 import type { DestinationData } from '../DestinationDetail'
 
 interface DestinationHeroProps {
@@ -12,6 +14,7 @@ interface DestinationHeroProps {
 }
 
 export function DestinationHero({ destination, originAirport }: DestinationHeroProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const airportDisplay = destination.airportCode || 'Airport info unavailable'
 
   return (
@@ -54,6 +57,18 @@ export function DestinationHero({ destination, originAirport }: DestinationHeroP
             </p>
           )}
 
+          {/* Price Widget */}
+          {originAirport && destination.airportCode && (
+            <div className="max-w-2xl mx-auto mt-8">
+              <PriceWidget
+                origin={originAirport}
+                destination={destination.airportCode}
+                cityName={destination.cityName}
+                onBookClick={() => setIsModalOpen(true)}
+              />
+            </div>
+          )}
+
           {/* CTA Buttons */}
           <div className="flex items-center justify-center gap-4 pt-6">
             <Button
@@ -67,40 +82,20 @@ export function DestinationHero({ destination, originAirport }: DestinationHeroP
             >
               Explore Videos
             </Button>
-
-            {originAirport && destination.airportCode && (
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  // Generate affiliate link with 30 days from now as departure
-                  const departureDate = new Date()
-                  departureDate.setDate(departureDate.getDate() + 30)
-                  const departureDateStr = departureDate.toISOString().split('T')[0]
-
-                  const affiliateUrl = generateSkyscannerLink({
-                    origin: originAirport,
-                    destination: destination.airportCode!,
-                    departureDate: departureDateStr,
-                    adults: 1
-                  })
-
-                  // Track the click
-                  trackAffiliateClick({
-                    provider: 'skyscanner',
-                    origin: originAirport,
-                    destination: destination.airportCode!
-                  })
-
-                  window.open(affiliateUrl, '_blank')
-                }}
-              >
-                Book Flights
-              </Button>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      {originAirport && destination.airportCode && (
+        <BookingModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          origin={originAirport}
+          destination={destination.airportCode}
+          cityName={destination.cityName}
+        />
+      )}
     </div>
   )
 }
