@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { DestinationHero } from './destination/DestinationHero'
 import { ThemeTabs } from './destination/ThemeTabs'
 import { POIVideoFeed } from './destination/POIVideoFeed'
+import { BookingConfirmButton } from './booking/BookingConfirmButton'
 
 export interface POIVideo {
   id: string
@@ -122,6 +123,9 @@ export function DestinationDetail({
           </div>
         )}
       </div>
+
+      {/* Booking Confirmation Button */}
+      <BookingConfirmButton />
     </div>
   )
 }

@@ -103,6 +103,7 @@ model FavoriteDestination {
 model AffiliateClick {
   id            String    @id @default(uuid())
   userId        String?   @map("user_id")  // Optional - null for anonymous users
+  sessionId     String?   @map("session_id")  // For anonymous user tracking
   destinationId String?   @map("destination_id")  // Which destination they were viewing
   partner       String    // "skyscanner", "kayak", "google_flights"
   clickUrl      String    @map("click_url") @db.Text  // Full affiliate URL clicked
@@ -124,7 +125,11 @@ model AffiliateClick {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
+  // Relations
+  creatorEarnings CreatorEarning[]
+
   @@index([userId])
+  @@index([sessionId])
   @@index([destinationId])
   @@index([partner])
   @@index([createdAt])
@@ -396,8 +401,9 @@ model CreatorEarning {
   tierRate     Decimal  @db.Decimal(5, 4)        // Creator's tier rate at time of earning
   earnedAt     DateTime @default(now()) @map("earned_at")
 
-  creator      Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  video        POIVideo @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  creator        Creator         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  video          POIVideo        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  affiliateClick AffiliateClick? @relation(fields: [affiliateClickId], references: [id], onDelete: SetNull)
 
   @@index([creatorId, earnedAt])
   @@index([videoId])

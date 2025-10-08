@@ -15,19 +15,20 @@ export interface AffiliateClickData {
   destinationId?: string
   originAirport?: string
   destinationAirport?: string
+  sessionId?: string
 }
 
 /**
  * Track affiliate link click
  *
  * @param data - Affiliate click data
- * @returns Promise<boolean> - True if tracked successfully
+ * @returns Promise<string | null> - Click ID if tracked successfully
  */
-export async function trackAffiliateClick(data: AffiliateClickData): Promise<boolean> {
+export async function trackAffiliateClick(data: AffiliateClickData): Promise<string | null> {
   // Check cookie consent - only track if marketing cookies are enabled
   if (!hasConsent('marketing')) {
     console.log('[Affiliate Tracking] Skipped - no marketing cookie consent')
-    return false
+    return null
   }
 
   try {
@@ -40,15 +41,22 @@ export async function trackAffiliateClick(data: AffiliateClickData): Promise<boo
     })
 
     if (response.ok) {
-      console.log('[Affiliate Tracking] Click tracked:', data.partner)
-      return true
+      const result = await response.json()
+      console.log('[Affiliate Tracking] Click tracked:', data.partner, result.clickId)
+
+      // Store click ID in localStorage for booking confirmation
+      if (result.clickId) {
+        localStorage.setItem('last_affiliate_click_id', result.clickId)
+      }
+
+      return result.clickId
     } else {
       console.error('[Affiliate Tracking] Failed to track click:', response.statusText)
-      return false
+      return null
     }
   } catch (error) {
     console.error('[Affiliate Tracking] Error tracking click:', error)
-    return false
+    return null
   }
 }
 
@@ -182,6 +190,7 @@ export function buildGoogleFlightsLink(params: {
  * @param partner - Affiliate partner
  * @param searchParams - Flight search parameters
  * @param destinationId - Destination ID (optional)
+ * @param sessionId - User session ID (optional)
  * @returns void (opens link in new tab)
  */
 export async function handleAffiliateClick(
@@ -193,7 +202,8 @@ export async function handleAffiliateClick(
     returnDate?: string
     adults?: number
   },
-  destinationId?: string
+  destinationId?: string,
+  sessionId?: string
 ): Promise<void> {
   // Build affiliate link based on partner
   let affiliateUrl: string
@@ -219,7 +229,8 @@ export async function handleAffiliateClick(
     clickUrl: affiliateUrl,
     destinationId,
     originAirport: searchParams.originAirport,
-    destinationAirport: searchParams.destinationAirport
+    destinationAirport: searchParams.destinationAirport,
+    sessionId
   }).catch(err => {
     console.error('[Affiliate Tracking] Failed to track click:', err)
   })

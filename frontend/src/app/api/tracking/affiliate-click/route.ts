@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
       clickUrl,
       destinationId,
       originAirport,
-      destinationAirport
+      destinationAirport,
+      sessionId
     } = body
 
     // Validate required fields
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
     const affiliateClick = await db.affiliateClick.create({
       data: {
         userId,
+        sessionId,
         destinationId,
         partner,
         clickUrl,
