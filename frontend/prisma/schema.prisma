@@ -31,6 +31,8 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   savedSearches           SavedSearch[]
   favoriteDestinations    FavoriteDestination[]
+  creator                 Creator?
+  videoViews              VideoView[]
 
   @@map("users")
 }
@@ -267,6 +269,13 @@ model POIVideo {
   videoUrl        String      @map("video_url")
   displayOrder    Int         @default(0) @map("display_order")
 
+  // Creator attribution (UGC)
+  creatorId       String?     @map("creator_id")
+
+  // Moderation status
+  status          String      @default("pending") // "pending" | "approved" | "rejected"
+  rejectionReason String?     @map("rejection_reason") @db.Text
+
   // SEO Fields
   caption         String?     @db.Text // Instagram-style caption (50-100 words) for SEO and social
   altText         String?     @map("alt_text") @db.VarChar(255) // Image alt text for accessibility & SEO
@@ -274,8 +283,13 @@ model POIVideo {
   createdAt       DateTime    @default(now()) @map("created_at")
 
   poi             ThemePOI    @relation(fields: [poiId], references: [id], onDelete: Cascade)
+  creator         Creator?    @relation(fields: [creatorId], references: [id])
+  views           VideoView[]
+  earnings        CreatorEarning[]
 
   @@index([poiId])
+  @@index([creatorId])
+  @@index([status])
   @@map("poi_videos")
 }
 
@@ -312,4 +326,81 @@ model OfferCache {
   @@index([queryHash])
   @@index([expiresAt, isStale])
   @@map("offer_cache")
+}
+
+// ============================================================================
+// UGC CREATOR SYSTEM
+// ============================================================================
+
+enum CreatorTier {
+  new      // 5% commission share
+  active   // 8% commission share
+  top      // 12% commission share
+  elite    // 15% commission share
+}
+
+// Creator profiles (extends User)
+model Creator {
+  id              String      @id @default(uuid())
+  userId          String      @unique @map("user_id")
+  displayName     String      @map("display_name")
+  bio             String?     @db.Text
+  instagramHandle String?     @map("instagram_handle")
+  tiktokHandle    String?     @map("tiktok_handle")
+  tier            CreatorTier @default(new)
+  totalEarnings   Decimal     @default(0) @map("total_earnings") @db.Decimal(10, 2)
+  isVerified      Boolean     @default(false) @map("is_verified")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videos          POIVideo[]
+  earnings        CreatorEarning[]
+  videoViews      VideoView[]
+
+  @@index([tier])
+  @@index([totalEarnings])
+  @@map("creators")
+}
+
+// Track video views for attribution
+model VideoView {
+  id            String   @id @default(uuid())
+  userId        String?  @map("user_id")        // Nullable for anonymous
+  sessionId     String   @map("session_id")     // Track anonymous users
+  videoId       String   @map("video_id")
+  creatorId     String?  @map("creator_id")     // Denormalized for fast queries
+  destinationId String   @map("destination_id") // Denormalized for fast queries
+  viewedAt      DateTime @default(now()) @map("viewed_at")
+
+  user    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video   POIVideo  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  creator Creator?  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([userId, destinationId, viewedAt])
+  @@index([sessionId, destinationId, viewedAt])
+  @@index([videoId])
+  @@index([creatorId])
+  @@map("video_views")
+}
+
+// Creator earnings from bookings
+model CreatorEarning {
+  id           String   @id @default(uuid())
+  creatorId    String   @map("creator_id")
+  videoId      String   @map("video_id")
+  affiliateClickId String? @map("affiliate_click_id") // Link to booking
+  amount       Decimal  @db.Decimal(10, 2)
+  commission   Decimal  @db.Decimal(10, 2)       // Total commission from booking
+  shareWeight  Decimal  @db.Decimal(5, 4)        // e.g., 0.1667 = 16.67%
+  tierRate     Decimal  @db.Decimal(5, 4)        // Creator's tier rate at time of earning
+  earnedAt     DateTime @default(now()) @map("earned_at")
+
+  creator      Creator  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  video        POIVideo @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId, earnedAt])
+  @@index([videoId])
+  @@index([affiliateClickId])
+  @@map("creator_earnings")
 }
