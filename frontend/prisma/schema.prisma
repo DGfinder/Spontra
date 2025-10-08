@@ -105,19 +105,26 @@ model AffiliateClick {
   userId        String?   @map("user_id")  // Optional - null for anonymous users
   sessionId     String?   @map("session_id")  // For anonymous user tracking
   destinationId String?   @map("destination_id")  // Which destination they were viewing
-  partner       String    // "skyscanner", "kayak", "google_flights"
+  partner       String    // "kiwi", "travelpayouts", "skyscanner", "kayak"
+  affiliateId   String?   @map("affiliate_id")  // Your affiliate ID for that partner
   clickUrl      String    @map("click_url") @db.Text  // Full affiliate URL clicked
 
   // Search context (what they were searching for)
   originAirport      String?  @map("origin_airport")
   destinationAirport String?  @map("destination_airport")
+  departureDate      String?  @map("departure_date")
+  returnDate         String?  @map("return_date")
+
+  // Price shown to user
+  displayedPrice     Decimal? @map("displayed_price") @db.Decimal(10, 2)
+  currency           String   @default("USD")
 
   // Tracking data
   referrer      String?   @db.Text  // HTTP referrer
   ipAddress     String?   @map("ip_address")  // For fraud detection
   userAgent     String?   @map("user_agent") @db.Text  // Browser/device info
 
-  // Conversion tracking (updated by webhooks if partner supports it)
+  // Conversion tracking (updated by webhooks/postbacks if partner supports it)
   converted     Boolean   @default(false)  // Did this click result in a booking?
   convertedAt   DateTime? @map("converted_at")  // When conversion happened
   commission    Decimal?  @db.Decimal(10, 2)  // Commission earned (if known)
@@ -134,6 +141,7 @@ model AffiliateClick {
   @@index([partner])
   @@index([createdAt])
   @@index([converted])
+  @@index([partner, createdAt])
   @@map("affiliate_clicks")
 }
 
@@ -358,10 +366,34 @@ model Creator {
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
+  // Payment Information
+  payoutMethod       String?   @map("payout_method") // "stripe" | "wise" | "manual"
+  stripeAccountId    String?   @map("stripe_account_id") // Stripe Connect account ID
+  wiseRecipientId    String?   @map("wise_recipient_id") // Wise recipient ID (fallback)
+
+  // Banking (encrypted in application layer)
+  bankAccountNumber  String?   @map("bank_account_number") @db.VarChar(255)
+  bankRoutingNumber  String?   @map("bank_routing_number") @db.VarChar(255)
+  bankAccountName    String?   @map("bank_account_name")
+
+  // Tax & Compliance
+  taxId              String?   @map("tax_id") @db.VarChar(255) // SSN/EIN (encrypted)
+  taxIdVerified      Boolean   @default(false) @map("tax_id_verified")
+  w9FormSubmitted    Boolean   @default(false) @map("w9_form_submitted")
+  w9FormUrl          String?   @map("w9_form_url") // S3/storage URL
+  taxCountry         String    @default("US") @map("tax_country")
+
+  // Payout Settings
+  payoutMinimum      Decimal   @default(25) @map("payout_minimum") @db.Decimal(10, 2)
+  payoutSchedule     String    @default("monthly") @map("payout_schedule") // "weekly" | "biweekly" | "monthly"
+  lastPayoutAt       DateTime? @map("last_payout_at")
+  pendingPayout      Decimal   @default(0) @map("pending_payout") @db.Decimal(10, 2)
+
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   videos          POIVideo[]
   earnings        CreatorEarning[]
   videoViews      VideoView[]
+  payouts         Payout[]
 
   @@index([tier])
   @@index([totalEarnings])
@@ -401,12 +433,59 @@ model CreatorEarning {
   tierRate     Decimal  @db.Decimal(5, 4)        // Creator's tier rate at time of earning
   earnedAt     DateTime @default(now()) @map("earned_at")
 
+  // Payout tracking
+  payoutId       String?   @map("payout_id")
+  isPaid         Boolean   @default(false) @map("is_paid")
+  paidAt         DateTime? @map("paid_at")
+  holdReleaseAt  DateTime? @map("hold_release_at") // When hold period ends (60 days default)
+
   creator        Creator         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   video          POIVideo        @relation(fields: [videoId], references: [id], onDelete: Cascade)
   affiliateClick AffiliateClick? @relation(fields: [affiliateClickId], references: [id], onDelete: SetNull)
+  payout         Payout?         @relation(fields: [payoutId], references: [id], onDelete: SetNull)
 
   @@index([creatorId, earnedAt])
+  @@index([creatorId, isPaid])
   @@index([videoId])
   @@index([affiliateClickId])
+  @@index([holdReleaseAt])
   @@map("creator_earnings")
+}
+
+// Payout records - track actual payments to creators
+model Payout {
+  id                String    @id @default(uuid())
+  creatorId         String    @map("creator_id")
+  amount            Decimal   @db.Decimal(10, 2)
+  status            String    @default("pending") // "pending" | "processing" | "completed" | "failed"
+  method            String    // "paypal" | "stripe" | "bank_transfer"
+
+  // Metadata
+  earningsCount     Int       @default(0) @map("earnings_count") // How many earnings included
+  periodStart       DateTime  @map("period_start")
+  periodEnd         DateTime  @map("period_end")
+
+  // Payment details
+  transactionId     String?   @map("transaction_id") // PayPal/Stripe transaction ID
+  paymentEmail      String?   @map("payment_email") // Email used for payment
+  failureReason     String?   @map("failure_reason") @db.Text
+  adminNotes        String?   @map("admin_notes") @db.Text
+
+  // Fees
+  processingFee     Decimal?  @map("processing_fee") @db.Decimal(10, 2)
+  netAmount         Decimal?  @map("net_amount") @db.Decimal(10, 2) // Amount after fees
+
+  // Timestamps
+  initiatedAt       DateTime  @default(now()) @map("initiated_at")
+  processedAt       DateTime? @map("processed_at")
+  completedAt       DateTime? @map("completed_at")
+  failedAt          DateTime? @map("failed_at")
+
+  creator           Creator           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  earnings          CreatorEarning[]
+
+  @@index([creatorId, status])
+  @@index([status, initiatedAt])
+  @@index([completedAt])
+  @@map("payouts")
 }
