@@ -2,39 +2,21 @@
 
 import axios from 'axios'
 import { db } from '@/lib/db'
+import { getCachedResponse, CACHE_DURATIONS } from '@/lib/cache/travelpayouts'
+import { withRetryAxios } from '@/lib/api/retry'
+import {
+  AviasalesSearchResponseSchema,
+  validateResponse,
+  type AviasalesFlightData
+} from '@/lib/validations/travelpayouts'
 
-// Aviasales Flight API types
+// Re-export types for backwards compatibility
 interface AviasalesSearchParams {
   origin: string
   destination: string
   departureDate: string
   returnDate?: string
   adults?: number
-}
-
-interface AviasalesFlightData {
-  origin: string
-  destination: string
-  origin_airport: string
-  destination_airport: string
-  price: number
-  airline: string
-  flight_number: string
-  departure_at: string
-  return_at?: string
-  transfers: number
-  return_transfers?: number
-  duration: number
-  duration_to?: number
-  duration_back?: number
-  link: string
-}
-
-interface AviasalesApiResponse {
-  success: boolean
-  data: AviasalesFlightData[]
-  currency?: string
-  error?: string
 }
 
 // Hotellook Hotel API types
@@ -61,7 +43,7 @@ interface HotellookHotelData {
 /**
  * Search for cheapest flight prices using Aviasales API
  * Returns cached prices from last 48 hours of user searches
- * Free tier: No specific rate limit
+ * Features: Caching, retry logic, response validation
  */
 export async function searchAviasalesFlights(params: AviasalesSearchParams) {
   try {
@@ -72,37 +54,82 @@ export async function searchAviasalesFlights(params: AviasalesSearchParams) {
       return { success: false, error: 'API not configured' }
     }
 
-    const response = await axios.get<AviasalesApiResponse>(
-      'https://api.travelpayouts.com/aviasales/v3/prices_for_dates',
-      {
-        params: {
-          origin: params.origin,
-          destination: params.destination,
-          departure_at: params.departureDate,
-          return_at: params.returnDate || undefined,
-          one_way: !params.returnDate,
-          currency: 'usd',
-          sorting: 'price',
-          direct: false,
-          limit: 10,
-          page: 1,
-          token: token
-        },
-        headers: {
-          'Accept-Encoding': 'gzip, deflate' // Faster response
-        },
-        timeout: 10000
-      }
+    // Cache key parameters
+    const cacheParams = {
+      origin: params.origin,
+      destination: params.destination,
+      departureDate: params.departureDate,
+      returnDate: params.returnDate || 'one-way'
+    }
+
+    // Fetch with caching and retry logic
+    const result = await getCachedResponse(
+      'prices_for_dates',
+      cacheParams,
+      async () => {
+        // Retry wrapper around API call
+        return await withRetryAxios(
+          async () => {
+            const response = await axios.get(
+              'https://api.travelpayouts.com/aviasales/v3/prices_for_dates',
+              {
+                params: {
+                  origin: params.origin,
+                  destination: params.destination,
+                  departure_at: params.departureDate,
+                  return_at: params.returnDate || undefined,
+                  one_way: !params.returnDate,
+                  currency: 'usd',
+                  sorting: 'price',
+                  direct: false,
+                  limit: 10,
+                  page: 1,
+                  token: token
+                },
+                headers: {
+                  'Accept-Encoding': 'gzip, deflate'
+                },
+                timeout: 30000 // Increased to 30s
+              }
+            )
+
+            return response.data
+          },
+          {
+            maxRetries: 3,
+            initialDelay: 200,
+            onRetry: (attempt, error) => {
+              console.log(`[Aviasales] Retry attempt ${attempt} for ${params.origin}-${params.destination}`)
+            }
+          }
+        )
+      },
+      CACHE_DURATIONS.FLIGHTS
     )
 
-    if (!response.data.success || !response.data.data || response.data.data.length === 0) {
+    // Validate response with Zod schema
+    const validated = validateResponse(
+      AviasalesSearchResponseSchema,
+      result,
+      'searchAviasalesFlights'
+    )
+
+    if (!validated) {
       return {
         success: false,
-        error: response.data.error || 'No flights found'
+        error: 'Invalid API response format'
       }
     }
 
-    const flights = response.data.data.map((flight) => ({
+    if (!validated.success || !validated.data || validated.data.length === 0) {
+      return {
+        success: false,
+        error: validated.error || 'No flights found'
+      }
+    }
+
+    // Transform to our internal format
+    const flights = validated.data.map((flight) => ({
       price: flight.price,
       airline: flight.airline,
       flightNumber: flight.flight_number,
@@ -123,7 +150,7 @@ export async function searchAviasalesFlights(params: AviasalesSearchParams) {
       success: true,
       data: {
         flights,
-        currency: response.data.currency || 'usd'
+        currency: validated.currency || 'usd'
       }
     }
   } catch (error) {
