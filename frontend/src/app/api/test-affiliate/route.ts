@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { searchAviasalesFlights, searchHotels, generateAviasalesLink } from '@/app/actions/travelpayouts'
+import { searchAviasalesFlights, searchHotels } from '@/app/actions/travelpayouts'
+import { generateAviasalesLink } from '@/lib/affiliate/travelpayouts'
 
 /**
  * Test endpoint for Travelpayouts affiliate integration

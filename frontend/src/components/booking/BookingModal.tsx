@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { X, Plane, Calendar, Users, ArrowRight, Hotel, Loader2 } from 'lucide-react'
-import { searchAviasalesFlights, generateAviasalesLink, trackAviasalesClick } from '@/app/actions/travelpayouts'
-import { searchHotels } from '@/app/actions/travelpayouts'
+import { searchAviasalesFlights, trackAviasalesClick, searchHotels } from '@/app/actions/travelpayouts'
+import { generateAviasalesLink } from '@/lib/affiliate/travelpayouts'
 
 interface BookingModalProps {
   isOpen: boolean

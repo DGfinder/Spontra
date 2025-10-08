@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { searchAviasalesFlights, searchHotels, generateAviasalesLink, trackAviasalesClick } from '@/app/actions/travelpayouts'
+import { searchAviasalesFlights, searchHotels, trackAviasalesClick } from '@/app/actions/travelpayouts'
+import { generateAviasalesLink } from '@/lib/affiliate/travelpayouts'
 
 export default function TestAffiliatePage() {
   const [apiTest, setApiTest] = useState<any>(null)
