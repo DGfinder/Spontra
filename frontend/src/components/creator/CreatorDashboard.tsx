@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { DollarSign, TrendingUp, Video, Award, Plus } from 'lucide-react'
+import { DollarSign, TrendingUp, Video, Award, Plus, BarChart } from 'lucide-react'
 import { Decimal } from '@prisma/client/runtime/library'
 
 interface Creator {
@@ -336,7 +336,7 @@ export function CreatorDashboard({ creator, earnings }: CreatorDashboardProps) {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Link
           href="/dashboard/creator/upload"
           className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-colors group"
@@ -345,6 +345,17 @@ export function CreatorDashboard({ creator, earnings }: CreatorDashboardProps) {
           <h3 className="text-white font-semibold mb-2">Upload New Video</h3>
           <p className="text-white/70 text-sm">
             Share your latest travel content and start earning
+          </p>
+        </Link>
+
+        <Link
+          href="/dashboard/creator/analytics"
+          className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:border-white/40 transition-colors group"
+        >
+          <BarChart className="w-8 h-8 text-white mb-3 group-hover:scale-110 transition-transform" />
+          <h3 className="text-white font-semibold mb-2">View Analytics</h3>
+          <p className="text-white/70 text-sm">
+            Track your performance and earnings data
           </p>
         </Link>
 

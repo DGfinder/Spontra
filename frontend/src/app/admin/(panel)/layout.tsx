@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutGrid, Globe, MapPin, Route, Map, Video, ArrowLeft } from 'lucide-react'
+import { LayoutGrid, Globe, MapPin, Route, Map, Video, BarChart, ArrowLeft } from 'lucide-react'
 import { ToastContainer } from '@/components/ui/Toast'
 
 export default function AdminPanelLayout({
@@ -13,11 +13,12 @@ export default function AdminPanelLayout({
   const pathname = usePathname()
 
   const navItems = [
+    { href: '/admin/analytics', label: 'Analytics', icon: BarChart },
+    { href: '/admin/moderate-videos', label: 'Moderate Videos', icon: Video },
     { href: '/admin/countries', label: 'Countries', icon: Globe },
     { href: '/admin/destinations', label: 'Destinations', icon: MapPin },
     { href: '/admin/routes', label: 'Flight Routes', icon: Route },
     { href: '/admin/map', label: 'Map View', icon: Map },
-    { href: '/admin/moderate-videos', label: 'Moderate Videos', icon: Video },
   ]
 
   return (
