@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
 import { Play, MapPin } from 'lucide-react'
 import { StructuredData } from '@/components/SEO/StructuredData'
 import { generateVideoStructuredData } from '@/lib/seo/generateStructuredData'
+import { useSessionTracking } from '@/hooks/useSessionTracking'
+import { trackVideoView } from '@/actions/videoTrackingActions'
 import type { ThemePOI } from '../DestinationDetail'
 
 interface POIVideoFeedProps {
@@ -42,6 +44,7 @@ export function POIVideoFeed({ pois, theme }: POIVideoFeedProps) {
               {poi.videos.map((video) => (
                 <VideoPlayer
                   key={video.id}
+                  videoId={video.id}
                   videoUrl={video.videoUrl}
                   poiName={poi.name}
                   caption={poi.caption}
@@ -73,14 +76,38 @@ interface VideoPlayerProps {
   poiName: string
   caption?: string | null
   altText?: string | null
+  videoId?: string // POIVideo ID for tracking
 }
 
-function VideoPlayer({ videoUrl, poiName, caption, altText }: VideoPlayerProps) {
+function VideoPlayer({ videoUrl, poiName, caption, altText, videoId: poiVideoId }: VideoPlayerProps) {
   const [showPlayer, setShowPlayer] = useState(false)
   const [imageError, setImageError] = useState(false)
+  const [hasTracked, setHasTracked] = useState(false)
+  const { sessionId } = useSessionTracking()
 
   const videoId = extractYouTubeId(videoUrl)
   const thumbnailUrl = videoId ? getYouTubeThumbnail(videoId, 'maxres') : null
+
+  // Track video view when player is shown
+  useEffect(() => {
+    async function trackView() {
+      if (showPlayer && !hasTracked && poiVideoId && sessionId) {
+        setHasTracked(true)
+
+        try {
+          await trackVideoView({
+            userId: null, // Will be populated server-side if logged in
+            sessionId,
+            videoId: poiVideoId
+          })
+        } catch (error) {
+          console.error('[VideoPlayer] Failed to track view:', error)
+        }
+      }
+    }
+
+    trackView()
+  }, [showPlayer, hasTracked, poiVideoId, sessionId])
 
   if (!videoId) {
     return (

@@ -126,6 +126,7 @@ export default async function ThemeDestinationPage({ params, searchParams }: Pag
         where: { theme },
         include: {
           videos: {
+            where: { status: 'approved' }, // Only show approved videos
             orderBy: { displayOrder: 'asc' }
           }
         },
