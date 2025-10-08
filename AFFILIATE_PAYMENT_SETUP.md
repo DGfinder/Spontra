@@ -439,14 +439,65 @@ Compare to converting everything to AUD then back: **5-7% overhead**
 
 ---
 
+## Testing Your Integration
+
+### Quick Test (5 minutes)
+
+1. **Add your credentials** to `frontend/.env.local`:
+   ```bash
+   TRAVELPAYOUTS_TOKEN="your_token_here"
+   TRAVELPAYOUTS_MARKER="your_marker_here"
+   ```
+
+2. **Restart dev server**:
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+3. **Visit test page**: http://localhost:3000/test-affiliate
+
+4. **Check results**:
+   - ✅ All tests passing? You're ready to build!
+   - ❌ Tests failing? Check error messages and verify credentials
+
+### Test API Endpoint Directly
+
+```bash
+curl http://localhost:3000/api/test-affiliate | jq
+```
+
+Returns JSON with:
+- Credential status
+- Flight search results (LAX→LAS)
+- Hotel search results (Las Vegas)
+- Affiliate link sample
+
+### Test in Code
+
+```typescript
+import { searchAviasalesFlights } from '@/app/actions/travelpayouts'
+
+const flights = await searchAviasalesFlights({
+  origin: 'SYD',
+  destination: 'MEL',
+  departureDate: '2025-12-01'
+})
+
+console.log(flights.data?.flights[0])
+// { price: 89, airline: 'QF', bookingLink: 'https://...' }
+```
+
+---
+
 ## Next Steps
 
-1. ✅ **Sign up for Kiwi.com** (takes 24-48h approval)
-2. ✅ **Sign up for Travelpayouts** (instant)
-3. ✅ **Open Wise Business account** (takes 1-2 days)
-4. ⏳ **Set up Stripe Connect** (coming next)
-5. ⏳ **Build payment settings UI** (coming next)
-6. ⏳ **Build admin payout dashboard** (coming next)
+1. ✅ **Sign up for Travelpayouts** (instant) - https://www.travelpayouts.com/
+2. ✅ **Test integration** - Visit `/test-affiliate` page
+3. ⏳ **Open Wise Business account** (takes 1-2 days) - for receiving USD
+4. ⏳ **Set up Stripe Connect** (coming next) - for creator payouts
+5. ⏳ **Build destination pages** - Show prices from Aviasales
+6. ⏳ **Add hotel recommendations** - 30% commission vs 2% flights!
 
 ---
 
