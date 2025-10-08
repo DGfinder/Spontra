@@ -23,7 +23,8 @@
       "Bash(npx prisma migrate:*)",
       "mcp__postgres__query",
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_bh12OmZINKPn@ep-frosty-cloud-a7tiov8j-pooler.ap-southeast-2.aws.neon.tech/neondb?sslmode=require\" npx tsx src/scripts/verify-direct-routes-batch.ts 0 2)",
-      "Bash(npx prisma generate:*)"
+      "Bash(npx prisma generate:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []
