@@ -5,19 +5,6 @@ import { revalidatePath } from 'next/cache'
 import { CreatorTier } from '@prisma/client'
 
 /**
- * Get creator tier commission rates
- */
-export function getTierRate(tier: CreatorTier): number {
-  const rates = {
-    new: 0.05,    // 5%
-    active: 0.08, // 8%
-    top: 0.12,    // 12%
-    elite: 0.15   // 15%
-  }
-  return rates[tier]
-}
-
-/**
  * Create a creator profile for a user
  */
 export async function createCreatorProfile(data: {

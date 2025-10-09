@@ -4,7 +4,7 @@ import Stripe from 'stripe'
 import { db } from '@/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia'
+  apiVersion: '2025-09-30.clover'
 })
 
 /**
@@ -187,7 +187,7 @@ export async function processCreatorPayout(payoutId: string) {
       data: {
         status: 'completed',
         processedAt: new Date(),
-        externalTransactionId: transfer.id
+        transactionId: transfer.id
       }
     })
 
@@ -228,8 +228,7 @@ export async function calculateCreatorEarnings(creatorId: string) {
     const earnings = await db.creatorEarning.findMany({
       where: {
         creatorId: creatorId,
-        status: 'confirmed',
-        paidOut: false,
+        isPaid: false,
         earnedAt: {
           lte: sixtyDaysAgo
         }
@@ -281,7 +280,6 @@ export async function createPayout(data: {
       data: {
         creatorId: data.creatorId,
         amount: data.amount,
-        currency: 'USD',
         status: 'pending',
         method: 'stripe',
         periodStart: data.periodStart,
@@ -295,7 +293,7 @@ export async function createPayout(data: {
         id: { in: data.earningIds }
       },
       data: {
-        paidOut: true,
+        isPaid: true,
         payoutId: payout.id
       }
     })
@@ -369,7 +367,7 @@ export async function getCreatorPayouts(creatorId: string) {
   try {
     const payouts = await db.payout.findMany({
       where: { creatorId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { initiatedAt: 'desc' },
       take: 50
     })
 

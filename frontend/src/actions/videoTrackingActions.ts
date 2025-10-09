@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { getTierRate } from './creatorActions'
+import { getTierRate } from '@/lib/creator/tiers'
 
 /**
  * Track a video view for attribution

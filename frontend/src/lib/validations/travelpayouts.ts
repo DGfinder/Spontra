@@ -263,7 +263,7 @@ export function validateResponse<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(`[Travelpayouts Validation Error]${context ? ` ${context}` : ''}:`, {
-        errors: error.errors,
+        errors: error.issues,
         receivedData: data
       })
     }
@@ -284,7 +284,7 @@ export function validateResponseStrict<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error(`[Travelpayouts Validation Error]${context ? ` ${context}` : ''}:`, {
-        errors: error.errors,
+        errors: error.issues,
         receivedData: data
       })
       throw new Error(`Invalid API response${context ? ` for ${context}` : ''}`)
