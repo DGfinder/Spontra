@@ -48,6 +48,10 @@ interface DestinationDetailProps {
   destination: DestinationData
   originAirport?: string
   selectedTheme?: string
+  departureDate?: string
+  returnDate?: string
+  cachedPrice?: number
+  cachedDuration?: number
   isDevMode?: boolean
 }
 
@@ -63,6 +67,10 @@ export function DestinationDetail({
   destination,
   originAirport,
   selectedTheme = 'adventure',
+  departureDate,
+  returnDate,
+  cachedPrice,
+  cachedDuration,
   isDevMode = false
 }: DestinationDetailProps) {
   const [activeTheme, setActiveTheme] = useState(selectedTheme)
@@ -76,6 +84,10 @@ export function DestinationDetail({
       <DestinationHero
         destination={destination}
         originAirport={originAirport}
+        departureDate={departureDate}
+        returnDate={returnDate}
+        cachedPrice={cachedPrice}
+        cachedDuration={cachedDuration}
       />
 
       {/* Dev Mode Badge */}

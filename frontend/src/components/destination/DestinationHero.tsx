@@ -11,9 +11,20 @@ import type { DestinationData } from '../DestinationDetail'
 interface DestinationHeroProps {
   destination: DestinationData
   originAirport?: string
+  departureDate?: string
+  returnDate?: string
+  cachedPrice?: number
+  cachedDuration?: number
 }
 
-export function DestinationHero({ destination, originAirport }: DestinationHeroProps) {
+export function DestinationHero({
+  destination,
+  originAirport,
+  departureDate,
+  returnDate,
+  cachedPrice,
+  cachedDuration
+}: DestinationHeroProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const airportDisplay = destination.airportCode || 'Airport info unavailable'
 
@@ -64,6 +75,9 @@ export function DestinationHero({ destination, originAirport }: DestinationHeroP
                 origin={originAirport}
                 destination={destination.airportCode}
                 cityName={destination.cityName}
+                departureDate={departureDate}
+                cachedPrice={cachedPrice}
+                cachedDuration={cachedDuration}
                 onBookClick={() => setIsModalOpen(true)}
               />
             </div>
@@ -94,6 +108,8 @@ export function DestinationHero({ destination, originAirport }: DestinationHeroP
           origin={originAirport}
           destination={destination.airportCode}
           cityName={destination.cityName}
+          departureDate={departureDate}
+          returnDate={returnDate}
         />
       )}
     </div>

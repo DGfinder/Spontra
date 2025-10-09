@@ -47,6 +47,60 @@ export type AviasalesFlightData = z.infer<typeof AviasalesFlightSchema>
 export type AviasalesSearchResponse = z.infer<typeof AviasalesSearchResponseSchema>
 
 // ============================================================================
+// V1 Real-Time Flight Search Schemas
+// ============================================================================
+
+// Initialize search response
+export const V1SearchInitResponseSchema = z.object({
+  search_id: z.string().uuid(),
+  status: z.enum(['pending', 'completed', 'failed']).optional()
+})
+
+// Flight segment schema
+const V1FlightSegmentSchema = z.object({
+  origin: IATACodeSchema,
+  destination: IATACodeSchema,
+  departure: z.string(), // ISO datetime
+  arrival: z.string(), // ISO datetime
+  flight_number: z.string(),
+  airline: AirlineCodeSchema,
+  duration: z.number().int().positive(), // minutes
+  aircraft: z.string().optional()
+})
+
+// Pricing info
+const V1PricingSchema = z.object({
+  total: MoneySchema,
+  base: MoneySchema.optional(),
+  taxes: MoneySchema.optional(),
+  currency: z.string().default('USD')
+})
+
+// Complete flight proposal
+const V1FlightProposalSchema = z.object({
+  id: z.string(),
+  segments: z.array(V1FlightSegmentSchema),
+  pricing: V1PricingSchema,
+  booking_link: z.string().url(),
+  trip_class: z.enum(['Y', 'C', 'F']), // Economy, Business, First
+  is_direct: z.boolean(),
+  total_duration: z.number().int().positive() // minutes
+})
+
+// Search results response (polling endpoint)
+export const V1SearchResultsResponseSchema = z.object({
+  search_id: z.string().uuid(),
+  status: z.enum(['pending', 'completed', 'failed']),
+  proposals: z.array(V1FlightProposalSchema).optional(),
+  error: z.string().optional(),
+  progress: z.number().min(0).max(100).optional() // percentage
+})
+
+export type V1SearchInitResponse = z.infer<typeof V1SearchInitResponseSchema>
+export type V1SearchResultsResponse = z.infer<typeof V1SearchResultsResponseSchema>
+export type V1FlightProposal = z.infer<typeof V1FlightProposalSchema>
+
+// ============================================================================
 // Calendar / Month Price Schemas
 // ============================================================================
 

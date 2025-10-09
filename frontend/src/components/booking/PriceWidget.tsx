@@ -8,15 +8,34 @@ interface PriceWidgetProps {
   origin?: string
   destination: string
   cityName: string
+  departureDate?: string
+  cachedPrice?: number
+  cachedDuration?: number
   onBookClick?: (price: number) => void
 }
 
-export function PriceWidget({ origin, destination, cityName, onBookClick }: PriceWidgetProps) {
+export function PriceWidget({
+  origin,
+  destination,
+  cityName,
+  departureDate,
+  cachedPrice,
+  cachedDuration,
+  onBookClick
+}: PriceWidgetProps) {
   const [price, setPrice] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    // If we have a cached price, use it immediately (no API call needed!)
+    if (cachedPrice !== undefined) {
+      setPrice(cachedPrice)
+      setLoading(false)
+      return
+    }
+
+    // Otherwise fetch from API
     if (!origin || !destination) {
       setLoading(false)
       return
@@ -24,13 +43,15 @@ export function PriceWidget({ origin, destination, cityName, onBookClick }: Pric
 
     async function fetchPrice() {
       try {
-        // Get price for 30 days from now
-        const departureDate = new Date()
-        departureDate.setDate(departureDate.getDate() + 30)
-        const departureDateStr = departureDate.toISOString().split('T')[0]
+        // Use provided departure date or default to 30 days from now
+        const departureDateStr = departureDate || (() => {
+          const date = new Date()
+          date.setDate(date.getDate() + 30)
+          return date.toISOString().split('T')[0]
+        })()
 
         const result = await searchAviasalesFlights({
-          origin,
+          origin: origin!,
           destination,
           departureDate: departureDateStr,
           adults: 1
@@ -50,7 +71,7 @@ export function PriceWidget({ origin, destination, cityName, onBookClick }: Pric
     }
 
     fetchPrice()
-  }, [origin, destination])
+  }, [cachedPrice, origin, destination, departureDate])
 
   // Don't render if no origin (anonymous user)
   if (!origin) {
@@ -111,7 +132,10 @@ export function PriceWidget({ origin, destination, cityName, onBookClick }: Pric
           <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-white/10">
             <TrendingDown className="w-3.5 h-3.5 text-green-400" />
             <span className="text-xs text-white/50">
-              Lowest price from {origin} in the next 30 days
+              {cachedPrice !== undefined
+                ? `Price from your search on ${departureDate ? new Date(departureDate).toLocaleDateString() : 'selected dates'}`
+                : `Lowest price from ${origin} in the next 30 days`
+              }
             </span>
           </div>
         )}

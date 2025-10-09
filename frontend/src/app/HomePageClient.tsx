@@ -379,10 +379,18 @@ function CountryResults() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const handleExploreCountry = (countryCode: string) => {
-    // TODO: Navigate to country details page showing all cities
-    console.log('Explore country:', countryCode)
-    // For now, switch to city results view
-    setCurrentStep('results')
+    // Build URL with search context
+    const searchParams = new URLSearchParams()
+    searchParams.set('from', filters.departureAirport)
+    searchParams.set('theme', filters.theme)
+    searchParams.set('minTime', filters.minFlightTime.toString())
+    searchParams.set('maxTime', filters.maxFlightTime.toString())
+    searchParams.set('departure', filters.departureDate)
+    searchParams.set('return', filters.returnDate)
+    searchParams.set('passengers', filters.passengers.toString())
+
+    // Navigate to country page with search context
+    window.location.href = `/explore/${countryCode.toLowerCase()}?${searchParams.toString()}`
   }
 
   const handleEditSearch = (newFilters: typeof filters) => {

@@ -26,7 +26,7 @@ export function PriceBadge({ origin, destination, themeColor = '#3b82f6' }: Pric
 
     async function fetchPrice() {
       try {
-        const result = await getCheapestPrice({ origin, destination })
+        const result = await getCheapestPrice({ origin: origin!, destination })
         setPrice(result)
       } catch (err) {
         console.error('Price badge error:', err)

@@ -12,6 +12,7 @@ interface BookingModalProps {
   destination: string
   cityName: string
   departureDate?: string
+  returnDate?: string
 }
 
 export function BookingModal({
@@ -20,7 +21,8 @@ export function BookingModal({
   origin,
   destination,
   cityName,
-  departureDate
+  departureDate,
+  returnDate
 }: BookingModalProps) {
   const [flights, setFlights] = useState<any[]>([])
   const [hotels, setHotels] = useState<any[]>([])

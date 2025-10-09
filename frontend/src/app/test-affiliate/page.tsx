@@ -1,12 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { searchAviasalesFlights, searchHotels, trackAviasalesClick } from '@/app/actions/travelpayouts'
+import {
+  searchAviasalesFlights,
+  searchFlightsRealtime,
+  searchHotels,
+  trackAviasalesClick
+} from '@/app/actions/travelpayouts'
 import { generateAviasalesLink } from '@/lib/affiliate/travelpayouts'
 
 export default function TestAffiliatePage() {
   const [apiTest, setApiTest] = useState<any>(null)
   const [flightTest, setFlightTest] = useState<any>(null)
+  const [realtimeTest, setRealtimeTest] = useState<any>(null)
   const [hotelTest, setHotelTest] = useState<any>(null)
   const [trackingTest, setTrackingTest] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -19,19 +25,36 @@ export default function TestAffiliatePage() {
       .catch(err => setApiTest({ error: err.message }))
   }, [])
 
-  // Test flight search manually
+  // Test flight search manually (using popular route)
   const testFlightSearch = async () => {
     setLoading(true)
     try {
       const result = await searchAviasalesFlights({
-        origin: 'SYD',
-        destination: 'MEL',
+        origin: 'LAX',
+        destination: 'JFK',
         departureDate: '2025-12-01',
         returnDate: '2025-12-08'
       })
       setFlightTest(result)
     } catch (error) {
       setFlightTest({ error: error instanceof Error ? error.message : 'Error' })
+    }
+    setLoading(false)
+  }
+
+  // Test real-time search (V1 API)
+  const testRealtimeSearch = async () => {
+    setLoading(true)
+    try {
+      const result = await searchFlightsRealtime({
+        origin: 'SYD',
+        destination: 'MEL',
+        departureDate: '2025-12-01',
+        adults: 1
+      })
+      setRealtimeTest(result)
+    } catch (error) {
+      setRealtimeTest({ error: error instanceof Error ? error.message : 'Error' })
     }
     setLoading(false)
   }
@@ -193,15 +216,47 @@ export default function TestAffiliatePage() {
 
         {/* Manual Tests */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Flight Search Test */}
+          {/* Real-Time Search Test (V1) */}
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
-            <h2 className="text-xl font-bold text-white mb-4">✈️ Test Flight Search</h2>
+            <h2 className="text-xl font-bold text-white mb-4">🚀 Test Real-Time Search (V1)</h2>
+            <p className="text-white/60 text-sm mb-4">Live pricing with signature auth & polling</p>
+            <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-3 mb-4">
+              <p className="text-yellow-200 text-sm">
+                ⚠️ V1 API requires special approval from Travelpayouts. Free tier credentials only support V2/V3 APIs.
+              </p>
+            </div>
+            <button
+              onClick={testRealtimeSearch}
+              disabled={loading}
+              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors w-full mb-4"
+            >
+              {loading ? 'Searching...' : 'Search SYD → MEL (Will fail with 401)'}
+            </button>
+
+            {realtimeTest && (
+              <div className="bg-white/5 rounded-lg p-4 max-h-96 overflow-y-auto">
+                <pre className="text-white text-xs whitespace-pre-wrap">
+                  {JSON.stringify(realtimeTest, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Flight Search Test (V3 - Recommended) */}
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+            <h2 className="text-xl font-bold text-white mb-4">✈️ Test Flight Search (V3 Cache) ✅</h2>
+            <p className="text-white/60 text-sm mb-4">Testing with popular route (LAX → JFK)</p>
+            <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-3 mb-4">
+              <p className="text-green-200 text-sm">
+                ✅ Recommended API - Works with free tier, cached prices, fast response
+              </p>
+            </div>
             <button
               onClick={testFlightSearch}
               disabled={loading}
               className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold transition-colors w-full mb-4"
             >
-              {loading ? 'Searching...' : 'Search SYD → MEL'}
+              {loading ? 'Searching...' : 'Search LAX → JFK'}
             </button>
 
             {flightTest && (

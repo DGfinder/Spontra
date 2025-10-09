@@ -13,7 +13,14 @@ import {
 
 interface PageProps {
   params: Promise<{ city: string; theme: string }>
-  searchParams: Promise<{ from?: string; dev?: string }>
+  searchParams: Promise<{
+    from?: string
+    dev?: string
+    departure?: string
+    return?: string
+    price?: string
+    duration?: string
+  }>
 }
 
 const VALID_THEMES = ['adventure', 'nature', 'vibe', 'indulge', 'discover']
@@ -102,10 +109,14 @@ export async function generateMetadata({ params }: PageProps) {
  */
 export default async function ThemeDestinationPage({ params, searchParams }: PageProps) {
   const { city, theme } = await params
-  const { from, dev } = await searchParams
+  const { from, dev, departure, return: returnDate, price, duration } = await searchParams
 
   // Check for dev mode
   const isDevMode = dev === 'true'
+
+  // Parse cached search data
+  const cachedPrice = price ? parseFloat(price) : undefined
+  const cachedDuration = duration ? parseFloat(duration) : undefined
 
   // Validate theme
   if (!VALID_THEMES.includes(theme)) {
@@ -217,6 +228,10 @@ export default async function ThemeDestinationPage({ params, searchParams }: Pag
         destination={serializedDestination}
         originAirport={from}
         selectedTheme={theme}
+        departureDate={departure}
+        returnDate={returnDate}
+        cachedPrice={cachedPrice}
+        cachedDuration={cachedDuration}
         isDevMode={isDevMode}
       />
     </>
