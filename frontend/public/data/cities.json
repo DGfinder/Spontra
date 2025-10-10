@@ -1,0 +1,3138 @@
+[
+  {
+    "id": "7c12b70d-3538-4c42-8649-54f42ea92789",
+    "cityName": "Aalborg",
+    "countryName": "Denmark",
+    "countryCode": "DK",
+    "airportCode": ""
+  },
+  {
+    "id": "55348205-7dfb-49a8-8d1b-14a20a65e1a5",
+    "cityName": "Aarhus",
+    "countryName": "Denmark",
+    "countryCode": "DK",
+    "airportCode": ""
+  },
+  {
+    "id": "4983fad2-37b1-415d-b3f3-6a621def7e81",
+    "cityName": "Abidjan",
+    "countryName": "Ivory Coast",
+    "countryCode": "CI",
+    "airportCode": ""
+  },
+  {
+    "id": "e49ff5ed-ff39-4e07-87eb-cc9a11814f4e",
+    "cityName": "Abu Dhabi",
+    "countryName": "United Arab Emirates",
+    "countryCode": "AE",
+    "airportCode": ""
+  },
+  {
+    "id": "d5a2d6d2-555f-4e37-9182-48dbf2eb8aa9",
+    "cityName": "Abuja",
+    "countryName": "Nigeria",
+    "countryCode": "NG",
+    "airportCode": ""
+  },
+  {
+    "id": "686d2d2b-5e4a-4871-b085-7ae43ed1a27f",
+    "cityName": "Accra",
+    "countryName": "Ghana",
+    "countryCode": "GH",
+    "airportCode": ""
+  },
+  {
+    "id": "6e654369-2844-471c-af45-5a0067ccdfe2",
+    "cityName": "Adana",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "18d31077-4e14-4a83-a043-814f28209745",
+    "cityName": "Addis Ababa",
+    "countryName": "Ethiopia",
+    "countryCode": "ET",
+    "airportCode": ""
+  },
+  {
+    "id": "f31062a5-da42-4cc2-960d-ba9f0118367c",
+    "cityName": "Adelaide",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "a74faa66-0351-406c-9656-abf9e02bec85",
+    "cityName": "Ahmedabad",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "2cc8758c-2a93-485f-bc5d-ab3e853cbe50",
+    "cityName": "Albuquerque",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "09191000-7c17-4ad5-a47b-e410876c616b",
+    "cityName": "Algiers",
+    "countryName": "Algeria",
+    "countryCode": "DZ",
+    "airportCode": ""
+  },
+  {
+    "id": "c225217c-8c8c-4272-a712-99a2282a9311",
+    "cityName": "Alicante",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "7f3ec1cc-1284-4a74-ae80-b893a476e236",
+    "cityName": "Amman",
+    "countryName": "Jordan",
+    "countryCode": "JO",
+    "airportCode": ""
+  },
+  {
+    "id": "b001c3f4-c13d-4e4d-8e47-dbaf0d488c58",
+    "cityName": "Amsterdam",
+    "countryName": "Netherlands",
+    "countryCode": "NL",
+    "airportCode": "AMS"
+  },
+  {
+    "id": "df53dd1a-a97f-4fa9-a4ff-07e6a8eaa5bc",
+    "cityName": "Anchorage",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "dc6000f7-cc79-4cd3-ae30-78abcbf7d4f7",
+    "cityName": "Angeles",
+    "countryName": "Philippines",
+    "countryCode": "PH",
+    "airportCode": ""
+  },
+  {
+    "id": "995276db-37cb-4654-80e4-5836cea95b71",
+    "cityName": "Ankara",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "3e3866ce-8941-4d2a-adca-a53a02628bfe",
+    "cityName": "Antalya",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "dd702a1a-12c0-457a-9345-dd65e6fdd9cc",
+    "cityName": "Antofagasta",
+    "countryName": "Chile",
+    "countryCode": "CL",
+    "airportCode": ""
+  },
+  {
+    "id": "f9fbb9aa-062d-4cdf-a19a-5746f57125e7",
+    "cityName": "Antwerp",
+    "countryName": "Belgium",
+    "countryCode": "BE",
+    "airportCode": ""
+  },
+  {
+    "id": "59591dc4-4d0f-4c7e-8405-42e2cdc5558c",
+    "cityName": "Arequipa",
+    "countryName": "Peru",
+    "countryCode": "PE",
+    "airportCode": ""
+  },
+  {
+    "id": "a525bb6b-67bc-4f54-b304-06b9b598d409",
+    "cityName": "Asunción",
+    "countryName": "Paraguay",
+    "countryCode": "PY",
+    "airportCode": ""
+  },
+  {
+    "id": "b2cad9a6-9455-4290-9a83-8fd81f1069c1",
+    "cityName": "Athens",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": "ATH"
+  },
+  {
+    "id": "66e3220f-1492-4aff-8f97-c6f59a3ed75d",
+    "cityName": "Atlanta",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "2c741914-51a3-420a-a3f3-cc56d2bccdff",
+    "cityName": "Auckland",
+    "countryName": "New Zealand",
+    "countryCode": "NZ",
+    "airportCode": ""
+  },
+  {
+    "id": "7d3d93ca-3611-4ea9-9cf0-8f09bbc5ab1f",
+    "cityName": "Austin",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "d0314ddd-2288-47f6-bf5b-26e39f34586c",
+    "cityName": "Bacău",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "f6d335f6-6056-4707-bc0c-87d048ac4ee9",
+    "cityName": "Baltimore",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "c0ee8c38-5376-45cf-a37f-93760fc7b7cc",
+    "cityName": "Bangalore",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "e7f28386-50e9-4b44-87c7-39c5ae23ae98",
+    "cityName": "Bangkok",
+    "countryName": "Thailand",
+    "countryCode": "TH",
+    "airportCode": "BKK"
+  },
+  {
+    "id": "2d574a57-5f63-4012-b5c8-4ead86559f76",
+    "cityName": "Barcelona",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": "BCN"
+  },
+  {
+    "id": "7806be50-7f4f-4506-a2d7-8b3827e0e79b",
+    "cityName": "Bariloche",
+    "countryName": "Argentina",
+    "countryCode": "AR",
+    "airportCode": ""
+  },
+  {
+    "id": "6e629b5d-875f-43b7-81db-bc865ea6b6ee",
+    "cityName": "Barranquilla",
+    "countryName": "Colombia",
+    "countryCode": "CO",
+    "airportCode": ""
+  },
+  {
+    "id": "3aad3dda-db31-4065-9600-40dcdbd9f128",
+    "cityName": "Basel/Mulhouse",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "6801fb60-cda6-4f66-8673-8c1246677c13",
+    "cityName": "Beijing",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "651ff923-2ce6-43c4-90cd-17b0b2b24ef7",
+    "cityName": "Beirut",
+    "countryName": "Lebanon",
+    "countryCode": "LB",
+    "airportCode": ""
+  },
+  {
+    "id": "45390994-4402-4292-8881-4868c9ef0445",
+    "cityName": "Belgrade",
+    "countryName": "Serbia",
+    "countryCode": "RS",
+    "airportCode": ""
+  },
+  {
+    "id": "92fe2dfb-271d-45ad-bb9f-16dc4d85a0b2",
+    "cityName": "Belize City",
+    "countryName": "Belize",
+    "countryCode": "BZ",
+    "airportCode": ""
+  },
+  {
+    "id": "8da73de8-b723-4695-a6c9-63d4dd1b04c5",
+    "cityName": "Belo Horizonte",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "c16c6e96-1ce7-4ef9-b70a-6ecb1a64161e",
+    "cityName": "Belém",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "785cf9e8-ed35-4846-a3d8-42901f1e2d26",
+    "cityName": "Bergamo",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "10de8a39-62e5-4ab4-a4c2-ea5ddec55b1a",
+    "cityName": "Bergen",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "587aedcd-e384-4603-847e-74ca879c717e",
+    "cityName": "Berlin",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "b6a5f224-3d9b-451a-8347-e04c98921f81",
+    "cityName": "Bern",
+    "countryName": "Switzerland",
+    "countryCode": "CH",
+    "airportCode": ""
+  },
+  {
+    "id": "ff0ada5e-f709-4444-81b9-05de570d7c9b",
+    "cityName": "Bilbao",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "67cf6de6-9d56-4d34-aff6-f0c7c0fecd91",
+    "cityName": "Billund",
+    "countryName": "Denmark",
+    "countryCode": "DK",
+    "airportCode": ""
+  },
+  {
+    "id": "588dcc09-3167-43af-b4b2-bc49ba15bf56",
+    "cityName": "Birmingham",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "7032dd82-2e13-4c0f-acde-ed1f7efd9cbd",
+    "cityName": "Birmingham",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "f03c4d0e-619a-4caa-8d7e-8ecffaf038fd",
+    "cityName": "Bodrum",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "0a70be98-bcfe-4299-a140-601a93379d7a",
+    "cityName": "Bodø",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "6a94aa24-fbd9-4421-bcce-fc75eb7600c9",
+    "cityName": "Bogotá",
+    "countryName": "Colombia",
+    "countryCode": "CO",
+    "airportCode": ""
+  },
+  {
+    "id": "be7f8bcf-5d9e-4392-9a6b-351e00321e9b",
+    "cityName": "Boise",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "d47d70db-c213-4553-9033-2b95fa4dce86",
+    "cityName": "Bol",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "aa199f85-2a90-4aae-8190-f909da52abf9",
+    "cityName": "Bologna",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "7ed40a1d-ff76-478c-b595-33686bee862c",
+    "cityName": "Bordeaux",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "8f8e69f9-a9a8-4789-b93e-57ea0b780dfb",
+    "cityName": "Boston",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "e6f32377-f7fc-45cf-a05b-33ad0eb62c5c",
+    "cityName": "Bragança",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "9127f14d-b434-4c89-bfa7-df0f16c2cd9e",
+    "cityName": "Brasília",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "9c5f1173-6967-46c4-99fb-2acbd49471ac",
+    "cityName": "Bratislava",
+    "countryName": "Slovakia",
+    "countryCode": "SK",
+    "airportCode": ""
+  },
+  {
+    "id": "e2c547d2-53c1-4c6d-ad01-746a59677c45",
+    "cityName": "Bridgetown",
+    "countryName": "Barbados",
+    "countryCode": "BB",
+    "airportCode": ""
+  },
+  {
+    "id": "c0662a48-4c98-4c69-b884-b046f45fa1de",
+    "cityName": "Brisbane",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "5a40b980-acd8-46a2-aab1-605b5d6f4b67",
+    "cityName": "Bristol",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "55b3a2e5-66f5-4fac-b167-eb5c6ec10a0c",
+    "cityName": "Brno",
+    "countryName": "Czech Republic",
+    "countryCode": "CZ",
+    "airportCode": ""
+  },
+  {
+    "id": "b5589e4f-f857-4c49-b7b5-8898f6da1b5b",
+    "cityName": "Brussels",
+    "countryName": "Belgium",
+    "countryCode": "BE",
+    "airportCode": ""
+  },
+  {
+    "id": "6947352c-f5f5-4f23-91a7-d23fd15d44fe",
+    "cityName": "Bucharest",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "35bc9e68-04b6-435f-9156-ea24cd299d59",
+    "cityName": "Budapest",
+    "countryName": "Hungary",
+    "countryCode": "HU",
+    "airportCode": ""
+  },
+  {
+    "id": "a5a44b9a-5dc6-4dd4-a32f-01adb09b7afc",
+    "cityName": "Buenos Aires",
+    "countryName": "Argentina",
+    "countryCode": "AR",
+    "airportCode": "EZE"
+  },
+  {
+    "id": "54b6fec6-3842-4844-8547-98e06ec7e14c",
+    "cityName": "Buffalo",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "f1879f65-e7ca-4893-b1a2-6e9dfb9c80de",
+    "cityName": "Burbank",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "851bbcdc-92bc-4dbb-b606-c39d40db1054",
+    "cityName": "Burgas",
+    "countryName": "Bulgaria",
+    "countryCode": "BG",
+    "airportCode": ""
+  },
+  {
+    "id": "a8173714-d9af-4faa-8052-4606289f8f61",
+    "cityName": "Busan",
+    "countryName": "South Korea",
+    "countryCode": "KR",
+    "airportCode": ""
+  },
+  {
+    "id": "f571d034-dc16-4ead-b725-dd26e455b439",
+    "cityName": "Cagliari",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "747a2bfb-b9a5-419e-9165-83f2bc5aa49c",
+    "cityName": "Cairns",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "007c25c8-ec0f-433e-9f12-2bf8a978f1ab",
+    "cityName": "Cairo",
+    "countryName": "Egypt",
+    "countryCode": "EG",
+    "airportCode": "CAI"
+  },
+  {
+    "id": "caf3d3de-e834-457e-9deb-f90cf979a382",
+    "cityName": "Calgary",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "2c546521-3997-4c84-a25a-6da0be0dfae5",
+    "cityName": "Cali",
+    "countryName": "Colombia",
+    "countryCode": "CO",
+    "airportCode": ""
+  },
+  {
+    "id": "4265b212-d469-422d-a2e6-b100cf812394",
+    "cityName": "Canberra",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "4abba40c-c659-412f-a835-0a5f49d024b8",
+    "cityName": "Cancún",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": "CUN"
+  },
+  {
+    "id": "06499634-abab-4344-9841-a8bb591ca741",
+    "cityName": "Cape Town",
+    "countryName": "South Africa",
+    "countryCode": "ZA",
+    "airportCode": "CPT"
+  },
+  {
+    "id": "8b38872e-bc9c-416a-972b-fd5a576bfce7",
+    "cityName": "Cartagena",
+    "countryName": "Colombia",
+    "countryCode": "CO",
+    "airportCode": ""
+  },
+  {
+    "id": "4675dd18-e6fc-4816-a92b-e7f2f41fe699",
+    "cityName": "Casablanca",
+    "countryName": "Morocco",
+    "countryCode": "MA",
+    "airportCode": ""
+  },
+  {
+    "id": "d737e7e1-7f1c-48c8-840c-b2f9b106f407",
+    "cityName": "Catania",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "e750de96-fe4d-456f-9f92-cb8c92294658",
+    "cityName": "Cebu",
+    "countryName": "Philippines",
+    "countryCode": "PH",
+    "airportCode": ""
+  },
+  {
+    "id": "de511946-421e-4c88-bf2c-17a6965633dc",
+    "cityName": "Chania",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "1c147bac-8de6-42cf-9f5d-588bcbf37de8",
+    "cityName": "Charleroi",
+    "countryName": "Belgium",
+    "countryCode": "BE",
+    "airportCode": ""
+  },
+  {
+    "id": "bf00b41b-1eed-4d5e-b0f8-b7986bf3f908",
+    "cityName": "Charlotte",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "c0b63dd1-bbb2-4818-93c4-5222ed677c3a",
+    "cityName": "Chaves",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "e6ec315f-d485-48fc-aa08-4a899d4267e9",
+    "cityName": "Chengdu",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "a2f327bb-ae70-4ec9-858e-2f75929cbae5",
+    "cityName": "Chennai",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "85fe1a1e-6139-4b4a-b3eb-ebfb1fa7ed0b",
+    "cityName": "Chiang Mai",
+    "countryName": "Thailand",
+    "countryCode": "TH",
+    "airportCode": ""
+  },
+  {
+    "id": "405016ca-37f7-424e-a980-5cd390d18b8c",
+    "cityName": "Chicago",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "0dc6e3aa-fe84-4f69-a13a-5c8980e8a374",
+    "cityName": "Chongqing",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "5f62ab2d-cbe6-4689-8610-7a3a81c8a845",
+    "cityName": "Christchurch",
+    "countryName": "New Zealand",
+    "countryCode": "NZ",
+    "airportCode": ""
+  },
+  {
+    "id": "3cdeda49-90a5-4a25-9a76-943ab4a51be8",
+    "cityName": "Cincinnati",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "600ec8a9-ea4f-46c4-a40a-e66b877d59db",
+    "cityName": "Cleveland",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "3c33b5a0-71fb-4da4-b103-91b9a9661dcd",
+    "cityName": "Cluj-Napoca",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "a24aa994-293e-4512-8096-bebe86d3a950",
+    "cityName": "Cologne",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "c0d4521f-a6a3-4157-a87e-99a885e0bd3e",
+    "cityName": "Columbus",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "4a14404d-647e-4e47-889a-0c0312e6b2aa",
+    "cityName": "Copenhagen",
+    "countryName": "Denmark",
+    "countryCode": "DK",
+    "airportCode": ""
+  },
+  {
+    "id": "4a483fbf-2c65-4ce6-8cd2-8f18f9859e6c",
+    "cityName": "Corfu",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "dff194fb-197e-4fc5-8d6f-d85c71af4b64",
+    "cityName": "Cork",
+    "countryName": "Ireland",
+    "countryCode": "IE",
+    "airportCode": ""
+  },
+  {
+    "id": "06943a4e-a382-434f-a16d-288476f209a7",
+    "cityName": "Craiova",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "c0b42636-d193-45e4-b656-bc2052825fc9",
+    "cityName": "Curitiba",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "72a451d2-cd36-4597-8769-dd40aadd4d72",
+    "cityName": "Cusco",
+    "countryName": "Peru",
+    "countryCode": "PE",
+    "airportCode": ""
+  },
+  {
+    "id": "9e5b39b2-b89d-43e1-b98f-3c70078ba57f",
+    "cityName": "Córdoba",
+    "countryName": "Argentina",
+    "countryCode": "AR",
+    "airportCode": ""
+  },
+  {
+    "id": "a8dfb424-0d72-467d-8ac1-9dfc26cea00c",
+    "cityName": "Da Nang",
+    "countryName": "Vietnam",
+    "countryCode": "VN",
+    "airportCode": ""
+  },
+  {
+    "id": "8bfce263-3287-4437-9803-168e18349639",
+    "cityName": "Daegu",
+    "countryName": "South Korea",
+    "countryCode": "KR",
+    "airportCode": ""
+  },
+  {
+    "id": "151059a3-e8bc-4f19-ab77-f12683c76c18",
+    "cityName": "Dakar",
+    "countryName": "Senegal",
+    "countryCode": "SN",
+    "airportCode": ""
+  },
+  {
+    "id": "0cf3ec13-f5cd-457f-95c9-58fa07766f7f",
+    "cityName": "Dalaman",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "d1dbf04d-1646-4f7c-aac6-baf973515a9c",
+    "cityName": "Dalian",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "43895ca2-cf0f-448e-9b66-391956229c92",
+    "cityName": "Dallas",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "c18c0d71-f9b7-4137-a1f5-2fd9087704ad",
+    "cityName": "Dammam",
+    "countryName": "Saudi Arabia",
+    "countryCode": "SA",
+    "airportCode": ""
+  },
+  {
+    "id": "7695d6ff-0e56-4871-81e4-e500ea319df5",
+    "cityName": "Dar es Salaam",
+    "countryName": "Tanzania",
+    "countryCode": "TZ",
+    "airportCode": ""
+  },
+  {
+    "id": "12df37f0-498f-40c1-8634-91ddd5929ab4",
+    "cityName": "Debrecen",
+    "countryName": "Hungary",
+    "countryCode": "HU",
+    "airportCode": ""
+  },
+  {
+    "id": "c982a034-a926-4e77-9732-398bf0be5be2",
+    "cityName": "Denpasar",
+    "countryName": "Indonesia",
+    "countryCode": "ID",
+    "airportCode": ""
+  },
+  {
+    "id": "b275522a-56c3-41b1-a022-7aaa3be0888d",
+    "cityName": "Denver",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "ada6a837-6199-450f-871a-cfdb24099375",
+    "cityName": "Des Moines",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "bdd1dd84-c1dd-49d3-b06f-a8fb9e9ce1aa",
+    "cityName": "Detroit",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "44e61a96-dc88-4a83-b14a-c38384041c5e",
+    "cityName": "Djerba",
+    "countryName": "Tunisia",
+    "countryCode": "TN",
+    "airportCode": ""
+  },
+  {
+    "id": "698b2185-c5db-43ef-8f9c-207c0ec56f24",
+    "cityName": "Doha",
+    "countryName": "Qatar",
+    "countryCode": "QA",
+    "airportCode": ""
+  },
+  {
+    "id": "0ef19b41-872d-46e3-b1a2-5937f82206a7",
+    "cityName": "Dortmund",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "a4340dd7-cad0-4035-b9e1-fcbfe37520c7",
+    "cityName": "Dubai",
+    "countryName": "United Arab Emirates",
+    "countryCode": "AE",
+    "airportCode": "DXB"
+  },
+  {
+    "id": "11317b7b-67dc-41f0-b0fe-035fea36b88b",
+    "cityName": "Dublin",
+    "countryName": "Ireland",
+    "countryCode": "IE",
+    "airportCode": "DUB"
+  },
+  {
+    "id": "a3358f22-531e-4b4f-9de0-db9a439aef24",
+    "cityName": "Dubrovnik",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "5a17d18b-3c55-4f08-9362-e389288c5953",
+    "cityName": "Dunedin",
+    "countryName": "New Zealand",
+    "countryCode": "NZ",
+    "airportCode": ""
+  },
+  {
+    "id": "648cc348-6601-43ac-83c0-a78f0da59dcc",
+    "cityName": "Durban",
+    "countryName": "South Africa",
+    "countryCode": "ZA",
+    "airportCode": ""
+  },
+  {
+    "id": "076e759d-5bd9-4296-945d-18dbb7ffc4ff",
+    "cityName": "Düsseldorf",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "78ae0de9-5e89-44d9-80f4-6dddfd291f79",
+    "cityName": "Easter Island",
+    "countryName": "Chile",
+    "countryCode": "CL",
+    "airportCode": ""
+  },
+  {
+    "id": "15510a83-6de2-4d92-b424-ee4f0a4b6593",
+    "cityName": "Edinburgh",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "375c5fea-8b39-4356-beee-222e4fed59be",
+    "cityName": "Edmonton",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "020bede5-46de-4ab1-8db4-ef281e43c59c",
+    "cityName": "Eindhoven",
+    "countryName": "Netherlands",
+    "countryCode": "NL",
+    "airportCode": ""
+  },
+  {
+    "id": "5950d2fd-3d60-4d75-b5fb-c1f95923e671",
+    "cityName": "Entebbe",
+    "countryName": "Uganda",
+    "countryCode": "UG",
+    "airportCode": ""
+  },
+  {
+    "id": "7307bf6c-7428-49c0-9205-f3f3c861a58c",
+    "cityName": "Faro",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "df948e0a-20c8-4253-9bfc-34d5ad56b5ea",
+    "cityName": "Fort Lauderdale",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "d6d47077-6673-4985-9064-5e2548b2d323",
+    "cityName": "Fort Myers",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "9db01599-7795-4d71-8028-badbbc301d64",
+    "cityName": "Fortaleza",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "99bc4f2c-39d1-4f1b-920f-faea07fb36b7",
+    "cityName": "Frankfurt",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "f934a158-4f2b-470e-8f4f-707ddb9c16f4",
+    "cityName": "Fukuoka",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "4aa15f10-b5a5-44ae-b922-141b6fb74fc5",
+    "cityName": "Funchal",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "961a8018-b85b-4036-b68d-96af08484aa7",
+    "cityName": "Fès",
+    "countryName": "Morocco",
+    "countryCode": "MA",
+    "airportCode": ""
+  },
+  {
+    "id": "51a65c88-aaab-4567-ad66-6da88ea518f9",
+    "cityName": "Gaborone",
+    "countryName": "Botswana",
+    "countryCode": "BW",
+    "airportCode": ""
+  },
+  {
+    "id": "1322c17d-e4db-459b-9b5e-95c8b5c73e2c",
+    "cityName": "Gaziantep",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "7158d5fe-5ce5-4d89-b64d-f5edf0d13f87",
+    "cityName": "Gdańsk",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "45b8d30f-e1e2-4878-b32e-d79b22b2f883",
+    "cityName": "Geneva",
+    "countryName": "Switzerland",
+    "countryCode": "CH",
+    "airportCode": ""
+  },
+  {
+    "id": "44318e9a-8b14-4591-8fe6-c4ce80293551",
+    "cityName": "Georgetown",
+    "countryName": "Guyana",
+    "countryCode": "GY",
+    "airportCode": ""
+  },
+  {
+    "id": "333aa8b2-37d5-4921-aa82-d635264af596",
+    "cityName": "Glasgow",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "0f4460dd-7135-4168-9990-9318631ce6d4",
+    "cityName": "Goa",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "e1ebbdf6-6cee-4d35-94bd-1c80840446b3",
+    "cityName": "Gold Coast",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "3779f089-d3fe-4424-b547-d9196216c1ab",
+    "cityName": "Gorna Oryahovitsa",
+    "countryName": "Bulgaria",
+    "countryCode": "BG",
+    "airportCode": ""
+  },
+  {
+    "id": "272bd2d5-f25f-4437-81e2-4b299ee6e828",
+    "cityName": "Gothenburg",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "4fc353d5-9e8a-4f95-9cd4-ded104c4c578",
+    "cityName": "Graz",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "c28d55b0-e6f3-4c69-8d43-b7827f4fce35",
+    "cityName": "Groningen",
+    "countryName": "Netherlands",
+    "countryCode": "NL",
+    "airportCode": ""
+  },
+  {
+    "id": "0929d77b-6aba-437c-9a65-0decf98ea67d",
+    "cityName": "Guadalajara",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "69858c7f-8cfc-4633-a921-e7f0911efd30",
+    "cityName": "Guangzhou",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "f05db9bd-24d3-43a3-954b-d241958b45ef",
+    "cityName": "Guatemala City",
+    "countryName": "Guatemala",
+    "countryCode": "GT",
+    "airportCode": ""
+  },
+  {
+    "id": "46f90c89-b2d8-4ccb-a519-e5c5e66d97c1",
+    "cityName": "Guayaquil",
+    "countryName": "Ecuador",
+    "countryCode": "EC",
+    "airportCode": ""
+  },
+  {
+    "id": "6b90d1ee-fa70-439b-84f0-15bb43a6efe4",
+    "cityName": "Halifax",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "560515c1-6855-4bce-8bb3-3dfb9f7dc9c2",
+    "cityName": "Hamburg",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "f76dc25e-fb63-436c-a73b-c85edac3ca4f",
+    "cityName": "Hangzhou",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "6a134575-4fca-474f-b822-e0123ba711f9",
+    "cityName": "Hannover",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "46676d01-42ba-4f4b-bc55-2341e20971e5",
+    "cityName": "Hanoi",
+    "countryName": "Vietnam",
+    "countryCode": "VN",
+    "airportCode": ""
+  },
+  {
+    "id": "760978f0-f561-46cf-a902-a957d6715bee",
+    "cityName": "Hartford",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "a4fc7ef9-64fd-4c45-a439-23f3aa002b24",
+    "cityName": "Haugesund",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "47b9651d-c070-4891-b2a4-1d7de891471c",
+    "cityName": "Havana",
+    "countryName": "Cuba",
+    "countryCode": "CU",
+    "airportCode": ""
+  },
+  {
+    "id": "a5acea74-c61c-438a-a469-17d04fa3dd8d",
+    "cityName": "Helsinki",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "03409c49-9f21-45d1-8cd8-deaa3d9bb585",
+    "cityName": "Heraklion",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "734596d9-4b1d-4843-a538-d4334606e0e4",
+    "cityName": "Hermosillo",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "d5a60e7b-7202-48bf-bad1-bf637482551b",
+    "cityName": "Hiroshima",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "342bc53a-de61-4cce-b575-7efd1143abb0",
+    "cityName": "Ho Chi Minh City",
+    "countryName": "Vietnam",
+    "countryCode": "VN",
+    "airportCode": ""
+  },
+  {
+    "id": "d0db035e-0dce-483f-9cb3-6f61717ce5b1",
+    "cityName": "Hong Kong",
+    "countryName": "Hong Kong",
+    "countryCode": "HK",
+    "airportCode": "HKG"
+  },
+  {
+    "id": "bb4dcfb2-20dc-4ee7-92ab-3168278e9c7f",
+    "cityName": "Honolulu",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "b3c09044-f822-4877-bb91-745900ffd741",
+    "cityName": "Horta",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "e823fbf1-1ec1-4684-93db-ed8d3a553955",
+    "cityName": "Houston",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "3efe26d0-6460-4a2a-8497-2e3225cdfaa5",
+    "cityName": "Hurghada",
+    "countryName": "Egypt",
+    "countryCode": "EG",
+    "airportCode": ""
+  },
+  {
+    "id": "04c5c7fe-7af7-4dae-9584-9fc84afccf78",
+    "cityName": "Hyderabad",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "24688836-47f5-46fc-98fd-3544624bbe5a",
+    "cityName": "Iași",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "71e51c02-093e-4428-a372-fbd7ffc21cd2",
+    "cityName": "Ibiza",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "3d556863-7f65-44a2-9ce5-3b2ce5bc6ef3",
+    "cityName": "Indianapolis",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "807f1bc6-aea4-48fe-b411-29887aa8e196",
+    "cityName": "Innsbruck",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "be684dd5-4ca6-4346-a888-948275711926",
+    "cityName": "Istanbul",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": "IST"
+  },
+  {
+    "id": "67e1be23-4c3d-41eb-a469-ab93ea0f5720",
+    "cityName": "Ivalo",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "62c40a83-9ee6-4681-96ba-892233753ea2",
+    "cityName": "Jacksonville",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "a9f10692-1821-4d5a-b964-9c72dd81de67",
+    "cityName": "Jaipur",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "bf1ff916-ecda-41e4-8b7d-8deda970d5ed",
+    "cityName": "Jakarta",
+    "countryName": "Indonesia",
+    "countryCode": "ID",
+    "airportCode": ""
+  },
+  {
+    "id": "82fc33d9-e52a-496f-9c2e-c71e33d76324",
+    "cityName": "Jeddah",
+    "countryName": "Saudi Arabia",
+    "countryCode": "SA",
+    "airportCode": ""
+  },
+  {
+    "id": "a0360bfe-1da2-46d5-b3ff-0ed252b3c346",
+    "cityName": "Jeju",
+    "countryName": "South Korea",
+    "countryCode": "KR",
+    "airportCode": ""
+  },
+  {
+    "id": "884dab8e-ead0-45f1-9b27-f7a50b8bcd2b",
+    "cityName": "Johannesburg",
+    "countryName": "South Africa",
+    "countryCode": "ZA",
+    "airportCode": "JNB"
+  },
+  {
+    "id": "7ff80aeb-59c1-47bc-95b6-61577b0a2817",
+    "cityName": "Johor Bahru",
+    "countryName": "Malaysia",
+    "countryCode": "MY",
+    "airportCode": ""
+  },
+  {
+    "id": "db31f2a7-eed6-464f-b348-0cdedbab8bc4",
+    "cityName": "Jyväskylä",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "b2f4f315-5ad5-42a9-85f5-eb5aafd4f967",
+    "cityName": "Kagoshima",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "b1e2d97f-eafb-450f-831d-9e6fb714807c",
+    "cityName": "Kajaani",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "b05ce9d2-c904-4af7-9917-d4071cc1b8b2",
+    "cityName": "Kansas City",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "9b41cc7e-07c8-4137-91b9-13eca9416363",
+    "cityName": "Kaohsiung",
+    "countryName": "Taiwan",
+    "countryCode": "TW",
+    "airportCode": ""
+  },
+  {
+    "id": "c51aacd4-9e0b-41ac-8b43-370d9febef90",
+    "cityName": "Karlovy Vary",
+    "countryName": "Czech Republic",
+    "countryCode": "CZ",
+    "airportCode": ""
+  },
+  {
+    "id": "37b87196-1a7b-4539-9f69-1c69122eda39",
+    "cityName": "Karup",
+    "countryName": "Denmark",
+    "countryCode": "DK",
+    "airportCode": ""
+  },
+  {
+    "id": "adb0ff0e-9c3f-47fa-b397-2b4f0fe0ec7a",
+    "cityName": "Katowice",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "7fb48786-407d-465d-b296-477a1c0f07fb",
+    "cityName": "Kaunas",
+    "countryName": "Lithuania",
+    "countryCode": "LT",
+    "airportCode": ""
+  },
+  {
+    "id": "c8426e33-aae9-465d-993a-534223544ebb",
+    "cityName": "Kemi",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "92c11ebe-384d-41f8-9acb-5730e157da9e",
+    "cityName": "Kerry",
+    "countryName": "Ireland",
+    "countryCode": "IE",
+    "airportCode": ""
+  },
+  {
+    "id": "b2ebab89-9bed-4827-a928-1b8520db6114",
+    "cityName": "Kigali",
+    "countryName": "Rwanda",
+    "countryCode": "RW",
+    "airportCode": ""
+  },
+  {
+    "id": "2a1dee70-07f7-4550-b547-4be2faeb6d24",
+    "cityName": "Kilimanjaro",
+    "countryName": "Tanzania",
+    "countryCode": "TZ",
+    "airportCode": ""
+  },
+  {
+    "id": "57ea70c7-7c39-4502-aafa-9777f2d97f98",
+    "cityName": "Kingston",
+    "countryName": "Jamaica",
+    "countryCode": "JM",
+    "airportCode": ""
+  },
+  {
+    "id": "4829eb15-9a93-4a82-a0fc-00285e785411",
+    "cityName": "Klagenfurt",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "1686acdb-85ac-456a-af82-0b3ef824bb20",
+    "cityName": "Knock",
+    "countryName": "Ireland",
+    "countryCode": "IE",
+    "airportCode": ""
+  },
+  {
+    "id": "7097610e-64f0-4b8a-bbcc-f263f4f987b0",
+    "cityName": "Kochi",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "044b035c-56d6-418c-b53b-5f131160c7a5",
+    "cityName": "Koh Samui",
+    "countryName": "Thailand",
+    "countryCode": "TH",
+    "airportCode": ""
+  },
+  {
+    "id": "e81e51f3-1e67-4a48-91ce-86d1b782319c",
+    "cityName": "Kolkata",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": ""
+  },
+  {
+    "id": "b98ee096-3ba5-46da-a091-4a282166e008",
+    "cityName": "Kos",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "7465eaf6-7ead-41aa-8f59-21ad8533bf97",
+    "cityName": "Košice",
+    "countryName": "Slovakia",
+    "countryCode": "SK",
+    "airportCode": ""
+  },
+  {
+    "id": "dfab7056-81d8-4623-8b53-5f8dcde225b5",
+    "cityName": "Kraków",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "c4e15dfa-8b69-491c-acd2-f0ce4816a010",
+    "cityName": "Kristiansand",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "5fd7113a-eaa2-4366-9cd1-12a34ced6306",
+    "cityName": "Kristianstad",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "8dbaedfd-9294-43bc-94a3-ba1934f34d27",
+    "cityName": "Kuala Lumpur",
+    "countryName": "Malaysia",
+    "countryCode": "MY",
+    "airportCode": ""
+  },
+  {
+    "id": "e4d71efe-26a7-4a03-b895-627ac521515c",
+    "cityName": "Kunming",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "5c7f7683-8a3f-4641-aed8-dc67d2eca55e",
+    "cityName": "Kuwait City",
+    "countryName": "Kuwait",
+    "countryCode": "KW",
+    "airportCode": ""
+  },
+  {
+    "id": "5b68bb15-c1fa-4742-9d42-4389ff3bfb61",
+    "cityName": "La Paz",
+    "countryName": "Bolivia",
+    "countryCode": "BO",
+    "airportCode": ""
+  },
+  {
+    "id": "fb6cc459-fbe0-48bf-9c6f-7d34a0ed47eb",
+    "cityName": "Lagos",
+    "countryName": "Nigeria",
+    "countryCode": "NG",
+    "airportCode": ""
+  },
+  {
+    "id": "70dd0ca8-8d67-423b-9399-4817b1dcf65b",
+    "cityName": "Langkawi",
+    "countryName": "Malaysia",
+    "countryCode": "MY",
+    "airportCode": ""
+  },
+  {
+    "id": "06b0bcf2-0a4b-4891-acdf-8663b0f53be1",
+    "cityName": "Larnaca",
+    "countryName": "Cyprus",
+    "countryCode": "CY",
+    "airportCode": ""
+  },
+  {
+    "id": "28a4731f-7c11-4b06-b71b-4d75495d9811",
+    "cityName": "Las Vegas",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": "LAS"
+  },
+  {
+    "id": "f5a52fb8-8d38-4ca7-acff-1838db340f26",
+    "cityName": "Liberia",
+    "countryName": "Costa Rica",
+    "countryCode": "CR",
+    "airportCode": ""
+  },
+  {
+    "id": "f698dd3d-f8c6-487d-a489-05df3343ac74",
+    "cityName": "Lille",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "683ba8ff-8e50-4105-a0c3-364d03987a56",
+    "cityName": "Lima",
+    "countryName": "Peru",
+    "countryCode": "PE",
+    "airportCode": ""
+  },
+  {
+    "id": "95be2004-fe03-4eec-9ee2-4683d3a31129",
+    "cityName": "Linz",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "f19e2b93-63c5-44a3-b204-c37136e9568a",
+    "cityName": "Lisbon",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": "LIS"
+  },
+  {
+    "id": "fc53065c-3a28-49c0-8c30-a4477af99f9d",
+    "cityName": "Liège",
+    "countryName": "Belgium",
+    "countryCode": "BE",
+    "airportCode": ""
+  },
+  {
+    "id": "defd07c3-b422-45b2-998c-9dba7d38ddab",
+    "cityName": "Ljubljana",
+    "countryName": "Slovenia",
+    "countryCode": "SI",
+    "airportCode": ""
+  },
+  {
+    "id": "88f393a2-cfeb-4a4f-b52d-3e0d78fd56ae",
+    "cityName": "London",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": "LHR"
+  },
+  {
+    "id": "e2d11fed-b2f0-48dc-a47a-373a8bebc505",
+    "cityName": "Los Angeles",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": "LAX"
+  },
+  {
+    "id": "b4089bbe-3a6a-43bb-abfb-5429ac7aa976",
+    "cityName": "Lublin",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "233a41b0-efd3-4f9d-a6e8-d4ea28f76e4f",
+    "cityName": "Lugano",
+    "countryName": "Switzerland",
+    "countryCode": "CH",
+    "airportCode": ""
+  },
+  {
+    "id": "47ce8ac1-0507-4344-8300-53b7651816a4",
+    "cityName": "Luleå",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "2a1544a4-f85e-4e38-80f4-33cdae2c004c",
+    "cityName": "Luxembourg City",
+    "countryName": "Luxembourg",
+    "countryCode": "LU",
+    "airportCode": ""
+  },
+  {
+    "id": "3a533d1d-0884-4073-b493-1fd25be86d2a",
+    "cityName": "Lyon",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "f1efa18b-bada-43b2-981c-ca7fe2f9dd6b",
+    "cityName": "Maastricht",
+    "countryName": "Netherlands",
+    "countryCode": "NL",
+    "airportCode": ""
+  },
+  {
+    "id": "ad4724bd-902e-41b1-9124-4707c94395c4",
+    "cityName": "Madrid",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "f144dd79-6e8b-4959-bee5-b4d8ad1af0a1",
+    "cityName": "Mahé",
+    "countryName": "Seychelles",
+    "countryCode": "SC",
+    "airportCode": ""
+  },
+  {
+    "id": "c83a036c-fa9e-459a-9709-85afc7af0d4c",
+    "cityName": "Malmö",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "8a068425-3ff2-403d-8480-9abecca22bed",
+    "cityName": "Managua",
+    "countryName": "Nicaragua",
+    "countryCode": "NI",
+    "airportCode": ""
+  },
+  {
+    "id": "25176c8a-5166-467d-a688-8fff5bb454b5",
+    "cityName": "Manama",
+    "countryName": "Bahrain",
+    "countryCode": "BH",
+    "airportCode": ""
+  },
+  {
+    "id": "b10b3bb7-013c-4a13-a22f-9fb2c236c6b3",
+    "cityName": "Manaus",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "92720795-37f6-4aca-89f4-635ec389b6d3",
+    "cityName": "Manchester",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "16ea496a-3626-4269-899d-e3bf027fbc5f",
+    "cityName": "Manila",
+    "countryName": "Philippines",
+    "countryCode": "PH",
+    "airportCode": ""
+  },
+  {
+    "id": "3f183eca-1118-4839-9974-6e80ba3dfbe2",
+    "cityName": "Marrakesh",
+    "countryName": "Morocco",
+    "countryCode": "MA",
+    "airportCode": ""
+  },
+  {
+    "id": "05334509-1d79-4584-8861-c49c3b2a597f",
+    "cityName": "Marseille",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "6a198fc9-4c2d-4aac-96bc-b9b23307a158",
+    "cityName": "Mauritius",
+    "countryName": "Mauritius",
+    "countryCode": "MU",
+    "airportCode": ""
+  },
+  {
+    "id": "5ba901a5-6d03-4c33-9211-94500f1abf06",
+    "cityName": "Mazatlán",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "e024f8e7-f899-4825-a7f3-9747167c9723",
+    "cityName": "Medellín",
+    "countryName": "Colombia",
+    "countryCode": "CO",
+    "airportCode": ""
+  },
+  {
+    "id": "819120f5-04bb-423b-8147-ce7430535bbf",
+    "cityName": "Melbourne",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": "MEL"
+  },
+  {
+    "id": "96670a42-3665-41ac-bce1-d60468b9802d",
+    "cityName": "Memphis",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "b29a02fe-55f4-467c-a838-98a4ae4e8813",
+    "cityName": "Mendoza",
+    "countryName": "Argentina",
+    "countryCode": "AR",
+    "airportCode": ""
+  },
+  {
+    "id": "4e39f970-8a19-4d64-8e9b-17ec92cae28e",
+    "cityName": "Mexico City",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": "MEX"
+  },
+  {
+    "id": "40da497b-443d-4643-b5ac-aa292dceb2b0",
+    "cityName": "Miami",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": "MIA"
+  },
+  {
+    "id": "bc0ca961-8475-4563-92cf-38af4c30c20c",
+    "cityName": "Milan",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "4c574257-590c-4bf2-a064-035bbcf193e6",
+    "cityName": "Milwaukee",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "cca91ac7-8606-4427-ac89-5efc913eca69",
+    "cityName": "Minneapolis",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "28a23d75-a9b0-411a-a283-3f3597e6d6ae",
+    "cityName": "Molde",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "aeae7fdf-e2d9-4981-b298-5ae1b6f9c520",
+    "cityName": "Mombasa",
+    "countryName": "Kenya",
+    "countryCode": "KE",
+    "airportCode": ""
+  },
+  {
+    "id": "0bd9fe1c-e743-4701-8a01-f6cdb94e15b6",
+    "cityName": "Montego Bay",
+    "countryName": "Jamaica",
+    "countryCode": "JM",
+    "airportCode": ""
+  },
+  {
+    "id": "bbf3847e-7a29-4068-be2b-013bb944e668",
+    "cityName": "Monterrey",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "a0c9f405-9255-4268-bf77-3ea79bc54034",
+    "cityName": "Montevideo",
+    "countryName": "Uruguay",
+    "countryCode": "UY",
+    "airportCode": ""
+  },
+  {
+    "id": "d934d0f7-625e-4155-97f6-78ef1c7bca88",
+    "cityName": "Montreal",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "543ed76e-bc23-4b0c-8e1d-71c702b57ddb",
+    "cityName": "Mumbai",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": "BOM"
+  },
+  {
+    "id": "9d384842-eecb-446b-bc22-da4f74aad7c9",
+    "cityName": "Munich",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "88151b25-c8a9-44bf-a271-fb32580291be",
+    "cityName": "Muscat",
+    "countryName": "Oman",
+    "countryCode": "OM",
+    "airportCode": ""
+  },
+  {
+    "id": "2477b377-2f70-4c95-9072-93dfd5ed4d44",
+    "cityName": "Mykonos",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "8f0028ce-497d-4a72-9da3-02e589aa5ca5",
+    "cityName": "Málaga",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "3945003b-a2fc-47c0-814b-b09e4c91c52c",
+    "cityName": "Nagoya",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "f99a6ed4-a8c6-4014-8963-bdcfdfe6419c",
+    "cityName": "Naha",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "b78dba35-88d3-4af6-a22e-9657e833e994",
+    "cityName": "Nairobi",
+    "countryName": "Kenya",
+    "countryCode": "KE",
+    "airportCode": ""
+  },
+  {
+    "id": "657ca495-4b33-47d5-b3bf-74fd57ac5709",
+    "cityName": "Nanjing",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "1c29f679-ac84-4a89-ae57-8784deb0a51b",
+    "cityName": "Nantes",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "c56e7d1a-1cb4-4d72-b8f9-456f35e53a46",
+    "cityName": "Naples",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "b76de30d-7bdf-49de-80eb-134b4261ffe9",
+    "cityName": "Nashville",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "0496e35d-f69f-428a-ac0a-62f75f969936",
+    "cityName": "Nassau",
+    "countryName": "Bahamas",
+    "countryCode": "BS",
+    "airportCode": ""
+  },
+  {
+    "id": "e1b995e6-efc1-4fef-b58b-7fb86d119bf5",
+    "cityName": "New Delhi",
+    "countryName": "India",
+    "countryCode": "IN",
+    "airportCode": "DEL"
+  },
+  {
+    "id": "8c6edc15-6e99-4a47-828f-c40ecbe4f2e4",
+    "cityName": "New Orleans",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "56bf3aa9-2d19-41a9-9c7e-92d5f3ba5bdc",
+    "cityName": "New York",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": "JFK"
+  },
+  {
+    "id": "abdb4626-4ecf-40a9-b405-071452245439",
+    "cityName": "Newark",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "57c1f210-046c-4659-bae2-6748fb26bfdd",
+    "cityName": "Newcastle",
+    "countryName": "United Kingdom",
+    "countryCode": "GB",
+    "airportCode": ""
+  },
+  {
+    "id": "598622d8-a460-4c7c-b92c-f9a17cdbfc3a",
+    "cityName": "Nice",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "ab9f88c0-d43b-4a2a-a9d6-27102932285b",
+    "cityName": "Niš",
+    "countryName": "Serbia",
+    "countryCode": "RS",
+    "airportCode": ""
+  },
+  {
+    "id": "b0b099ae-9422-4384-adc5-39d58ece8637",
+    "cityName": "Norfolk",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "27e8e99b-564f-4850-982e-b4f3b88ff442",
+    "cityName": "Nuremberg",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "f04d3d27-b34e-4854-9531-dc57547d6005",
+    "cityName": "Oakland",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "0a97cd06-2b3f-4700-acbc-28ed4de326bf",
+    "cityName": "Oklahoma City",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "3b34d17d-e2f9-4efa-91c1-903b0f695041",
+    "cityName": "Omaha",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "bc85d9e1-6f31-4405-9c27-76571c0ebd9d",
+    "cityName": "Ontario",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "e0906010-fa79-46b4-81f4-8135a4b0f034",
+    "cityName": "Oradea",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "bd6672a8-a08e-4fa0-8b4f-d2a2097394db",
+    "cityName": "Oranjestad",
+    "countryName": "Aruba",
+    "countryCode": "AW",
+    "airportCode": ""
+  },
+  {
+    "id": "eb85df0a-d0a5-45c4-9046-364ddf7096d4",
+    "cityName": "Orlando",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "c77df31a-67cb-4ec5-ab09-5f1aa5e2053b",
+    "cityName": "Osaka",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "e445641a-79b5-4e3b-a428-b1482cf42ea6",
+    "cityName": "Osijek",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "21723adf-3efd-426e-af97-863553117b31",
+    "cityName": "Oslo",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "3f08aeb3-fa14-4d43-ace5-4e2ade1f7c93",
+    "cityName": "Ostend",
+    "countryName": "Belgium",
+    "countryCode": "BE",
+    "airportCode": ""
+  },
+  {
+    "id": "5fe7a46c-71c4-4e8f-8d22-1175b64cfab1",
+    "cityName": "Ostrava",
+    "countryName": "Czech Republic",
+    "countryCode": "CZ",
+    "airportCode": ""
+  },
+  {
+    "id": "2d8e7427-0d62-4927-8371-ed0098e75446",
+    "cityName": "Ottawa",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "787ea2de-9847-4696-b137-e40c5b6380fe",
+    "cityName": "Oulu",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "98d38cb2-ae40-45e2-a96a-1527854ae013",
+    "cityName": "Palanga",
+    "countryName": "Lithuania",
+    "countryCode": "LT",
+    "airportCode": ""
+  },
+  {
+    "id": "57385c00-b0af-4ce7-9423-584a906448e9",
+    "cityName": "Palma",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "03d17e82-e418-4109-974e-9e524f73151c",
+    "cityName": "Panama City",
+    "countryName": "Panama",
+    "countryCode": "PA",
+    "airportCode": ""
+  },
+  {
+    "id": "60bf2b01-8b51-461e-809a-dbf03c940334",
+    "cityName": "Paphos",
+    "countryName": "Cyprus",
+    "countryCode": "CY",
+    "airportCode": ""
+  },
+  {
+    "id": "6bd6ac8a-4117-41bb-9e0d-0bafce0bc459",
+    "cityName": "Paramaribo",
+    "countryName": "Suriname",
+    "countryCode": "SR",
+    "airportCode": ""
+  },
+  {
+    "id": "efceaf16-aed1-4bea-8f90-c0054da16b5a",
+    "cityName": "Pardubice",
+    "countryName": "Czech Republic",
+    "countryCode": "CZ",
+    "airportCode": ""
+  },
+  {
+    "id": "11f874c5-401f-4eb1-911e-3ca431db4efb",
+    "cityName": "Paris",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": "CDG"
+  },
+  {
+    "id": "abcc2c69-2a9c-43f6-b887-56e3b7603d38",
+    "cityName": "Penang",
+    "countryName": "Malaysia",
+    "countryCode": "MY",
+    "airportCode": ""
+  },
+  {
+    "id": "bcfb1a51-20e6-4751-a0a6-9561e45b1a6a",
+    "cityName": "Perth",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": ""
+  },
+  {
+    "id": "b516a53d-4ce5-457b-828a-4cb8c5bbf660",
+    "cityName": "Philadelphia",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "cc792344-1c2e-4d21-9767-8c3a594eb4e7",
+    "cityName": "Phoenix",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "e1cfdaef-ff82-4c64-9a7d-4b64f9250c58",
+    "cityName": "Phuket",
+    "countryName": "Thailand",
+    "countryCode": "TH",
+    "airportCode": ""
+  },
+  {
+    "id": "dd5a32db-3863-4a7a-9a1b-f8d995507a18",
+    "cityName": "Pisa",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "e5582c71-c659-4ae7-9e49-8c43959fe95c",
+    "cityName": "Pittsburgh",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "df99b8a0-483f-4842-8145-56bae62426da",
+    "cityName": "Plovdiv",
+    "countryName": "Bulgaria",
+    "countryCode": "BG",
+    "airportCode": ""
+  },
+  {
+    "id": "68354ac6-2f49-4acf-a84d-6e33479140d8",
+    "cityName": "Ponta Delgada",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "6414309c-71ca-4297-87ab-187bddced97a",
+    "cityName": "Port of Spain",
+    "countryName": "Trinidad and Tobago",
+    "countryCode": "TT",
+    "airportCode": ""
+  },
+  {
+    "id": "44be2c7b-ced1-4af5-81b6-75f9fbdf280f",
+    "cityName": "Portland",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "77302156-9b55-4551-a372-f377caece160",
+    "cityName": "Porto",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "6ede8809-2f40-4bfa-a9ac-46ff4952015e",
+    "cityName": "Porto Alegre",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "3ad6eb3e-89cf-4434-8e75-79476908be99",
+    "cityName": "Poznań",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "ae3b4926-eb03-41de-b633-1c6cdfda795b",
+    "cityName": "Prague",
+    "countryName": "Czech Republic",
+    "countryCode": "CZ",
+    "airportCode": "PRG"
+  },
+  {
+    "id": "03ac59b8-acee-4b9b-8bab-32a9e7340e18",
+    "cityName": "Providence",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "3be01275-76da-40a6-a27b-13a581632bc2",
+    "cityName": "Puerto Vallarta",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "a293681f-d733-4985-b576-d2762e40c95e",
+    "cityName": "Pula",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "2ae36e82-952c-425a-97cb-5314c376da75",
+    "cityName": "Punta Cana",
+    "countryName": "Dominican Republic",
+    "countryCode": "DO",
+    "airportCode": ""
+  },
+  {
+    "id": "f947e066-2886-4e12-9950-ea0fb31a1ff0",
+    "cityName": "Qingdao",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "db155727-24f7-4902-b285-0d61f1495385",
+    "cityName": "Quebec City",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "9e520cf5-3ae6-4e06-816b-0520604c1706",
+    "cityName": "Queenstown",
+    "countryName": "New Zealand",
+    "countryCode": "NZ",
+    "airportCode": ""
+  },
+  {
+    "id": "c490d86d-80c7-4103-951a-24a856c19e19",
+    "cityName": "Quito",
+    "countryName": "Ecuador",
+    "countryCode": "EC",
+    "airportCode": ""
+  },
+  {
+    "id": "bb3d86b5-ea88-4a73-b075-955f43917d0c",
+    "cityName": "Raleigh",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "0ece5201-b107-4589-9a51-80ff052bd901",
+    "cityName": "Recife",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "caacf361-3d9b-4ffb-9ad9-1aebfcbe4e5d",
+    "cityName": "Reno",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "27b245d0-855c-49cc-88f8-e09188792beb",
+    "cityName": "Reykjavik",
+    "countryName": "Iceland",
+    "countryCode": "IS",
+    "airportCode": ""
+  },
+  {
+    "id": "574e7202-b491-43da-a3fa-50717bdb9aaa",
+    "cityName": "Rhodes",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "79ca92fc-7ffc-4b96-ac70-9e8fc0f58a4e",
+    "cityName": "Richmond",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "ba544d54-7d7f-4d79-8a4e-762427920e4b",
+    "cityName": "Riga",
+    "countryName": "Latvia",
+    "countryCode": "LV",
+    "airportCode": ""
+  },
+  {
+    "id": "d040d761-1fec-4f86-90d0-8750c068009f",
+    "cityName": "Rijeka",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "518cc1ca-d4f4-4218-8c1d-f387f3be13a1",
+    "cityName": "Rio de Janeiro",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": "GIG"
+  },
+  {
+    "id": "a3f81732-264c-44de-9428-699a526709b0",
+    "cityName": "Riyadh",
+    "countryName": "Saudi Arabia",
+    "countryCode": "SA",
+    "airportCode": ""
+  },
+  {
+    "id": "77ef0f92-8f41-4658-b61e-3b48a06c43ae",
+    "cityName": "Rome",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": "FCO"
+  },
+  {
+    "id": "70644322-a449-4050-8186-1bdd91e63a0a",
+    "cityName": "Ronneby",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "5bc8f363-80e4-41a6-af1a-e07266509ece",
+    "cityName": "Rotterdam",
+    "countryName": "Netherlands",
+    "countryCode": "NL",
+    "airportCode": ""
+  },
+  {
+    "id": "ef790183-e2a3-4ec3-aa84-66a423810dd2",
+    "cityName": "Rovaniemi",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "4181f732-3ea8-4746-b66d-b0b7d685e4ef",
+    "cityName": "Rzeszów",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "3c1042be-4827-475c-a324-878a026446fb",
+    "cityName": "Sacramento",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "ccfe01d3-93c7-4fe5-bc17-907f0acfa114",
+    "cityName": "Salt Lake City",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "6f02cfbf-5669-4764-8b6a-b3dfa0205dd2",
+    "cityName": "Salvador",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": ""
+  },
+  {
+    "id": "dfc5f99f-e88f-4941-811c-2aac4c59776c",
+    "cityName": "Salzburg",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "aa7d38c1-179c-4d23-aa8b-d10ec39c30b7",
+    "cityName": "San Antonio",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "79adeae9-3825-46a7-9890-c15a86b9bffa",
+    "cityName": "San Diego",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "06c45801-147e-4dbc-aca5-253b49b29162",
+    "cityName": "San Francisco",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": "SFO"
+  },
+  {
+    "id": "953c1392-8854-4f97-96ab-e22a4876a555",
+    "cityName": "San Jose",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "c4e087d3-4328-43df-bf6a-c1292c55e3a4",
+    "cityName": "San José",
+    "countryName": "Costa Rica",
+    "countryCode": "CR",
+    "airportCode": ""
+  },
+  {
+    "id": "7d98872a-3a0d-4fcc-aa94-3508f5eb693c",
+    "cityName": "San José del Cabo",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "fcf55d07-ff13-4a0e-bbe4-fd45f7a83916",
+    "cityName": "San Juan",
+    "countryName": "Puerto Rico",
+    "countryCode": "PR",
+    "airportCode": ""
+  },
+  {
+    "id": "8a82b994-2701-4de8-aef9-16bd9bc5ba49",
+    "cityName": "San Salvador",
+    "countryName": "El Salvador",
+    "countryCode": "SV",
+    "airportCode": ""
+  },
+  {
+    "id": "28cb1d85-dae1-43a1-862b-bf2d901c4f8a",
+    "cityName": "Santa Ana",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "47c20cfd-1d4f-4962-bbf0-1e031cba7065",
+    "cityName": "Santa Cruz",
+    "countryName": "Bolivia",
+    "countryCode": "BO",
+    "airportCode": ""
+  },
+  {
+    "id": "fda173ab-6676-41f7-b88b-0b035e2b1731",
+    "cityName": "Santa Maria",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "7888ea0b-dfc4-41ef-9c35-2f65a70d742a",
+    "cityName": "Santiago",
+    "countryName": "Chile",
+    "countryCode": "CL",
+    "airportCode": ""
+  },
+  {
+    "id": "f2712149-f2b2-42da-880a-54fca033e2d1",
+    "cityName": "Santo Domingo",
+    "countryName": "Dominican Republic",
+    "countryCode": "DO",
+    "airportCode": ""
+  },
+  {
+    "id": "0bbacc85-8945-4cd4-bc3e-93b0e3b16991",
+    "cityName": "Santorini",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "9b38d204-5ed4-4da7-9927-c09ea120254c",
+    "cityName": "Sapporo",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "ebeefc3c-9ff7-4ac6-a7ea-f5067dcb9aa0",
+    "cityName": "Sarasota",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "ecdffdb0-f792-41eb-9f23-1c92e918e200",
+    "cityName": "Satu Mare",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "41af4539-27ce-48d0-828f-7981e9f5f8cd",
+    "cityName": "Seattle",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "90b7f997-ad6e-4576-a7bd-2889f34e831a",
+    "cityName": "Sendai",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": ""
+  },
+  {
+    "id": "984a184d-1a62-4f94-aa1a-97ca78cbd00b",
+    "cityName": "Seoul",
+    "countryName": "South Korea",
+    "countryCode": "KR",
+    "airportCode": "ICN"
+  },
+  {
+    "id": "bc34d4cf-8e14-4df9-baf7-8c4be7e61c4c",
+    "cityName": "Seville",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "bd056531-0724-4671-998b-eb99525071c0",
+    "cityName": "Shanghai",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "37697e32-35d1-4f6b-bf9d-2e1d17f9cba4",
+    "cityName": "Shannon",
+    "countryName": "Ireland",
+    "countryCode": "IE",
+    "airportCode": ""
+  },
+  {
+    "id": "4f88c5f0-b4ee-4dd9-baa7-7ee45ce196f3",
+    "cityName": "Sharjah",
+    "countryName": "United Arab Emirates",
+    "countryCode": "AE",
+    "airportCode": ""
+  },
+  {
+    "id": "0df98a98-44f2-4b66-805a-3df9e0359503",
+    "cityName": "Sharm El Sheikh",
+    "countryName": "Egypt",
+    "countryCode": "EG",
+    "airportCode": ""
+  },
+  {
+    "id": "c19c608f-3322-4654-b680-7ebb5de1236d",
+    "cityName": "Shenzhen",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "f2600b4f-d84a-4ea2-86b6-2b8a9a66e3fc",
+    "cityName": "Sibiu",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "444f7b91-744d-427e-b8ba-84f2fe67cc90",
+    "cityName": "Singapore",
+    "countryName": "Singapore",
+    "countryCode": "SG",
+    "airportCode": "SIN"
+  },
+  {
+    "id": "d233cdae-d42a-46ae-b0ba-b695bf25c367",
+    "cityName": "Sofia",
+    "countryName": "Bulgaria",
+    "countryCode": "BG",
+    "airportCode": ""
+  },
+  {
+    "id": "e95c83c0-49e0-4d21-82bd-634249535aec",
+    "cityName": "Split",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "47a1753b-d69f-4e80-aa56-5cd9c18c213d",
+    "cityName": "Spokane",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "83e23928-830c-42d0-a24b-2657b5e5ef45",
+    "cityName": "St. George's",
+    "countryName": "Grenada",
+    "countryCode": "GD",
+    "airportCode": ""
+  },
+  {
+    "id": "4f5f5908-4c46-4c7b-9666-62d9c3a98010",
+    "cityName": "St. Louis",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "0601564a-7c97-4094-bb7f-c5b8618d4275",
+    "cityName": "Stavanger",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "14cdf248-8cd6-4b90-ad3b-f0048a78c37c",
+    "cityName": "Stockholm",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "48936e60-2740-4723-b134-ed7961705b97",
+    "cityName": "Stuttgart",
+    "countryName": "Germany",
+    "countryCode": "DE",
+    "airportCode": ""
+  },
+  {
+    "id": "05e28fa7-f8be-46c9-921a-34f8f24936ec",
+    "cityName": "Surabaya",
+    "countryName": "Indonesia",
+    "countryCode": "ID",
+    "airportCode": ""
+  },
+  {
+    "id": "67be154f-686b-4f1e-a51f-834555e33089",
+    "cityName": "Sydney",
+    "countryName": "Australia",
+    "countryCode": "AU",
+    "airportCode": "SYD"
+  },
+  {
+    "id": "7d04c260-614a-4e7c-aed8-929d8e2f3f84",
+    "cityName": "Szczecin",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "9df7de1e-843a-489e-813c-a2fa8088bc7c",
+    "cityName": "Sármellék",
+    "countryName": "Hungary",
+    "countryCode": "HU",
+    "airportCode": ""
+  },
+  {
+    "id": "27a5e1a6-0911-4a05-820a-5eaccf1f7b7b",
+    "cityName": "São Paulo",
+    "countryName": "Brazil",
+    "countryCode": "BR",
+    "airportCode": "GRU"
+  },
+  {
+    "id": "4866df15-9f79-47c8-86dd-81bbe27de0c3",
+    "cityName": "Taipei",
+    "countryName": "Taiwan",
+    "countryCode": "TW",
+    "airportCode": ""
+  },
+  {
+    "id": "111d1851-73b7-40e7-b17f-2def99c5686a",
+    "cityName": "Tallinn",
+    "countryName": "Estonia",
+    "countryCode": "EE",
+    "airportCode": ""
+  },
+  {
+    "id": "9d06b2e8-2691-4d89-b6c5-1b50bdb4a9ce",
+    "cityName": "Tampa",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "1f039470-7e12-4d51-8a07-52dc7bc1183b",
+    "cityName": "Tampere",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "815dba14-3483-429b-a081-91d22775aafa",
+    "cityName": "Tangier",
+    "countryName": "Morocco",
+    "countryCode": "MA",
+    "airportCode": ""
+  },
+  {
+    "id": "1ac8a026-409c-4b7a-a534-d1cca5708189",
+    "cityName": "Tbilisi",
+    "countryName": "Georgia",
+    "countryCode": "GE",
+    "airportCode": ""
+  },
+  {
+    "id": "55bed95a-ba6a-4c3f-a7cd-8e5e98edde28",
+    "cityName": "Tegucigalpa",
+    "countryName": "Honduras",
+    "countryCode": "HN",
+    "airportCode": ""
+  },
+  {
+    "id": "45010ef9-c1f6-4863-88da-0977fdfb4518",
+    "cityName": "Tel Aviv",
+    "countryName": "Israel",
+    "countryCode": "IL",
+    "airportCode": ""
+  },
+  {
+    "id": "d484aa45-2368-453c-bcd3-1e7121758149",
+    "cityName": "Tenerife",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "9f2c8e34-d2ad-4a50-ae7f-e5eef792edb3",
+    "cityName": "Terceira",
+    "countryName": "Portugal",
+    "countryCode": "PT",
+    "airportCode": ""
+  },
+  {
+    "id": "dfcc6c74-3f2a-4cf3-b43d-0c0e14a6150e",
+    "cityName": "Thessaloniki",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "fecf73f1-48be-477f-9e0b-59e9a4453f6c",
+    "cityName": "Tianjin",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "81e85749-0432-4708-a022-0a09e58d23f6",
+    "cityName": "Tijuana",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "c4aa744a-e0b3-4568-a266-81af23709180",
+    "cityName": "Timișoara",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "1252bfe8-759f-43e5-8876-975b921c5ccc",
+    "cityName": "Tokyo",
+    "countryName": "Japan",
+    "countryCode": "JP",
+    "airportCode": "NRT"
+  },
+  {
+    "id": "6660ab37-81e7-4ea6-b8ed-a6e114ca162b",
+    "cityName": "Toronto",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": "YYZ"
+  },
+  {
+    "id": "b7269129-7877-417b-8e78-a4f86a89d921",
+    "cityName": "Toulouse",
+    "countryName": "France",
+    "countryCode": "FR",
+    "airportCode": ""
+  },
+  {
+    "id": "e7bba5b4-55cf-445e-9d3e-aad5c66c55b7",
+    "cityName": "Trabzon",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  },
+  {
+    "id": "db41704a-8ea1-4323-bdc1-b9910c4855ec",
+    "cityName": "Tromsø",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "e8228a58-eae0-4543-bf4e-c49d304f433e",
+    "cityName": "Trondheim",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "ef9e2e20-66cc-47a4-af44-ff54091bdae9",
+    "cityName": "Tucson",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "8d54440e-c5af-4721-bb1b-ebb3285f2f06",
+    "cityName": "Tunis",
+    "countryName": "Tunisia",
+    "countryCode": "TN",
+    "airportCode": ""
+  },
+  {
+    "id": "ae788a64-8d6e-453e-b7e7-bfc450bb6810",
+    "cityName": "Turku",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "3aba960c-6b15-4e53-a827-bc1252ef44ec",
+    "cityName": "Târgu Mureș",
+    "countryName": "Romania",
+    "countryCode": "RO",
+    "airportCode": ""
+  },
+  {
+    "id": "919320d3-31e6-4a93-838f-f18675dc91bc",
+    "cityName": "Umeå",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "72969cd2-2896-424b-a2b1-d15daa260673",
+    "cityName": "Vaasa",
+    "countryName": "Finland",
+    "countryCode": "FI",
+    "airportCode": ""
+  },
+  {
+    "id": "55dedc83-6756-4b0d-b7b0-3e0d9fb722b0",
+    "cityName": "Valencia",
+    "countryName": "Spain",
+    "countryCode": "ES",
+    "airportCode": ""
+  },
+  {
+    "id": "f1d56f24-8e9c-4289-b08b-bd4380dacc22",
+    "cityName": "Valletta",
+    "countryName": "Malta",
+    "countryCode": "MT",
+    "airportCode": ""
+  },
+  {
+    "id": "99356621-1a44-4d3b-881b-bae8a4d41dac",
+    "cityName": "Vancouver",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": "YVR"
+  },
+  {
+    "id": "6b2fe077-23a2-4529-91f3-de583b2fe2b7",
+    "cityName": "Varadero",
+    "countryName": "Cuba",
+    "countryCode": "CU",
+    "airportCode": ""
+  },
+  {
+    "id": "0309ab7c-e7ac-4dcb-a36b-0784ff751af9",
+    "cityName": "Varna",
+    "countryName": "Bulgaria",
+    "countryCode": "BG",
+    "airportCode": ""
+  },
+  {
+    "id": "a441e4a7-7454-4049-a64e-7fafd1bee451",
+    "cityName": "Venice",
+    "countryName": "Italy",
+    "countryCode": "IT",
+    "airportCode": ""
+  },
+  {
+    "id": "d195967d-454b-4099-853e-4cafb44c3352",
+    "cityName": "Victoria",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "5a18d3a8-ba68-492d-b45a-c195a52f651e",
+    "cityName": "Victoria Falls",
+    "countryName": "Zimbabwe",
+    "countryCode": "ZW",
+    "airportCode": ""
+  },
+  {
+    "id": "dab87935-5e9f-48d2-9953-f378699760da",
+    "cityName": "Vienna",
+    "countryName": "Austria",
+    "countryCode": "AT",
+    "airportCode": ""
+  },
+  {
+    "id": "13d5b192-100f-4e68-9377-b812587f9528",
+    "cityName": "Vieux Fort",
+    "countryName": "Saint Lucia",
+    "countryCode": "LC",
+    "airportCode": ""
+  },
+  {
+    "id": "add6adb7-72c7-4436-af60-65334f2fa5e5",
+    "cityName": "Vilnius",
+    "countryName": "Lithuania",
+    "countryCode": "LT",
+    "airportCode": ""
+  },
+  {
+    "id": "9af3fa10-107e-422b-ab16-5cfc6ecf3566",
+    "cityName": "Visby",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "8c0e243d-733a-45d9-9c06-ab72c68244e3",
+    "cityName": "Västerås",
+    "countryName": "Sweden",
+    "countryCode": "SE",
+    "airportCode": ""
+  },
+  {
+    "id": "9fb243e1-6be8-4812-8046-e55e2b5e201d",
+    "cityName": "Warsaw",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "41a9e340-63dc-4f47-9776-e4c4f1682cec",
+    "cityName": "Washington DC",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "d424605b-d8f2-4a50-963d-7eca3136f3b2",
+    "cityName": "Wellington",
+    "countryName": "New Zealand",
+    "countryCode": "NZ",
+    "airportCode": ""
+  },
+  {
+    "id": "d543d579-a087-4aa9-a090-abf4eecab0b8",
+    "cityName": "West Palm Beach",
+    "countryName": "United States",
+    "countryCode": "US",
+    "airportCode": ""
+  },
+  {
+    "id": "dfe052bf-1653-453e-b1f1-ff2907f6ad11",
+    "cityName": "Willemstad",
+    "countryName": "Curaçao",
+    "countryCode": "CW",
+    "airportCode": ""
+  },
+  {
+    "id": "9cdc8b51-e201-44c9-b29d-b925df881abf",
+    "cityName": "Windhoek",
+    "countryName": "Namibia",
+    "countryCode": "NA",
+    "airportCode": ""
+  },
+  {
+    "id": "a35e4cdf-495a-4d9b-9288-f1e6e22405b0",
+    "cityName": "Winnipeg",
+    "countryName": "Canada",
+    "countryCode": "CA",
+    "airportCode": ""
+  },
+  {
+    "id": "c5e677ec-74cb-48d4-9719-ca2cd038ed0c",
+    "cityName": "Wrocław",
+    "countryName": "Poland",
+    "countryCode": "PL",
+    "airportCode": ""
+  },
+  {
+    "id": "4353b56e-0f48-4266-97d6-fcbe96c67f53",
+    "cityName": "Wuhan",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "42a158b4-ab69-4274-97e9-d159e4175cc8",
+    "cityName": "Xi'an",
+    "countryName": "China",
+    "countryCode": "CN",
+    "airportCode": ""
+  },
+  {
+    "id": "a1af5fc2-449b-4633-9ec7-400a825221d6",
+    "cityName": "Yerevan",
+    "countryName": "Armenia",
+    "countryCode": "AM",
+    "airportCode": ""
+  },
+  {
+    "id": "58cd913d-d2eb-49e1-b9f3-98f565d63178",
+    "cityName": "Yogyakarta",
+    "countryName": "Indonesia",
+    "countryCode": "ID",
+    "airportCode": ""
+  },
+  {
+    "id": "c444cf71-2cf6-4297-996f-4f335ca865d4",
+    "cityName": "Zadar",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "330d340b-8be1-408e-b6ac-6af4ce742765",
+    "cityName": "Zagreb",
+    "countryName": "Croatia",
+    "countryCode": "HR",
+    "airportCode": ""
+  },
+  {
+    "id": "ada6d2a1-ef54-4b6b-abc6-33f3d8ea8a0d",
+    "cityName": "Zakynthos",
+    "countryName": "Greece",
+    "countryCode": "GR",
+    "airportCode": ""
+  },
+  {
+    "id": "f329e4ca-9075-4dcc-9400-a0b6c5c1af68",
+    "cityName": "Zanzibar",
+    "countryName": "Tanzania",
+    "countryCode": "TZ",
+    "airportCode": ""
+  },
+  {
+    "id": "9f23ee64-2a5d-4283-ad2c-66b3c9523369",
+    "cityName": "Zihuatanejo",
+    "countryName": "Mexico",
+    "countryCode": "MX",
+    "airportCode": ""
+  },
+  {
+    "id": "ebb980dd-0ebf-404e-b3d6-6e59fb1bae53",
+    "cityName": "Zurich",
+    "countryName": "Switzerland",
+    "countryCode": "CH",
+    "airportCode": ""
+  },
+  {
+    "id": "6c2e0cb3-5730-4989-8697-00f4736dd5a7",
+    "cityName": "Ålesund",
+    "countryName": "Norway",
+    "countryCode": "NO",
+    "airportCode": ""
+  },
+  {
+    "id": "09039be3-c4f2-4d55-bbe8-59a9f7f5c8cd",
+    "cityName": "İzmir",
+    "countryName": "Turkey",
+    "countryCode": "TR",
+    "airportCode": ""
+  }
+]

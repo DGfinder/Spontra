@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { X, Compass, Trees, Wine, Music, Globe, Clock, MapPin, User, LogOut, LogIn, UserPlus } from 'lucide-react'
+import { X, Compass, Trees, Wine, Music, Globe, Clock, MapPin, User, LogOut, LogIn, UserPlus, Hotel } from 'lucide-react'
 import { useAuth } from '@/lib/hooks/useAuth'
 
 const THEMES = [
@@ -157,6 +157,18 @@ export function HeaderMobileMenu({ isOpen, onClose }: HeaderMobileMenuProps) {
               Quick Links
             </h3>
             <ul className="space-y-1">
+              <li>
+                <Link
+                  href="/hotels"
+                  onClick={onClose}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg
+                           text-white/70 hover:text-white hover:bg-white/10
+                           transition-colors"
+                >
+                  <Hotel className="w-5 h-5 text-white/50" />
+                  <span>Hotels</span>
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/destinations"

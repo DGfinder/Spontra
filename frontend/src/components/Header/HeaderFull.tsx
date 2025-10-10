@@ -68,6 +68,14 @@ export function HeaderFull({ theme, className = '' }: HeaderFullProps) {
               {/* Explore Dropdown */}
               <ExploreDropdown />
 
+              {/* Hotels Link */}
+              <Link
+                href="/hotels"
+                className="px-3 py-2 text-white/80 hover:text-white transition-colors"
+              >
+                Hotels
+              </Link>
+
               {/* Destinations Link */}
               <Link
                 href="/destinations"
