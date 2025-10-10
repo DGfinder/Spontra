@@ -21,7 +21,7 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     color: '#ffbd0a',
     background: '/backgrounds/adventure-background.webp',
     title: 'Thrilling Adventures Await',
-    description: 'Discover adrenaline-pumping experiences and unforgettable outdoor activities that will get your heart racing.',
+    description: 'From mountain treks to hidden canyons, uncover destinations packed with adrenaline and breathtaking views. Find trips that match your sense of adventure.',
     gradient: 'from-yellow-500/20 to-orange-600/20'
   },
   {
@@ -31,8 +31,8 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     icon: Trees,
     color: '#02c06d',
     background: '/backgrounds/nature-background.webp',
-    title: 'Nature\'s Wonders',
-    description: 'Explore breathtaking natural landscapes, serene parks, and pristine wilderness destinations.',
+    title: 'Pristine Wilderness Calls',
+    description: 'Discover untouched landscapes, national parks, and eco-lodges where nature takes center stage. Perfect for those seeking tranquility.',
     gradient: 'from-green-500/20 to-emerald-600/20'
   },
   {
@@ -42,8 +42,8 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     icon: Music,
     color: '#eb5b25',
     background: '/backgrounds/vibe-background.webp',
-    title: 'Feel the Vibe',
-    description: 'Experience vibrant nightlife, cultural hotspots, and the electric energy of urban entertainment.',
+    title: 'Cultural Rhythms Beckon',
+    description: 'Feel the pulse of local music, festivals, and nightlife. Immerse yourself in destinations where culture and energy collide.',
     gradient: 'from-orange-500/20 to-red-600/20'
   },
   {
@@ -53,8 +53,8 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     icon: Wine,
     color: '#e52b00',
     background: '/backgrounds/indulge-background.webp',
-    title: 'Indulge Your Senses',
-    description: 'Savor exquisite dining, luxury experiences, and refined pleasures that satisfy your sophisticated tastes.',
+    title: 'Luxury Beyond Compare',
+    description: 'Five-star resorts, Michelin dining, and exclusive experiences await. Treat yourself to the finest destinations and accommodations.',
     gradient: 'from-red-500/20 to-pink-600/20'
   },
   {
@@ -64,8 +64,8 @@ export const THEME_CONFIGS: ThemeConfig[] = [
     icon: Globe,
     color: '#8b5cf6',
     background: '/backgrounds/discover-background.webp',
-    title: 'Discover Hidden Gems',
-    description: 'Uncover unique attractions, local secrets, and off-the-beaten-path treasures waiting to be explored.',
+    title: 'Hidden Gems Unveiled',
+    description: 'Explore lesser-known destinations and off-the-beaten-path wonders. For travelers who seek the unique and extraordinary.',
     gradient: 'from-purple-500/20 to-indigo-600/20'
   }
 ]

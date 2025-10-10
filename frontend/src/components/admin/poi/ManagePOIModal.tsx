@@ -255,18 +255,22 @@ export function ManagePOIModal({
       )}
 
       {/* Video Edit Modal (nested) */}
-      {poiManager.uiMode === 'edit-video' && poiManager.editingVideoId && (
-        <VideoEditDialog
-          videoId={poiManager.editingVideoId}
-          currentUrl={
-            poiManager.selectedPOI?.videos.find(v => v.id === poiManager.editingVideoId)?.videoUrl || ''
-          }
-          onClose={() => poiManager.setUIMode('list', null, null)}
-          onUpdate={async () => {
-            await poiManager.reload()
-          }}
-        />
-      )}
+      {poiManager.uiMode === 'edit-video' && poiManager.editingVideoId && (() => {
+        const video = poiManager.selectedPOI?.videos.find(v => v.id === poiManager.editingVideoId)
+        return (
+          <VideoEditDialog
+            videoId={poiManager.editingVideoId}
+            currentUrl={video?.videoUrl || ''}
+            currentChannelName={video?.youtubeChannelName}
+            currentChannelUrl={video?.youtubeChannelUrl}
+            currentChannelId={video?.youtubeChannelId}
+            onClose={() => poiManager.setUIMode('list', null, null)}
+            onUpdate={async () => {
+              await poiManager.reload()
+            }}
+          />
+        )
+      })()}
 
       {/* Bulk Action Bar (floats at bottom) */}
       {poiManager.uiMode === 'list' && (

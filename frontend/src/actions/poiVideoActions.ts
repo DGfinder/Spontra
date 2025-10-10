@@ -23,6 +23,9 @@ export interface VideoWithMetadata {
   caption?: string
   altText?: string
   instagramUrl?: string
+  youtubeChannelName?: string
+  youtubeChannelUrl?: string
+  youtubeChannelId?: string
 }
 
 export async function addVideos(poiId: string, videos: VideoWithMetadata[]) {
@@ -53,7 +56,10 @@ export async function addVideos(poiId: string, videos: VideoWithMetadata[]) {
         displayOrder: startOrder + index,
         caption: video.caption || null,
         altText: video.altText || null,
-        instagramUrl: video.instagramUrl || null
+        instagramUrl: video.instagramUrl || null,
+        youtubeChannelName: video.youtubeChannelName || null,
+        youtubeChannelUrl: video.youtubeChannelUrl || null,
+        youtubeChannelId: video.youtubeChannelId || null
       }))
     })
 
@@ -66,7 +72,15 @@ export async function addVideos(poiId: string, videos: VideoWithMetadata[]) {
   }
 }
 
-export async function updateVideoUrl(videoId: string, newUrl: string) {
+export async function updateVideoUrl(
+  videoId: string,
+  newUrl: string,
+  channelData?: {
+    youtubeChannelName: string | null
+    youtubeChannelUrl: string | null
+    youtubeChannelId: string | null
+  }
+) {
   try {
     // Validate new URL
     if (!extractYouTubeId(newUrl)) {
@@ -75,7 +89,14 @@ export async function updateVideoUrl(videoId: string, newUrl: string) {
 
     await db.pOIVideo.update({
       where: { id: videoId },
-      data: { videoUrl: newUrl }
+      data: {
+        videoUrl: newUrl,
+        ...(channelData && {
+          youtubeChannelName: channelData.youtubeChannelName,
+          youtubeChannelUrl: channelData.youtubeChannelUrl,
+          youtubeChannelId: channelData.youtubeChannelId
+        })
+      }
     })
 
     revalidatePath('/admin/destinations')

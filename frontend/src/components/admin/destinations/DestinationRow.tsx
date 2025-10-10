@@ -29,7 +29,10 @@ export function DestinationRow({ destination, onManage }: DestinationRowProps) {
   const poiCount = destination._count.themePOIs
 
   return (
-    <div className="group flex items-center justify-between px-4 py-3 hover:bg-white/5 rounded-lg transition-colors">
+    <div
+      onClick={onManage}
+      className="group flex items-center justify-between px-4 py-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+    >
       {/* Left Section - City & Airports */}
       <div className="flex items-center gap-4 flex-1 min-w-0">
         {/* City Name */}
@@ -75,9 +78,12 @@ export function DestinationRow({ destination, onManage }: DestinationRowProps) {
         {/* Quality Badge */}
         <DataQualityBadge hasAirports={hasAirports} poiCount={poiCount} />
 
-        {/* Manage Button */}
+        {/* Manage Button - Visual indicator (row is clickable) */}
         <button
-          onClick={onManage}
+          onClick={(e) => {
+            e.stopPropagation() // Prevent double-trigger
+            onManage()
+          }}
           className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-all opacity-60 group-hover:opacity-100"
         >
           Manage POIs

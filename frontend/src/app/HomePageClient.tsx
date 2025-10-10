@@ -16,6 +16,7 @@ import { useAuth } from '@/lib/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-toastify'
 import { useEffect } from 'react'
+import { ThemeDescriptionCard } from '@/components/ThemeDescriptionCard'
 
 function SearchResults() {
   const { destinations, filters, isLoading, error, setCurrentStep, reset } = useSearchStore()
@@ -538,14 +539,19 @@ function CountryResults() {
 }
 
 export function HomePageClient() {
-  const { currentStep } = useSearchStore()
+  const { currentStep, filters } = useSearchStore()
 
   // Sync filters with URL parameters for shareable links
   useUrlSync()
 
   return (
-    <main className="min-h-screen">
-      {currentStep === 'search' && <SearchForm />}
+    <main className="relative min-h-screen">
+      {currentStep === 'search' && (
+        <>
+          <SearchForm />
+          <ThemeDescriptionCard theme={filters.theme} />
+        </>
+      )}
       {currentStep === 'countries' && <CountryResults />}
       {currentStep === 'results' && <SearchResults />}
     </main>

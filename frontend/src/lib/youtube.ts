@@ -74,6 +74,30 @@ export function getYouTubeShortsUrl(videoId: string): string {
 }
 
 /**
+ * Get YouTube video URL (watch page)
+ * Useful for "Watch on YouTube" links
+ */
+export function getYouTubeVideoUrl(videoId: string): string {
+  return `https://www.youtube.com/watch?v=${videoId}`
+}
+
+/**
+ * Get YouTube channel URL from channel ID
+ */
+export function getYouTubeChannelUrl(channelId: string): string {
+  return `https://www.youtube.com/channel/${channelId}`
+}
+
+/**
+ * Get YouTube channel URL from custom handle (e.g., @username)
+ */
+export function getYouTubeChannelUrlFromHandle(handle: string): string {
+  // Remove @ if present
+  const cleanHandle = handle.startsWith('@') ? handle : `@${handle}`
+  return `https://www.youtube.com/${cleanHandle}`
+}
+
+/**
  * Validate video exists (checks if thumbnail loads)
  * Returns true if valid, false if video doesn't exist or is private
  */

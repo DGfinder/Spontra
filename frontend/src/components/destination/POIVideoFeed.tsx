@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { extractYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
-import { Play, MapPin } from 'lucide-react'
+import { extractYouTubeId, getYouTubeThumbnail, getYouTubeVideoUrl } from '@/lib/youtube'
+import { Play, MapPin, ExternalLink, Youtube } from 'lucide-react'
 import { StructuredData } from '@/components/SEO/StructuredData'
 import { generateVideoStructuredData } from '@/lib/seo/generateStructuredData'
 import { useSessionTracking } from '@/hooks/useSessionTracking'
@@ -49,6 +49,9 @@ export function POIVideoFeed({ pois, theme }: POIVideoFeedProps) {
                   poiName={poi.name}
                   caption={poi.caption}
                   altText={poi.altText}
+                  youtubeChannelName={video.youtubeChannelName}
+                  youtubeChannelUrl={video.youtubeChannelUrl}
+                  youtubeChannelId={video.youtubeChannelId}
                 />
               ))}
             </div>
@@ -77,9 +80,12 @@ interface VideoPlayerProps {
   caption?: string | null
   altText?: string | null
   videoId?: string // POIVideo ID for tracking
+  youtubeChannelName?: string | null
+  youtubeChannelUrl?: string | null
+  youtubeChannelId?: string | null
 }
 
-function VideoPlayer({ videoUrl, poiName, caption, altText, videoId: poiVideoId }: VideoPlayerProps) {
+function VideoPlayer({ videoUrl, poiName, caption, altText, videoId: poiVideoId, youtubeChannelName, youtubeChannelUrl, youtubeChannelId }: VideoPlayerProps) {
   const [showPlayer, setShowPlayer] = useState(false)
   const [imageError, setImageError] = useState(false)
   const [hasTracked, setHasTracked] = useState(false)
@@ -87,6 +93,7 @@ function VideoPlayer({ videoUrl, poiName, caption, altText, videoId: poiVideoId 
 
   const videoId = extractYouTubeId(videoUrl)
   const thumbnailUrl = videoId ? getYouTubeThumbnail(videoId, 'maxres') : null
+  const watchUrl = videoId ? getYouTubeVideoUrl(videoId) : null
 
   // Track video view when player is shown
   useEffect(() => {
@@ -184,6 +191,47 @@ function VideoPlayer({ videoUrl, poiName, caption, altText, videoId: poiVideoId 
       {caption && !showPlayer && (
         <div className="p-4 bg-white/5">
           <p className="text-white/80 text-sm leading-relaxed">{caption}</p>
+        </div>
+      )}
+
+      {/* YouTube Attribution */}
+      {!showPlayer && (
+        <div className="px-4 py-3 bg-white/5 border-t border-white/10 flex items-center justify-between gap-3">
+          {/* Channel Attribution */}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {youtubeChannelUrl && youtubeChannelName ? (
+              <a
+                href={youtubeChannelUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group"
+              >
+                <Youtube className="w-4 h-4 text-red-500 flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs font-medium truncate group-hover:underline">
+                  {youtubeChannelName}
+                </span>
+                <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true" />
+              </a>
+            ) : (
+              <div className="flex items-center gap-2 text-white/50">
+                <Youtube className="w-4 h-4 text-red-500 flex-shrink-0" aria-hidden="true" />
+                <span className="text-xs">YouTube Short</span>
+              </div>
+            )}
+          </div>
+
+          {/* Watch on YouTube Link */}
+          {watchUrl && (
+            <a
+              href={watchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-medium text-blue-300 hover:text-blue-200 transition-colors whitespace-nowrap"
+            >
+              Watch on YouTube
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+            </a>
+          )}
         </div>
       )}
     </article>

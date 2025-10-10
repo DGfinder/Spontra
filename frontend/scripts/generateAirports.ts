@@ -34,7 +34,8 @@ async function generateAirportsJson() {
         iataCode: true,
         name: true,
         city: true,
-        country: true
+        country: true,
+        passengerVolume: true
       },
       orderBy: {
         iataCode: 'asc'

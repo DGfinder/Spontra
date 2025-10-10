@@ -1,0 +1,852 @@
+Country ,City,IATA Code,Pax number ,,Adventure,Nature,Shopping,Party,Learn,Finshed,Uploaded
+,,,,,,,,,,,
+,,,,,,,,,,,
+Afghanistan,Kabul,KBL,,,x,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Albania,Tirana,TIA,"2,195,100",,x,x,,x,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Algeria,Algiers,ALG,"7,500,000",,,,,,,FALSE,FALSE
+,Oran,"ORN, ORA","1,085,753",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Angola,Luanda,LAD,"2,430,794",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Antigua And Barbuda,Saint John’s,ANU,"40,000",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Argentina,Buenos Aires,"EZE , AEP","21,700,000",,,x,x,x,x,FALSE,FALSE
+,Córdoba,COR,"2,200,000",,,x,,,x,FALSE,FALSE
+,Mendoza,MDZ,"1,300,000",,x,,,,x,FALSE,FALSE
+,Salta,SLA,"972,000",,,x,,,x,FALSE,FALSE
+,Rosario,ROS,"510,000",,,,,,x,FALSE,FALSE
+,Rio Gallegos,RGL,"237,000",,,x,,,x,FALSE,FALSE
+,Ushuaia,USH,,,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Armenia,Yerevan,EVN,"2,100,000",,,x,,,x,TRUE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Aruba,Oranjestad,AUA,,,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Australia,Sydney,SYD,"39,021,357 Pax",,,x,x,,x,FALSE,FALSE
+,Melbourne,"MEL, AVV, MEB","31,935,600",,,x,,,x,FALSE,FALSE
+,Brisbane,BNE,"21,918,357",,,x,,,x,FALSE,FALSE
+,Perth,PER,"12,723,035",,,x,,,x,FALSE,FALSE
+,Adelaide,ADL,"7,670,201",,,x,,,x,FALSE,FALSE
+,Gold Coast,OOL,"5,867,294",,,,,,,FALSE,FALSE
+,Cairns,CNS,"4,391,014",,,,,,,FALSE,FALSE
+,Canberra,CBR,"2,803,989",,,,,,,FALSE,FALSE
+,Hobart,HBA,"2,186,358",,,x,,,x,FALSE,FALSE
+,Darwin,DRW,"2,057,307",,,,,,,FALSE,FALSE
+,Townsville,TSV,"1,497,946",,,,,,,FALSE,FALSE
+,Hamilton Island,HTI,"493,860",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Austria,Vienna,VIE,"21,999,820",,,x,,,x,FALSE,FALSE
+,Salzburg,SZG,"1,662,834",,,x,,,x,FALSE,FALSE
+,Innsbruck,INN,"981,118",,,x,,,x,FALSE,FALSE
+,Graz,GRZ,"881,565",,,x,,,x,FALSE,FALSE
+,Linz,LNZ,"561,295",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Azerbaijan,Baku,GYD,"3,000,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bahamas,Nassau,NAS,"3,250,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bahrain,Bahrain,BAH,"8,800,000",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bangladesh,Dhaka,DAC,"6,100,000",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Barbados,Bridgetown,BGI,"2,100,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Belarus,Minsk,MSQ,"3,400,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Belgium,Brussels,"BRU, CRL","30,000,000",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Belize,Belize City,BZE,"870,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bermuda,Hamilton,BDA,"900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bolivia,Santa Cruz,VVI,"2,400,000",,,,x,,x,FALSE,FALSE
+,La Paz,LPB,"1,800,000",,,,,x,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bosnia and Herzegovina,Sarajevo,SJJ,"840,000",,,x,,x,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Botswana,Gaborone,GBE,,,,,,,,FALSE,FALSE
+,Maun,MUB,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Brazil,Sao Paulo,"GRU, CGH","58,000,000",,,,x,,x,FALSE,FALSE
+,Rio De Janiero,"GIG, SDU","24,100,000",,,,,x,x,FALSE,FALSE
+,Brasilia,BSB,"18,000,000",,,,,,x,FALSE,FALSE
+,Belo Horizonte,CNF,"9,700,000",,,x,,,,FALSE,FALSE
+,Campinas,VCP,"9,400,000",,,,,,,FALSE,FALSE
+,Porto Alegre,POA,"7,700,000",,,,,,,FALSE,FALSE
+,Salvador,SSA,"7,500,000",,,,,,,FALSE,FALSE
+,Recife,REC,"6,800,000",,,,,,,FALSE,FALSE
+,Curitiba,CWB,"6,400, 000",,,,,,,FALSE,FALSE
+,Fortaleza,FOR,"5,700,000",,,,,,,FALSE,FALSE
+,Florianopolis,FLN,"3,500,000",,,x,,,,FALSE,FALSE
+,Foz do Iguaçu,IGU,"1,800,000",,,x,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Brunei,Bandar Seri Begawan,BWN,"1,300,000",,,,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Bulgaria,Sofia,SOF,"3,800,000",,,,,,,FALSE,FALSE
+,Bourgas,BOJ,"2,500,000",,,,,,,FALSE,FALSE
+,Varna,VAR,"1,400,000",,,,,,,FALSE,FALSE
+,Plovdiv,PDV,"100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Cambodia,Siem Reap,REP,"3,500,000",,,,,,,FALSE,FALSE
+,Phnom Penh,PNH,"3,400,000",,,,,,,FALSE,FALSE
+,Sihanoukville,KOS,"100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Cameroon,Douala,DLA,"1,500,000",,,,,,,FALSE,FALSE
+,Yaounde,NSI,"210,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Canada,Toronto,YYZ,"47,100,000",,,,,,,FALSE,FALSE
+,Vancouver,YVR,"22,300,000",,,,,,,FALSE,FALSE
+,Montreal,YUL,"16,600,000",,,,,,,FALSE,FALSE
+,Calgary,YYC,"15,700,000",,,,,,,FALSE,FALSE
+,Edmonton,YEG,"7,500,000",,,,,,,FALSE,FALSE
+,Ottawa,YOW,"4,700,000",,,,,,,FALSE,FALSE
+,Winnipeg,YWG,"4,000,000",,,,,,,FALSE,FALSE
+,Kelowna,YLW,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Cayman Islands,Grand Cayman Island,GCM,"1,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Chile,Santiago,SCL,"17,200,000",,,,,,,FALSE,FALSE
+,Antofagasta,ANF,"1,900,000",,,,x,,,FALSE,FALSE
+,Puerto Montt,PMC,"1,200,000",,,,,,,FALSE,FALSE
+,Easter Island,IPC,"160,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+China,Beijing,"PEK,SHA","134,900,000",,,,,,,FALSE,FALSE
+,Shanghai,PVG,"66,000,000",,,,x,,,FALSE,FALSE
+,Guangzhou,CAN,"59,700,000",,,,x,,,FALSE,FALSE
+,Chengdu,CTU,"46,000,000",,,,,,,FALSE,FALSE
+,Kunming,KMG,"41,980,000",,,,,,,FALSE,FALSE
+,Xi’an,XIY,"36,900,000",,,,,,,FALSE,FALSE
+,Chongqing,CKG,"35,900,000",,,,,,,FALSE,FALSE
+,Changsha,CSX,"21,300,000",,,,,,,FALSE,FALSE
+,Guilin,KWL,"6,670,000",,,,,,,FALSE,FALSE
+,Lhasa,LXA,"3,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Colombia,Bogota,BOG,"20,200,000",,,,,,,FALSE,FALSE
+,Medellín,"MDE,EOH","4,600,000",,,,,,,FALSE,FALSE
+,Cali,CLO,"3,200,000",,,,,,,FALSE,FALSE
+,Cartagena,CTG,"2,140,000",,,,,,,FALSE,FALSE
+,Barranquilla,BAQ,"1.680,000",,,,,,,FALSE,FALSE
+,Bucaramanga,BGA,"1,300,000",,,,,,,FALSE,FALSE
+,San Andres,ADZ,"1,001,000",,,,,,,FALSE,FALSE
+,Pereira,PEI,"860,000",,,,,,,FALSE,FALSE
+,Santa Marta,SMR,"864,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Republic of Congo,Pointe Noire,PNR,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Costa Rica,San Jose,SJO,"4,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Crimea (flights can only be done through Russia),Simferopol,SIP,"5,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Croatia,Zagreb,ZAG,"2,800,000",,,x,,x,x,FALSE,FALSE
+,Split,SPU,"2,200,000",,,x,,,x,FALSE,FALSE
+,Dubrovnik,DBV,"2,000,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Cuba,Havana,HAV,"4,000,000",,,x,,x,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Curacao,Curacao,CUR,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Cyprus,Larnaca,LCA,"5,200,000",,,x,,x,x,FALSE,FALSE
+,Paphos,PFO,"2,200,000",,,x,,,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Czech Republic,Prague,PRG,"12,000,000",,,x,,x,x,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Denmark,Copenahgen,CPH,"29,000,000",,,,,,,FALSE,FALSE
+,Billund,BLL,"3,100,000",,,,,,,FALSE,FALSE
+,Aalborg,AAL,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Dijibouti,Dijibouti,JIB,"260,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Dominican Republic,Punta Cana,PUJ,"6,400,000",,,,,,,FALSE,FALSE
+,Santa Domingo,SDQ,"3,700,000",,,,,,,FALSE,FALSE
+,Puerto Plata,POP,"740,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+DR of Congo,Kinshasa,FIH,"773,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Ecuador,Quito,UIO,"6,000,000",,,,x,,,FALSE,FALSE
+,Guayaquil,GYE,"4,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Egypt,Cairo,CAI,"14,700,000",,,,,,,FALSE,FALSE
+,Hurghada,HRG,"2,900,000",,,,,,,FALSE,FALSE
+,Alexandria,HBE,"2,600,000",,,,,,,FALSE,FALSE
+,Sharm El Sheikh,SSH,"1,800,000",,,,,,,FALSE,FALSE
+,Luxor,LXR,"1,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+El Salvador,San Salvador,SAL,"3,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Estonia,Tallinn,TLL,"2,220,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Ethiopia,Addis Ababa,ADD,"8,900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Fiji,Nadi,NAN,"2,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Finland,Helsinki,HEL,"17,173,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+France,Paris,"CDG,ORY,BVA","96,600,000",,,,x,,,FALSE,FALSE
+,Nice,NCE,"11,700,000",,,,,,,FALSE,FALSE
+,Lyon,LYS,"8,500,000",,,,,,,FALSE,FALSE
+,Marseille,MRS,"8,200,000",,,,,,,FALSE,FALSE
+,Toulouse,TLS,"7,500,000",,,,,,,FALSE,FALSE
+,Mulhouse,MLH,"6,500,000",,,,,,,FALSE,FALSE
+,Bordeaux,BOD,"5,000,000",,,,,,,FALSE,FALSE
+,Nantes,NTE,"4,200,000",,,,,,,FALSE,FALSE
+,Montpellier,MPL,"1,400,000",,,,,,,FALSE,FALSE
+,Strasbourg,SXB,"1,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+French Guinea,Cayenne,CAY,"400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+French Polynesia,Papeete,PPT,"1,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Georgia,Tbilisi,TBS,"2,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Germany,Frankfurt,FRA,"61,000,000",,,,,,,FALSE,FALSE
+,Munich,MUC,"42,200,000",,,,,,,FALSE,FALSE
+,Berlin,"TXL, SXF","32,800,000",,,,,,,FALSE,FALSE
+,Düsseldorf,DUS,"23,500,000",,,,,,,FALSE,FALSE
+,Hamburg,HAM,"16,200,000",,,,,,,FALSE,FALSE
+,Cologne,CGN,"11,900,000",,,,,,,FALSE,FALSE
+,Stuttgart,POA,"10,600,000",,,,,,,FALSE,FALSE
+,Hanover,HAJ,"5,400,000",,,,,,,FALSE,FALSE
+,Bremen,BRE,"2,500,000",,,,,,,FALSE,FALSE
+,Leipzig,LEJ,"2,200,000",,,,,,,FALSE,FALSE
+,Dortmund,DTM,"1,900,000",,,,,,,FALSE,FALSE
+,Dresden,DRS,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Gibraltar,Gibraltar,GIB,"450,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Greece,Athens,ATH,"20,000,000",,,,,,,FALSE,FALSE
+,Heraklion,HER,"6,900,000",,,,,,,FALSE,FALSE
+,Thessaloniki,SKG,"6,000,000",,,,,,,FALSE,FALSE
+,Rhodes,RHO,"5,000,000",,,,,,,FALSE,FALSE
+,Chania,CHQ,"3,000,000",,,,,,,FALSE,FALSE
+,Corfu,CFU,"2,800,000",,,,,,,FALSE,FALSE
+,Kos,KGS,"1,900,000",,,,,,,FALSE,FALSE
+,Santorini,JTR,"1,700,000",,,,,,,FALSE,FALSE
+,Zakynthos,ZTH,"1,400,000",,,,,,,FALSE,FALSE
+,Mykonos,JMK,"1,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Guadeloupe,Pointe-a-Pitre,PTP,"2,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Guam,Tamuning,GUM,"2,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Guatemala,Guatemala City,GUA,"2,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Haiti,Port-au-Prince,PAP,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Honduras,San Pedro Sula,SAP,"870,000",,,,,,,FALSE,FALSE
+,Roatan,RTB,"370,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Hong Kong,Hong Kong,HKG,"70,500,000",,,,x,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Hungary,Budapest,BUD,"11,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Iceland,Reykjavik,KEF,"6,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+India,Delhi,DEL,"57,700,000",,,,,,,FALSE,FALSE
+,Mumbai,BOM,"45,100,000",,,,,,,FALSE,FALSE
+,Bangalore,BLR,"32,800,000",,,,,,,FALSE,FALSE
+,Chennai,MAA,"18,300,000",,,,,,,FALSE,FALSE
+,Kolkata,CCU,"15,800,000",,,,,,,FALSE,FALSE
+,Hyderabad,HYD,"11,900,000",,,,,,,FALSE,FALSE
+,Kochi,COK,"9,000,000",,,,,,,FALSE,FALSE
+,Ahmedabad,AMD,"7,400,000",,,,,,,FALSE,FALSE
+,Pune,PNQ,"6,800,000",,,,,,,FALSE,FALSE
+,Dabolim (Goa),GOI,"4,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Indonesia,Jakarta,"CGK, HLP","64,300,000",,,,,,,FALSE,FALSE
+,Denpasar (Bali),DPS,"20,000,000",,,,x,,,FALSE,FALSE
+,Surabaya,SUB,"19,500,000",,,,,,,FALSE,FALSE
+,Makassar,UPG,"10,700,000",,,,,,,FALSE,FALSE
+,Medan,KNO,"9,000,000",,,,,,,FALSE,FALSE
+,Balikpapan,BPN,"7,500,000",,,,,,,FALSE,FALSE
+,Yogyakarta,JOG,"7,200,000",,,,,,,FALSE,FALSE
+,Batam,BTH,"6,200,000",,,,,,,FALSE,FALSE
+,Semarang,SRG,"4,200,000",,,,,,,FALSE,FALSE
+,Padang,PDG,"3,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Iran,Tehran,"THR,IKA","24,100,000",,,,,,,FALSE,FALSE
+,Mashad,MHD,"10,000,000",,,,,,,FALSE,FALSE
+,Shiraz,SYZ,"3,300,000",,,,,,,FALSE,FALSE
+,Isfahan,AWZ,"2,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Ireland,Dublin,DUB,"21,700,000",,,,,,,FALSE,FALSE
+,Cork,ORK,"2,100,000",,,,,,,FALSE,FALSE
+,Shannon,SNN,"1,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Israel,Tel Aviv,TLV,"17,900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Italy,Rome,"FCO,CIA","47,000,000",,,,x,,,FALSE,FALSE
+,Milan,"MXP,LIN,BGY","40,100,000",,,,x,,,FALSE,FALSE
+,Venice,VCE,"9,600,000",,,,,,,FALSE,FALSE
+,Catania,CTA,"18,300,000",,,,,,,FALSE,FALSE
+,Bologna,BLQ,"7,700,000",,,,x,,,FALSE,FALSE
+,Naples,NAP,"6,800,000",,,,,,,FALSE,FALSE
+,Palermo,PMO,"5,300,000",,,,,,,FALSE,FALSE
+,Pisa,PSA,"5,000,000",,,,,,,FALSE,FALSE
+,Bari,BRI,"4,300,000",,,,,,,FALSE,FALSE
+,Turin,TRN,"4,000,000",,,,,,,FALSE,FALSE
+,Cagliari,CAG,"3,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Ivory Coast,Abidjan,ABJ,"1,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Jamaica,Montego Bay,MBJ,"4,000,000",,,,,,,FALSE,FALSE
+,Kingston,KIN,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Japan,Tokyo,"NRT,HND","89,900,000",,,,,,,FALSE,FALSE
+,Osaka,"KIX,ITM","37,800,000",,,,,,,FALSE,FALSE
+,Fukoka,FUK,"21,000,000",,,,,,,FALSE,FALSE
+,Sapporo,CTS,"20,500,000",,,,,,,FALSE,FALSE
+,Naha,OKA,"18,400,000",,,,,,,FALSE,FALSE
+,Kagoshima,KOJ,"5,200,000",,,,,,,FALSE,FALSE
+,Kumamoto,KMJ,"3,200,000",,,,,,,FALSE,FALSE
+,Sendai,SDJ,"3,100,000",,,,,,,FALSE,FALSE
+,Matsuyama,MYJ,"2,900,000",,,,,,,FALSE,FALSE
+,Ishigaki,ISG,"2,300,000",,,,,,,FALSE,FALSE
+,Komatsu,KMQ,"1,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Jordan,Amman,AMM,"7,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Kazakhstan,Almaty,ALA,"4,900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Kenya,Nairobi,NBO,"7,100,000",,,,,,,FALSE,FALSE
+,Mombasa,MBA,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Kosovo,Pristina,PRN,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Kuwait,Kuwait,KWI,"11,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Kyrgyzstan,Bishkek,FRU,"1,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Laos,Vientiane,VTE,,,,,,,,FALSE,FALSE
+,Luang Prabang,LPQ,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Latvia,Riga,RIX,"5,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,FALSE,FALSE
+,,,,,,,,,,FALSE,FALSE
+Lebanon,Beirut,BEY,"7,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Lesotho,Maseru,MSU,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Lithuania,Vilnius,VNO,"3,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Luxembourg,Luxembourg,LUX,"3,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Macau,Macau,MFM,"6,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Madagascar,Antananarivo,TNR,"600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Malawi,Lilongwe,LLW,"300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Malaysia,Kuala Lumpur,"KUL,SZB","55,400,000",,,,,,,FALSE,FALSE
+,Kota Kinabalu,BKI,"7,200,000",,,,,,,FALSE,FALSE
+,George Town (Penang),PEN,"6,700,000",,,,,,,FALSE,FALSE
+,Kuching,KCH,"4,900,000",,,,,,,FALSE,FALSE
+,Johor Bahru,JHB,"2,800,000",,,,,,,FALSE,FALSE
+,Langkawi,LGK,"2,600,000",,,,,,,FALSE,FALSE
+,Miri,MYY,"2,200,000",,,,,,,FALSE,FALSE
+,Kota Bahru,KBR,"2,000,000",,,,,,,FALSE,FALSE
+,Sibu,SBW,"1,500,000",,,,,,,FALSE,FALSE
+,Tawau,TWU,"1,300,000",,,,,,,FALSE,FALSE
+,Kuala Terrengganu,TGG,"900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Maldives,Male,MLE,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mali,Bamako,BKO,"900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Malta,Luqa,MLA,"5,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Martinique,Fort De France,FDF,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mauritania,Nouakchott,NKC,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mauritius,Mauritius,MRU,"3,500,000",,,,,,,FALSE,FALSE
+,Rodrigues Island,RRG,"50,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mexico,Mexico City,MEX,"41,700,000",,,,,,,FALSE,FALSE
+,Cancún,CUN,"21,400,000",,,,,,,FALSE,FALSE
+,Guadalajara,GDL,"11,300,000",,,,,,,FALSE,FALSE
+,Monterrey,MTY,"9,200,000",,,,,,,FALSE,FALSE
+,Tijuana,TIJ,"6,300,000",,,,,,,FALSE,FALSE
+,San José del Cabo,SJD,"4,100,000",,,,,,,FALSE,FALSE
+,Puerto Vallarta,PVR,"4,000,000",,,,,,,FALSE,FALSE
+,Mérida,MID,"2,000,000",,,,,,,FALSE,FALSE
+,Tuxtla Gutiérrez,TGZ,"1,300,000",,,,,,,FALSE,FALSE
+,Villahermosa,VSA,"1,200,000",,,,,,,FALSE,FALSE
+,Acapulco,ACA,"720,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Moldova,Chisinau,KIV,"2,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mongolia,Ulan Bator,ULN,"1,100,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Montenegro,Tivat,TIV,"980,000",,,,,,,FALSE,FALSE
+,Podgorica,TGD,"870,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Morocco,Casablanca,CMN,"7,600,000",,,,,,,FALSE,FALSE
+,Marrakesh,RAK,"4,000,000",,,,,,,FALSE,FALSE
+,Agadir,AGA,"1,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mozambique,Maputo,MPM,"670,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Mozambique,Maputo,MPM,"670,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Namibia,Windhoek,WDH,"800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Nepal,Kathmandu,KTM,"3,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Netherlands,Amsterdam,AMS,"58,200,000",,,,,,,FALSE,FALSE
+,Eindhoven,EIN,"4,800,000",,,,,,,FALSE,FALSE
+,Rotterdam,RTM,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+New Caledonia,Noumea,NOU,"480,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+New Zealand,Auckland,AKL,"19,000,000",,,,,,,FALSE,FALSE
+,Christchurch,CHC,"6,600,000",,,,,,,FALSE,FALSE
+,Wellington,WLG,"6,100,000",,,,,,,FALSE,FALSE
+,Queenstown,ZQN,"1,900,000",,,,,,,FALSE,FALSE
+,Nelson,NSN,"1,000,000",,,,,,,FALSE,FALSE
+,Dunedin,DUD,"970,000",,,,,,,FALSE,FALSE
+,Napier,NPE,"650,000",,,,,,,FALSE,FALSE
+,New Plymouth,NPL,"410,000",,,,,,,FALSE,FALSE
+,Tauranga,TRG,"300,000",,,,,,,FALSE,FALSE
+,Invercargill,IVC,"290,000",,,,,,,FALSE,FALSE
+,Rotorua,ROT,"220,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Nicaragua,Managua,MGA,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Nigeria,Lagos,LOS,"6,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Norway,Oslo,OSL,"25,600,000",,,,,,,FALSE,FALSE
+,Bergen,BGO,"6,000,000",,,,,,,FALSE,FALSE
+,Trondheim,TRD,"4,400,000",,,,,,,FALSE,FALSE
+,Stavanger,SVG,"4,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Oman,Muscat,MCT,"12,000,000",,,,,,,FALSE,FALSE
+,Salalah,SLL,"1,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Pakistan,Karachi,KHI,"6,200,000",,,,,,,FALSE,FALSE
+,Islamabad,ISB,"4,800,000",,,,,,,FALSE,FALSE
+,Lahore,LHE,"4,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Palau,Koror,ROR,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Panama,Panama City,PTY,"13,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Papua New Guinea,Port Moresby,POM,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Paraguay,Ascuncion,ASU,"1,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Peru,Lima,LIM,"19,400,000",,x,,,x,x,FALSE,FALSE
+,Cusco,CUZ,"3,200,000",,,,,x,x,FALSE,FALSE
+,Arequipa,AQP,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Philippines,Manila,MNL,"39,500,000",,,,,,,FALSE,FALSE
+,Cebu,CEB,"8,800,000",,,,,,,FALSE,FALSE
+,Davao,DVO,"3,600,000",,,,,,,FALSE,FALSE
+,Kalibo,KLO,"2,800,000",,,,,,,FALSE,FALSE
+,Iloilo,ILO,"1,900,000",,,,,,,FALSE,FALSE
+,Cagayan de Oro,CGY,"1,800,000",,,,,,,FALSE,FALSE
+,Puerto Princesa,PPS,"1,600,000",,,,,,,FALSE,FALSE
+,Bacolod,BCD,"1,500,000",,,,,,,FALSE,FALSE
+,Tacloban,TAC,"1,100,000",,,,,,,FALSE,FALSE
+,Angeles,CRK,"950,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Poland,Warsaw,"WAW,WMI","15,600,000",,,,,,,FALSE,FALSE
+,Kraków,KRK,"5,000,000",,,,,,,FALSE,FALSE
+,Gdańsk,GDN,"4,000,000",,,,,,,FALSE,FALSE
+,Katowice,KTW,"3,200,000",,,,,,,FALSE,FALSE
+,Wrocław,WRO,"2,800,000",,,,,,,FALSE,FALSE
+,Poznań,POZ,"1,700,000",,,,,,,FALSE,FALSE
+,Rzeszów,RZE,"660,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Portugal,Lisbon,LIS,"22,400,000",,,,,,,FALSE,FALSE
+,Porto,OPO,"9,400,000",,,,,,,FALSE,FALSE
+,Faro,FAO,"7,600,000",,,,,,,FALSE,FALSE
+,Madeira,FNC,"3,000,000",,,,,,,FALSE,FALSE
+,Ponta Delgada,PDL,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Puerto Rico,San Juan,SJU,"8,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Qatar,Doha,DOH,"37,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Republic of Macedonia,Skopje,SKP,"1,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Reunion,Reunion,LIS,"2,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Romania,Bucharest,OTP,"11,000,000",,,,,,,FALSE,FALSE
+,Cluj-Napoca,CLJ,"1,900,000",,,,,,,FALSE,FALSE
+,Timișoara,TSR,"1,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Russia,Moscow,"SVO,DME,VKO","76,100,000",,,,x,,,FALSE,FALSE
+,Saint Petersburg,LED,"13,300,000",,,,,,,FALSE,FALSE
+,Kochi,AER,"5,200,000",,,,,,,FALSE,FALSE
+,Yekaterinburg,SVX,"4,300,000",,,,,,,FALSE,FALSE
+,Novosibirsk,OVB,"4,100,000",,,,,,,FALSE,FALSE
+,Krasnodar,KRR,"3,000,000",,,,,,,FALSE,FALSE
+,Ufa,UFA,"2,300,000",,,,,,,FALSE,FALSE
+,Rostov on Don,ROV,"2,100,000",,,,,,,FALSE,FALSE
+,Kazan,KZN,"2,100,000",,,,,,,FALSE,FALSE
+,Khabarovsk,KHV,"950,000",,,,,,,FALSE,FALSE
+,Vladivostok,VVO,"1,900,000",,,,,,,FALSE,FALSE
+,Krasnoyarsk,KJA,"1,800,000",,,,,,,FALSE,FALSE
+,Kaliningrad,KGD,"1,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Rwanda,Kigali,KGL,"710,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Saint Lucia,Castries,SLU,"196,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Saint Martin,Saint Martin,SXM,"1,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Samoa,Apia,APW,"600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Saudi Arabia,Jeddah,JED,"30,100,000",,,,,,,FALSE,FALSE
+,Riyadh,RUH,"22,300,000",,,,,,,FALSE,FALSE
+,Damman,DMM,"9,600,000",,,,,,,FALSE,FALSE
+,Medina,MED,"6,600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Senegal,Dakar,DKR,"2,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Serbia,Belgrade,BEG,"4,900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Seychelles,Mahe Island,SEZ,"740,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Singapore,Singapore,SIN,"58,700,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Slovakia,Bratislavia,BTS,"1,800,000",,,,,,,FALSE,FALSE
+,Kosice,KSC,"440,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Slovenia,LJubljana,LJU,"1,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Solomon Islands,Honiara,HIR,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+South Africa,Johannesburg,JNB,"20,700,000",,,,,,,FALSE,FALSE
+,Cape Town,CPT,"10,200,000",,,,,,,FALSE,FALSE
+,Durban,Dur,"5,200,000",,,,,,,FALSE,FALSE
+,Port Elizabeth,PLZ,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+South Korea,Seoul,"ICN,GMP","72,100,000",,,,,,,FALSE,FALSE
+,Jeju,CJU,"30,100,000",,,,,,,FALSE,FALSE
+,Busan,PUS,"14,900,000",,,,,,,FALSE,FALSE
+,Cheongju,CJJ,"2,700,000",,,,,,,FALSE,FALSE
+,Daegu,TAE,"2,000,000",,,,,,,FALSE,FALSE
+,Gwangju,"KWJ,MWX","1,900,000",,,,,,,FALSE,FALSE
+,Ulsan,USN,"600,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Spain,Madrid,MAD,"50,400,000",,,,,,,FALSE,FALSE
+,Barcelona,BCN,"44,200,000",,,,x,,,FALSE,FALSE
+,Palma De Mallorca,PMI,"26,200,000",,,,,,,FALSE,FALSE
+,Málaga,AGP,"16,700,000",,,,,,,FALSE,FALSE
+,Tenerife,"TFS,TFN","14,200,000",,,,,,,FALSE,FALSE
+,Alicante,ALC,"12,300,000",,,,,,,FALSE,FALSE
+,Gran Canaria,LPA,"12,100,000",,,,,,,FALSE,FALSE
+,Ibiza,IBZ,"7,400,000",,,,,,,FALSE,FALSE
+,Lanzarote,ACE,"6,700,000",,,,,,,FALSE,FALSE
+,Valencia,VLC,"5,800,000",,,,,,,FALSE,FALSE
+,Fuerteventura,FUE,"5,700,000",,,,,,,FALSE,FALSE
+,Bilboa,BIL,"4,600,000",,,,,,,FALSE,FALSE
+,Seville,SVQ,"4,600,000",,,,,,,FALSE,FALSE
+,Menorca,MAH,"3,200,000",,,,,,,FALSE,FALSE
+,Santiago de Compostela,SCQ,"2,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Sri Lanka,Colombo,CMB,"9,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Sudan,Khartoum,KRT,"2,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Swaziland,Manzini,MTS,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Sweden,Stockholm,"ARN,BMA","27,200,000",,,,,,,FALSE,FALSE
+,Gothenburg,GOT,"6,400,000",,,,,,,FALSE,FALSE
+,Malmö,MMX,"2,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Switzerland,Zurich,ZRH,"27,800,000",,,,,,,FALSE,FALSE
+,Geneva,GVA,"16,500,000",,,,,,,FALSE,FALSE
+,Basel,BSL,"6,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Taiwan,Taipei,"TPE,TSE","48,300,000",,,,,,,FALSE,FALSE
+,Kaohsiung,KHH,"6,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Thailand,Bangkok,"BKK,DMK","99,000,000",,,,x,,,FALSE,FALSE
+,Phuket,HKT,"15,100,000",,,,,,,FALSE,FALSE
+,Chiang Mai,CNX,"9,500,000",,,,,,,FALSE,FALSE
+,Surat Thani (Koh Samui),"USM,URT","4,500,000",,,,,,,FALSE,FALSE
+,Krabi,KBV,"4,100,000",,,,,,,FALSE,FALSE
+,Songkhla,HDY,"4,000,000",,,,,,,FALSE,FALSE
+,Udon Thani,UTH,"2,400,000",,,,,,,FALSE,FALSE
+,Chiang Rai,CEI,"2,000,000",,,,,,,FALSE,FALSE
+,Ubon Ratchathani,UBP,"1,700,000",,,,,,,FALSE,FALSE
+,Nakhon Si Thammarat,NST,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Tonga,Tongatapu,TBU,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Trinidad and Tobago,Tunis,TUN,"5,200,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Turkey,Istanbul,"IST,SAW","89,400,000",,,,,,,FALSE,FALSE
+,Antalya,AYT,"27,700,000",,,,,,,FALSE,FALSE
+,Ankara,ESB,"12,300,000",,,,,,,FALSE,FALSE
+,Izmir,ADB,"12,100,000",,,,,,,FALSE,FALSE
+,Adana,ADA,"5,400,000",,,,,,,FALSE,FALSE
+,Dalaman,DLM,"4,400,000",,,,,,,FALSE,FALSE
+,Bodrum,BJV,"3,900,000",,,,,,,FALSE,FALSE
+,Trabzon,TZX,"3,400,000",,,,,,,FALSE,FALSE
+,Gaziantep,GZT,"2,500,000",,,,,,,FALSE,FALSE
+,Kayseri,ASR,"2,000,000",,,,,,,FALSE,FALSE
+,Erzurum,ERZ,"1,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Turkmenistan,Ashgabat,ASB,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Turks and Caicos Islands,Providenciales,PLS,"20,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Uganda,Entebbe,EBB,"1,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Ukraine,Kiev,"KBP,IEV","9,700,000",,,,,,,FALSE,FALSE
+,Odessa,ODS,"1,100,000",,,,,,,FALSE,FALSE
+,Lviv,LWO,"740,000",,,,,,,FALSE,FALSE
+,Kherson,KHE,"63,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United Arab Emirates,Dubai,DXB,"83,700,000",,,,x,,,FALSE,FALSE
+,Abu Dhabi,AUH,"26,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United Kingdom,London,"LHR,LGW,STN,LTN,LCY","159,800,000",,,,x,,,FALSE,FALSE
+,Manchester,MAN,"25,600,000",,,,,,,FALSE,FALSE
+,Edinburgh,EDI,"12,300,000",,,,,,,FALSE,FALSE
+,Birmingham,BHX,"11,700,000",,,,,,,FALSE,FALSE
+,Glasgow,GLS,"9,300,000",,,,,,,FALSE,FALSE
+,Belfast,"BFS,BHD","7,800,000",,,,,,,FALSE,FALSE
+,Bristol,BRS,"7,600,000",,,,,,,FALSE,FALSE
+,Newcastle,NCL,"4,800,000",,,,,,,FALSE,FALSE
+,Liverpool,LPL,"4,800,000",,,,,,,FALSE,FALSE
+,Aberdeen,ABZ,"3,000,000",,,,,,,FALSE,FALSE
+,Southampton,SOU,"2,000,000",,,,,,,FALSE,FALSE
+,Jersey,JER,"1,600,000",,,,,,,FALSE,FALSE
+,Cardiff,CWL,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United States – The South,"Atlanta,GA",ATL,"50,500,000",,,,,,,FALSE,FALSE
+,"Washington,D.C","BWI,DCA,IAD","37,300,000",,,,,,,FALSE,FALSE
+,"Miami,FL","MIA,FLL","35,000,000",,,,,,,FALSE,FALSE
+,"Dallas,TX",DFW,"31,200,000",,,,,,,FALSE,FALSE
+,"Charlotte,NC",CLT,"21,500,000",,,,,,,FALSE,FALSE
+,"Orlando,FL",MCO,"20,200,000",,,,,,,FALSE,FALSE
+,"Houston,TX",IAH,"20,000,000",,,,,,,FALSE,FALSE
+,"Philadelphia,PA",PHL,"14,500,000",,,,,,,FALSE,FALSE
+,"Tampa,FL",TPA,"9,200,000",,,,,,,FALSE,FALSE
+,"Austin,TX",AUS,"5,800,000",,,,,,,FALSE,FALSE
+,"Nashville,TN",BNA,"5,700,000",,,,,,,FALSE,FALSE
+,"New Orleans,LA",MSY,"5,300,000",,,,,,,FALSE,FALSE
+,"Memphis,TN",MEM,"3,800,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United States – The West,"Los Angeles,CA",LAX,"39,600,000",,,,x,,,FALSE,FALSE
+,"Denver,CO",DEN,"28,200,000",,,,,,,FALSE,FALSE
+,"San Francisco,CA",SFO,"25,700,000",,,,,,,FALSE,FALSE
+,"Las Vegas, NV",LAS,"22,700,000",,,,,,,FALSE,FALSE
+,"Seattle,WA",SEA,"21,900,000",,,,,,,FALSE,FALSE
+,"Pheonix,AZ",PHX,"20,900,000",,,,,,,FALSE,FALSE
+,"Salt Lake City,UT",SLT,"11,100,000",,,,,,,FALSE,FALSE
+,"San Diego,CA",SAN,"10,300,000",,,,,,,FALSE,FALSE
+,"Honululu,HI",HNL,"9,700,000",,,,,,,FALSE,FALSE
+,"Portland,OR",PDX,"9,000,000",,,,,,,FALSE,FALSE
+,"Anchorage,AK",ANC,"2,500,000",,,,,,,FALSE,FALSE
+,"Albuquerque,NM",ABQ,"2,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United States – The Northeast,"New York,NY","JFK,EWR,LGA,BUF","65,500,000",,,,x,,,FALSE,FALSE
+,"Chicago,IL","ORD,MDW","48,600,000",,,,,,,FALSE,FALSE
+,"Boston,MA",BOS,"17,700,000",,,,,,,FALSE,FALSE
+,"Detroit, MI",DTW,"16,800,000",,,,,,,FALSE,FALSE
+,"Pittsburgh,PA",PIT,"3,900,000",,,,,,,FALSE,FALSE
+,"Providence,RI",PVD,"3,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+United States – The Midwest,"St.Louis,MO",STL,"6,200,000",,,,,,,FALSE,FALSE
+,"Kansas City,MO",MCI,"5,100,000",,,,,,,FALSE,FALSE
+,"Cleveland,OH",CLE,"3,900,000",,,,,,,FALSE,FALSE
+,"Indianapolis,IN",IND,"3,900,000",,,,,,,FALSE,FALSE
+,"Colombus,OH",CMH,"3,300,000",,,,,,,FALSE,FALSE
+,"Milwaukee,WI",MKE,"3,200,000",,,,,,,FALSE,FALSE
+,"Des Moines,IA",DSM,"2,500,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Uruguay,Montevideo,MVD,"1,900,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+U.S Virgin Islands,Saint Thomas,STT,"1,400,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Uzbekistan,Tashkent,TAS,"3,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Venezuela,Caracas,CCS,"5,000,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Vietnam,Ho Chi Minh City,SGN,"32,500,000",,,,,,,FALSE,FALSE
+,Hanoi,MCI,"20,600,000",,,,,,,FALSE,FALSE
+,Da Nang,DAD,"8,800,000",,,,x,,,FALSE,FALSE
+,Nha Trang,NXR,"4,900,000",,,,,,,FALSE,FALSE
+,Phu Quoc,PQC,"2,100,000",,,,,,,FALSE,FALSE
+,Vinh,VII,"1,600,000",,,,,,,FALSE,FALSE
+,Hue,HUI,"1,300,000",,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Zambia,Lusaka,LUN,"790,000",,,,,,,FALSE,FALSE
+,Livingstone,LVI,,,,,,,,FALSE,FALSE
+,,,,,,,,,,,
+,,,,,,,,,,,
+Zimbabwe,Harare,HRE,"610,000",,,,,,,FALSE,FALSE
+,Victoria Falls,VFA,,,,,,,,FALSE,FALSE

@@ -86,10 +86,10 @@ export function ThemeInfoPanel({
               className="text-3xl font-bold mb-3 transition-all duration-300"
               style={{ color: themeConfig.color }}
             >
-              {themeConfig.title}
+              {themeConfig.label}
             </h3>
             <p className="text-white/90 text-lg leading-relaxed">
-              {themeConfig.description}
+              Manage points of interest for the {themeConfig.label.toLowerCase()} theme in {cityName}
             </p>
           </div>
         </div>

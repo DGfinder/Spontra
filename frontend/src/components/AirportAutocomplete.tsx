@@ -10,6 +10,7 @@ export interface Airport {
   name: string
   city: string
   country: string
+  passengerVolume: number // Annual passengers in millions
 }
 
 interface AirportAutocompleteProps {
@@ -115,7 +116,54 @@ export function AirportAutocomplete({
     // Instant client-side search with minimal debounce for smooth UX
     debounceRef.current = setTimeout(() => {
       const results = fuseRef.current!.search(inputValue)
-      const matchedAirports = results.map(result => result.item).slice(0, 8)
+      const queryLower = inputValue.toLowerCase().trim()
+      const queryLength = queryLower.length
+
+      // Adaptive weights based on query length
+      const weights = queryLength <= 2
+        ? { fuzzy: 5, iata: 100, position: 10, volume: 2 }   // Short: favor exact matches
+        : { fuzzy: 15, iata: 20, position: 8, volume: 5 }    // Long: favor relevance
+
+      // 2025-level smart ranking: Multi-factor scoring
+      const scoredResults = results.map(result => {
+        const airport = result.item
+        const fuzzyScore = 1 - (result.score || 0) // Fuse returns 0-1 where 0 is perfect match
+
+        // 1. IATA exact match (3-char queries) - instant top result
+        const iataLower = airport.iataCode.toLowerCase()
+        const iataBoost = iataLower === queryLower && queryLength === 3
+          ? weights.iata
+          : iataLower.startsWith(queryLower) ? weights.iata * 0.5 : 0
+
+        // 2. Position-weighted city matching
+        const cityLower = airport.city.toLowerCase()
+        let positionBoost = 0
+        if (cityLower === queryLower) {
+          positionBoost = weights.position * 1.5  // Exact city match
+        } else if (cityLower.startsWith(queryLower)) {
+          positionBoost = weights.position  // Starts with query (e.g., "lon" → "London")
+        } else if (cityLower.includes(` ${queryLower}`)) {
+          positionBoost = weights.position * 0.5  // Word boundary match
+        } else if (cityLower.includes(queryLower)) {
+          positionBoost = weights.position * 0.25  // Contains anywhere
+        }
+
+        // 3. Logarithmic passenger volume (realistic scaling)
+        // log10(100M) = 2 → ~5pts, log10(10M) = 1 → ~2.5pts, log10(1M) = 0 → ~0pts
+        const volumeBoost = Math.log10(airport.passengerVolume + 1) * 2.5 * (weights.volume / 5)
+
+        // 4. Combined score with adaptive weighting
+        const finalScore = (fuzzyScore * weights.fuzzy) + iataBoost + positionBoost + volumeBoost
+
+        return { airport, finalScore }
+      })
+
+      // Sort by final score (descending) and take top 8
+      const matchedAirports = scoredResults
+        .sort((a, b) => b.finalScore - a.finalScore)
+        .slice(0, 8)
+        .map(item => item.airport)
+
       setAirports(matchedAirports)
       setIsOpen(matchedAirports.length > 0)
       setSelectedIndex(0)

@@ -154,10 +154,11 @@ model Airport {
   country      String
   latitude     Decimal?
   longitude    Decimal?
-  isActive     Boolean  @default(true) @map("is_active")
-  isSearchable Boolean  @default(false) @map("is_searchable")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  isActive        Boolean  @default(true) @map("is_active")
+  isSearchable    Boolean  @default(false) @map("is_searchable")
+  passengerVolume Int      @default(0) @map("passenger_volume") // Annual passengers (millions)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   originFlights      FlightRoute[]        @relation("OriginAirport")
   destinationFlights FlightRoute[]        @relation("DestinationAirport")
@@ -288,6 +289,11 @@ model POIVideo {
   // Moderation status
   status          String      @default("pending") // "pending" | "approved" | "rejected"
   rejectionReason String?     @map("rejection_reason") @db.Text
+
+  // YouTube channel attribution (for proper creator credit)
+  youtubeChannelName  String?  @map("youtube_channel_name") @db.VarChar(255)
+  youtubeChannelUrl   String?  @map("youtube_channel_url") @db.VarChar(500)
+  youtubeChannelId    String?  @map("youtube_channel_id") @db.VarChar(100)
 
   // SEO Fields
   caption         String?     @db.Text // Instagram-style caption (50-100 words) for SEO and social

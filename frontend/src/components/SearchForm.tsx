@@ -419,7 +419,6 @@ export function SearchForm() {
                           key={theme.value}
                           type="button"
                           onClick={() => updateFilter('theme', theme.value)}
-                          title={theme.description}
                           className={`
                             flex items-center gap-2.5 px-3.5 h-9 sm:h-9 md:h-10 rounded-full font-normal
                             transition-all duration-300
