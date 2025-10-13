@@ -11,6 +11,9 @@ interface POIVideo {
   caption?: string | null
   altText?: string | null
   instagramUrl?: string | null
+  youtubeChannelName?: string | null
+  youtubeChannelUrl?: string | null
+  youtubeChannelId?: string | null
 }
 
 interface VideoCardProps {

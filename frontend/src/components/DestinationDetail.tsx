@@ -12,6 +12,9 @@ export interface POIVideo {
   videoUrl: string
   displayOrder: number
   createdAt: string
+  youtubeChannelName?: string | null
+  youtubeChannelUrl?: string | null
+  youtubeChannelId?: string | null
 }
 
 export interface ThemePOI {

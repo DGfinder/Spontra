@@ -9,6 +9,8 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { CookieConsent } from '@/components/CookieConsent'
 import { PageViewTracker } from '@/components/PageViewTracker'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const arimo = Arimo({
   subsets: ['latin'],
@@ -74,6 +76,10 @@ export default function RootLayout({
             <PageViewTracker />
           </Suspense>
         </div>
+
+        {/* Vercel Performance Monitoring */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

@@ -13,7 +13,7 @@ dotenv.config({ path: join(process.cwd(), '.env.local') })
 const db = new PrismaClient()
 
 // Airport split ratios for multi-airport cities (based on typical distribution)
-const AIRPORT_SPLIT_RATIOS: Record<string, Record<string, number>> = {
+const AIRPORT_SPLIT_RATIOS: Record<string, number> = {
   // London airports
   'LHR': 0.50,  // Heathrow: ~50%
   'LGW': 0.25,  // Gatwick: ~25%
