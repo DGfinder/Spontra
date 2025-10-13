@@ -165,6 +165,10 @@ model Airport {
   destinations       DestinationAirport[]
 
   @@index([isSearchable])
+  @@index([city])
+  @@index([country])
+  @@index([passengerVolume(sort: Desc)])
+  @@index([isActive, isSearchable])
   @@map("airports")
 }
 
@@ -187,6 +191,9 @@ model FlightRoute {
   @@unique([originAirportCode, destinationAirportCode])
   @@index([isDirect])
   @@index([isEstimated])
+  @@index([totalDurationMinutes])
+  @@index([originAirportCode, totalDurationMinutes])
+  @@index([destinationAirportCode])
   @@map("flight_routes")
 }
 
@@ -231,6 +238,9 @@ model Destination {
   hotels               Hotel[]
 
   @@index([countryId])
+  @@index([cityName])
+  @@index([popularityScore(sort: Desc)])
+  @@index([slug])
   @@map("destinations")
 }
 
@@ -274,6 +284,8 @@ model ThemePOI {
   videos          POIVideo[]
 
   @@index([destinationId, theme])
+  @@index([theme])
+  @@index([destinationId, displayOrder])
   @@map("theme_pois")
 }
 
@@ -351,6 +363,8 @@ model Hotel {
   @@index([cityName, primaryTheme])
   @@index([destinationId])
   @@index([isActive])
+  @@index([primaryTheme])
+  @@index([isActive, priceLevel])
   @@map("hotels")
 }
 
@@ -466,6 +480,7 @@ model VideoView {
   @@index([sessionId, destinationId, viewedAt])
   @@index([videoId])
   @@index([creatorId])
+  @@index([creatorId, viewedAt(sort: Desc)])
   @@map("video_views")
 }
 
@@ -497,6 +512,8 @@ model CreatorEarning {
   @@index([videoId])
   @@index([affiliateClickId])
   @@index([holdReleaseAt])
+  @@index([holdReleaseAt, isPaid])
+  @@index([isPaid, earnedAt])
   @@map("creator_earnings")
 }
 
