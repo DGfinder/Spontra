@@ -22,6 +22,9 @@ const TIME_RANGES = {
 
 type TimeRangeKey = keyof typeof TIME_RANGES
 
+// ISR: Revalidate every 30 minutes (destination data changes occasionally)
+export const revalidate = 1800
+
 /**
  * Generate static params for explore pages
  */

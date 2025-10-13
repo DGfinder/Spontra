@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Learn how Spontra collects, uses, and protects your personal information.',
 }
 
+// ISR: Revalidate every 24 hours (legal content changes infrequently)
+export const revalidate = 86400
+
 export default function PrivacyPage() {
   return (
     <LegalPageTemplate title="Privacy Policy" lastUpdated="October 2025">

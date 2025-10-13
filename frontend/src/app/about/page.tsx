@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Learn about Spontra - the platform that helps you discover destinations by flight time and travel style.',
 }
 
+// ISR: Revalidate every 24 hours (static informational content)
+export const revalidate = 86400
+
 export default function AboutPage() {
   return (
     <LegalPageTemplate title="About Spontra">

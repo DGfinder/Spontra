@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Learn about how Spontra uses cookies and similar technologies to enhance your experience.',
 }
 
+// ISR: Revalidate every 24 hours (legal content changes infrequently)
+export const revalidate = 86400
+
 export default function CookiesPage() {
   return (
     <LegalPageTemplate title="Cookie Policy" lastUpdated="October 2025">

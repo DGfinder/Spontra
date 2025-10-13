@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description: 'Read the terms and conditions for using Spontra travel discovery platform.',
 }
 
+// ISR: Revalidate every 24 hours (legal content changes infrequently)
+export const revalidate = 86400
+
 export default function TermsPage() {
   return (
     <LegalPageTemplate title="Terms of Service" lastUpdated="October 2025">
