@@ -1134,3 +1134,20 @@ model PasswordResetToken {
   @@index([expiresAt])
   @@map("password_reset_tokens")
 }
+// Creator Program Waitlist
+model CreatorWaitlist {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  source      String   @default("website")
+  position    Int
+  status      String   @default("pending") // pending, invited, joined
+  invitedAt   DateTime?
+  joinedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+  @@map("creator_waitlist")
+}
