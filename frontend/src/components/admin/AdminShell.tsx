@@ -14,6 +14,7 @@ const PRIMARY_NAVIGATION = [
   { href: '/admin/destinations/manage', label: 'Destinations' },
   { href: '/admin/airports/manage', label: 'Airports' },
   { href: '/admin/moderation', label: 'Moderation' },
+  { href: '/admin/creators', label: 'Creators' },
 ]
 
 interface AdminShellProps {
