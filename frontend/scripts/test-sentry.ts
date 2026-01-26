@@ -85,12 +85,11 @@ async function testSentryIntegration() {
 
   // Test performance monitoring
   console.log('\n5. Testing performance monitoring...')
-  const result = sentryHelpers.startTransaction('test-operation', 'test')
-  
-  // Simulate some work
-  await new Promise(resolve => setTimeout(resolve, 100))
-  
-  // Note: Sentry 8.x uses different API - span operations are handled differently
+  await sentryHelpers.startSpan('test-operation', 'test', async () => {
+    // Simulate some work
+    await new Promise(resolve => setTimeout(resolve, 100))
+    return { success: true }
+  })
   console.log('   ✅ Performance monitoring initialized')
 
   // Test API error handling

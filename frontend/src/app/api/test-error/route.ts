@@ -30,13 +30,12 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return NextResponse.json({ message: 'Async error thrown' })
       
       case 'performance':
-        // Test performance monitoring
-        const result = sentryHelpers.startTransaction('test-operation', 'test')
-        
-        // Simulate slow operation
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Note: Sentry 8.x handles span completion automatically
+        // Test performance monitoring (Sentry 8.x)
+        await sentryHelpers.startSpan('test-operation', 'test', async () => {
+          // Simulate slow operation
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          return { success: true }
+        })
         return NextResponse.json({ message: 'Performance test completed' })
       
       case 'breadcrumb':

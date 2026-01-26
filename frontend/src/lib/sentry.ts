@@ -153,14 +153,16 @@ export const sentryHelpers = {
   },
 
   /**
-   * Start a transaction for performance monitoring
-   * Note: startTransaction is deprecated in Sentry 8.x, use startSpan instead
+   * Start a span for performance monitoring (Sentry 8.x)
    */
-  startTransaction(name: string, operation?: string) {
-    return Sentry.startSpan({
-      name,
-      op: operation || 'function',
-    }, (span) => span)
+  startSpan<T>(name: string, operation: string, fn: () => Promise<T>): Promise<T> {
+    return Sentry.startSpan(
+      {
+        name,
+        op: operation,
+      },
+      fn
+    )
   },
 
   /**
@@ -208,52 +210,59 @@ export const sentryHelpers = {
   },
 
   /**
-   * Monitor database operations
+   * Monitor database operations (Sentry 8.x compatible)
    */
   monitorDatabaseOperation<T>(
     operation: string,
     table: string,
     fn: () => Promise<T>
   ): Promise<T> {
-    const transaction = this.startTransaction(`db.${operation}`, 'db')
-    transaction.setTag('db.table', table)
-    
-    return fn()
-      .catch((error) => {
-        const dbError = new DatabaseError(
-          error.message || 'Database operation failed',
-          operation,
-          table
-        )
-        
-        this.captureError(dbError, 'error', {
-          database: {
+    return Sentry.startSpan(
+      {
+        name: `db.${operation}`,
+        op: 'db',
+        attributes: {
+          'db.table': table,
+          'db.operation': operation,
+        },
+      },
+      async () => {
+        try {
+          return await fn()
+        } catch (error: any) {
+          const dbError = new DatabaseError(
+            error.message || 'Database operation failed',
             operation,
-            table,
-            error: error.message,
-          },
-        })
-        
-        throw dbError
-      })
-      .finally(() => {
-        transaction.finish()
-      })
+            table
+          )
+          
+          this.captureError(dbError, 'error', {
+            database: {
+              operation,
+              table,
+              error: error.message,
+            },
+          })
+          
+          throw dbError
+        }
+      }
+    )
   },
 }
 
-// Global error boundary helper for React components
+// Global error boundary helper for React components (Sentry 8.x compatible)
 export function withSentryErrorBoundary<T extends React.ComponentType<any>>(
   Component: T,
   options?: {
-    fallback?: React.ComponentType<any>
+    fallback?: React.ReactElement
     showDialog?: boolean
   }
 ): T {
-  const fallbackComponent = options?.fallback || React.createElement('div', null, 'Something went wrong')
+  const fallbackElement = options?.fallback || React.createElement('div', null, 'Something went wrong')
   
   return Sentry.withErrorBoundary(Component, {
-    fallback: fallbackComponent as React.ComponentType<Sentry.ErrorBoundaryFallbackProps>,
+    fallback: fallbackElement as React.ReactElement,
     showDialog: options?.showDialog || false,
   }) as T
 }
