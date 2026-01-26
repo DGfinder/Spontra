@@ -3,6 +3,9 @@ import { LandingPageFormModern } from '@/components/LandingPageFormModern'
 import { cacheGet } from '@/lib/cacheServer'
 import type { Metadata } from 'next'
 
+// Force dynamic rendering - page has client interactivity
+export const dynamic = 'force-dynamic'
+
 // Enhanced metadata with dynamic content
 export async function generateMetadata(): Promise<Metadata> {
   // Fetch dynamic data for SEO optimization

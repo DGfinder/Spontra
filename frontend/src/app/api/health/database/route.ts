@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkDatabaseConnection, getDatabaseStats } from '@/lib/db'
 
+// Force dynamic rendering - never pre-render this route
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 export interface DatabaseHealthResponse {
   status: 'healthy' | 'unhealthy'
   timestamp: string

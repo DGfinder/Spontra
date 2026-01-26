@@ -103,11 +103,16 @@ const nextConfig: NextConfig = {
   },
   
   // Server components external packages (moved from experimental in Next.js 15)
+  // These packages should NOT be bundled into server-side code
   serverExternalPackages: [
     'cassandra-driver', 
     '@opentelemetry/exporter-trace-otlp-http',
     '@opentelemetry/exporter-metrics-otlp-http',
     'web-vitals',
+    // Browser-only packages that break SSR
+    'zustand',
+    'eventemitter3',
+    'p-queue',
   ],
 
   // Turbopack configuration (moved from experimental.turbo in Next.js 15)
@@ -171,7 +176,8 @@ const nextConfig: NextConfig = {
     }
 
     // Enhanced React 19 and Next.js 15 optimizations
-    if (!dev) {
+    // IMPORTANT: Only apply splitChunks to client builds - server builds need different bundling
+    if (!dev && !isServer) {
       // Enhanced split chunks optimization for React 19
       config.optimization = {
         ...config.optimization,

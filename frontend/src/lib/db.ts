@@ -5,18 +5,34 @@ import { PrismaClient } from '@prisma/client'
 export { sql }
 
 // Prisma client with optimized configuration for Vercel
+// Use lazy initialization to avoid build-time errors when DATABASE_URL is not set
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  datasources: {
-    db: {
-      url: process.env.POSTGRES_URL
-    }
+function createPrismaClient(): PrismaClient {
+  const url = process.env.POSTGRES_URL || process.env.DATABASE_URL
+  if (!url) {
+    // Return a mock client during build time
+    console.warn('[Prisma] No DATABASE_URL - returning stub client for build')
+    return new Proxy({} as PrismaClient, {
+      get: (target, prop) => {
+        if (prop === '$disconnect') return async () => {}
+        if (prop === '$connect') return async () => {}
+        throw new Error(`Database not configured - attempted to access prisma.${String(prop)}`)
+      }
+    })
   }
-})
+  
+  return new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    datasources: {
+      db: { url }
+    }
+  })
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
