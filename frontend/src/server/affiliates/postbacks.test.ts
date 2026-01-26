@@ -138,6 +138,6 @@ describe("Affiliate Postback Verification", () => {
     // Should not be empty or just whitespace
     expect(validClickId.trim()).toBeTruthy();
     expect("").toBeFalsy();
-    expect("   ").trim().toBeFalsy();
+    expect("   ".trim()).toBeFalsy();
   });
 });

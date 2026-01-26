@@ -1,14 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest'
 import { NextRequest } from 'next/server'
-import { testDataFactory, createMockDatabase } from '../factories/testDataFactory'
+import { testDataFactory, getMockDatabase, resetMockDatabase } from '../factories/testDataFactory'
 
 /**
  * Performance and Load Tests
  * Validates that API endpoints can handle expected load and respond within SLA
  */
 
+// Get stable mock database instance
+const mockDb = getMockDatabase()
+
 // Mock dependencies for performance testing
-vi.mock('@/lib/db', () => createMockDatabase())
+vi.mock('@/lib/db', () => mockDb)
 vi.mock('@vercel/kv', () => ({
   kv: {
     get: vi.fn().mockResolvedValue(0), // Allow requests
@@ -26,17 +29,21 @@ describe('Performance and Load Tests', () => {
     process.env.ADMIN_API_KEY = 'test_admin_key'
 
     // Setup realistic database response times
-    const { prisma } = vi.mocked(createMockDatabase().prisma)
+    const { prisma } = mockDb
     
     // Simulate database latency (50-200ms)
     const addLatency = <T>(result: T): Promise<T> => 
       new Promise(resolve => setTimeout(() => resolve(result), 50 + Math.random() * 150))
 
-    prisma.searchSession.create.mockImplementation((args) => 
-      addLatency(testDataFactory.createSearchSession(args?.data)))
+    if (prisma?.searchSession?.create) {
+      prisma.searchSession.create.mockImplementation((args: any) => 
+        addLatency(testDataFactory.createSearchSession(args?.data)))
+    }
     
-    prisma.clickEvent.create.mockImplementation((args) => 
-      addLatency(testDataFactory.createClickEvent(args?.data)))
+    if (prisma?.clickEvent?.create) {
+      prisma.clickEvent.create.mockImplementation((args: any) => 
+        addLatency(testDataFactory.createClickEvent(args?.data)))
+    }
   })
 
   describe('Search API Performance', () => {

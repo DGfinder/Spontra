@@ -50,6 +50,14 @@ export function buildDeeplink(params: {
   u.searchParams.set("utm_campaign", "flights");
   // Many networks accept one of these; template should include the canonical one but this is a safe fallback:
   if (!u.searchParams.has("aff_click_id")) u.searchParams.set("aff_click_id", clickId);
+  
+  // Add campaign and placement IDs as query params for tracking
+  if (campaignId && !u.searchParams.has("campaignId")) {
+    u.searchParams.set("campaignId", campaignId);
+  }
+  if (placementId && !u.searchParams.has("placementId")) {
+    u.searchParams.set("placementId", placementId);
+  }
 
   return u.toString();
 }

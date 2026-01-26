@@ -113,28 +113,50 @@ vi.mock('next/headers', () => ({
 }))
 
 // Mock external APIs and services
-vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
-  captureMessage: vi.fn(),
-  withScope: vi.fn((callback) => {
-    const scope = {
-      setTag: vi.fn(),
-      setContext: vi.fn(),
-      setLevel: vi.fn(),
-      setUser: vi.fn()
-    }
-    callback(scope)
-  }),
-  setUser: vi.fn(),
-  addBreadcrumb: vi.fn(),
-  startTransaction: vi.fn(() => ({
-    setTag: vi.fn(),
-    finish: vi.fn()
-  })),
-  metrics: {
-    increment: vi.fn()
+vi.mock('@sentry/nextjs', () => {
+  const mockScope = {
+    setTag: vi.fn().mockReturnThis(),
+    setContext: vi.fn().mockReturnThis(),
+    setLevel: vi.fn().mockReturnThis(),
+    setUser: vi.fn().mockReturnThis(),
+    setExtra: vi.fn().mockReturnThis(),
+    setFingerprint: vi.fn().mockReturnThis(),
+    addBreadcrumb: vi.fn().mockReturnThis(),
   }
-}))
+  
+  return {
+    captureException: vi.fn(),
+    captureMessage: vi.fn(),
+    withScope: vi.fn((callback) => callback(mockScope)),
+    setUser: vi.fn(),
+    addBreadcrumb: vi.fn(),
+    // Sentry 8.x API
+    startSpan: vi.fn((options, callback) => callback({
+      setAttribute: vi.fn(),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+    })),
+    startInactiveSpan: vi.fn(() => ({
+      setAttribute: vi.fn(),
+      setStatus: vi.fn(),
+      end: vi.fn(),
+    })),
+    // Legacy API for backwards compat
+    startTransaction: vi.fn(() => ({
+      setTag: vi.fn(),
+      finish: vi.fn(),
+    })),
+    metrics: {
+      increment: vi.fn(),
+      gauge: vi.fn(),
+      distribution: vi.fn(),
+      set: vi.fn(),
+    },
+    // Server-side exports
+    init: vi.fn(),
+    flush: vi.fn().mockResolvedValue(true),
+  }
+})
 
 vi.mock('resend', () => ({
   Resend: vi.fn().mockImplementation(() => ({

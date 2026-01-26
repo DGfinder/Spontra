@@ -333,6 +333,20 @@ export class TestDataFactory {
 export const testDataFactory = TestDataFactory.getInstance()
 
 // Helper functions for common test scenarios
+// Singleton mock database for consistent mock state across tests
+let _mockDbInstance: ReturnType<typeof createMockDatabase> | null = null
+
+export const getMockDatabase = () => {
+  if (!_mockDbInstance) {
+    _mockDbInstance = createMockDatabase()
+  }
+  return _mockDbInstance
+}
+
+export const resetMockDatabase = () => {
+  _mockDbInstance = null
+}
+
 export const createMockDatabase = () => ({
   prisma: {
     $connect: vi.fn(),
