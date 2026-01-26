@@ -403,10 +403,36 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                 </FormField>
 
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 space-y-3">
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">
                       Flight duration
                     </span>
+                    
+                    {/* Direct flights toggle */}
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/50 group-hover:text-white/70 transition-colors">
+                        Direct only
+                      </span>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={formValues.directFlightsOnly || false}
+                        onClick={() => setValue('directFlightsOnly', !formValues.directFlightsOnly)}
+                        className={cn(
+                          'relative h-5 w-9 rounded-full transition-colors duration-200',
+                          formValues.directFlightsOnly 
+                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' 
+                            : 'bg-white/20 hover:bg-white/30'
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
+                            formValues.directFlightsOnly ? 'translate-x-4' : 'translate-x-0.5'
+                          )}
+                        />
+                      </button>
+                    </label>
                   </div>
 
                   <FlightTimeSlider
