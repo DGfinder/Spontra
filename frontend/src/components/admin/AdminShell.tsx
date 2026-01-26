@@ -11,6 +11,7 @@ import { ADMIN_LOCATION_DATA } from '@/data/adminLocations'
 
 const PRIMARY_NAVIGATION = [
   { href: '/admin/dashboard', label: 'Dashboard' },
+  { href: '/admin/analytics', label: 'Analytics' },
   { href: '/admin/destinations/manage', label: 'Destinations' },
   { href: '/admin/airports/manage', label: 'Airports' },
   { href: '/admin/moderation', label: 'Moderation' },
