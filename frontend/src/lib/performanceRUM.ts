@@ -1,4 +1,4 @@
-import { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } from 'web-vitals'
+// SSR-safe performance monitoring - web-vitals is loaded dynamically
 import { trace } from '@opentelemetry/api'
 
 interface VitalMetric {
@@ -12,7 +12,6 @@ interface VitalMetric {
 }
 
 interface PerformanceReport extends VitalMetric {
-  // Enhanced context
   route: string
   userAgent: string
   connectionType: string
@@ -21,18 +20,14 @@ interface PerformanceReport extends VitalMetric {
   timestamp: number
   sessionId: string
   userId?: string
-  // Navigation context
   navigationTiming?: PerformanceNavigationTiming
-  // Custom attributes
   isBot: boolean
   hasServiceWorker: boolean
   cacheStatus?: string
-  // Quality controls
   deviceClass: 'mobile' | 'desktop' | 'tablet'
   country: string
   interactionCount: number
   sampleRate: number
-  // Attribution data
   lcpElement?: string
   lcpResourceOrigin?: string
   clsAttribution?: string[]
@@ -47,15 +42,19 @@ class PerformanceReporter {
   private interactionCount = 0
   private sampleRate: number
   private isQualified = true
+  private initialized = false
 
   constructor() {
     this.sessionId = this.generateSessionId()
     this.route = typeof window !== 'undefined' ? window.location.pathname : '/'
     this.sampleRate = this.getSampleRate()
-    this.checkQualityControls()
     
-    if (this.isQualified && this.shouldSample()) {
-      this.initializeTracking()
+    // Only initialize in browser
+    if (typeof window !== 'undefined') {
+      this.checkQualityControls()
+      if (this.isQualified && this.shouldSample()) {
+        this.initializeTracking()
+      }
     }
   }
 
@@ -64,7 +63,6 @@ class PerformanceReporter {
   }
 
   private getSampleRate(): number {
-    // Production: 0.1 (10%), Development: 1.0 (100%)
     return parseFloat(process.env.NEXT_PUBLIC_RUM_SAMPLE_RATE || '1.0')
   }
 
@@ -76,8 +74,6 @@ class PerformanceReporter {
     if (typeof navigator === 'undefined') return
 
     const ua = navigator.userAgent.toLowerCase()
-    
-    // Bot & QA filtering
     const botPatterns = [
       'headless', 'phantom', 'crawler', 'bot', 'spider',
       'lighthouse', 'pagespeed', 'gtmetrix', 'pingdom',
@@ -85,25 +81,20 @@ class PerformanceReporter {
     ]
     
     const isBot = botPatterns.some(pattern => ua.includes(pattern))
-    
-    // Check for QA headers
     const isQA = document.documentElement.hasAttribute('data-qa') ||
                  window.location.search.includes('qa=1') ||
                  window.location.hostname.includes('test')
     
-    // Navigation spam detection (>20 nav/min)
     const navCount = parseInt(sessionStorage.getItem('perf_nav_count') || '0')
     const navTime = parseInt(sessionStorage.getItem('perf_nav_time') || '0')
     const now = Date.now()
     
     if (now - navTime > 60000) {
-      // Reset counter every minute
       sessionStorage.setItem('perf_nav_count', '1')
       sessionStorage.setItem('perf_nav_time', now.toString())
     } else {
       const newCount = navCount + 1
       sessionStorage.setItem('perf_nav_count', newCount.toString())
-      
       if (newCount > 20) {
         this.isQualified = false
         return
@@ -122,7 +113,6 @@ class PerformanceReporter {
     if (/Android.*Mobile/.test(ua)) return 'mobile'
     if (/Android/.test(ua)) return 'tablet'
     
-    // Screen-based detection
     if (typeof screen !== 'undefined') {
       const width = Math.min(screen.width, screen.height)
       if (width < 768) return 'mobile'
@@ -133,7 +123,6 @@ class PerformanceReporter {
   }
 
   private getCountry(): string {
-    // Cloudflare country header or timezone-based detection
     const cf_country = (window as any).CF_COUNTRY
     if (cf_country) return cf_country
     
@@ -165,10 +154,7 @@ class PerformanceReporter {
         }
       }
       
-      return {
-        element: `${elementType}:${elementInfo}`,
-        resourceOrigin
-      }
+      return { element: `${elementType}:${elementInfo}`, resourceOrigin }
     } catch {
       return {}
     }
@@ -176,16 +162,13 @@ class PerformanceReporter {
 
   private getCLSAttribution(): string[] {
     const attribution: string[] = []
-    
     try {
-      // Check for known layout shifters
       const shifters = [
         { selector: '[data-consent-banner]', name: 'consent-banner' },
         { selector: '[data-affiliate-disclosure]', name: 'affiliate-ribbon' },
         { selector: '.ad-container', name: 'ads' },
         { selector: '[data-lazy-load]', name: 'lazy-images' }
       ]
-      
       shifters.forEach(shifter => {
         if (document.querySelector(shifter.selector)) {
           attribution.push(shifter.name)
@@ -194,13 +177,11 @@ class PerformanceReporter {
     } catch {
       // Ignore errors
     }
-    
     return attribution
   }
 
   private getDeviceInfo() {
     if (typeof navigator === 'undefined') return {}
-    
     return {
       userAgent: navigator.userAgent,
       connectionType: (navigator as any).connection?.effectiveType || 'unknown',
@@ -213,7 +194,6 @@ class PerformanceReporter {
 
   private getNavigationTiming(): PerformanceNavigationTiming | undefined {
     if (typeof performance === 'undefined') return undefined
-    
     const entries = performance.getEntriesByType('navigation')
     return entries[0] as PerformanceNavigationTiming
   }
@@ -224,7 +204,6 @@ class PerformanceReporter {
     const lcpAttribution = metric.name === 'lcp' ? this.getLCPAttribution() : {}
     const clsAttribution = metric.name === 'cls' ? this.getCLSAttribution() : undefined
     
-    // Track hydration phases for attribution
     let hydrationPhase: 'start' | 'end' | 'interactive' | undefined
     if (metric.name === 'hydration') {
       if (metric.id.includes('start')) hydrationPhase = 'start'
@@ -256,9 +235,7 @@ class PerformanceReporter {
   }
 
   private async sendToAnalytics(report: PerformanceReport) {
-    // Send to existing OTel pipeline
     const span = this.tracer.startSpan(`performance.${report.name}`)
-    
     span.setAttributes({
       'performance.metric.name': report.name,
       'performance.metric.value': report.value,
@@ -271,16 +248,13 @@ class PerformanceReporter {
       'performance.is_bot': report.isBot,
       'performance.navigation_type': report.navigationType
     })
-
     span.end()
 
-    // Also send to analytics endpoint for dashboards
     try {
       await fetch('/api/analytics/performance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(report),
-        // Don't block the main thread
         keepalive: true
       })
     } catch (error) {
@@ -290,51 +264,44 @@ class PerformanceReporter {
 
   private async reportMetric(metric: VitalMetric) {
     const report = this.createReport(metric)
-    
-    // Log for debugging
     console.log(`📊 ${metric.name}: ${metric.value.toFixed(2)}ms (${metric.rating})`)
-    
     await this.sendToAnalytics(report)
   }
 
-  private initializeTracking() {
-    if (typeof window === 'undefined') return
+  private async initializeTracking() {
+    if (typeof window === 'undefined' || this.initialized) return
+    this.initialized = true
 
-    // Set up interaction counting for quality controls
     this.trackInteractions()
 
-    // Track all Core Web Vitals with bias controls
-    onCLS((metric) => this.reportMetric(metric))
-    onFCP((metric) => this.reportMetric(metric))
-    onFID((metric) => this.reportMetric(metric))
-    onINP((metric) => {
-      // INP bias control: Only report if we have sufficient interactions
-      if (this.interactionCount >= 3) {
-        this.reportMetric(metric)
-      }
-    })
-    onLCP((metric) => this.reportMetric(metric))
-    onTTFB((metric) => this.reportMetric(metric))
+    // Dynamic import of web-vitals to avoid SSR issues
+    try {
+      const { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } = await import('web-vitals')
+      
+      onCLS((metric) => this.reportMetric(metric))
+      onFCP((metric) => this.reportMetric(metric))
+      onFID((metric) => this.reportMetric(metric))
+      onINP((metric) => {
+        if (this.interactionCount >= 3) {
+          this.reportMetric(metric)
+        }
+      })
+      onLCP((metric) => this.reportMetric(metric))
+      onTTFB((metric) => this.reportMetric(metric))
+    } catch (error) {
+      console.warn('Failed to load web-vitals:', error)
+    }
 
-    // Track custom metrics
     this.trackHydrationTiming()
     this.trackRouteChanges()
   }
 
   private trackInteractions() {
     if (typeof window === 'undefined') return
-
     const interactionEvents = ['click', 'keydown', 'pointerdown', 'touchstart']
-    
-    const handleInteraction = () => {
-      this.interactionCount++
-    }
-
+    const handleInteraction = () => { this.interactionCount++ }
     interactionEvents.forEach(event => {
-      document.addEventListener(event, handleInteraction, { 
-        passive: true, 
-        capture: true 
-      })
+      document.addEventListener(event, handleInteraction, { passive: true, capture: true })
     })
   }
 
@@ -344,7 +311,6 @@ class PerformanceReporter {
     const hydrationStart = performance.now()
     let isFirstInteractionDetected = false
     
-    // Track hydration start
     this.reportMetric({
       name: 'hydration',
       value: 0,
@@ -355,11 +321,9 @@ class PerformanceReporter {
       entries: []
     })
 
-    // Wait for React to hydrate (hydration end)
     setTimeout(() => {
       const hydrationEnd = performance.now()
       const hydrationTime = hydrationEnd - hydrationStart
-
       this.reportMetric({
         name: 'hydration',
         value: hydrationTime,
@@ -371,14 +335,11 @@ class PerformanceReporter {
       })
     }, 0)
 
-    // Simple click probe for "first interactive" detection
-    const interactiveProbe = (event: MouseEvent | TouchEvent) => {
+    const interactiveProbe = () => {
       if (isFirstInteractionDetected) return
-      
       const interactiveTime = performance.now()
       const timeToInteractive = interactiveTime - hydrationStart
       isFirstInteractionDetected = true
-
       this.reportMetric({
         name: 'hydration',
         value: timeToInteractive,
@@ -388,33 +349,27 @@ class PerformanceReporter {
         navigationType: 'navigate',
         entries: []
       })
-
-      // Clean up listeners after first interaction
       document.removeEventListener('click', interactiveProbe, { capture: true })
       document.removeEventListener('touchstart', interactiveProbe, { capture: true })
     }
 
-    // Listen for first meaningful interaction
     document.addEventListener('click', interactiveProbe, { capture: true, passive: true })
     document.addEventListener('touchstart', interactiveProbe, { capture: true, passive: true })
 
-    // Timeout fallback - assume interactive after 5 seconds if no interaction
     setTimeout(() => {
       if (!isFirstInteractionDetected) {
         const fallbackTime = performance.now()
         const timeToInteractive = fallbackTime - hydrationStart
         isFirstInteractionDetected = true
-
         this.reportMetric({
           name: 'hydration',
           value: timeToInteractive,
-          rating: 'poor', // No interaction suggests poor UX
+          rating: 'poor',
           delta: timeToInteractive,
           id: `hydration-timeout-${this.sessionId}`,
           navigationType: 'navigate',
           entries: []
         })
-
         document.removeEventListener('click', interactiveProbe, { capture: true })
         document.removeEventListener('touchstart', interactiveProbe, { capture: true })
       }
@@ -424,9 +379,7 @@ class PerformanceReporter {
   private trackRouteChanges() {
     if (typeof window === 'undefined') return
 
-    // Track SPA route changes
     let routeChangeStart = 0
-    
     const originalPushState = history.pushState
     const originalReplaceState = history.replaceState
 
@@ -444,11 +397,9 @@ class PerformanceReporter {
       routeChangeStart = performance.now()
     })
 
-    // Track when route change completes
     const observer = new MutationObserver(() => {
       if (routeChangeStart > 0) {
         const routeChangeTime = performance.now() - routeChangeStart
-        
         this.reportMetric({
           name: 'route-change',
           value: routeChangeTime,
@@ -458,26 +409,16 @@ class PerformanceReporter {
           navigationType: 'spa',
           entries: []
         })
-
         routeChangeStart = 0
       }
     })
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    })
+    observer.observe(document.body, { childList: true, subtree: true })
   }
 
-  public setUserId(userId: string) {
-    this.userId = userId
-  }
+  public setUserId(userId: string) { this.userId = userId }
+  public setRoute(route: string) { this.route = route }
 
-  public setRoute(route: string) {
-    this.route = route
-  }
-
-  // Manual performance marks for custom tracking
   public mark(name: string) {
     if (typeof performance !== 'undefined') {
       performance.mark(`spontra:${name}`)
@@ -487,16 +428,13 @@ class PerformanceReporter {
   public measure(name: string, startMark?: string) {
     if (typeof performance !== 'undefined') {
       const measureName = `spontra:${name}`
-      
       if (startMark) {
         performance.measure(measureName, `spontra:${startMark}`)
       } else {
         performance.measure(measureName)
       }
-
       const measures = performance.getEntriesByName(measureName, 'measure')
       const measure = measures[measures.length - 1]
-
       if (measure) {
         this.reportMetric({
           name: `custom.${name}`,
@@ -512,7 +450,6 @@ class PerformanceReporter {
   }
 }
 
-// Singleton instance
 let performanceReporter: PerformanceReporter | null = null
 
 export function getPerformanceReporter(): PerformanceReporter {
@@ -522,10 +459,8 @@ export function getPerformanceReporter(): PerformanceReporter {
   return performanceReporter
 }
 
-// Convenience functions for React components
 export function usePerformanceTracking() {
   const reporter = getPerformanceReporter()
-  
   return {
     mark: (name: string) => reporter.mark(name),
     measure: (name: string, startMark?: string) => reporter.measure(name, startMark),
@@ -534,7 +469,7 @@ export function usePerformanceTracking() {
   }
 }
 
-// Initialize tracking automatically
+// Initialize only in browser
 if (typeof window !== 'undefined') {
   getPerformanceReporter()
 }

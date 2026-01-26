@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { devtools, persist } from 'zustand/middleware'
+import { devtools, persist, createJSONStorage } from 'zustand/middleware'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { NavigationState, SelectedCity, SelectedActivity, SelectedFlight, NavigationStep } from '@/types/navigation'
 
@@ -404,6 +404,16 @@ export const useSearchStore = create<SearchStore>()(
       }),
       {
         name: 'spontra-search-store',
+        storage: createJSONStorage(() => {
+          if (typeof window === 'undefined') {
+            return {
+              getItem: () => null,
+              setItem: () => {},
+              removeItem: () => {},
+            }
+          }
+          return localStorage
+        }),
         partialize: (state) => ({
           searchHistory: state.searchHistory,
           preferences: state.preferences,
