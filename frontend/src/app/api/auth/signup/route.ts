@@ -7,6 +7,7 @@ import {
 } from '@/lib/userAuth'
 import { userRepository } from '@/lib/userRepository'
 import { signupRateLimit, emailBasedRateLimit } from '@/lib/rateLimitAuth'
+import { sendWelcomeEmail } from '@/lib/emailService'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -74,8 +75,11 @@ export async function POST(request: NextRequest) {
     // Parse user preferences for response
     const userWithPreferences = userRepository.parseUserPreferences(newUser)
     
-    // TODO: Send verification email
-    // await sendVerificationEmail(newUser.email)
+    // Send welcome email (async, don't block signup)
+    sendWelcomeEmail(
+      newUser.email, 
+      newUser.firstName || newUser.username || 'there'
+    ).catch(err => console.error('Welcome email failed:', err))
 
     // Create session token
     const token = await createUserSessionToken({
