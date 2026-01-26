@@ -1,84 +1,198 @@
-﻿import { Activity, ClipboardList, MapPin, ShieldCheck, Video } from 'lucide-react'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Activity, ClipboardList, MapPin, ShieldCheck, Video, TrendingUp, Users, DollarSign, Loader2 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 interface MetricCard {
   id: string
   title: string
   value: string
+  change?: string
+  changeType?: 'positive' | 'negative' | 'neutral'
   helper: string
   icon: LucideIcon
+  loading?: boolean
 }
 
-const METRICS: MetricCard[] = [
-  {
-    id: 'destinations',
-    title: 'Ready destinations',
-    value: '--',
-    helper: 'Populated once the search index is connected.',
-    icon: MapPin,
-  },
-  {
-    id: 'themes',
-    title: 'Theme readiness',
-    value: '--',
-    helper: 'Tracks theme gating across active cities.',
-    icon: Activity,
-  },
-  {
-    id: 'moderation',
-    title: 'Moderation queue',
-    value: '0',
-    helper: 'Connect to the reporting service to surface items here.',
-    icon: ShieldCheck,
-  },
-  {
-    id: 'media',
-    title: 'Media awaiting review',
-    value: '--',
-    helper: 'Pulls from /api/admin/reel-media when wired up.',
-    icon: Video,
-  },
-]
-
-const TODO_ITEMS: string[] = [
-  'Hook search readiness metrics to the destination index.',
-  'Expose the moderation feed once the reporting service ships.',
-  'Stream reel analytics into this overview to monitor volatility.',
-]
+interface DashboardStats {
+  destinations: { total: number; active: number }
+  moderation: { pending: number }
+  creators: { waitlist: number }
+  health: { database: boolean; cache: boolean }
+}
 
 export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const [destinationsRes, moderationRes, waitlistRes, healthRes] = await Promise.allSettled([
+          fetch('/api/admin/destinations?limit=1').then(r => r.json()),
+          fetch('/api/admin/moderation?status=pending&limit=1').then(r => r.json()),
+          fetch('/api/creators/waitlist').then(r => r.json()),
+          fetch('/api/health').then(r => r.json()),
+        ])
+
+        setStats({
+          destinations: {
+            total: destinationsRes.status === 'fulfilled' ? (destinationsRes.value.total || 0) : 0,
+            active: destinationsRes.status === 'fulfilled' ? (destinationsRes.value.data?.length || 0) : 0,
+          },
+          moderation: {
+            pending: moderationRes.status === 'fulfilled' ? (moderationRes.value.total || 0) : 0,
+          },
+          creators: {
+            waitlist: waitlistRes.status === 'fulfilled' ? (waitlistRes.value.count || 0) : 0,
+          },
+          health: {
+            database: healthRes.status === 'fulfilled' && healthRes.value.status === 'healthy',
+            cache: healthRes.status === 'fulfilled' && healthRes.value.cache?.status === 'healthy',
+          },
+        })
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStats()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const metrics: MetricCard[] = [
+    {
+      id: 'destinations',
+      title: 'Destinations',
+      value: loading ? '--' : String(stats?.destinations.total || 0),
+      helper: 'Total destinations in the index',
+      icon: MapPin,
+      loading,
+    },
+    {
+      id: 'moderation',
+      title: 'Moderation Queue',
+      value: loading ? '--' : String(stats?.moderation.pending || 0),
+      changeType: (stats?.moderation.pending || 0) > 10 ? 'negative' : 'neutral',
+      helper: 'Items awaiting review',
+      icon: ShieldCheck,
+      loading,
+    },
+    {
+      id: 'waitlist',
+      title: 'Creator Waitlist',
+      value: loading ? '--' : String(stats?.creators.waitlist || 0),
+      changeType: 'positive',
+      helper: 'People signed up for creator program',
+      icon: Users,
+      loading,
+    },
+    {
+      id: 'health',
+      title: 'System Health',
+      value: loading ? '--' : (stats?.health.database ? '✓ Online' : '✗ Issues'),
+      changeType: stats?.health.database ? 'positive' : 'negative',
+      helper: 'Database and cache status',
+      icon: Activity,
+      loading,
+    },
+  ]
+
+  const quickActions = [
+    { label: 'Review moderation queue', href: '/admin/moderation' },
+    { label: 'Manage destinations', href: '/admin/destinations/manage' },
+    { label: 'View creator waitlist', href: '/admin/creators' },
+  ]
+
   return (
-    <div className='space-y-8'>
-      <header className='space-y-1'>
-        <h1 className='text-2xl font-semibold text-slate-900'>Admin overview</h1>
-        <p className='text-sm text-slate-600'>High level status for the travel curation surface.</p>
+    <div className="space-y-8">
+      <header className="space-y-1">
+        <h1 className="text-2xl font-semibold text-slate-900">Admin Dashboard</h1>
+        <p className="text-sm text-slate-600">
+          Overview of Spontra platform status and metrics
+          {!loading && <span className="ml-2 text-xs text-slate-400">• Auto-refreshes every 30s</span>}
+        </p>
       </header>
 
-      <section className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
-        {METRICS.map(({ id, title, value, helper, icon: Icon }) => (
-          <article key={id} className='rounded-xl border border-slate-200 bg-white p-6 shadow-sm'>
-            <div className='flex items-start justify-between'>
+      {/* Metrics Grid */}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {metrics.map(({ id, title, value, changeType, helper, icon: Icon, loading: isLoading }) => (
+          <article key={id} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between">
               <div>
-                <p className='text-xs uppercase tracking-wide text-slate-500'>{title}</p>
-                <p className='mt-2 text-2xl font-semibold text-slate-900'>{value}</p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">{title}</p>
+                <div className="mt-2 flex items-baseline gap-2">
+                  {isLoading ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+                  ) : (
+                    <p className={`text-2xl font-semibold ${
+                      changeType === 'positive' ? 'text-emerald-600' :
+                      changeType === 'negative' ? 'text-red-600' :
+                      'text-slate-900'
+                    }`}>
+                      {value}
+                    </p>
+                  )}
+                </div>
               </div>
-              <Icon size={20} className='text-slate-400' />
+              <div className={`p-2 rounded-lg ${
+                changeType === 'positive' ? 'bg-emerald-50' :
+                changeType === 'negative' ? 'bg-red-50' :
+                'bg-slate-50'
+              }`}>
+                <Icon size={20} className={
+                  changeType === 'positive' ? 'text-emerald-500' :
+                  changeType === 'negative' ? 'text-red-500' :
+                  'text-slate-400'
+                } />
+              </div>
             </div>
-            <p className='mt-4 text-sm text-slate-500'>{helper}</p>
+            <p className="mt-4 text-sm text-slate-500">{helper}</p>
           </article>
         ))}
       </section>
 
-      <section className='rounded-xl border border-slate-200 bg-white p-6 shadow-sm'>
-        <h2 className='text-sm font-medium text-slate-700'>Deployment checklist</h2>
-        <ul className='mt-4 space-y-3 text-sm text-slate-600'>
-          {TODO_ITEMS.map((item) => (
-            <li key={item} className='flex items-start gap-3'>
-              <ClipboardList size={16} className='mt-0.5 text-blue-500' />
-              <span>{item}</span>
-            </li>
+      {/* Quick Actions */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-sm font-medium text-slate-700 mb-4">Quick Actions</h2>
+        <div className="flex flex-wrap gap-3">
+          {quickActions.map(({ label, href }) => (
+            <a
+              key={href}
+              href={href}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              {label}
+              <span className="text-slate-400">→</span>
+            </a>
           ))}
-        </ul>
+        </div>
+      </section>
+
+      {/* Recent Activity Placeholder */}
+      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-sm font-medium text-slate-700 mb-4">Platform Status</h2>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+            <span className="text-sm text-slate-600">Database</span>
+            <span className={`text-sm font-medium ${stats?.health.database ? 'text-emerald-600' : 'text-red-600'}`}>
+              {loading ? '...' : (stats?.health.database ? 'Connected' : 'Disconnected')}
+            </span>
+          </div>
+          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+            <span className="text-sm text-slate-600">Creator Program</span>
+            <span className="text-sm font-medium text-amber-600">Coming Soon</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <span className="text-sm text-slate-600">Affiliate Integrations</span>
+            <span className="text-sm font-medium text-emerald-600">Active</span>
+          </div>
+        </div>
       </section>
     </div>
   )
