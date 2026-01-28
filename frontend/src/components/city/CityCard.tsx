@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import { MapPin, Star, Info } from 'lucide-react'
 import { Card, Badge, ThemeBadge } from '@/components/ui'
 import { getThemeColor } from '@/lib/theme'
@@ -38,6 +39,7 @@ interface CityCardProps {
   city: CityOption
   selectedTheme?: string
   onClick: () => void
+  index?: number // For staggered animations
 }
 
 // Theme icon mapping
@@ -72,10 +74,8 @@ const getThemeColorClass = (theme: string) => {
   return colorMap[theme] || 'text-yellow-400'
 }
 
-export function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
+export function CityCard({ city, selectedTheme, onClick, index = 0 }: CityCardProps) {
   const [showDetails, setShowDetails] = useState(false)
-  const [isHovered, setIsHovered] = useState(false)
-  const [isPressed, setIsPressed] = useState(false)
 
   const relevantSecondaryThemes = city.secondary_themes
     .filter(t => t.strength >= 0.3)
@@ -95,27 +95,39 @@ export function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
   }
 
   return (
-    <div
+    <motion.div
       className="group cursor-pointer w-full max-w-sm"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onMouseDown={() => setIsPressed(true)}
-      onMouseUp={() => setIsPressed(false)}
       onClick={handleCardClick}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      transition={{
+        duration: 0.35,
+        delay: index * 0.06,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+      whileHover={{ 
+        y: -8,
+        transition: { duration: 0.2, ease: 'easeOut' }
+      }}
+      whileTap={{ 
+        scale: 0.98,
+        transition: { duration: 0.1 }
+      }}
     >
-      <Card
-        variant="glass"
-        hover
-        interactive
+      <motion.div
         className={`
-          relative p-6 transition-all duration-500 ease-out
-          ${isHovered 
-            ? 'transform -translate-y-2 shadow-2xl shadow-black/30 border-white/40 bg-gradient-to-br from-white/15 to-white/8' 
-            : 'shadow-lg shadow-black/10'
-          }
-          ${isPressed ? 'transform -translate-y-1 scale-98' : ''}
+          relative p-6 rounded-xl overflow-hidden
+          bg-black/40 backdrop-blur-sm border border-white/20
+          shadow-lg shadow-black/10
           ${isSelectedTheme ? 'ring-2 ring-yellow-400/60 ring-offset-2 ring-offset-transparent' : ''}
         `}
+        whileHover={{ 
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+          borderColor: 'rgba(255, 255, 255, 0.4)',
+          background: 'linear-gradient(to bottom right, rgba(255,255,255,0.15), rgba(255,255,255,0.08))'
+        }}
+        transition={{ duration: 0.2 }}
       >
         {/* Hidden Gem Badge */}
         {city.is_hidden_gem && (
@@ -200,7 +212,13 @@ export function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
 
         {/* Mobile Details Popup */}
         {showDetails && (
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm rounded-xl p-4 z-20 sm:hidden">
+          <motion.div 
+            className="absolute inset-0 bg-black/90 backdrop-blur-sm rounded-xl p-4 z-20 sm:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
             <button
               onClick={toggleDetails}
               className="absolute top-2 right-2 text-white/70 hover:text-white"
@@ -231,9 +249,9 @@ export function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
                 </div>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
-      </Card>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { DestinationRecommendation } from '@/services/apiClient'
 
 interface CountryConstellationProps {
@@ -15,25 +16,64 @@ interface CountryCircleProps {
   onClick?: () => void
 }
 
-function CountryCircle({ recommendation, position, onClick }: CountryCircleProps) {
+function CountryCircle({ recommendation, position, onClick }: CountryCircleProps & { index?: number }) {
   const [isHovered, setIsHovered] = useState(false)
   
   const flightHours = Math.round(recommendation.flight_route.total_duration_minutes / 60 * 10) / 10
 
   return (
-    <div
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-all duration-500 hover:scale-110 animate-in fade-in zoom-in duration-700"
+    <motion.div
+      className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
       }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ 
+        opacity: 1, 
+        scale: 1,
+        y: [0, -6, 0], // Subtle floating effect
+      }}
+      transition={{
+        opacity: { duration: 0.5 },
+        scale: { duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }, // Bouncy spring
+        y: { duration: 3 + Math.random() * 2, repeat: Infinity, ease: 'easeInOut' }
+      }}
+      whileHover={{ 
+        scale: 1.15,
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.95 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       onClick={onClick}
     >
-      {/* Country Circle */}
+      {/* Country Circle with glow */}
       <div className="relative">
-        <div className="w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 border-2 border-yellow-400 rounded-full flex items-center justify-center backdrop-blur-sm hover:bg-gradient-to-br hover:from-yellow-400/30 hover:to-orange-500/30 hover:border-yellow-300 hover:shadow-lg hover:shadow-yellow-400/20 transition-all duration-300">
+        {/* Glow effect */}
+        <motion.div
+          className="absolute inset-0 rounded-full bg-yellow-400/30"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          style={{ filter: 'blur(8px)' }}
+        />
+        
+        <motion.div 
+          className="relative w-24 h-24 bg-gradient-to-br from-yellow-400/20 to-orange-500/20 border-2 border-yellow-400 rounded-full flex items-center justify-center backdrop-blur-sm"
+          whileHover={{
+            background: 'linear-gradient(to bottom right, rgba(250, 204, 21, 0.3), rgba(249, 115, 22, 0.3))',
+            borderColor: 'rgb(253, 224, 71)',
+            boxShadow: '0 0 30px rgba(250, 204, 21, 0.4)',
+          }}
+          transition={{ duration: 0.2 }}
+        >
           <div className="text-center">
             <div className="text-white font-semibold text-sm leading-tight">
               {recommendation.destination.country_name}
@@ -42,60 +82,103 @@ function CountryCircle({ recommendation, position, onClick }: CountryCircleProps
               {recommendation.destination.city_name}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Hover Tooltip */}
-        {isHovered && (
-          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-black/90 backdrop-blur-sm text-white p-3 rounded-lg text-xs z-50 animate-in fade-in slide-in-from-bottom-1 duration-200">
-            <div className="font-semibold text-yellow-400 mb-1">
-              {recommendation.destination.city_name}, {recommendation.destination.country_name}
-            </div>
-            
-            <div className="space-y-1 text-white/90">
-              <div className="flex justify-between">
-                <span>Flight Time:</span>
-                <span className="text-yellow-300">{flightHours}h</span>
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div 
+              className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 bg-black/90 backdrop-blur-sm text-white p-3 rounded-lg text-xs z-50"
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 5, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+            >
+              <div className="font-semibold text-yellow-400 mb-1">
+                {recommendation.destination.city_name}, {recommendation.destination.country_name}
               </div>
               
-              {recommendation.estimated_flight_price && (
+              <div className="space-y-1 text-white/90">
                 <div className="flex justify-between">
-                  <span>Price:</span>
-                  <span className="text-green-400">{recommendation.estimated_flight_price}</span>
+                  <span>Flight Time:</span>
+                  <span className="text-yellow-300">{flightHours}h</span>
                 </div>
-              )}
-              
-              <div className="flex justify-between">
-                <span>Match:</span>
-                <span className="text-blue-400">{Math.round(recommendation.match_score)}%</span>
+                
+                {recommendation.estimated_flight_price && (
+                  <div className="flex justify-between">
+                    <span>Price:</span>
+                    <span className="text-green-400">{recommendation.estimated_flight_price}</span>
+                  </div>
+                )}
+                
+                <div className="flex justify-between">
+                  <span>Match:</span>
+                  <span className="text-blue-400">{Math.round(recommendation.match_score)}%</span>
+                </div>
+                
+                {recommendation.reason_for_recommendation && (
+                  <div className="mt-2 pt-2 border-t border-white/20 text-white/70">
+                    {recommendation.reason_for_recommendation}
+                  </div>
+                )}
               </div>
-              
-              {recommendation.reason_for_recommendation && (
-                <div className="mt-2 pt-2 border-t border-white/20 text-white/70">
-                  {recommendation.reason_for_recommendation}
-                </div>
-              )}
-            </div>
 
-            {/* Tooltip Arrow */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90"></div>
-          </div>
-        )}
+              {/* Tooltip Arrow */}
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90"></div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
 function CentralOriginCircle({ originAirport }: { originAirport: string }) {
   return (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-in fade-in zoom-in duration-500">
-      <div className="w-28 h-28 bg-gradient-to-br from-white/15 to-gray-300/10 border-2 border-white/60 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+    <motion.div 
+      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      initial={{ opacity: 0, scale: 0.3 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ 
+        duration: 0.6, 
+        ease: [0.34, 1.56, 0.64, 1] // Bouncy effect
+      }}
+    >
+      {/* Pulse ring effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full border-2 border-white/30"
+        animate={{
+          scale: [1, 1.4, 1.4],
+          opacity: [0.6, 0, 0],
+        }}
+        transition={{
+          duration: 2,
+          repeat: Infinity,
+          ease: 'easeOut',
+        }}
+      />
+      
+      <motion.div 
+        className="w-28 h-28 bg-gradient-to-br from-white/15 to-gray-300/10 border-2 border-white/60 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg"
+        whileHover={{
+          scale: 1.05,
+          boxShadow: '0 0 40px rgba(255, 255, 255, 0.3)',
+        }}
+        transition={{ duration: 0.2 }}
+      >
         <div className="text-center">
           <div className="text-white/80 text-xs mb-1 font-medium">Country of</div>
           <div className="text-white font-bold text-base">Origin</div>
-          <div className="text-yellow-300 text-sm mt-1 font-semibold">{originAirport}</div>
+          <motion.div 
+            className="text-yellow-300 text-sm mt-1 font-semibold"
+            animate={{ opacity: [0.8, 1, 0.8] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            {originAirport}
+          </motion.div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -160,49 +243,113 @@ export function CountryConstellation({ originAirport, recommendations, onCountry
 
   const positions = getConstellationPositions(recommendations.length)
 
+  // Generate background stars
+  const stars = useMemo(() => 
+    Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      delay: Math.random() * 3,
+      duration: Math.random() * 2 + 2,
+    })),
+  [])
+
   // Show loading or empty state instead of null
   if (recommendations.length === 0) {
     return (
-      <div className="relative w-full h-full min-h-96 flex items-center justify-center">
+      <motion.div 
+        className="relative w-full h-full min-h-96 flex items-center justify-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="text-center text-white/60">
           <div className="text-lg mb-2">No destinations found</div>
           <div className="text-sm">Try adjusting your search criteria</div>
         </div>
-      </div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="relative w-full h-full min-h-96">
+    <motion.div 
+      className="relative w-full h-full min-h-96 overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Animated Background Stars */}
+      <div className="absolute inset-0 pointer-events-none">
+        {stars.map((star) => (
+          <motion.div
+            key={star.id}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${star.x}%`,
+              top: `${star.y}%`,
+              width: star.size,
+              height: star.size,
+            }}
+            animate={{
+              opacity: [0.2, 0.7, 0.2],
+              scale: [1, 1.3, 1],
+            }}
+            transition={{
+              duration: star.duration,
+              delay: star.delay,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+
       {/* Header */}
-      <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10">
+      <motion.div 
+        className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <h3 className="text-white text-base font-medium text-center tracking-wide">
           FIND FLIGHTS TO YOUR COUNTRY OF DESTINATION
         </h3>
         <p className="text-white/60 text-xs text-center mt-2 tracking-wider">
           Hover over countries to see flight details
         </p>
-      </div>
+      </motion.div>
 
       {/* Central Origin Circle */}
       <CentralOriginCircle originAirport={originAirport} />
 
       {/* Destination Country Circles */}
-      {recommendations.map((recommendation, index) => (
-        <CountryCircle
-          key={`${recommendation.destination.airport_code}-${index}`}
-          recommendation={recommendation}
-          position={positions[index]}
-          onClick={() => onCountryClick?.(recommendation)}
-        />
-      ))}
+      <AnimatePresence>
+        {recommendations.map((recommendation, index) => (
+          <CountryCircle
+            key={`${recommendation.destination.airport_code}-${index}`}
+            recommendation={recommendation}
+            position={positions[index]}
+            onClick={() => onCountryClick?.(recommendation)}
+          />
+        ))}
+      </AnimatePresence>
 
       {/* Results Summary */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="bg-black/40 backdrop-blur-sm text-white/80 px-6 py-2 rounded-full text-xs tracking-wide font-medium">
+      <motion.div 
+        className="absolute bottom-6 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <motion.div 
+          className="bg-black/40 backdrop-blur-sm text-white/80 px-6 py-2 rounded-full text-xs tracking-wide font-medium"
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.2 }}
+        >
           {recommendations.length} DESTINATION{recommendations.length !== 1 ? 'S' : ''} FOUND
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </motion.div>
   )
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { motion, AnimatePresence } from 'motion/react'
 import { CityCard, type CityOption } from './CityCard'
 import { LoadingSkeleton } from '../LoadingSkeleton'
 
@@ -63,15 +64,23 @@ export function CityGrid({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {cities.map((city) => (
-        <CityCard
-          key={city.id}
-          city={city}
-          selectedTheme={selectedTheme}
-          onClick={() => onCitySelect(city)}
-        />
-      ))}
-    </div>
+    <motion.div 
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <AnimatePresence mode="popLayout">
+        {cities.map((city, index) => (
+          <CityCard
+            key={city.id}
+            city={city}
+            selectedTheme={selectedTheme}
+            onClick={() => onCitySelect(city)}
+            index={index}
+          />
+        ))}
+      </AnimatePresence>
+    </motion.div>
   )
 }

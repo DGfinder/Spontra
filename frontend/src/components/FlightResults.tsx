@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin, TrendingDown, TrendingUp, Wifi, Monitor, Utensils, Zap, Luggage } from 'lucide-react'
 import { ExplorationProgress } from './ExplorationProgress'
 import { ErrorState } from './ErrorState'
@@ -92,12 +93,21 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
   }
 
   return (
-    <div
-      className={`relative group cursor-pointer transition-all duration-500 transform hover:scale-105 ${
-        isSelected ? 'scale-105 ring-2 ring-yellow-400' : ''
+    <motion.div
+      className={`relative group cursor-pointer ${
+        isSelected ? 'ring-2 ring-yellow-400' : ''
       }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ 
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.98 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       onClick={onClick}
     >
       {/* Main Flight Card */}
@@ -210,14 +220,29 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
         </div>
 
         {/* Hover Effects */}
-        {isHovered && (
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-orange-500/10 rounded-2xl border border-yellow-400/40 transition-all duration-300" />
-        )}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div 
+              className="absolute inset-0 bg-gradient-to-br from-yellow-400/10 to-orange-500/10 rounded-2xl border border-yellow-400/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Expanded Details on Hover */}
-      {isHovered && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200 max-w-md">
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div 
+            className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg p-4 z-50 max-w-md"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.15 }}
+          >
           <div className="text-white text-sm space-y-3">
             <div className="flex justify-between">
               <span className="text-white/70">Confidence:</span>
@@ -280,9 +305,10 @@ function FlightCard({ flight, recommendation, selectedActivity, isSelected, onCl
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   )
 }
 
@@ -484,10 +510,60 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
 
           {/* Loading State */}
           {isLoading && (
-            <div className="flex items-center justify-center h-64">
+            <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <div className="animate-spin w-8 h-8 border-2 border-yellow-400 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-white/80">Searching real-time flight prices...</p>
+                <div className="relative w-48 h-16 mx-auto mb-6">
+                  {/* Flight path line */}
+                  <motion.div
+                    className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  
+                  {/* Animated airplane */}
+                  <motion.div
+                    className="absolute top-1/2 -translate-y-1/2 text-3xl"
+                    animate={{
+                      x: [0, 180, 0],
+                      y: [0, -12, 0, -8, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                  >
+                    ✈️
+                  </motion.div>
+                </div>
+                
+                {/* Pulsing dots */}
+                <div className="flex justify-center gap-1 mb-4">
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      className="w-2 h-2 rounded-full bg-yellow-400"
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.5, 1, 0.5],
+                      }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        delay: i * 0.2,
+                      }}
+                    />
+                  ))}
+                </div>
+                
+                <motion.p
+                  className="text-white/80 text-lg"
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  Searching real-time flight prices...
+                </motion.p>
                 <p className="text-white/50 text-sm mt-2">Getting live availability and pricing from airlines</p>
               </div>
             </div>
@@ -495,18 +571,36 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
 
           {/* Flight Options Grid */}
           {!isLoading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-              {flights.map((flight) => (
-                <FlightCard
-                  key={flight.id}
-                  flight={flight}
-                  recommendation={recommendation}
-                  selectedActivity={selectedActivity}
-                  isSelected={selectedFlight?.id === flight.id}
-                  onClick={() => handleFlightSelect(flight)}
-                />
-              ))}
-            </div>
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {flights.map((flight, index) => (
+                  <motion.div
+                    key={flight.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ 
+                      duration: 0.35, 
+                      delay: index * 0.08,
+                      ease: [0.25, 0.46, 0.45, 0.94]
+                    }}
+                  >
+                    <FlightCard
+                      flight={flight}
+                      recommendation={recommendation}
+                      selectedActivity={selectedActivity}
+                      isSelected={selectedFlight?.id === flight.id}
+                      onClick={() => handleFlightSelect(flight)}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           )}
 
           {/* Error State */}
