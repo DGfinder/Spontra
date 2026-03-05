@@ -27,9 +27,8 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   const csp = [
     "default-src 'self'",
     // Script sources - nonce-based for production security
-    isDevelopment 
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://js.sentry-cdn.com"
-      : "script-src 'self' https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://js.sentry-cdn.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vitals.vercel-analytics.com https://va.vercel-scripts.com https://js.sentry-cdn.com https://vercel.live blob:",
+    "worker-src 'self' blob:",
     // Style sources - allow inline styles for Tailwind and libraries
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     // Image sources - comprehensive allowlist
@@ -62,8 +61,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
     'usb=()',
     'magnetometer=()',
     'gyroscope=()',
-    'speaker=()',
-    'vibrate=()',
+
     'fullscreen=(self)',
     'sync-xhr=()'
   ].join(', '))
