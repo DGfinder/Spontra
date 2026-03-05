@@ -72,24 +72,24 @@ export async function GET(req: NextRequest) {
         rm."sourceUrl" as source_url,
         rm.credit,
         rm."altText" as alt_text,
-        COALESCE(d."cityName", a.city, r.iata) as city_name,
-        COALESCE(d."countryName", a.country, 'Unknown') as country_name,
-        COALESCE(d."countryCode", a."countryCode", 'XX') as country_code,
-        fr."totalDurationMinutes" as flight_duration_minutes,
+        COALESCE(d.city_name, a.city, r.iata) as city_name,
+        COALESCE(a.country, 'Unknown') as country_name,
+        'XX' as country_code,
+        fr.total_duration_minutes as flight_duration_minutes,
         NULL::numeric as estimated_price
       FROM "Reel" r
       INNER JOIN "ReelMedia" rm ON rm."reelId" = r.id AND rm."isActive" = true
-      LEFT JOIN destinations d ON d."airportCode" = r.iata
-      LEFT JOIN airports a ON a."iataCode" = r.iata
-      LEFT JOIN flight_routes fr ON fr."originAirportCode" = ${origin} AND fr."destinationAirportCode" = r.iata
+      LEFT JOIN destinations d ON d.airport_code = r.iata
+      LEFT JOIN airports a ON a.iata_code = r.iata
+      LEFT JOIN flight_routes fr ON fr.origin_airport_code = ${origin} AND fr.destination_airport_code = r.iata
       WHERE r."isActive" = true
         AND r."themeSlug" = ${theme}
         AND (
-          fr."totalDurationMinutes" IS NULL 
-          OR (fr."totalDurationMinutes" >= ${minFlightMinutes} AND fr."totalDurationMinutes" <= ${maxFlightMinutes})
+          fr.total_duration_minutes IS NULL 
+          OR (fr.total_duration_minutes >= ${minFlightMinutes} AND fr.total_duration_minutes <= ${maxFlightMinutes})
         )
       ORDER BY 
-        fr."totalDurationMinutes" ASC NULLS LAST,
+        fr.total_duration_minutes ASC NULLS LAST,
         r."sortOrder" ASC,
         r."createdAt" DESC
       LIMIT ${limit}

@@ -6,23 +6,23 @@ export const THEME_COLORS = {
     name: 'Adventure'
   },
   vibe: {
-    primary: 'rgb(147, 51, 234)', // Purple (social energy)
-    hover: 'rgb(168, 85, 247)',
+    primary: 'rgb(249, 115, 22)', // Orange
+    hover: 'rgb(234, 88, 12)',
     name: 'Vibe'
   },
   nature: {
-    primary: 'rgb(2, 192, 109)', // Green
-    hover: 'rgb(12, 202, 119)',
+    primary: 'rgb(34, 197, 94)', // Green
+    hover: 'rgb(22, 163, 74)',
     name: 'Nature'
   },
   indulge: {
-    primary: 'rgb(217, 119, 6)', // Amber (luxury/wellness)
-    hover: 'rgb(245, 158, 11)',
+    primary: 'rgb(239, 68, 68)', // Red
+    hover: 'rgb(220, 38, 38)',
     name: 'Indulge'
   },
   discover: {
-    primary: 'rgb(59, 130, 246)', // Blue (cultural/culinary)
-    hover: 'rgb(99, 102, 241)',
+    primary: 'rgb(147, 51, 234)', // Purple
+    hover: 'rgb(126, 34, 206)',
     name: 'Discover'
   }
 } as const
@@ -135,12 +135,12 @@ export const THEME_TAILWIND_CLASSES = {
     ring: 'ring-yellow-500'
   },
   vibe: {
-    bg: 'bg-purple-600',
-    bgHover: 'bg-purple-700',
-    text: 'text-purple-600',
-    textHover: 'text-purple-700',
-    border: 'border-purple-600',
-    ring: 'ring-purple-600'
+    bg: 'bg-orange-500',
+    bgHover: 'bg-orange-600',
+    text: 'text-orange-500',
+    textHover: 'text-orange-600',
+    border: 'border-orange-500',
+    ring: 'ring-orange-500'
   },
   nature: {
     bg: 'bg-green-500',
@@ -151,20 +151,20 @@ export const THEME_TAILWIND_CLASSES = {
     ring: 'ring-green-500'
   },
   indulge: {
-    bg: 'bg-amber-600',
-    bgHover: 'bg-amber-700',
-    text: 'text-amber-600',
-    textHover: 'text-amber-700',
-    border: 'border-amber-600',
-    ring: 'ring-amber-600'
+    bg: 'bg-red-500',
+    bgHover: 'bg-red-600',
+    text: 'text-red-500',
+    textHover: 'text-red-600',
+    border: 'border-red-500',
+    ring: 'ring-red-500'
   },
   discover: {
-    bg: 'bg-blue-500',
-    bgHover: 'bg-blue-600',
-    text: 'text-blue-500',
-    textHover: 'text-blue-600',
-    border: 'border-blue-500',
-    ring: 'ring-blue-500'
+    bg: 'bg-purple-600',
+    bgHover: 'bg-purple-700',
+    text: 'text-purple-600',
+    textHover: 'text-purple-700',
+    border: 'border-purple-600',
+    ring: 'ring-purple-600'
   }
 } as const
 

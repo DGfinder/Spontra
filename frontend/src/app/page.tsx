@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { LandingPageFormModern } from '@/components/LandingPageFormModern'
 import { cacheGet } from '@/lib/cacheServer'
+import { config } from '@/lib/config'
 import type { Metadata } from 'next'
 
 // Force dynamic rendering - page has client interactivity
@@ -18,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Discover amazing destinations with AI-powered flight search',
       type: 'website' as const,
       siteName: 'Spontra',
+      url: config.appUrl,
     },
     twitter: {
       card: 'summary_large_image' as const,

@@ -18,6 +18,7 @@ const mulish = Mulish({
 })
 
 // Metadata moved to page.tsx since client components can't export metadata
+// Smart App Banner — once app is live on App Store, update the app-id below
 
 export default function RootLayout({
   children,
@@ -26,6 +27,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
+      <head>
+        {/* iOS Smart App Banner — shows "Open in Spontra" on Safari mobile */}
+        {/* TODO: update app-id once App Store listing is live */}
+        <meta name="apple-itunes-app" content="app-id=PLACEHOLDER, app-argument=spontra://" />
+      </head>
       <body className={`${inter.className} ${mulish.variable} h-full`}>
         <ErrorBoundary 
           onError={(error, errorInfo) => {

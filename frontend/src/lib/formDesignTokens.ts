@@ -42,9 +42,9 @@ export const getThemeFocusRing = (theme: string) => {
   const themeColors: Record<string, string> = {
     adventure: '#f97316',
     nature: '#10b981',
-    indulge: '#d946ef',
-    vibe: '#ec4899',
-    discover: '#06b6d4',
+    indulge: '#ef4444',
+    vibe: '#f97316',
+    discover: '#9333ea',
   }
   const fallback = '#60a5fa'
   return {

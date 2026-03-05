@@ -88,10 +88,10 @@ const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
     // Theme-based variants (when using theme prop)
     const themeStyles = {
       adventure: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
-      vibe: 'bg-purple-600/20 text-purple-300 border border-purple-600/30',
+      vibe: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
       nature: 'bg-green-500/20 text-green-300 border border-green-500/30',
-      indulge: 'bg-amber-600/20 text-amber-300 border border-amber-600/30',
-      discover: 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+      indulge: 'bg-red-500/20 text-red-300 border border-red-500/30',
+      discover: 'bg-purple-600/20 text-purple-300 border border-purple-600/30'
     }
 
     // Use theme styles if theme is provided and variant is default

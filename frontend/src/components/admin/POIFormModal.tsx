@@ -37,10 +37,10 @@ interface POIFormModalProps {
 }
 
 const themeConfig = {
-  vibe: { icon: Zap, color: 'purple', label: 'City Vibe' },
+  vibe: { icon: Zap, color: 'orange', label: 'City Vibe' },
   adventure: { icon: Mountain, color: 'orange', label: 'Adventure' },
-  discover: { icon: Compass, color: 'blue', label: 'Discovery' },
-  indulge: { icon: Coffee, color: 'amber', label: 'Indulgence' },
+  discover: { icon: Compass, color: 'purple', label: 'Discovery' },
+  indulge: { icon: Coffee, color: 'red', label: 'Indulgence' },
   nature: { icon: TreePine, color: 'green', label: 'Nature' }
 }
 

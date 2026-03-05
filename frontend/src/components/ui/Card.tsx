@@ -346,10 +346,10 @@ const CardAction = forwardRef<HTMLDivElement, CardActionProps>(
     
     const themeColors = {
       adventure: 'yellow',
-      vibe: 'purple',
+      vibe: 'orange',
       nature: 'green',
-      indulge: 'amber',
-      discover: 'blue'
+      indulge: 'red',
+      discover: 'purple'
     }
     
     const colorName = themeColors[validTheme] || 'blue'

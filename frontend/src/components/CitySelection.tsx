@@ -63,7 +63,7 @@ function CityCard({ city, selectedTheme, onClick }: CityCardProps) {
       case 'adventure': return 'text-orange-400'
       case 'discover':
       case 'culture': return 'text-blue-400'
-      case 'indulge': return 'text-amber-400'
+      case 'indulge': return 'text-red-400'
       case 'nature': return 'text-emerald-400'
       case 'food': return 'text-green-400'
       default: return 'text-yellow-400'
@@ -367,9 +367,9 @@ export function CitySelection({ country, originAirport, selectedTheme, onBack, o
     switch (selectedTheme) {
       case 'adventure': return 'from-orange-900 via-amber-900 to-slate-900'
       case 'nature': return 'from-green-900 via-teal-900 to-slate-900'
-      case 'indulge': return 'from-amber-900 via-orange-900 to-slate-900'
-      case 'vibe': return 'from-purple-900 via-pink-900 to-slate-900'
-      case 'discover': return 'from-blue-900 via-indigo-900 to-slate-900'
+      case 'indulge': return 'from-red-900 via-rose-900 to-slate-900'
+      case 'vibe': return 'from-orange-900 via-amber-900 to-slate-900'
+      case 'discover': return 'from-purple-900 via-violet-900 to-slate-900'
       case 'nightlife': return 'from-purple-900 via-pink-900 to-slate-900'
       case 'culture': return 'from-blue-900 via-indigo-900 to-slate-900'
       case 'food': return 'from-green-900 via-emerald-900 to-slate-900'
