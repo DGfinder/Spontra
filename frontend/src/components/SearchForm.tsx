@@ -195,14 +195,17 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                           'flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-semibold transition-all duration-200 shadow-sm',
                           selected
                             ? 'text-slate-900 shadow-[0_18px_38px_rgba(0,0,0,0.45)]'
-                            : 'text-white/80 border-white/15 bg-white/[0.05] hover:border-white/30 hover:text-white',
+                            : 'hover:brightness-110 hover:scale-105',
                         )}
-                        style={selected ? { backgroundColor: chipColor, borderColor: chipColor } : undefined}
+                        style={selected
+                          ? { backgroundColor: chipColor, borderColor: chipColor }
+                          : { backgroundColor: `${chipColor}22`, borderColor: `${chipColor}55`, color: chipColor }
+                        }
                         role="radio"
                         aria-checked={selected}
                         aria-label={`Select ${theme.label} theme`}
                       >
-                        <Icon className={cn('h-5 w-5', selected ? 'text-slate-900/80' : 'text-white/70')} />
+                        <Icon className="h-5 w-5" style={{ color: selected ? 'rgba(0,0,0,0.7)' : chipColor }} />
                         <span className="whitespace-nowrap">{theme.label}</span>
                       </button>
                     )
@@ -408,31 +411,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                       Flight duration
                     </span>
                     
-                    {/* Direct flights toggle */}
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/50 group-hover:text-white/70 transition-colors">
-                        Direct only
-                      </span>
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={formValues.directFlightsOnly || false}
-                        onClick={() => setValue('directFlightsOnly', !formValues.directFlightsOnly)}
-                        className={cn(
-                          'relative h-5 w-9 rounded-full transition-colors duration-200',
-                          formValues.directFlightsOnly 
-                            ? 'bg-gradient-to-r from-emerald-500 to-emerald-400' 
-                            : 'bg-white/20 hover:bg-white/30'
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            'absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200',
-                            formValues.directFlightsOnly ? 'translate-x-4' : 'translate-x-0.5'
-                          )}
-                        />
-                      </button>
-                    </label>
+                    {/* Direct only — advanced option, hidden from main form */}
                   </div>
 
                   <FlightTimeSlider
@@ -473,7 +452,7 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
               className={cn(
                 'flex h-12 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold uppercase tracking-[0.28em]',
                 'transition-all duration-200 shadow-[0_18px_48px_rgba(0,0,0,0.45)]',
-                canSubmit ? 'text-slate-900 hover:brightness-110 active:scale-[0.99]' : 'cursor-not-allowed opacity-60 text-slate-200',
+                canSubmit ? 'text-slate-900 hover:brightness-110 active:scale-[0.99]' : 'text-slate-900 opacity-75 hover:brightness-110',
               )}
               style={{
                 background: `linear-gradient(135deg, ${themeColor} 0%, ${themeHover} 100%)`,
