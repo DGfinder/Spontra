@@ -279,15 +279,24 @@ export function LandingPageForm() {
 
   return (
     <div 
-      className="h-screen w-full bg-cover bg-center bg-no-repeat relative overflow-hidden"
-      style={{ 
-        backgroundImage: `url('${currentTheme.background}')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center center',
-        height: '100vh',
-        width: '100vw'
-      }}
+      className="h-screen w-full relative overflow-hidden"
+      style={{ height: '100vh', width: '100vw' }}
     >
+      {/* Crossfading background layers — one per theme, opacity transition */}
+      {THEMES.map(theme => (
+        <div
+          key={theme.id}
+          style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: `url('${theme.background}')`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            opacity: currentTheme.id === theme.id ? 1 : 0,
+            transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            zIndex: 0,
+          }}
+        />
+      ))}
       {/* Network Status Monitor */}
       <NetworkStatus onRetry={handleRetrySearch} />
       {/* Header - Mobile Responsive */}

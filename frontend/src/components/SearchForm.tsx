@@ -192,20 +192,31 @@ export const SearchForm = React.memo<SearchFormProps>(({ themes, onSubmit, isLoa
                         type="button"
                         onClick={() => setValue('selectedTheme', theme.id)}
                         className={cn(
-                          'flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-semibold transition-all duration-200 shadow-sm',
+                          'flex items-center gap-2.5 rounded-full px-4 py-2.5 text-[13px] font-semibold tracking-wide transition-all duration-300 ease-out',
                           selected
-                            ? 'text-slate-900 shadow-[0_18px_38px_rgba(0,0,0,0.45)]'
-                            : 'hover:brightness-110 hover:scale-105',
+                            ? 'text-black shadow-lg scale-105'
+                            : 'text-white/80 hover:text-white hover:scale-[1.03]',
                         )}
                         style={selected
-                          ? { backgroundColor: chipColor, borderColor: chipColor }
-                          : { backgroundColor: `${chipColor}22`, borderColor: `${chipColor}55`, color: chipColor }
+                          ? {
+                              backgroundColor: chipColor,
+                              boxShadow: `0 4px 20px ${chipColor}66`,
+                              border: 'none',
+                            }
+                          : {
+                              background: 'rgba(255,255,255,0.07)',
+                              border: '1px solid rgba(255,255,255,0.15)',
+                              backdropFilter: 'blur(8px)',
+                            }
                         }
                         role="radio"
                         aria-checked={selected}
                         aria-label={`Select ${theme.label} theme`}
                       >
-                        <Icon className="h-5 w-5" style={{ color: selected ? 'rgba(0,0,0,0.7)' : chipColor }} />
+                        <Icon
+                          className="h-4 w-4 shrink-0"
+                          style={{ color: selected ? 'rgba(0,0,0,0.65)' : chipColor }}
+                        />
                         <span className="whitespace-nowrap">{theme.label}</span>
                       </button>
                     )
