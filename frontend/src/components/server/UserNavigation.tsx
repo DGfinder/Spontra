@@ -41,7 +41,7 @@ export function UserNavigation() {
           </div>
         </div>
       ) : (
-        <Link href="/auth/login" className="hover:text-white transition-colors">
+        <Link href="/admin/login" className="hover:text-white transition-colors">
           Sign In
         </Link>
       )}

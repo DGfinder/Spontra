@@ -182,7 +182,7 @@ export function useRequireAuth() {
       // Redirect to login if not authenticated
       if (typeof window !== 'undefined') {
         const currentPath = window.location.pathname
-        window.location.href = `/auth/login?redirect=${encodeURIComponent(currentPath)}`
+        window.location.href = `/admin/login?redirect=${encodeURIComponent(currentPath)}`
       }
     }
   }, [isLoading, isAuthenticated])

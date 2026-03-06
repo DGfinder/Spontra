@@ -67,7 +67,7 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   ].join(', '))
   
   // Additional security headers
-  response.headers.set('Cross-Origin-Embedder-Policy', 'require-corp')
+  // Cross-Origin-Embedder-Policy removed — breaks Vercel tooling and third-party embeds
   response.headers.set('Cross-Origin-Opener-Policy', 'same-origin')
   response.headers.set('Cross-Origin-Resource-Policy', 'same-origin')
   
