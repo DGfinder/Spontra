@@ -1,32 +1,13 @@
 import { MetadataRoute } from 'next'
+import { config } from '@/lib/config'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://spontra.com'
+  const base = config.baseUrl
 
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/flights`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/creators`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/dashboard`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.5,
-    },
+    { url: base,                  lastModified: new Date(), changeFrequency: 'daily',  priority: 1 },
+    { url: `${base}/flights`,     lastModified: new Date(), changeFrequency: 'daily',  priority: 0.9 },
+    { url: `${base}/creators`,    lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${base}/dashboard`,   lastModified: new Date(), changeFrequency: 'weekly', priority: 0.5 },
   ]
 }

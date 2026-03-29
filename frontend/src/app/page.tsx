@@ -81,7 +81,7 @@ export default async function HomePage() {
       {/* Enhanced error boundary with Suspense for better UX */}
       <Suspense 
         fallback={
-          <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 flex items-center justify-center">
+          <div className="min-h-screen w-full bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin h-12 w-12 border-4 border-white/30 border-t-white rounded-full mx-auto mb-4"></div>
               <p className="text-white/80 text-lg font-muli">Loading your travel adventure...</p>

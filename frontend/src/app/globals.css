@@ -13,11 +13,30 @@
   
   body {
     @apply text-gray-900 antialiased;
+    font-family: var(--font-sans, 'DM Sans', sans-serif);
     height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    /* Subtle noise grain overlay for depth */
+    background-color: #f5f3f0;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
   }
   
   #__next {
@@ -29,20 +48,67 @@
 @layer components {
   @reference "tailwindcss";
   
+  /* Primary CTA — adventure orange */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    box-shadow: 0 2px 8px rgba(238, 109, 22, 0.25);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 4px 16px rgba(238, 109, 22, 0.35);
   }
   
+  /* Secondary — warm cream/sand tone */
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-secondary-100 hover:bg-secondary-200 active:bg-secondary-300 text-secondary-900 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    border: 1px solid rgba(var(--color-secondary-300, 188 176 154) / 0.5);
   }
   
+  /* Input fields — warm focus ring */
   .input-field {
-    @apply block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm;
+    @apply block w-full rounded-lg border-gray-300 shadow-sm sm:text-sm;
+    @apply focus:border-primary-500 focus:ring-primary-500;
   }
   
+  /* Cards — warm depth */
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-xl p-6;
+    border: 1px solid rgba(188, 176, 154, 0.3);
+    box-shadow: 
+      0 1px 3px rgba(20, 35, 56, 0.06),
+      0 4px 16px rgba(20, 35, 56, 0.08);
+  }
+
+  .card:hover {
+    box-shadow:
+      0 2px 6px rgba(20, 35, 56, 0.08),
+      0 8px 24px rgba(20, 35, 56, 0.12);
+    border-color: rgba(238, 109, 22, 0.2);
+  }
+
+  /* Warm gradient hero mesh */
+  .hero-gradient {
+    background: 
+      radial-gradient(ellipse 80% 60% at 20% 30%, rgba(238, 109, 22, 0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 70%, rgba(241, 139, 60, 0.08) 0%, transparent 50%),
+      linear-gradient(160deg, #0c1623 0%, #142338 40%, #1f3550 100%);
+  }
+
+  /* Noise texture utility */
+  .texture-noise {
+    position: relative;
+  }
+
+  .texture-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
   }
 
   /* Mobile-friendly background handling */

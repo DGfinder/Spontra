@@ -1,0 +1,51 @@
+name: Spontra
+options:
+  bundleIdPrefix: com.spontra
+  deploymentTarget:
+    iOS: "17.0"
+  xcodeVersion: "16"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    ENABLE_PREVIEWS: "YES"
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  Spontra:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - path: Spontra
+        excludes:
+          - "**/*.md"
+    info:
+      path: Spontra/Info.plist
+      properties:
+        CFBundleDisplayName: Spontra
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchStoryboardName: LaunchScreen
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIUserInterfaceStyle: Dark
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+          NSExceptionDomains:
+            localhost:
+              NSExceptionAllowsInsecureHTTPLoads: true
+        NSCameraUsageDescription: "Not used"
+        NSMicrophoneUsageDescription: "Not used"
+        NSUserNotificationsUsageDescription: "Spontra uses notifications for price alerts on saved destinations."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.spontra.app
+        INFOPLIST_FILE: Spontra/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_EMIT_LOC_STRINGS: YES

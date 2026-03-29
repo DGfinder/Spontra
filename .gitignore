@@ -170,3 +170,5 @@ debug_*.*
 .vercel/
 .netlify/
 .firebase/
+.vercel
+.env*.local

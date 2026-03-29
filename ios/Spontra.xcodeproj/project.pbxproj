@@ -1,0 +1,500 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03AAC1DCD02DE52CFA4C9C24 /* SpontraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D1AA3A67AC0A2E249A6B4E5 /* SpontraApp.swift */; };
+		07BED372C8C2764044C0A813 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E9DDA0991F3AF440624B436 /* VideoPlayerView.swift */; };
+		0D536C69FFEF60953E84A73B /* SavedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A95D5B3E466A3174DC741A3 /* SavedView.swift */; };
+		19DDE727437E4C3942CEB006 /* SavedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFE91B1ABBDDF464A0FD79C3 /* SavedStore.swift */; };
+		235CB4655941A8D9DA7363A7 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5933BCF116D2505028AB1F09 /* AppState.swift */; };
+		2E921DC8A0FF7B00683B717F /* FlightOfferCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFDAA07B18845E333B4652FE /* FlightOfferCard.swift */; };
+		467C4C2ED8CEECF6024F295F /* ThemePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E8931C4DCE13BB8AA7098A /* ThemePickerView.swift */; };
+		5108252AC3C128E992470AB7 /* DurationPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 664B51D7014EB2A3861B3C62 /* DurationPickerView.swift */; };
+		64402DFC764FAC05DE3CDA8C /* Color+Spontra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A4D4014025966264EA1F2A3 /* Color+Spontra.swift */; };
+		7461029286B081F2F936A868 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F2E7DF8B9D01411FDB8B174 /* HomeView.swift */; };
+		7948F84DE77735C02C3FDD80 /* SwipeHintOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7029BBF4D94FBA5D62C82DA8 /* SwipeHintOverlay.swift */; };
+		7C4D1CE7A4CE2EA692045B7E /* FeedLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BDFDB6E376BC6CB144A8630 /* FeedLoadingView.swift */; };
+		7EEAADB83BA9EC03D9888B30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24040F5D6AD192169265089F /* ContentView.swift */; };
+		7F47E1BCC57E65E648B98791 /* FlightModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899AA259363D0836291ED917 /* FlightModels.swift */; };
+		81C512FC774B3CD20221A477 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C26341EA5F550FDD53EE1A9C /* Assets.xcassets */; };
+		87EAF81C120D7284A1CD921C /* DestinationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88EB6DA69AAE5CADF221BF7B /* DestinationView.swift */; };
+		887AC83C35EB54EADA45B1E5 /* LikeAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0CEA2ADF48E7B6D45F8B17 /* LikeAnimation.swift */; };
+		89E4E380A5811CFA12FE81F6 /* FlexibleDatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDF67C4223731D6A8C8D0B29 /* FlexibleDatesView.swift */; };
+		8DD8E1D4B0780E80B38F2C09 /* PriceAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2DEB9B1825884C1C041A523 /* PriceAlertView.swift */; };
+		95DA91259C546EA700F1CBC4 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B906266BD38CD8A00CFC756 /* Models.swift */; };
+		A9407E7A836A08CA7CDF8CBA /* FlightSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E225561253B95469D71B7A8 /* FlightSearchSheet.swift */; };
+		C52B49D92A1D1FF9A288E501 /* DestinationCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85A23050675D4F1D0A549788 /* DestinationCard.swift */; };
+		D17937A93B6BA4B56053307C /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5305F08F41AAC163D2B6B523 /* FeedView.swift */; };
+		DCCDD02B7E56677CFD811BDE /* SpontraAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1989B79D08E8B50C19554E /* SpontraAPI.swift */; };
+		ECC891ECDD5284BADECFE2B5 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF173AFD80A4B481B2CEC69 /* Theme.swift */; };
+		F8601E7DEC183205AADB4F37 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562C31E5BC6FD79F9A351221 /* OnboardingView.swift */; };
+		FD7F23FA400278F8BCA50F1F /* AirportSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A135ACFA14A19598CD02353 /* AirportSearchView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		24040F5D6AD192169265089F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		2A4D4014025966264EA1F2A3 /* Color+Spontra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Spontra.swift"; sourceTree = "<group>"; };
+		3A95D5B3E466A3174DC741A3 /* SavedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedView.swift; sourceTree = "<group>"; };
+		3AD8FBC9E8E410AFF41987E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3D1AA3A67AC0A2E249A6B4E5 /* SpontraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpontraApp.swift; sourceTree = "<group>"; };
+		5305F08F41AAC163D2B6B523 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
+		562C31E5BC6FD79F9A351221 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		5933BCF116D2505028AB1F09 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		5A135ACFA14A19598CD02353 /* AirportSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirportSearchView.swift; sourceTree = "<group>"; };
+		664B51D7014EB2A3861B3C62 /* DurationPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DurationPickerView.swift; sourceTree = "<group>"; };
+		6F2E7DF8B9D01411FDB8B174 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		7029BBF4D94FBA5D62C82DA8 /* SwipeHintOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeHintOverlay.swift; sourceTree = "<group>"; };
+		7EF173AFD80A4B481B2CEC69 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		85A23050675D4F1D0A549788 /* DestinationCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationCard.swift; sourceTree = "<group>"; };
+		88EB6DA69AAE5CADF221BF7B /* DestinationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DestinationView.swift; sourceTree = "<group>"; };
+		899AA259363D0836291ED917 /* FlightModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightModels.swift; sourceTree = "<group>"; };
+		8E225561253B95469D71B7A8 /* FlightSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightSearchSheet.swift; sourceTree = "<group>"; };
+		8E9DDA0991F3AF440624B436 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		9B906266BD38CD8A00CFC756 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		9BDFDB6E376BC6CB144A8630 /* FeedLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoadingView.swift; sourceTree = "<group>"; };
+		AFDAA07B18845E333B4652FE /* FlightOfferCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlightOfferCard.swift; sourceTree = "<group>"; };
+		BF0CEA2ADF48E7B6D45F8B17 /* LikeAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikeAnimation.swift; sourceTree = "<group>"; };
+		C26341EA5F550FDD53EE1A9C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F020C0EE3FEA4B24863758D9 /* Spontra.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Spontra.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1E8931C4DCE13BB8AA7098A /* ThemePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePickerView.swift; sourceTree = "<group>"; };
+		F2DEB9B1825884C1C041A523 /* PriceAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertView.swift; sourceTree = "<group>"; };
+		FC1989B79D08E8B50C19554E /* SpontraAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpontraAPI.swift; sourceTree = "<group>"; };
+		FDF67C4223731D6A8C8D0B29 /* FlexibleDatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlexibleDatesView.swift; sourceTree = "<group>"; };
+		FFE91B1ABBDDF464A0FD79C3 /* SavedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0F668CF2869ADE77DD09606F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				85DF859586FEAC052B849C9C /* Destination */,
+				7B1410AB97F6D461463FA47D /* Feed */,
+				6FF106617F8B562FF6490393 /* Flights */,
+				C34AD472E87DCC5480F50582 /* Home */,
+				42B36BDA3F1582727583DCCB /* Onboarding */,
+				8DDBD81BF44C5937E0F8CA17 /* Saved */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		1CB01464FE39C9610CC2CFA0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				899AA259363D0836291ED917 /* FlightModels.swift */,
+				9B906266BD38CD8A00CFC756 /* Models.swift */,
+				7EF173AFD80A4B481B2CEC69 /* Theme.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		229EACDA27E7624B3B76BBFE /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				5933BCF116D2505028AB1F09 /* AppState.swift */,
+				FFE91B1ABBDDF464A0FD79C3 /* SavedStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		42B36BDA3F1582727583DCCB /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				562C31E5BC6FD79F9A351221 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		4EE496D4C2206879DC61E612 /* Spontra */ = {
+			isa = PBXGroup;
+			children = (
+				607131E22A3FCAC42EBF341E /* Extensions */,
+				1CB01464FE39C9610CC2CFA0 /* Models */,
+				FAAD109F1CCA286F9EC6497E /* Services */,
+				229EACDA27E7624B3B76BBFE /* Store */,
+				0F668CF2869ADE77DD09606F /* Views */,
+				C26341EA5F550FDD53EE1A9C /* Assets.xcassets */,
+				24040F5D6AD192169265089F /* ContentView.swift */,
+				3AD8FBC9E8E410AFF41987E0 /* Info.plist */,
+				3D1AA3A67AC0A2E249A6B4E5 /* SpontraApp.swift */,
+			);
+			path = Spontra;
+			sourceTree = "<group>";
+		};
+		607131E22A3FCAC42EBF341E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				2A4D4014025966264EA1F2A3 /* Color+Spontra.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		6FF106617F8B562FF6490393 /* Flights */ = {
+			isa = PBXGroup;
+			children = (
+				FDF67C4223731D6A8C8D0B29 /* FlexibleDatesView.swift */,
+				AFDAA07B18845E333B4652FE /* FlightOfferCard.swift */,
+				8E225561253B95469D71B7A8 /* FlightSearchSheet.swift */,
+				F2DEB9B1825884C1C041A523 /* PriceAlertView.swift */,
+			);
+			path = Flights;
+			sourceTree = "<group>";
+		};
+		7B1410AB97F6D461463FA47D /* Feed */ = {
+			isa = PBXGroup;
+			children = (
+				85A23050675D4F1D0A549788 /* DestinationCard.swift */,
+				9BDFDB6E376BC6CB144A8630 /* FeedLoadingView.swift */,
+				5305F08F41AAC163D2B6B523 /* FeedView.swift */,
+				BF0CEA2ADF48E7B6D45F8B17 /* LikeAnimation.swift */,
+				7029BBF4D94FBA5D62C82DA8 /* SwipeHintOverlay.swift */,
+				8E9DDA0991F3AF440624B436 /* VideoPlayerView.swift */,
+			);
+			path = Feed;
+			sourceTree = "<group>";
+		};
+		7F1044840B4968C4ABC9A7D6 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F020C0EE3FEA4B24863758D9 /* Spontra.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85DF859586FEAC052B849C9C /* Destination */ = {
+			isa = PBXGroup;
+			children = (
+				88EB6DA69AAE5CADF221BF7B /* DestinationView.swift */,
+			);
+			path = Destination;
+			sourceTree = "<group>";
+		};
+		8DDBD81BF44C5937E0F8CA17 /* Saved */ = {
+			isa = PBXGroup;
+			children = (
+				3A95D5B3E466A3174DC741A3 /* SavedView.swift */,
+			);
+			path = Saved;
+			sourceTree = "<group>";
+		};
+		C34AD472E87DCC5480F50582 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				5A135ACFA14A19598CD02353 /* AirportSearchView.swift */,
+				664B51D7014EB2A3861B3C62 /* DurationPickerView.swift */,
+				6F2E7DF8B9D01411FDB8B174 /* HomeView.swift */,
+				F1E8931C4DCE13BB8AA7098A /* ThemePickerView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		EA361C770B59D76EB151990B = {
+			isa = PBXGroup;
+			children = (
+				4EE496D4C2206879DC61E612 /* Spontra */,
+				7F1044840B4968C4ABC9A7D6 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FAAD109F1CCA286F9EC6497E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FC1989B79D08E8B50C19554E /* SpontraAPI.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C81ABA20F9AEACA4970F0D9F /* Spontra */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C491E56B0B3F0221F688F152 /* Build configuration list for PBXNativeTarget "Spontra" */;
+			buildPhases = (
+				28E94123A696A83190A34A7F /* Sources */,
+				0E85101801CE6AE3F5804EA6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Spontra;
+			packageProductDependencies = (
+			);
+			productName = Spontra;
+			productReference = F020C0EE3FEA4B24863758D9 /* Spontra.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0ADB696B7D45F0D39D499DA0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					C81ABA20F9AEACA4970F0D9F = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = 559B60BB75EF72C6B47EF754 /* Build configuration list for PBXProject "Spontra" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = EA361C770B59D76EB151990B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7F1044840B4968C4ABC9A7D6 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C81ABA20F9AEACA4970F0D9F /* Spontra */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0E85101801CE6AE3F5804EA6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				81C512FC774B3CD20221A477 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		28E94123A696A83190A34A7F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD7F23FA400278F8BCA50F1F /* AirportSearchView.swift in Sources */,
+				235CB4655941A8D9DA7363A7 /* AppState.swift in Sources */,
+				64402DFC764FAC05DE3CDA8C /* Color+Spontra.swift in Sources */,
+				7EEAADB83BA9EC03D9888B30 /* ContentView.swift in Sources */,
+				C52B49D92A1D1FF9A288E501 /* DestinationCard.swift in Sources */,
+				87EAF81C120D7284A1CD921C /* DestinationView.swift in Sources */,
+				5108252AC3C128E992470AB7 /* DurationPickerView.swift in Sources */,
+				7C4D1CE7A4CE2EA692045B7E /* FeedLoadingView.swift in Sources */,
+				D17937A93B6BA4B56053307C /* FeedView.swift in Sources */,
+				89E4E380A5811CFA12FE81F6 /* FlexibleDatesView.swift in Sources */,
+				7F47E1BCC57E65E648B98791 /* FlightModels.swift in Sources */,
+				2E921DC8A0FF7B00683B717F /* FlightOfferCard.swift in Sources */,
+				A9407E7A836A08CA7CDF8CBA /* FlightSearchSheet.swift in Sources */,
+				7461029286B081F2F936A868 /* HomeView.swift in Sources */,
+				887AC83C35EB54EADA45B1E5 /* LikeAnimation.swift in Sources */,
+				95DA91259C546EA700F1CBC4 /* Models.swift in Sources */,
+				F8601E7DEC183205AADB4F37 /* OnboardingView.swift in Sources */,
+				8DD8E1D4B0780E80B38F2C09 /* PriceAlertView.swift in Sources */,
+				19DDE727437E4C3942CEB006 /* SavedStore.swift in Sources */,
+				0D536C69FFEF60953E84A73B /* SavedView.swift in Sources */,
+				DCCDD02B7E56677CFD811BDE /* SpontraAPI.swift in Sources */,
+				03AAC1DCD02DE52CFA4C9C24 /* SpontraApp.swift in Sources */,
+				7948F84DE77735C02C3FDD80 /* SwipeHintOverlay.swift in Sources */,
+				ECC891ECDD5284BADECFE2B5 /* Theme.swift in Sources */,
+				467C4C2ED8CEECF6024F295F /* ThemePickerView.swift in Sources */,
+				07BED372C8C2764044C0A813 /* VideoPlayerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		06FAFBF2729EA26F0CA402D3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Spontra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.spontra.app;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		611A031C7F20B355466A69A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		71FD8787E820691B0D57C952 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Spontra/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.spontra.app;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		DA63E432ED80B42A5585C2DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		559B60BB75EF72C6B47EF754 /* Build configuration list for PBXProject "Spontra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				611A031C7F20B355466A69A0 /* Debug */,
+				DA63E432ED80B42A5585C2DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C491E56B0B3F0221F688F152 /* Build configuration list for PBXNativeTarget "Spontra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06FAFBF2729EA26F0CA402D3 /* Debug */,
+				71FD8787E820691B0D57C952 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 0ADB696B7D45F0D39D499DA0 /* Project object */;
+}

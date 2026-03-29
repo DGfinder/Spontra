@@ -1,6 +1,6 @@
 'use client'
 
-import { Inter, Mulish } from 'next/font/google'
+import { Instrument_Serif, DM_Sans } from 'next/font/google'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { UserAuthProvider } from '@/contexts/UserAuthContext'
 import { Analytics } from '@vercel/analytics/react'
@@ -9,11 +9,18 @@ import AffiliateDisclosure from '@/components/AffiliateDisclosure'
 // import { PerformanceTracker } from '@/components/PerformanceTracker' // Disabled for MVP build
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
-const mulish = Mulish({ 
+const instrumentSerif = Instrument_Serif({ 
   subsets: ['latin'],
-  weight: ['400', '700'],
-  variable: '--font-muli',
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  variable: '--font-display',
+  display: 'swap'
+})
+
+const dmSans = DM_Sans({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-sans',
   display: 'swap'
 })
 
@@ -32,7 +39,7 @@ export default function RootLayout({
         {/* TODO: update app-id once App Store listing is live */}
         <meta name="apple-itunes-app" content="app-id=PLACEHOLDER, app-argument=spontra://" />
       </head>
-      <body className={`${inter.className} ${mulish.variable} h-full`}>
+      <body className={`${dmSans.variable} ${instrumentSerif.variable} h-full`}>
         <ErrorBoundary 
           onError={(error, errorInfo) => {
             // Log errors to console in production for debugging
