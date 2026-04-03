@@ -75,6 +75,7 @@
         "seed": "tsx prisma/seed.ts"
     },
     "dependencies": {
+        "@chenglou/pretext": "^0.0.4",
         "@headlessui/react": "^1.7.17",
         "@heroicons/react": "^2.0.18",
         "@hookform/resolvers": "^3.3.2",
