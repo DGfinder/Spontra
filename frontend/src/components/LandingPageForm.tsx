@@ -158,8 +158,14 @@ export function LandingPageForm() {
       console.log(`Found ${response.recommended_destinations.length} destinations for ${data.selectedTheme} theme`)
       
       // Results are automatically set by the hook via store
-      // Navigate to results step
-      navigateToStep('results')
+      // Navigate to swipe feed
+      const feedParams = new URLSearchParams({
+        origin: data.departureAirport,
+        theme: data.selectedTheme,
+        maxFlightMinutes: String(data.flightTimeRange?.[1] ? data.flightTimeRange[1] * 60 : data.maxFlightTime ? data.maxFlightTime * 60 : 360),
+      })
+      router.push(`/feed?${feedParams.toString()}`)
+      return
     } catch (error) {
       console.error('Destination exploration failed:', error)
       
