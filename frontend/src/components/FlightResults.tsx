@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { ArrowLeft, Clock, Plane, DollarSign, Users, Star, MapPin, TrendingDown, TrendingUp, Wifi, Monitor, Utensils, Zap, Luggage } from 'lucide-react'
+import { toast } from 'sonner'
 import { ExplorationProgress } from './ExplorationProgress'
 import { ErrorState } from './ErrorState'
 import { getErrorMessage } from '@/lib/environment'
@@ -353,17 +354,26 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
     setError(null)
     let isActive = true
     setIsLoading(true)
+    toast.loading('Fetching live flight prices…', { id: 'flights' })
     fetchFlightOptions()
       .then((flightOptions) => {
         if (!isActive) return
         setFlights(flightOptions)
         setError(null)
+        toast.success(`${flightOptions.length} flight${flightOptions.length !== 1 ? 's' : ''} found`, {
+          id: 'flights',
+          description: 'Compare prices and pick your perfect flight ✈️',
+        })
       })
       .catch((err) => {
         if (!isActive) return
         const errorInfo = getErrorMessage(err, 'Flight search')
         setError({ message: errorInfo.userMessage, type: errorInfo.type })
         setFlights([])
+        toast.error('Flight search failed', {
+          id: 'flights',
+          description: errorInfo.userMessage,
+        })
       })
       .finally(() => {
         if (!isActive) return
@@ -569,8 +579,28 @@ export function FlightResults({ recommendation, originAirport, selectedActivity,
             </div>
           )}
 
+          {/* Empty state — no flights found */}
+          {!isLoading && !error && flights.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mb-5 bg-orange-500/10 border border-orange-500/20">
+                <span className="text-4xl">✈️</span>
+              </div>
+              <h3 className="text-white text-xl font-semibold mb-2">No flights found</h3>
+              <p className="text-white/40 text-sm mb-6 max-w-xs">
+                We couldn't find flights to {recommendation.destination.city_name} for your selected dates.
+                Try adjusting your dates or searching again.
+              </p>
+              <button
+                onClick={handleRetry}
+                className="bg-orange-500 hover:bg-orange-400 active:scale-95 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+              >
+                Search Again
+              </button>
+            </div>
+          )}
+
           {/* Flight Options Grid */}
-          {!isLoading && !error && (
+          {!isLoading && !error && flights.length > 0 && (
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8"
               initial={{ opacity: 0 }}

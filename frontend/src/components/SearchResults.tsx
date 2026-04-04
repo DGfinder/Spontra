@@ -132,16 +132,17 @@ export const SearchResults = React.memo<SearchResultsProps>(({
 
         {/* Error State */}
         {isError && (
-          <div className="text-center py-12">
-            <div className="text-red-400 text-lg mb-4">
-              ⚠️ Search failed
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mb-4">
+              <span className="text-2xl">⚠️</span>
             </div>
-            <div className="text-white/60 text-sm mb-4">
-              {error || 'Unable to search destinations at the moment'}
-            </div>
+            <h3 className="text-white text-lg font-semibold mb-2">Search hit some turbulence</h3>
+            <p className="text-white/50 text-sm mb-6 max-w-xs">
+              {error || 'Unable to search destinations at the moment. Check your connection and try again.'}
+            </p>
             <button
               onClick={onRetry}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors duration-200"
+              className="bg-orange-500 hover:bg-orange-400 active:scale-95 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
               aria-label="Retry search"
             >
               Try Again
@@ -151,13 +152,23 @@ export const SearchResults = React.memo<SearchResultsProps>(({
 
         {/* Empty State */}
         {!isError && !isLoading && (!results || results.length === 0) && (
-          <div className="text-center py-12">
-            <div className="text-white/60 text-lg">
-              No destinations found within {maxFlightTime} hours.
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+            <div className="w-20 h-20 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mb-5">
+              <span className="text-4xl">🌍</span>
             </div>
-            <div className="text-white/40 text-sm mt-2">
-              Try increasing your flight time range or selecting a different theme.
-            </div>
+            <h3 className="text-white text-xl font-semibold mb-2">No destinations found</h3>
+            <p className="text-white/50 text-sm mb-2 max-w-xs">
+              We couldn&apos;t find destinations within {maxFlightTime} hours for your selected theme.
+            </p>
+            <p className="text-white/30 text-xs mb-6 max-w-xs">
+              Try increasing your flight time range or picking a different travel theme.
+            </p>
+            <button
+              onClick={onBackToSearch}
+              className="bg-white/10 hover:bg-orange-500/20 border border-orange-500/30 active:scale-95 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition-all duration-150"
+            >
+              ← Adjust Search
+            </button>
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { getErrorMessage } from '@/lib/environment'
 import { SearchForm } from './SearchForm'
 import { SearchResults } from './SearchResults'
@@ -19,6 +20,7 @@ import { useDestinationExploreModern } from '@/hooks/useDestinationExploreModern
 import { useFormData, useSearchState, useNavigationState, useNavigationActions } from '@/store/searchStore'
 import { DestinationRecommendation } from '@/services/apiClient'
 import { type ThemeKey } from '@/lib/theme'
+import { OnboardingHint } from './OnboardingHint'
 
 interface FormData {
   selectedTheme: string
@@ -101,17 +103,24 @@ export function LandingPageFormModern({ initialData }: LandingPageFormModernProp
     try {
       console.log(`🚀 Modern form submission with Server Actions`)
       
+      toast.loading('Searching destinations…', { id: 'search' })
+      
       // Call the modern hook which uses Server Actions
       const result = await exploreDestinations(data)
       
       if (result?.redirectTo) {
         // Direct flight search - navigate immediately
+        toast.dismiss('search')
         router.push(result.redirectTo)
         return
       }
       
       if (result?.success) {
         console.log(`Found ${result.totalResults} destinations for ${data.selectedTheme} theme`)
+        toast.success(`Found ${result.totalResults ?? ''} destinations`.trim(), {
+          id: 'search',
+          description: `Your ${data.selectedTheme} adventure awaits ✈️`,
+        })
         // Navigation is handled by the Server Action result
         navigateToStep('results')
       }
@@ -121,6 +130,10 @@ export function LandingPageFormModern({ initialData }: LandingPageFormModernProp
       // Show honest error, no fake data
       const errorInfo = getErrorMessage(error, 'Destination search')
       console.error('Error - no fallback available:', errorInfo.userMessage)
+      toast.error('Search failed', {
+        id: 'search',
+        description: errorInfo.userMessage,
+      })
       // Error state is already handled by useOptimistic in the hook
     }
   }
@@ -256,6 +269,7 @@ export function LandingPageFormModern({ initialData }: LandingPageFormModernProp
                 />
               </Suspense>
             </SearchFormErrorBoundary>
+            <OnboardingHint />
           </div>
         </div>
         

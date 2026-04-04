@@ -3,6 +3,7 @@
 import { useEffect, useCallback, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Heart, X, ChevronUp, Bookmark, Plane, RotateCcw } from 'lucide-react'
+import { toast } from 'sonner'
 import { useFeedStore, FeedDestination } from '@/store/feedStore'
 import { SwipeCard } from './SwipeCard'
 import { getThemeColor, type ThemeKey } from '@/lib/theme'
@@ -77,6 +78,10 @@ export function SwipeFeed({ origin, theme, maxFlightMinutes = 360 }: SwipeFeedPr
     setActionFlash('save')
     setTimeout(() => setActionFlash(null), 600)
     advance()
+    toast.success(`${item.cityName} saved!`, {
+      description: 'Find it in your saved destinations ❤️',
+      duration: 2500,
+    })
   }, [saveItem, advance])
 
   const handleSkip = useCallback((iata: string) => {

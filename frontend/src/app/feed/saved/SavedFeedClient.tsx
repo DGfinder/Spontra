@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Plane, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useFeedStore } from '@/store/feedStore'
 import { getThemeColor, type ThemeKey } from '@/lib/theme'
 
@@ -20,9 +21,23 @@ export default function SavedFeedClient() {
       </div>
 
       {saved.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-4 pt-32 px-8 text-center">
-          <span className="text-5xl">🗺️</span>
-          <p className="text-white/50">Swipe right on destinations to save them here.</p>
+        <div className="flex flex-col items-center justify-center gap-5 pt-32 px-8 text-center">
+          <div className="w-24 h-24 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+            <span className="text-5xl">🗺️</span>
+          </div>
+          <div>
+            <h2 className="text-white text-xl font-black tracking-tight mb-2">No saved destinations yet</h2>
+            <p className="text-white/40 text-sm max-w-xs leading-relaxed">
+              Swipe right on destinations in the explore feed to save them here for later.
+            </p>
+          </div>
+          <button
+            onClick={() => router.push('/feed')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-black"
+            style={{ backgroundColor: '#ee6d16' }}
+          >
+            <Plane size={14} /> Start Exploring
+          </button>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 p-4">
@@ -52,7 +67,10 @@ export default function SavedFeedClient() {
                       <Plane size={11} /> Book
                     </button>
                     <button
-                      onClick={() => unsave(item.iata)}
+                      onClick={() => {
+                        unsave(item.iata)
+                        toast('Destination removed', { duration: 2000 })
+                      }}
                       className="w-8 h-8 flex items-center justify-center rounded-full bg-white/15 text-white/60 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={13} />

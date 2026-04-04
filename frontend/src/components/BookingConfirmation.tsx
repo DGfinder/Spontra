@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { ExternalLink, ArrowRight, Calendar, MapPin, Plane, Clock, CheckCircle, AlertCircle } from 'lucide-react'
+import { toast } from 'sonner'
 import { DestinationRecommendation } from '@/services/apiClient'
 
 interface FlightOption {
@@ -53,6 +54,14 @@ export function RedirectSuccess({
   onStartNewSearch
 }: RedirectSuccessProps) {
   const [showTips, setShowTips] = useState(false)
+  const providerName = getProviderInfo(redirectProvider).name
+  useEffect(() => {
+    toast.success("Ready to book!", {
+      description: `Redirecting you to ${providerName} now ✈️`,
+      duration: 3000,
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const providerInfo = getProviderInfo(redirectProvider)
 
   return (

@@ -52,7 +52,7 @@ export function DestinationCard({
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl border border-white/20 bg-white/10 p-6 text-white shadow-sm backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-orange-400/40 hover:bg-white/20 hover:shadow-xl ${getThemeBgClass(theme, true)}`}
+      className={`group relative flex flex-col rounded-xl border border-white/20 bg-white/10 p-6 text-white shadow-sm backdrop-blur transition-all duration-200 ease-out hover:-translate-y-2 hover:border-orange-400/60 hover:bg-white/20 hover:shadow-[0_12px_40px_rgba(238,109,22,0.18)] active:scale-[0.99] cursor-pointer ${getThemeBgClass(theme, true)}`}
       style={{ animationDelay: `${index * 120}ms` }}
       role="article"
       aria-label={`Destination card for ${destination.city_name}, ${destination.country_name}`}
@@ -124,7 +124,7 @@ export function DestinationCard({
         <button
           type="button"
           onClick={handleExplore}
-          className="w-full rounded-lg border border-white/20 bg-white/10 py-3 text-sm font-medium transition hover:border-white/40 hover:bg-white/20"
+          className="w-full rounded-lg border border-orange-500/30 bg-orange-500/10 py-3 text-sm font-medium transition-all duration-150 hover:bg-orange-500/20 hover:border-orange-500/50 active:scale-[0.98] group-hover:border-orange-400/50"
         >
           Explore {destination.city_name} {'->'}
         </button>
