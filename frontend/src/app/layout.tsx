@@ -1,85 +1,39 @@
-'use client'
-
+import type { Metadata } from 'next'
 import { Instrument_Serif, DM_Sans } from 'next/font/google'
-import { Toaster } from 'sonner'
-import { ErrorBoundary } from '../components/ErrorBoundary'
-import { UserAuthProvider } from '@/contexts/UserAuthContext'
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-import AffiliateDisclosure from '@/components/AffiliateDisclosure'
-// import { PerformanceTracker } from '@/components/PerformanceTracker' // Disabled for MVP build
+import { ClientProviders } from './ClientProviders'
 import './globals.css'
 
-const instrumentSerif = Instrument_Serif({ 
+const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],
   style: ['normal', 'italic'],
   variable: '--font-display',
-  display: 'swap'
+  display: 'swap',
 })
 
-const dmSans = DM_Sans({ 
+const dmSans = DM_Sans({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700'],
   variable: '--font-sans',
-  display: 'swap'
+  display: 'swap',
 })
 
-// Metadata moved to page.tsx since client components can't export metadata
-// Smart App Banner — once app is live on App Store, update the app-id below
+export const metadata: Metadata = {
+  title: 'Spontra — Explore Destinations',
+  description: 'Discover your next trip based on how you want to feel.',
+  other: {
+    // iOS Smart App Banner — update app-id once App Store listing is live
+    'apple-itunes-app': 'app-id=PLACEHOLDER, app-argument=spontra://',
+  },
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full">
-      <head>
-        {/* iOS Smart App Banner — shows "Open in Spontra" on Safari mobile */}
-        {/* TODO: update app-id once App Store listing is live */}
-        <meta name="apple-itunes-app" content="app-id=PLACEHOLDER, app-argument=spontra://" />
-      </head>
       <body className={`${dmSans.variable} ${instrumentSerif.variable} h-full`}>
-        <ErrorBoundary 
-          onError={(error, errorInfo) => {
-            // Log errors to console in production for debugging
-            console.error('React Error Boundary caught:', error, errorInfo)
-            
-            // In a real app, you might want to send this to an error reporting service
-            // like Sentry, LogRocket, or Bugsnag
-            if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-              console.log('Error in production build - this would be sent to error reporting service')
-            }
-          }}
-        >
-          <UserAuthProvider>
-            {children}
-          </UserAuthProvider>
-        </ErrorBoundary>
-        <AffiliateDisclosure 
-          showOnPages={['/', '/flights', '/search']}
-          position="bottom"
-        />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#0e1520',
-              border: '1px solid rgba(238,109,22,0.25)',
-              color: '#ffffff',
-              fontFamily: 'var(--font-sans)',
-            },
-            classNames: {
-              success: 'border-orange-500/40',
-              error: 'border-red-500/40',
-            },
-          }}
-          richColors
-        />
-        <Analytics />
-        <SpeedInsights />
-        {/* <PerformanceTracker /> Disabled for MVP build */}
+        <ClientProviders>
+          {children}
+        </ClientProviders>
       </body>
     </html>
   )
