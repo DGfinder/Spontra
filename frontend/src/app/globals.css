@@ -111,6 +111,18 @@
     background-size: 200px 200px;
   }
 
+  /* Ambient gradient pan — hero background */
+  @keyframes gradient-pan {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .hero-ambient {
+    background-size: 200% 200%;
+    animation: gradient-pan 20s ease infinite;
+  }
+
   /* Mobile-friendly background handling */
   @media (max-width: 768px) {
     .bg-fixed {
@@ -121,4 +133,13 @@
   /* Hide scrollbars where immersion matters */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Reduced motion — respect user preference */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
