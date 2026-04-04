@@ -1,20 +1,17 @@
-import { Suspense } from 'react'
-import { FeedPageClient } from './FeedPageClient'
+import dynamic from 'next/dynamic'
 
-export const metadata = {
-  title: 'Discover | Spontra',
-}
+export const metadata = { title: 'Discover | Spontra' }
+
+// Zustand + useSearchParams — must be client-only, no SSR
+const FeedPageClient = dynamic(
+  () => import('./FeedPageClient').then(m => ({ default: m.FeedPageClient })),
+  { ssr: false }
+)
 
 export default function FeedPage() {
   return (
     <div className="h-screen w-screen bg-black overflow-hidden">
-      <Suspense fallback={
-        <div className="h-full w-full flex items-center justify-center text-white/40">
-          Loading...
-        </div>
-      }>
-        <FeedPageClient />
-      </Suspense>
+      <FeedPageClient />
     </div>
   )
 }
